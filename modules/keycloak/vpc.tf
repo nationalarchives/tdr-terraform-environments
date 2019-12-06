@@ -67,7 +67,7 @@ resource "aws_nat_gateway" "gw" {
 
   tags = merge(
   var.common_tags,
-  map("Name", "nat-gateway-${count.index}-${var.environment}-${var.environment}")
+  map("Name", "nat-gateway-${count.index}-${var.app_name}-${var.environment}")
   )
 }
 
@@ -83,7 +83,7 @@ resource "aws_route_table" "private" {
 
   tags = merge(
   var.common_tags,
-  map("Name", "route-table-${count.index}-${var.environment}")
+  map("Name", "route-table-${count.index}-${var.app_name}-${var.environment}")
   )
 }
 
