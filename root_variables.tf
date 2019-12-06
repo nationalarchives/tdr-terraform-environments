@@ -8,3 +8,13 @@ variable "workspace_to_environment_map" {
     prod = "prod"
   }
 }
+
+variable "workspace_aws_profile_map" {
+  type = map(string)
+
+  default = {
+    ci   = "intgterraform"
+    test = "stagingterraform"
+    prod = "prodterraform"
+  }
+}
