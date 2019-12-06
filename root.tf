@@ -16,7 +16,7 @@ terraform {
     key = "tdr-terraform.state"
     region = "eu-west-2"
     encrypt = true
-    dynamodb_table = "tdr-terraform-statelock"
+    dynamodb_table = "tdr-terraform-state-lock"
   }
 }
 
@@ -24,12 +24,13 @@ provider "aws" {
   region = local.aws_region
 }
 
-module "database" {
-  source = "./modules/database"
+module "keycloak" {
+  app_name = "keycloak"
+  source = "./modules/keycloak"
   environment = local.environment
   common_tags = local.common_tags
   database_availability_zones = local.availability_zones
-  security_group_ids = []
-  subnet_group_name =  "subnet"
+  az_count = 2
+  region = "eu-west-2"
 }
 
