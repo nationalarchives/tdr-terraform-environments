@@ -3,9 +3,9 @@ variable "workspace_to_environment_map" {
 
   //Maps the Terraform workspace to the AWS environment.
   default = {
-    ci   = "ci"
-    test = "test"
-    prod = "prod"
+    intg    = "intg"
+    staging = "staging"
+    prod    = "prod"
   }
 }
 
@@ -13,8 +13,8 @@ variable "workspace_aws_profile_map" {
   type = map(string)
 
   default = {
-    ci   = "intgterraform"
-    test = "stagingterraform"
-    prod = "prodterraform"
+    intg    = "intgterraform"
+    staging = "stagingterraform"
+    prod    = "prodterraform"
   }
 }

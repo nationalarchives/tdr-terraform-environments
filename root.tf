@@ -1,7 +1,7 @@
 locals {
   #Ensure that developers' workspaces always default to 'ci'
-  environment         = lookup(var.workspace_to_environment_map, terraform.workspace, "ci")
-  environment_profile = lookup(var.workspace_aws_profile_map, terraform.workspace, "ci")
+  environment         = lookup(var.workspace_to_environment_map, terraform.workspace, "intg")
+  environment_profile = lookup(var.workspace_aws_profile_map, terraform.workspace, "intg")
 
   common_tags = map(
     "Environment", local.environment,
