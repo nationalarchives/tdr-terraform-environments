@@ -1,5 +1,5 @@
 resource "aws_ssm_parameter" "database_url" {
-  name  = "url"
+  name  = "/${var.environment}/keycloak/database/url"
   type  = "String"
   value = "jdbc:postgresql://${aws_rds_cluster.keycloak_database.endpoint}:${aws_rds_cluster.keycloak_database.port}/${aws_rds_cluster.keycloak_database.database_name}"
 }
