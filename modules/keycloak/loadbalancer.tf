@@ -32,12 +32,17 @@ resource "aws_alb_target_group" "keycloak_target" {
   )
 }
 
+data "aws_acm_certificate" "national_archives" {
+  domain   = "*.nationalarchives.gov.uk"
+  statuses = ["ISSUED"]
+}
+
 resource "aws_alb_listener" "keycloak_tls" {
   load_balancer_arn = aws_alb.main.id
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "arn:aws:acm:eu-west-2:328920706552:certificate/74afe7f4-1506-4147-a601-60053fcef5dc"
+  certificate_arn   = data.aws_acm_certificate.national_archives.arn
 
   default_action {
     target_group_arn = aws_alb_target_group.keycloak_target.arn
