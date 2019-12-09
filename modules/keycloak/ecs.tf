@@ -2,11 +2,11 @@ locals {
   app_port = 8080
 }
 resource "aws_ecs_cluster" "keycloak_ecs" {
-  name = "keycloak-ecs-${var.environment}"
+  name = "keycloak_${var.environment}"
 
   tags = merge(
   var.common_tags,
-  map("Name", "keycloak-ecs-${var.environment}")
+  map("Name", "keycloak_${var.environment}")
   )
 }
 
@@ -41,7 +41,7 @@ resource "aws_ecs_task_definition" "keycloak_task" {
 }
 
 resource "aws_ecs_service" "keycloak_service" {
-  name                              = "${var.app_name}-service-${var.environment}"
+  name                              = "${var.app_name}_service_${var.environment}"
   cluster                           = aws_ecs_cluster.keycloak_ecs.id
   task_definition                   = aws_ecs_task_definition.keycloak_task.arn
   desired_count                     = 1
