@@ -4,7 +4,7 @@ This respository contains the Terraform code to create the AWS resources needed 
 
 ## Terraform Structure
 
-The prototype is divided into separate Terraform modules that represent the different AWS resources that are needed to for the TDR project.
+The prototype is divided into separate Terraform modules that represent the different AWS resources that are needed for the TDR project.
 
 The different modules are used by Terraform workspaces which represent three AWS environments:
 
@@ -18,7 +18,9 @@ The different modules are used by Terraform workspaces which represent three AWS
 
 Ensure that the Terraform backend has been created.
 
-See here: https://github.com/nationalarchives/tdr-dev-documentation/blob/tkAWSInfrastructureSetup/tdr-create-aws-instructure-setup.md
+See here: https://github.com/nationalarchives/tdr-dev-documentation/tree/master/manual/tdr-create-aws-instructure-setup.md
+
+This project creates an s3 Terraform backend that stores the Terraform state for the different TDR environments.
 
 ### Install Terraform locally
 
@@ -34,7 +36,7 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
 
 ### Add AWS Credentials and Profiles
 
-1. Update local AWS credentials file (~/.aws/credentials) with Terraform user credentials for the TDR AWS management account:
+1. Update local AWS credentials file (~/.aws/credentials) with a user's credentials for the TDR AWS management account:
 
    ```
    ... other credentials ...
@@ -43,6 +45,11 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
    aws_access_key_id = ... terraform user access key ...
    aws_secret_access_key = ... terraform user secret access key ...
    ```
+    
+    The user will need to be added to the relevant group to have permission to create resources in the AWS environments accounts:
+    
+    * tdr-terraform-developers: access to the TDR Integration environment
+    * tdr-terraform-administrators: access to all TDR environments   
    
 2. Update local AWS configuration file (~/.aws/config) with the profiles for running Terraform in the different TDR environments:
 
@@ -64,7 +71,6 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
    role_arn = ... terraform role arn for prod environment ...
    source_profile = terraform   
    ```
-   Depending the Terraform workspace selected Terraform will use the relevant profile to update the TDR environment that corresponds to the Terraform workspace.   
    
 ## Running Terraform Project
 
