@@ -56,8 +56,8 @@ resource "aws_security_group" "database" {
 
   ingress {
     protocol        = "tcp"
-    from_port       = local.app_port
-    to_port         = local.app_port
+    from_port       = 3306
+    to_port         = 3306
     security_groups = [aws_security_group.ecs_tasks.id]
   }
 
