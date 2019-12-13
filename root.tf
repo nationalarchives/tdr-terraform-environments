@@ -1,5 +1,6 @@
 locals {
-  #Ensure that developers' workspaces always default to 'ci'
+  #Ensure that developers' workspaces always default to 'intg'
+
   environment         = lookup(var.workspace_to_environment_map, terraform.workspace, "intg")
   environment_profile = lookup(var.workspace_aws_profile_map, terraform.workspace, "intg")
 
@@ -34,6 +35,5 @@ module "frontend" {
   az_count = 2
   region = "eu-west-2"
 }
-
 
 
