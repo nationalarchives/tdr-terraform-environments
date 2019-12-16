@@ -24,3 +24,13 @@ provider "aws" {
   region  = "eu-west-2"
   profile = local.environment_profile
 }
+
+module "keycloak" {
+  app_name = "keycloak"
+  source = "./modules/keycloak"
+  environment = local.environment
+  common_tags = local.common_tags
+  database_availability_zones = ["eu-west-2a", "eu-west-2b"]
+  az_count = 2
+  region = "eu-west-2"
+}
