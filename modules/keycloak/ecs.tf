@@ -61,7 +61,6 @@ resource "aws_ecs_service" "keycloak_service" {
   }
 }
 
-
 resource "aws_iam_role" "keycloak_ecs_execution" {
   name = "keycloak_ecs_execution_role_${var.environment}"
   assume_role_policy = data.aws_iam_policy_document.ecs_assume_role.json
