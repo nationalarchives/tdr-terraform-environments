@@ -3,7 +3,7 @@ resource "random_password" "play_secret" {
 }
 
 resource "aws_ssm_parameter" "play_secret" {
-  name = "/${var.environment}/frontend/play_secret"
-  type = "String"
+  name  = "/${var.environment}/frontend/play_secret"
+  type  = "String"
   value = random_password.play_secret.result
 }
