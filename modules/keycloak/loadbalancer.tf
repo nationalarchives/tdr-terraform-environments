@@ -8,7 +8,6 @@ resource "aws_alb" "main" {
   )
 }
 
-
 resource "aws_alb_target_group" "keycloak_target" {
   name        = "keycloak-target-group-${var.environment}"
   port        = 8080

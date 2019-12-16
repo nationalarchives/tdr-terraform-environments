@@ -34,6 +34,3 @@ module "keycloak" {
   az_count = 2
   region = "eu-west-2"
 }
-
-
-
