@@ -1,5 +1,5 @@
 resource "random_password" "password" {
-  length = 16
+  length  = 16
   special = false
 }
 
@@ -8,17 +8,17 @@ resource "aws_db_subnet_group" "user_subnet_group" {
   subnet_ids = aws_subnet.private.*.id
 
   tags = merge(
-  var.common_tags,
-  map(
-  "Name", "user-db-subnet-group-${var.environment}"
-  )
+    var.common_tags,
+    map(
+      "Name", "user-db-subnet-group-${var.environment}"
+    )
   )
 }
 
 resource "aws_rds_cluster" "keycloak_database" {
   cluster_identifier_prefix = "keycloak-db-${var.environment}"
   engine                    = "aurora"
-  engine_mode		        = "serverless"
+  engine_mode               = "serverless"
   engine_version            = "5.6.10a"
   availability_zones        = var.database_availability_zones
   database_name             = "keycloakdb"
@@ -29,10 +29,10 @@ resource "aws_rds_cluster" "keycloak_database" {
   db_subnet_group_name      = aws_db_subnet_group.user_subnet_group.name
 
   tags = merge(
-  var.common_tags,
-  map(
-  "Name", "content-db-cluster-${var.environment}"
-  )
+    var.common_tags,
+    map(
+      "Name", "content-db-cluster-${var.environment}"
+    )
   )
 
   lifecycle {

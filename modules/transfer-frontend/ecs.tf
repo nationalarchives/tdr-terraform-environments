@@ -1,38 +1,35 @@
 locals {
-  app_port = 8080
+  app_port = 9000
 }
-resource "aws_ecs_cluster" "keycloak_ecs" {
-  name = "keycloak_${var.environment}"
+resource "aws_ecs_cluster" "frontend_ecs" {
+  name = "frontend_${var.environment}"
 
   tags = merge(
     var.common_tags,
-    map("Name", "keycloak_${var.environment}")
+    map("Name", "frontend_${var.environment}")
   )
 }
 
 data "template_file" "app" {
-  template = file("modules/keycloak/templates/keycloak.json.tpl")
+  template = file("modules/transfer-frontend/templates/frontend.json.tpl")
 
   vars = {
-    app_image       = "nationalarchives/keycloak:${var.environment}"
+    app_image       = "nationalarchives/tdr-transfer-frontend:${var.environment}"
     app_port        = local.app_port
     app_environment = var.environment
     aws_region      = var.region
-    url_path        = aws_ssm_parameter.database_url.name
-    username_path   = aws_ssm_parameter.database_username.name
-    password_path   = aws_ssm_parameter.database_password.name
   }
 }
 
-resource "aws_ecs_task_definition" "keycloak_task" {
+resource "aws_ecs_task_definition" "frontend_task" {
   family                   = "${var.app_name}-${var.environment}"
-  execution_role_arn       = aws_iam_role.keycloak_ecs_execution.arn
+  execution_role_arn       = aws_iam_role.frontend_ecs_execution.arn
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = 512
   memory                   = 1024
   container_definitions    = data.template_file.app.rendered
-  task_role_arn            = aws_iam_role.keycloak_ecs_task.arn
+  task_role_arn            = aws_iam_role.frontend_ecs_task.arn
 
   tags = merge(
     var.common_tags,
@@ -40,10 +37,10 @@ resource "aws_ecs_task_definition" "keycloak_task" {
   )
 }
 
-resource "aws_ecs_service" "keycloak_service" {
+resource "aws_ecs_service" "frontend_service" {
   name                              = "${var.app_name}_service_${var.environment}"
-  cluster                           = aws_ecs_cluster.keycloak_ecs.id
-  task_definition                   = aws_ecs_task_definition.keycloak_task.arn
+  cluster                           = aws_ecs_cluster.frontend_ecs.id
+  task_definition                   = aws_ecs_task_definition.frontend_task.arn
   desired_count                     = 1
   launch_type                       = "FARGATE"
   health_check_grace_period_seconds = "360"
@@ -55,14 +52,15 @@ resource "aws_ecs_service" "keycloak_service" {
   }
 
   load_balancer {
-    target_group_arn = aws_alb_target_group.keycloak_target.arn
+    target_group_arn = aws_alb_target_group.frontend_target.arn
     container_name   = var.app_name
-    container_port   = 8080
+    container_port   = 9000
   }
 }
 
-resource "aws_iam_role" "keycloak_ecs_execution" {
-  name               = "keycloak_ecs_execution_role_${var.environment}"
+
+resource "aws_iam_role" "frontend_ecs_execution" {
+  name               = "frontend_ecs_execution_role_${var.environment}"
   assume_role_policy = data.aws_iam_policy_document.ecs_assume_role.json
 
   tags = merge(
@@ -73,8 +71,8 @@ resource "aws_iam_role" "keycloak_ecs_execution" {
   )
 }
 
-resource "aws_iam_role" "keycloak_ecs_task" {
-  name               = "keycloak_ecs_task_role_${var.environment}"
+resource "aws_iam_role" "frontend_ecs_task" {
+  name               = "frontend_ecs_task_role_${var.environment}"
   assume_role_policy = data.aws_iam_policy_document.ecs_assume_role.json
 
   tags = merge(
@@ -99,28 +97,28 @@ data "aws_iam_policy_document" "ecs_assume_role" {
   }
 }
 
-resource "aws_iam_role_policy_attachment" "keycloak_ecs_execution_ssm" {
-  role       = aws_iam_role.keycloak_ecs_execution.name
+resource "aws_iam_role_policy_attachment" "frontend_ecs_execution_ssm" {
+  role       = aws_iam_role.frontend_ecs_execution.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
 }
 
-resource "aws_iam_role_policy_attachment" "keycloak_ecs_execution" {
-  role       = aws_iam_role.keycloak_ecs_execution.name
-  policy_arn = aws_iam_policy.keycloak_ecs_execution.arn
+resource "aws_iam_role_policy_attachment" "frontend_ecs_execution" {
+  role       = aws_iam_role.frontend_ecs_execution.name
+  policy_arn = aws_iam_policy.frontend_ecs_execution.arn
 }
 
-resource "aws_iam_policy" "keycloak_ecs_execution" {
-  name   = "keycloak_ecs_execution_policy_${var.environment}"
+resource "aws_iam_policy" "frontend_ecs_execution" {
+  name   = "frontend_ecs_execution_policy_${var.environment}"
   path   = "/"
-  policy = data.aws_iam_policy_document.keycloak_ecs_execution.json
+  policy = data.aws_iam_policy_document.frontend_ecs_execution.json
 }
 
-data "aws_iam_policy_document" "keycloak_ecs_execution" {
+data "aws_iam_policy_document" "frontend_ecs_execution" {
   statement {
     actions = [
       "logs:CreateLogStream",
       "logs:PutLogEvents"
     ]
-    resources = [aws_cloudwatch_log_group.keycloak_log_group.arn]
+    resources = [aws_cloudwatch_log_group.frontend_log_group.arn]
   }
 }
