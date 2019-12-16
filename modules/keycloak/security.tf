@@ -1,6 +1,6 @@
 resource "aws_security_group" "lb" {
   name        = "${var.app_name}-load-balancer-security-group"
-  description = "Controls access to the frontend load balancer"
+  description = "Controls access to the keycloak load balancer"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -26,7 +26,7 @@ resource "aws_security_group" "lb" {
 # Traffic to the ECS cluster should only come from the application load balancer
 resource "aws_security_group" "ecs_tasks" {
   name        = "${var.app_name}-ecs-tasks-security-group-${var.environment}"
-  description = "Allow inbound access from the frontend load balancer only"
+  description = "Allow inbound access from the keycloak load balancer only"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -51,7 +51,7 @@ resource "aws_security_group" "ecs_tasks" {
 
 resource "aws_security_group" "database" {
   name        = "${var.app_name}-database-security-group-${var.environment}"
-  description = "Allow inbound access from the frontend load balancer only"
+  description = "Allow inbound access from the keycloak load balancer only"
   vpc_id      = aws_vpc.main.id
 
   ingress {

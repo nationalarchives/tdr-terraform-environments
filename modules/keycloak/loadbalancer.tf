@@ -1,5 +1,5 @@
 resource "aws_alb" "main" {
-  name            = "tdr-frontend-load-balancer-${var.environment}"
+  name            = "tdr-keycloak-load-balancer-${var.environment}"
   subnets         = aws_subnet.public.*.id
   security_groups = [aws_security_group.lb.id]
   tags = merge(
@@ -8,15 +8,9 @@ resource "aws_alb" "main" {
   )
 }
 
-resource "random_string" "target_group_prefix" {
-  length  = 4
-  upper   = false
-  special = false
-}
-
-resource "aws_alb_target_group" "frontend_target" {
-  name        = "frontend-target-group-${random_string.target_group_prefix.result}-${var.environment}"
-  port        = 9000
+resource "aws_alb_target_group" "keycloak_target" {
+  name        = "keycloak-target-group-${var.environment}"
+  port        = 8080
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
   target_type = "ip"
@@ -42,7 +36,7 @@ data "aws_acm_certificate" "national_archives" {
   statuses = ["ISSUED"]
 }
 
-resource "aws_alb_listener" "frontend_tls" {
+resource "aws_alb_listener" "keycloak_tls" {
   load_balancer_arn = aws_alb.main.id
   port              = "443"
   protocol          = "HTTPS"
@@ -50,7 +44,7 @@ resource "aws_alb_listener" "frontend_tls" {
   certificate_arn   = data.aws_acm_certificate.national_archives.arn
 
   default_action {
-    target_group_arn = aws_alb_target_group.frontend_target.arn
+    target_group_arn = aws_alb_target_group.keycloak_target.arn
     type             = "forward"
   }
 

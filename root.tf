@@ -26,14 +26,23 @@ provider "aws" {
   profile = local.environment_profile
 }
 
+
 module "frontend" {
-  app_name = "frontend"
-  source = "./modules/transfer-frontend"
-  environment = local.environment
-  common_tags = local.common_tags
+  app_name                    = "frontend"
+  source                      = "./modules/transfer-frontend"
+  environment                 = local.environment
+  common_tags                 = local.common_tags
   database_availability_zones = ["eu-west-2a", "eu-west-2b"]
-  az_count = 2
-  region = "eu-west-2"
+  az_count                    = 2
+  region                      = "eu-west-2"
 }
 
-
+module "keycloak" {
+  app_name                    = "keycloak"
+  source                      = "./modules/keycloak"
+  environment                 = local.environment
+  common_tags                 = local.common_tags
+  database_availability_zones = ["eu-west-2a", "eu-west-2b"]
+  az_count                    = 2
+  region                      = "eu-west-2"
+}
