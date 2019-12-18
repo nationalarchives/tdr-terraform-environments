@@ -9,6 +9,12 @@
         "name": "PLAY_SECRET_KEY"
       }
     ],
+    "environment": [
+      {
+        "name" : "ENVIRONMENT",
+        "value" : "${app_environment}"
+      }
+    ],
     "networkMode": "awsvpc",
     "logConfiguration": {
       "logDriver": "awslogs",
