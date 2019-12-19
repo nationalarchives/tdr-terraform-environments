@@ -109,7 +109,7 @@ def getAccountNumberFromBranch() {
     ]
 
     if (branchToAccountMap.get(env.GIT_BRANCH)) {
-        stage = branchToAccountMap.get(env.GIT_BRANCH)
+        accountNumber = branchToAccountMap.get(env.GIT_BRANCH)
     }
 
     return accountNumber
