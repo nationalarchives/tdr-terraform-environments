@@ -1,6 +1,6 @@
 # TDR Terraform Environments
 
-This respository contains the Terraform code to create the AWS resources needed to support the TDR application.
+This respository contains the Terraform code to create the AWS resources needed to support the TDR application
 
 ## Terraform Structure
 
