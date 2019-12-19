@@ -29,14 +29,6 @@
       {
         "name" : "DB_VENDOR",
         "value" : "mysql"
-      },
-      {
-        "name" : "KEYCLOAK_LOGLEVEL",
-        "value" : "TRACE"
-      },
-      {
-        "name" : "TEST",
-        "value" : "${url_path}"
       }
     ],
     "networkMode": "awsvpc",
