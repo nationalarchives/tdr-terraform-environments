@@ -13,7 +13,7 @@ pipeline {
             steps {
                 echo 'Configuring AWS credentials...'
                 sh 'java -version'
-                sh "aws configure set role_arn arn:aws:iam::${env.account_number}:role/${env.stage}-terraform-role --profile ${env.stage}terraform"
+                sh "aws configure set role_arn arn:aws:iam::${env.account_number}:role/TDRTerraformRole${env.stage.capitalize()} --profile ${env.stage}terraform"
                 sh "aws configure set region eu-west-2 --profile ${env.stage}terraform"
                 sh "aws configure set source_profile default --profile ${env.stage}terraform"
                 withCredentials([[
@@ -109,7 +109,7 @@ def getAccountNumberFromBranch() {
     ]
 
     if (branchToAccountMap.get(env.GIT_BRANCH)) {
-        stage = branchToStageMap.get(env.GIT_BRANCH)
+        stage = branchToAccountMap.get(env.GIT_BRANCH)
     }
 
     return accountNumber
