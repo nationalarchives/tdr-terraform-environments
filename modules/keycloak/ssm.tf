@@ -22,13 +22,13 @@ resource "aws_ssm_parameter" "database_password" {
 }
 
 resource "aws_ssm_parameter" "keycloak_admin_password" {
-  name = "/${var.environment}/keycloak/admin/password"
-  type = "SecureString"
+  name  = "/${var.environment}/keycloak/admin/password"
+  type  = "SecureString"
   value = random_password.password.result
 }
 
 resource "aws_ssm_parameter" "keycloak_admin_user" {
-  name = "/${var.environment}/keycloak/admin/user"
-  type = "SecureString"
+  name  = "/${var.environment}/keycloak/admin/user"
+  type  = "SecureString"
   value = "tdr-keycloak-admin-${var.environment}"
 }
