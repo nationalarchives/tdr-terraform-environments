@@ -6,15 +6,29 @@
     "secrets": [
       {
         "valueFrom": "${url_path}",
-        "name": "DB_URL"
+        "name": "DB_ADDR"
       },
       {
         "valueFrom": "${username_path}",
-        "name": "DB_USERNAME"
+        "name": "DB_USER"
       },
       {
         "valueFrom": "${password_path}",
         "name": "DB_PASSWORD"
+      },
+      {
+        "valueFrom": "${admin_user_path}",
+        "name": "KEYCLOAK_USER"
+      },
+      {
+        "valueFrom": "${admin_password_path}",
+        "name": "KEYCLOAK_PASSWORD"
+      }
+    ],
+    "environment": [
+      {
+        "name" : "DB_VENDOR",
+        "value" : "mysql"
       }
     ],
     "networkMode": "awsvpc",
