@@ -3,6 +3,7 @@ locals {
 
   environment         = lookup(var.workspace_to_environment_map, terraform.workspace, "intg")
   environment_profile = lookup(var.workspace_aws_profile_map, terraform.workspace, "intg")
+  assume_role         = "arn:aws:iam::${var.account_number}:role/TDRTerraformRole${title(local.environment)}"
 
   common_tags = map(
     "Environment", local.environment,
@@ -24,7 +25,7 @@ terraform {
 provider "aws" {
   region  = "eu-west-2"
   assume_role {
-    role_arn = "arn:aws:iam::229554778675:role/TDRTerraformRoleIntg"
+    role_arn = local.assume_role
     session_name = "terraform"
   }
 }
