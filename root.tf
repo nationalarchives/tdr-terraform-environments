@@ -23,7 +23,6 @@ terraform {
 
 provider "aws" {
   region  = "eu-west-2"
-  profile = local.environment_profile
 }
 
 
