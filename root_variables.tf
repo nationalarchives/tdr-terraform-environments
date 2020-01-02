@@ -18,3 +18,7 @@ variable "workspace_aws_profile_map" {
     prod    = "prodterraform"
   }
 }
+
+variable "account_number" {
+  type = string
+}
