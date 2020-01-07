@@ -1,20 +1,10 @@
-variable "workspace_to_environment_map" {
-  type = map(string)
-
-  //Maps the Terraform workspace to the AWS environment.
-  default = {
-    intg    = "intg"
-    staging = "staging"
-    prod    = "prod"
-  }
+variable "tdr_account_number" {
+  description = "The AWS account number where the TDR environment is hosted"
+  type        = string
 }
 
-variable "workspace_aws_profile_map" {
-  type = map(string)
-
-  default = {
-    intg    = "intgterraform"
-    staging = "stagingterraform"
-    prod    = "prodterraform"
-  }
+variable "tdr_environment" {
+  description = "The TDR environment"
+  type        = string
+  default     = "intg"
 }
