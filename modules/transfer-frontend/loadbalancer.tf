@@ -15,7 +15,7 @@ resource "random_string" "target_group_prefix" {
 }
 
 resource "aws_alb_target_group" "frontend_target" {
-  name        = "frontend-target-group-${random_string.target_group_prefix.result}-${var.environment}"
+  name        = "frontend-tg-${random_string.target_group_prefix.result}-${var.environment}"
   port        = 9000
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id

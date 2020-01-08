@@ -15,7 +15,7 @@ resource "random_string" "alb_prefix" {
 }
 
 resource "aws_alb_target_group" "keycloak_target" {
-  name        = "keycloak-target-group-${random_string.alb_prefix.result}-${var.environment}"
+  name        = "keycloak-tg-${random_string.alb_prefix.result}-${var.environment}"
   port        = 8080
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
