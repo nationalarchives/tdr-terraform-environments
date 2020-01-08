@@ -3,7 +3,6 @@ pipeline {
         label "master"
     }
     environment {
-        mgmtAccount = sh(returnStdout: true, script: 'echo $MANAGEMENT_ACCOUNT').trim()
         stage = getStageFromBranch()
     }
     stages {
@@ -11,7 +10,7 @@ pipeline {
             agent {
                 ecs {
                     inheritFrom 'terraform'
-                    taskrole "arn:aws:iam::${env.mgmtAccount}:role/TDRTerraformAssumeRole${env.stage.capitalize()}"
+                    taskrole "arn:aws:iam::${env.MANAGEMENT_ACCOUNT}:role/TDRTerraformAssumeRole${env.stage.capitalize()}"
                 }
             }
             environment {
