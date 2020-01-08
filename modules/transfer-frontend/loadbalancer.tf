@@ -1,5 +1,5 @@
 resource "aws_alb" "main" {
-  name            = "tdr-frontend-load-balancer-${var.environment}"
+  name            = "tdr-frontend-lb-${var.environment}"
   subnets         = aws_subnet.public.*.id
   security_groups = [aws_security_group.lb.id]
   tags = merge(
@@ -15,7 +15,7 @@ resource "random_string" "target_group_prefix" {
 }
 
 resource "aws_alb_target_group" "frontend_target" {
-  name        = "frontend-target-group-${random_string.target_group_prefix.result}-${var.environment}"
+  name        = "frontend-tg-${random_string.target_group_prefix.result}-${var.environment}"
   port        = 9000
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
