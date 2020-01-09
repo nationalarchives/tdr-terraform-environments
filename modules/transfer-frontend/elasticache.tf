@@ -1,9 +1,20 @@
-resource "aws_elasticache_cluster" "example" {
-  cluster_id           = "frontend-cache-${var.environment}"
+resource "aws_elasticache_replication_group" "redis_replication_group" {
+  replication_group_description = "The replication group for redis for the front end"
+  replication_group_id = "frontend-redis-${var.environment}"
+  number_cache_clusters = 1
+  at_rest_encryption_enabled = true
+  transit_encryption_enabled = true
+  auth_token = random_password.redis_password.result
   engine               = "redis"
   node_type            = "cache.t2.micro"
-  num_cache_nodes      = 1
   parameter_group_name = "default.redis5.0"
   engine_version       = "5.0.5"
   port                 = 6379
+  security_group_ids   = aws_security_group.redis.*.id
+  subnet_group_name    =  aws_elasticache_subnet_group.redis_subnet_group.name
+}
+
+resource "aws_elasticache_subnet_group" "redis_subnet_group" {
+  name = "frontend-subnet-group-${var.environment}"
+  subnet_ids = aws_subnet.private.*.id
 }
