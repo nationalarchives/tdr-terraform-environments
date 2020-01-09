@@ -6,5 +6,5 @@ resource "aws_elasticache_cluster" "example" {
   parameter_group_name = "default.redis5.0"
   engine_version       = "5.0.5"
   port                 = 6379
-  security_group_ids = aws_security_group.redis.*.id
+  security_group_ids   = aws_security_group.redis.*.id
 }
