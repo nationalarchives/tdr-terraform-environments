@@ -9,12 +9,12 @@
         "name": "PLAY_SECRET_KEY"
       },
       {
-        "valueFrom" : "/${app_environment}/frontend/redis/password",
-        "name": "REDIS_PASSWORD"
-      },
-      {
         "valueFrom": "/${app_environment}/frontend/redis/host",
         "name": "REDIS_HOST"
+      },
+      {
+        "valueFrom": "/${app_environment}/auth/secret",
+        "name": "AUTH_SECRET"
       }
     ],
     "environment": [

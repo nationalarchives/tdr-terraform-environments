@@ -3,8 +3,6 @@ resource "aws_elasticache_replication_group" "redis_replication_group" {
   replication_group_id = "frontend-redis-${var.environment}"
   number_cache_clusters = 1
   at_rest_encryption_enabled = true
-  transit_encryption_enabled = true
-  auth_token = random_password.redis_password.result
   engine               = "redis"
   node_type            = "cache.t2.micro"
   parameter_group_name = "default.redis5.0"
