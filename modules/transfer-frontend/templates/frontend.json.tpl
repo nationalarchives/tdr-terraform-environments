@@ -7,6 +7,14 @@
       {
         "valueFrom": "/${app_environment}/frontend/play_secret",
         "name": "PLAY_SECRET_KEY"
+      },
+      {
+        "valueFrom": "/${app_environment}/frontend/redis/host",
+        "name": "REDIS_HOST"
+      },
+      {
+        "valueFrom": "/${app_environment}/auth/secret",
+        "name": "AUTH_SECRET"
       }
     ],
     "environment": [

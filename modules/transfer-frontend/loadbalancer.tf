@@ -53,5 +53,17 @@ resource "aws_alb_listener" "frontend_tls" {
     target_group_arn = aws_alb_target_group.frontend_target.arn
     type             = "forward"
   }
+}
 
+resource "aws_alb_listener" "frontend_http" {
+  load_balancer_arn = aws_alb.main.id
+  port              = 80
+  default_action {
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
 }

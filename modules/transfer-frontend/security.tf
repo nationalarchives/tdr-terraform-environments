@@ -10,6 +10,13 @@ resource "aws_security_group" "lb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    protocol    = "tcp"
+    from_port   = 80
+    to_port     = 80
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     protocol    = "-1"
     from_port   = 0
@@ -50,7 +57,7 @@ resource "aws_security_group" "ecs_tasks" {
 }
 
 resource "aws_security_group" "redis" {
-  name        = "${var.app_name}-database-security-group-${var.environment}"
+  name        = "${var.app_name}-redis-sg-${var.environment}"
   description = "Allow inbound access from the frontend load balancer only"
   vpc_id      = aws_vpc.main.id
 
