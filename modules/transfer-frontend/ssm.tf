@@ -9,7 +9,7 @@ resource "aws_ssm_parameter" "play_secret" {
 }
 
 resource "aws_ssm_parameter" "redis_host" {
-  name = "/${var.environment}/frontend/redis/host"
-  type = "SecureString"
+  name  = "/${var.environment}/frontend/redis/host"
+  type  = "SecureString"
   value = aws_elasticache_replication_group.redis_replication_group.primary_endpoint_address
 }
