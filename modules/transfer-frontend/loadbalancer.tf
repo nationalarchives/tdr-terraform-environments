@@ -57,7 +57,7 @@ resource "aws_alb_listener" "frontend_tls" {
 
 resource "aws_alb_listener" "frontend_http" {
   load_balancer_arn = aws_alb.main.id
-  port = 80
+  port              = 80
   default_action {
     type = "redirect"
     redirect {
