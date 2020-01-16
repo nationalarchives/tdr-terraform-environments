@@ -14,5 +14,5 @@ resource "aws_elasticache_replication_group" "redis_replication_group" {
 
 resource "aws_elasticache_subnet_group" "redis_subnet_group" {
   name       = "frontend-subnet-group-${var.environment}"
-  subnet_ids = aws_subnet.private.*.id
+  subnet_ids = var.private_subnets
 }
