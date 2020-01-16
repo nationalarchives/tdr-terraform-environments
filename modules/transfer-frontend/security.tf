@@ -1,7 +1,7 @@
 resource "aws_security_group" "lb" {
   name        = "${var.app_name}-load-balancer-security-group"
   description = "Controls access to the frontend load balancer"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      =  var.vpc_id
 
   ingress {
     protocol    = "tcp"
@@ -34,7 +34,7 @@ resource "aws_security_group" "lb" {
 resource "aws_security_group" "ecs_tasks" {
   name        = "${var.app_name}-ecs-tasks-security-group-${var.environment}"
   description = "Allow inbound access from the frontend load balancer only"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = var.vpc_id
 
   ingress {
     protocol        = "tcp"
@@ -59,7 +59,7 @@ resource "aws_security_group" "ecs_tasks" {
 resource "aws_security_group" "redis" {
   name        = "${var.app_name}-redis-sg-${var.environment}"
   description = "Allow inbound access from the frontend load balancer only"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = var.vpc_id
 
   ingress {
     protocol        = "tcp"
