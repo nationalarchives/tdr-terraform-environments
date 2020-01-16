@@ -7,6 +7,7 @@ locals {
     "Owner", "TDR",
     "Terraform", true
   )
+  database_availability_zones = ["eu-west-2a", "eu-west-2b"]
 }
 
 terraform {
@@ -27,14 +28,36 @@ provider "aws" {
   }
 }
 
+
+module "shared_vpc" {
+  source = "./modules/shared-vpc"
+  az_count = 2
+  common_tags = local.common_tags
+  environment = local.environment
+  database_availability_zones = local.database_availability_zones
+}
+
+module "consignment_api" {
+  source = "./modules/consignment-api"
+  app_name = "consignmentapi"
+  common_tags = local.common_tags
+  database_availability_zones = local.database_availability_zones
+  environment = local.environment
+  private_subnets = module.shared_vpc.private_subnets
+  public_subnets = module.shared_vpc.public_subnets
+  vpc_id = module.shared_vpc.vpc_id
+  region = "eu-west-2"
+}
+
 module "frontend" {
   app_name                    = "frontend"
   source                      = "./modules/transfer-frontend"
   environment                 = local.environment
   common_tags                 = local.common_tags
-  database_availability_zones = ["eu-west-2a", "eu-west-2b"]
-  az_count                    = 2
   region                      = "eu-west-2"
+  vpc_id = module.shared_vpc.vpc_id
+  public_subnets = module.shared_vpc.public_subnets
+  private_subnets = module.shared_vpc.private_subnets
 }
 
 module "keycloak" {
@@ -42,7 +65,7 @@ module "keycloak" {
   source                      = "./modules/keycloak"
   environment                 = local.environment
   common_tags                 = local.common_tags
-  database_availability_zones = ["eu-west-2a", "eu-west-2b"]
+  database_availability_zones = local.database_availability_zones
   az_count                    = 2
   region                      = "eu-west-2"
 }
