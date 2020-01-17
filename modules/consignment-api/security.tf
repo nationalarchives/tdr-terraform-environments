@@ -7,7 +7,7 @@ resource "aws_security_group" "database" {
     protocol        = "tcp"
     from_port       = 3306
     to_port         = 3306
-    security_groups = [aws_security_group.ecs_tasks.id]
+    security_groups = [aws_security_group.ecs_tasks.id, var.db_migration_sg]
   }
 
   egress {

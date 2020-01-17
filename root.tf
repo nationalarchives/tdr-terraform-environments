@@ -37,6 +37,17 @@ module "shared_vpc" {
   database_availability_zones = local.database_availability_zones
 }
 
+module "database_migrations" {
+  source = "./modules/database-migrations"
+  environment = local.environment
+  vpc_id = module.shared_vpc.vpc_id
+  private_subnets = module.shared_vpc.private_subnets
+  common_tags = local.common_tags
+  db_url = module.consignment_api.database_url
+  db_user = module.consignment_api.database_username
+  db_password = module.consignment_api.database_password
+}
+
 module "consignment_api" {
   source = "./modules/consignment-api"
   app_name = "consignmentapi"
@@ -47,6 +58,7 @@ module "consignment_api" {
   public_subnets = module.shared_vpc.public_subnets
   vpc_id = module.shared_vpc.vpc_id
   region = "eu-west-2"
+  db_migration_sg = module.database_migrations.db_migration_security_group
 }
 
 module "frontend" {
