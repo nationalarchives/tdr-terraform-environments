@@ -58,6 +58,8 @@ resource "aws_lambda_function" "database_migration_function" {
   role = aws_iam_role.lambda_assume_role.arn
   runtime = "java8"
   filename = "${path.module}/temp.zip"
+  memory_size = 128
+  timeout = 60
   vpc_config {
     security_group_ids = [aws_security_group.db_migration.id]
     subnet_ids = var.private_subnets
@@ -67,6 +69,7 @@ resource "aws_lambda_function" "database_migration_function" {
       DB_URL = "jdbc:mysql://${var.db_url}"
       DB_USER = var.db_user
       DB_PASSWORD = var.db_password
+      STAGE = var.environment
     }
   }
 }
