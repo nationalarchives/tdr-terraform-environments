@@ -3,8 +3,8 @@ resource "aws_alb" "main" {
   subnets         = var.public_subnets
   security_groups = [aws_security_group.lb.id]
   tags = merge(
-  var.common_tags,
-  map("Name", "${var.app_name}-loadbalancer")
+    var.common_tags,
+    map("Name", "${var.app_name}-loadbalancer")
   )
 }
 
@@ -32,8 +32,8 @@ resource "aws_alb_target_group" "consignment_api_target" {
   }
 
   tags = merge(
-  var.common_tags,
-  map("Name", "${var.app_name}-target-group")
+    var.common_tags,
+    map("Name", "${var.app_name}-target-group")
   )
 }
 
