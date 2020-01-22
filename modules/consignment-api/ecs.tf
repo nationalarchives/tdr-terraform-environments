@@ -14,7 +14,7 @@ data "template_file" "app" {
   template = file("modules/consignment-api/templates/consignment-api.json.tpl")
 
   vars = {
-    app_image       = "nationalarchives/sangria:${var.environment}"
+    app_image       = "nationalarchives/consignment-api:${var.environment}"
     app_port        = local.app_port
     app_environment = var.environment
     aws_region      = var.region
