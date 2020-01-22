@@ -5,8 +5,8 @@ resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
 
   tags = merge(
-  var.common_tags,
-  map("Name", "tdr-vpc-${var.environment}")
+    var.common_tags,
+    map("Name", "tdr-vpc-${var.environment}")
   )
 }
 
@@ -18,8 +18,8 @@ resource "aws_subnet" "private" {
   vpc_id            = aws_vpc.main.id
 
   tags = merge(
-  var.common_tags,
-  map("Name", "tdr-private-subnet-${count.index}-${var.environment}")
+    var.common_tags,
+    map("Name", "tdr-private-subnet-${count.index}-${var.environment}")
   )
 }
 
@@ -34,8 +34,8 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = merge(
-  var.common_tags,
-  map("Name", "tdr-public-subnet-${count.index}-${var.environment}")
+    var.common_tags,
+    map("Name", "tdr-public-subnet-${count.index}-${var.environment}")
   )
 }
 
@@ -58,7 +58,7 @@ resource "aws_eip" "gw" {
   depends_on = [aws_internet_gateway.gw]
 
   tags = merge(
-  var.common_tags
+    var.common_tags
   )
 }
 
@@ -68,8 +68,8 @@ resource "aws_nat_gateway" "gw" {
   allocation_id = aws_eip.gw.*.id[count.index]
 
   tags = merge(
-  var.common_tags,
-  map("Name", "nat-gateway-${count.index}-tdr-${var.environment}")
+    var.common_tags,
+    map("Name", "nat-gateway-${count.index}-tdr-${var.environment}")
   )
 }
 
@@ -84,8 +84,8 @@ resource "aws_route_table" "private" {
   }
 
   tags = merge(
-  var.common_tags,
-  map("Name", "route-table-${count.index}-tdr-${var.environment}")
+    var.common_tags,
+    map("Name", "route-table-${count.index}-tdr-${var.environment}")
   )
 }
 

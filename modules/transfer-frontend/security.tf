@@ -1,7 +1,7 @@
 resource "aws_security_group" "lb" {
   name        = "${var.app_name}-load-balancer-security-group"
   description = "Controls access to the frontend load balancer"
-  vpc_id      =  var.vpc_id
+  vpc_id      = var.vpc_id
 
   ingress {
     protocol    = "tcp"

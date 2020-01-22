@@ -8,10 +8,10 @@ resource "aws_db_subnet_group" "consignment_api_subnet_group" {
   subnet_ids = var.private_subnets
 
   tags = merge(
-  var.common_tags,
-  map(
-  "Name", "user-db-subnet-group-${var.environment}"
-  )
+    var.common_tags,
+    map(
+      "Name", "user-db-subnet-group-${var.environment}"
+    )
   )
 }
 
@@ -33,10 +33,10 @@ resource "aws_rds_cluster" "consignment_api_database" {
   vpc_security_group_ids    = aws_security_group.database.*.id
   db_subnet_group_name      = aws_db_subnet_group.consignment_api_subnet_group.name
   tags = merge(
-  var.common_tags,
-  map(
-  "Name", "content-db-cluster-${var.environment}"
-  )
+    var.common_tags,
+    map(
+      "Name", "content-db-cluster-${var.environment}"
+    )
   )
 
   lifecycle {

@@ -5,8 +5,8 @@ resource "aws_ecs_cluster" "consignment_api_ecs" {
   name = "${var.app_name}_${var.environment}"
 
   tags = merge(
-  var.common_tags,
-  map("Name", "consignment_api_${var.environment}")
+    var.common_tags,
+    map("Name", "consignment_api_${var.environment}")
   )
 }
 
@@ -15,12 +15,12 @@ data "template_file" "app" {
 
   vars = {
     app_image       = "nationalarchives/sangria:${var.environment}"
-    app_port            = local.app_port
-    app_environment     = var.environment
-    aws_region          = var.region
-    url_path            = aws_ssm_parameter.database_url.name
-    username_path       = aws_ssm_parameter.database_username.name
-    password_path       = aws_ssm_parameter.database_password.name
+    app_port        = local.app_port
+    app_environment = var.environment
+    aws_region      = var.region
+    url_path        = aws_ssm_parameter.database_url.name
+    username_path   = aws_ssm_parameter.database_username.name
+    password_path   = aws_ssm_parameter.database_password.name
   }
 }
 
@@ -35,8 +35,8 @@ resource "aws_ecs_task_definition" "consignment_api_task" {
   task_role_arn            = aws_iam_role.consignment_api_ecs_task.arn
 
   tags = merge(
-  var.common_tags,
-  map("Name", "${var.app_name}-task-definition")
+    var.common_tags,
+    map("Name", "${var.app_name}-task-definition")
   )
 }
 
@@ -67,10 +67,10 @@ resource "aws_iam_role" "consignment_api_ecs_execution" {
   assume_role_policy = data.aws_iam_policy_document.ecs_assume_role.json
 
   tags = merge(
-  var.common_tags,
-  map(
-  "Name", "api-ecs-execution-iam-role-${var.environment}",
-  )
+    var.common_tags,
+    map(
+      "Name", "api-ecs-execution-iam-role-${var.environment}",
+    )
   )
 }
 
@@ -79,10 +79,10 @@ resource "aws_iam_role" "consignment_api_ecs_task" {
   assume_role_policy = data.aws_iam_policy_document.ecs_assume_role.json
 
   tags = merge(
-  var.common_tags,
-  map(
-  "Name", "api-ecs-task-iam-role-${var.environment}",
-  )
+    var.common_tags,
+    map(
+      "Name", "api-ecs-task-iam-role-${var.environment}",
+    )
   )
 }
 
