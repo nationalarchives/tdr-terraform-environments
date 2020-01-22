@@ -7,5 +7,6 @@ output "database_username" {
 }
 
 output "database_password" {
-  value = aws_rds_cluster.consignment_api_database.master_password
+  value     = aws_rds_cluster.consignment_api_database.master_password
+  sensitive = true
 }

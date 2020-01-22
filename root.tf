@@ -8,6 +8,7 @@ locals {
     "Terraform", true
   )
   database_availability_zones = ["eu-west-2a", "eu-west-2b"]
+  region                      = "eu-west-2"
 }
 
 terraform {
@@ -57,7 +58,7 @@ module "consignment_api" {
   private_subnets             = module.shared_vpc.private_subnets
   public_subnets              = module.shared_vpc.public_subnets
   vpc_id                      = module.shared_vpc.vpc_id
-  region                      = "eu-west-2"
+  region                      = local.region
   db_migration_sg             = module.database_migrations.db_migration_security_group
 }
 
@@ -66,7 +67,7 @@ module "frontend" {
   source          = "./modules/transfer-frontend"
   environment     = local.environment
   common_tags     = local.common_tags
-  region          = "eu-west-2"
+  region          = local.region
   vpc_id          = module.shared_vpc.vpc_id
   public_subnets  = module.shared_vpc.public_subnets
   private_subnets = module.shared_vpc.private_subnets
@@ -79,5 +80,5 @@ module "keycloak" {
   common_tags                 = local.common_tags
   database_availability_zones = local.database_availability_zones
   az_count                    = 2
-  region                      = "eu-west-2"
+  region                      = local.region
 }
