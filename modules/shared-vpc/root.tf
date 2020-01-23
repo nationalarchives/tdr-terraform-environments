@@ -6,7 +6,7 @@ resource "aws_vpc" "main" {
 
   tags = merge(
     var.common_tags,
-    map("Name", "${var.app_name}-vpc-${var.environment}")
+    map("Name", "tdr-vpc-${var.environment}")
   )
 }
 
@@ -19,7 +19,7 @@ resource "aws_subnet" "private" {
 
   tags = merge(
     var.common_tags,
-    map("Name", "${var.app_name}-private-subnet-${count.index}-${var.environment}")
+    map("Name", "tdr-private-subnet-${count.index}-${var.environment}")
   )
 }
 
@@ -35,7 +35,7 @@ resource "aws_subnet" "public" {
 
   tags = merge(
     var.common_tags,
-    map("Name", "${var.app_name}-public-subnet-${count.index}-${var.environment}")
+    map("Name", "tdr-public-subnet-${count.index}-${var.environment}")
   )
 }
 
@@ -69,7 +69,7 @@ resource "aws_nat_gateway" "gw" {
 
   tags = merge(
     var.common_tags,
-    map("Name", "nat-gateway-${count.index}-${var.app_name}-${var.environment}")
+    map("Name", "nat-gateway-${count.index}-tdr-${var.environment}")
   )
 }
 
@@ -85,7 +85,7 @@ resource "aws_route_table" "private" {
 
   tags = merge(
     var.common_tags,
-    map("Name", "route-table-${count.index}-${var.app_name}-${var.environment}")
+    map("Name", "route-table-${count.index}-tdr-${var.environment}")
   )
 }
 

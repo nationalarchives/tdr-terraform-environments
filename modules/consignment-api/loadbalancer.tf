@@ -1,5 +1,5 @@
 resource "aws_alb" "main" {
-  name            = "tdr-frontend-lb-${var.environment}"
+  name            = "tdr-${var.app_name}-lb-${var.environment}"
   subnets         = var.public_subnets
   security_groups = [aws_security_group.lb.id]
   tags = merge(
@@ -8,15 +8,15 @@ resource "aws_alb" "main" {
   )
 }
 
-resource "random_string" "target_group_prefix" {
+resource "random_string" "alb_prefix" {
   length  = 4
   upper   = false
   special = false
 }
 
-resource "aws_alb_target_group" "frontend_target" {
-  name        = "frontend-tg-${random_string.target_group_prefix.result}-${var.environment}"
-  port        = 9000
+resource "aws_alb_target_group" "consignment_api_target" {
+  name        = "${var.app_name}-tg-${random_string.alb_prefix.result}-${var.environment}"
+  port        = 8080
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
   target_type = "ip"
@@ -42,7 +42,7 @@ data "aws_acm_certificate" "national_archives" {
   statuses = ["ISSUED"]
 }
 
-resource "aws_alb_listener" "frontend_tls" {
+resource "aws_alb_listener" "consignment_api_tls" {
   load_balancer_arn = aws_alb.main.id
   port              = "443"
   protocol          = "HTTPS"
@@ -50,20 +50,8 @@ resource "aws_alb_listener" "frontend_tls" {
   certificate_arn   = data.aws_acm_certificate.national_archives.arn
 
   default_action {
-    target_group_arn = aws_alb_target_group.frontend_target.arn
+    target_group_arn = aws_alb_target_group.consignment_api_target.arn
     type             = "forward"
   }
-}
 
-resource "aws_alb_listener" "frontend_http" {
-  load_balancer_arn = aws_alb.main.id
-  port              = 80
-  default_action {
-    type = "redirect"
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
-  }
 }
