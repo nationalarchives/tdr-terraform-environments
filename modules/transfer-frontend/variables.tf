@@ -1,6 +1,7 @@
-variable "database_availability_zones" {}
 variable "environment" {}
 variable "common_tags" {}
 variable "app_name" {}
-variable "az_count" {}
 variable "region" {}
+variable "vpc_id" {}
+variable "public_subnets" {}
+variable "private_subnets" {}
