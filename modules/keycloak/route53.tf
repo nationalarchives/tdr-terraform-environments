@@ -3,12 +3,12 @@ data "aws_route53_zone" "keycloak_dns_zone" {
 }
 
 resource "aws_route53_record" "keycloak_dns" {
-  name = "auth"
-  type = "A"
+  name    = "auth"
+  type    = "A"
   zone_id = data.aws_route53_zone.keycloak_dns_zone.zone_id
   alias {
     evaluate_target_health = false
-    name = aws_alb.main.dns_name
-    zone_id = aws_alb.main.zone_id
+    name                   = aws_alb.main.dns_name
+    zone_id                = aws_alb.main.zone_id
   }
 }
