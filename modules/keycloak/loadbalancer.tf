@@ -38,7 +38,7 @@ resource "aws_alb_target_group" "keycloak_target" {
 }
 
 data "aws_acm_certificate" "national_archives" {
-  domain   = "auth.tdr-${var.environment_full}.nationalarchives.gov.uk"
+  domain   = "auth.tdr-${var.environment_full_name}.nationalarchives.gov.uk"
   statuses = ["ISSUED"]
 }
 
