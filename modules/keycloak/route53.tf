@@ -1,5 +1,11 @@
 data "aws_route53_zone" "keycloak_dns_zone" {
   name = "tdr-${var.environment_full_name}.nationalarchives.gov.uk"
+  tags = merge(
+  var.common_tags,
+  map(
+  "Name", "keycloak-dns-zone-${var.environment}"
+  )
+  )
 }
 
 resource "aws_route53_record" "keycloak_dns" {
