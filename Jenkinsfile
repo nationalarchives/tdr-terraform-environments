@@ -77,31 +77,22 @@ pipeline {
 
 def getStageFromBranch() {
 
-    def stage = "intg"
-
     def branchToStageMap = [
+            "origin/intg": "intg",
             "origin/staging": "staging",
             "origin/prod": "prod"
     ]
 
-    if (branchToStageMap.get(env.GIT_BRANCH)) {
-        stage = branchToStageMap.get(env.GIT_BRANCH)
-    }
-
-    return stage
+    return branchToStageMap.get(env.GIT_BRANCH)
 }
 
 def getAccountNumberFromBranch() {
-    def accountNumber = env.INTG_ACCOUNT
 
     def branchToAccountMap = [
+            "origin/intg": env.INTG_ACCOUNT,
             "origin/staging": env.STAGING_ACCOUNT,
             "origin/prod": env.PROD_ACCOUNT
     ]
 
-    if (branchToAccountMap.get(env.GIT_BRANCH)) {
-        accountNumber = branchToAccountMap.get(env.GIT_BRANCH)
-    }
-
-    return accountNumber
+    return branchToAccountMap.get(env.GIT_BRANCH)
 }

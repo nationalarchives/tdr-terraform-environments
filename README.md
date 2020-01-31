@@ -109,13 +109,13 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
     * TF_VAR_tdr_environment=*[name of the TDR environment to update]* 
     
    
-6. Initialize Terraform (if not done so previously):
+7. Initialize Terraform (if not done so previously):
 
    ```
    [location of project] $ terraform init   
    ```
    
-7. Run Terraform to make changes to the TDR environment AWS resources
+8. Run Terraform to make changes to the TDR environment AWS resources
 
    ```
    [location of project] $ terraform apply
