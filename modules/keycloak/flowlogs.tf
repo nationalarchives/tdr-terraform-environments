@@ -6,12 +6,12 @@ resource "aws_flow_log" "keycloak_flowlog" {
 }
 
 resource "aws_cloudwatch_log_group" "keycloak_flowlog_log_group" {
-  name = "/flowlogs/keycloak-keycloak-vpc-${var.environment}"
+  name = "/flowlogs/keycloak-vpc-${var.environment}"
   tags = merge(
-  var.common_tags,
-  map(
-  "Name", "flowlogs/keycloak-keycloak-vpc-${var.environment}",
-  )
+    var.common_tags,
+    map(
+      "Name", "flowlogs/keycloak-vpc-${var.environment}",
+    )
   )
 }
 
@@ -19,10 +19,10 @@ resource "aws_iam_role" "keycloak_flowlog_role" {
   name               = "keycloak_flowlog_role_${var.environment}"
   assume_role_policy = data.aws_iam_policy_document.keycloak_flowlog_assume_role_policy.json
   tags = merge(
-  var.common_tags,
-  map(
-  "Name", "keycloak-flowlog-role-${var.environment}",
-  )
+    var.common_tags,
+    map(
+      "Name", "keycloak-flowlog-role-${var.environment}",
+    )
   )
 }
 
@@ -39,7 +39,7 @@ data "aws_iam_policy_document" "keycloak_flowlog_assume_role_policy" {
 }
 
 resource "aws_iam_policy" "keycloak_flowlog_policy" {
-  name   = "keycloakkeycloakFlowlogPolicy${title(var.environment)}"
+  name   = "TDRKeycloakFlowlogPolicy${title(var.environment)}"
   path   = "/"
   policy = data.aws_iam_policy_document.keycloak_flowlog_policy.json
 }
