@@ -38,7 +38,7 @@ resource "aws_alb_target_group" "consignment_api_target" {
 }
 
 data "aws_acm_certificate" "national_archives" {
-  domain   = "*.nationalarchives.gov.uk"
+  domain   = "api.tdr-${var.environment_full}.nationalarchives.gov.uk"
   statuses = ["ISSUED"]
 }
 
