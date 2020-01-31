@@ -38,7 +38,7 @@ resource "aws_alb_target_group" "frontend_target" {
 }
 
 data "aws_acm_certificate" "national_archives" {
-  domain   = "*.nationalarchives.gov.uk"
+  domain   = "tdr-${var.environment_full_name}.nationalarchives.gov.uk"
   statuses = ["ISSUED"]
 }
 

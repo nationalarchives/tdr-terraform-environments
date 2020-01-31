@@ -4,3 +4,4 @@ variable "common_tags" {}
 variable "app_name" {}
 variable "az_count" {}
 variable "region" {}
+variable "environment_full_name" {}
