@@ -1,5 +1,5 @@
 data "aws_route53_zone" "frontend_dns_zone" {
-  name = "tdr-${var.environment_full}.nationalarchives.gov.uk"
+  name = "tdr-${var.environment_full_name}.nationalarchives.gov.uk"
 }
 
 resource "aws_route53_record" "frontend_dns" {
