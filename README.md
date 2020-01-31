@@ -72,7 +72,9 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
    source_profile = terraform   
    ```
    
-## Running Terraform Project
+## Running Terraform Project Locally
+
+**NOTE: Running Terraform locally should only be used to check the TErraform plan. Updating the TDr environments should only ever be done through Jenkins**
 
 1. Clone TDR Environments project to local machine: https://github.com/nationalarchives/tdr-terraform-environments
 
@@ -100,6 +102,12 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
    ```
    
    There is an issue with Terraform not using the correct profile when more than one profile in the AWs config file
+   
+6. Set the following Terraform environment variables on the local environment:
+
+    * TF_VAR_tdr_account_number=*[account number of the environment to update]*
+    * TF_VAR_tdr_environment=*[name of the TDR environment to update]* 
+    
    
 6. Initialize Terraform (if not done so previously):
 
