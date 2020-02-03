@@ -55,7 +55,7 @@ data "aws_iam_policy_document" "tdr_flowlog_policy" {
     ]
 
     resources = [
-      "*",
+      "arn:aws:logs:*:*:log-group:/flowlogs/tdr-vpc-*"
     ]
   }
 }

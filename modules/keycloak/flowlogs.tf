@@ -55,7 +55,7 @@ data "aws_iam_policy_document" "keycloak_flowlog_policy" {
     ]
 
     resources = [
-      "*",
+      "arn:aws:logs:*:*:log-group:/flowlogs/keycloak-vpc-*"
     ]
   }
 }
