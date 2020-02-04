@@ -77,7 +77,7 @@ pipeline {
 def getStageFromBranch() {
 
     def branchToStageMap = [
-            "origin/intg": "intg",
+            "origin/master": "intg",
             "origin/staging": "staging",
             "origin/prod": "prod"
     ]
