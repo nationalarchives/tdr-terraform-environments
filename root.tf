@@ -1,5 +1,5 @@
 locals {
-  environment = var.tdr_environment
+  environment = terraform.workspace
   assume_role = "arn:aws:iam::${var.tdr_account_number}:role/TDRTerraformRole${title(local.environment)}"
 
   common_tags = map(
