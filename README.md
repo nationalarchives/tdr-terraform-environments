@@ -1,6 +1,6 @@
 # TDR Terraform Environments
 
-This respository contains the Terraform code to create the AWS resources needed to support the TDR application
+This repository contains the Terraform code to create the AWS resources needed to support the TDR application
 
 ## Terraform Structure
 
@@ -45,34 +45,10 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
    aws_access_key_id = ... terraform user access key ...
    aws_secret_access_key = ... terraform user secret access key ...
    ```
-    
-    The user will need to be added to the relevant group to have permission to create resources in the AWS environments accounts:
-    
-    * tdr-terraform-developers: access to the TDR Integration environment
-    * tdr-terraform-administrators: access to all TDR environments   
    
-2. Update local AWS configuration file (~/.aws/config) with the profiles for running Terraform in the different TDR environments:
+## Running Terraform Project Locally
 
-   ```
-   ... other profiles ....
-   
-   [profile intgterraform]
-   region = eu-west-2
-   role_arn = ... terraform role arn for intg environment ...
-   source_profile = terraform
-   
-   [profile stagingterraform]
-   region = eu-west-2
-   role_arn = ... terraform role arn for staging environment ...
-   source_profile = terraform
-   
-   [profile prodterraform]
-   region = eu-west-2
-   role_arn = ... terraform role arn for prod environment ...
-   source_profile = terraform   
-   ```
-   
-## Running Terraform Project
+**NOTE: Running Terraform locally should only be used to check the Terraform plan. Updating the TDR environments should only ever be done through Jenkins**
 
 1. Clone TDR Environments project to local machine: https://github.com/nationalarchives/tdr-terraform-environments
 
@@ -98,19 +74,22 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
    ```
    [location of project] $ export AWS_PROFILE=terraform
    ```
-   
-   There is an issue with Terraform not using the correct profile when more than one profile in the AWs config file
-   
-6. Initialize Terraform (if not done so previously):
+      
+6. Set the following Terraform environment variables on the local environment:
+
+    * TF_VAR_tdr_account_number=*[account number of the environment to update]*
+    * TF_VAR_tdr_environment=*[name of the TDR environment to update]*
+     
+7. Initialize Terraform (if not done so previously):
 
    ```
    [location of project] $ terraform init   
    ```
    
-7. Run Terraform to make changes to the TDR environment AWS resources
+8. Run Terraform to make changes to the TDR environment AWS resources
 
    ```
-   [location of project] $ terraform apply
+   [location of project] $ terraform plan
    ```
 ## Further Information
 
