@@ -9,10 +9,15 @@ locals {
   common_tags = map(
     "Environment", local.environment,
     "Owner", "TDR",
-    "Terraform", true
+    "Terraform", true,
+    "CostCentre", data.aws_ssm_parameter.cost_centre.value,
   )
   database_availability_zones = ["eu-west-2a", "eu-west-2b"]
   region                      = "eu-west-2"
+}
+
+data "aws_ssm_parameter" "cost_centre" {
+  name = "/mgmt/cost_centre"
 }
 
 terraform {
