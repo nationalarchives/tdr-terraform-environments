@@ -15,7 +15,6 @@ pipeline {
             }
             environment {
                 TF_VAR_tdr_account_number = getAccountNumberFromBranch()
-                TF_VAR_tdr_environment = "${env.stage}"
                 //no-color option set for Terraform commands as Jenkins console unable to output the colour
                 //making output difficult to read
                 TF_CLI_ARGS="-no-color"
@@ -77,31 +76,22 @@ pipeline {
 
 def getStageFromBranch() {
 
-    def stage = "intg"
-
     def branchToStageMap = [
+            "origin/intg": "intg",
             "origin/staging": "staging",
             "origin/prod": "prod"
     ]
 
-    if (branchToStageMap.get(env.GIT_BRANCH)) {
-        stage = branchToStageMap.get(env.GIT_BRANCH)
-    }
-
-    return stage
+    return branchToStageMap.get(env.GIT_BRANCH)
 }
 
 def getAccountNumberFromBranch() {
-    def accountNumber = env.INTG_ACCOUNT
 
     def branchToAccountMap = [
+            "origin/intg": env.INTG_ACCOUNT,
             "origin/staging": env.STAGING_ACCOUNT,
             "origin/prod": env.PROD_ACCOUNT
     ]
 
-    if (branchToAccountMap.get(env.GIT_BRANCH)) {
-        accountNumber = branchToAccountMap.get(env.GIT_BRANCH)
-    }
-
-    return accountNumber
+    return branchToAccountMap.get(env.GIT_BRANCH)
 }
