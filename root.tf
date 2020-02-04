@@ -59,7 +59,7 @@ module "consignment_api" {
   common_tags                 = local.common_tags
   database_availability_zones = local.database_availability_zones
   environment                 = local.environment
-  environment_full_name       = local.environment_full_name_map[var.tdr_environment]
+  environment_full_name       = local.environment_full_name_map[local.environment]
   private_subnets             = module.shared_vpc.private_subnets
   public_subnets              = module.shared_vpc.public_subnets
   vpc_id                      = module.shared_vpc.vpc_id
@@ -71,7 +71,7 @@ module "frontend" {
   app_name              = "frontend"
   source                = "./modules/transfer-frontend"
   environment           = local.environment
-  environment_full_name = local.environment_full_name_map[var.tdr_environment]
+  environment_full_name = local.environment_full_name_map[local.environment]
   common_tags           = local.common_tags
   region                = local.region
   vpc_id                = module.shared_vpc.vpc_id
@@ -83,7 +83,7 @@ module "keycloak" {
   app_name                    = "keycloak"
   source                      = "./modules/keycloak"
   environment                 = local.environment
-  environment_full_name       = local.environment_full_name_map[var.tdr_environment]
+  environment_full_name       = local.environment_full_name_map[local.environment]
   common_tags                 = local.common_tags
   database_availability_zones = local.database_availability_zones
   az_count                    = 2
