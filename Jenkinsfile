@@ -36,7 +36,7 @@ pipeline {
                         sh 'terraform plan'
                         slackSend(
                                 color: 'good',
-                                message: "Terraform plan complete for ${env.stage} TDR environment. View here for plan: https://d1is5dxb7gt8v.cloudfront.net/job/${JOB_NAME}/${BUILD_NUMBER}/console",
+                                message: "Terraform plan complete for ${env.stage} TDR environment. View here for plan: https://jenkins.tdr-management.nationalarchives.gov.uk/job/${JOB_NAME}/${BUILD_NUMBER}/console",
                                 channel: '#tdr'
                         )
                     }
@@ -46,7 +46,7 @@ pipeline {
                         echo 'Sending request for approval of Terraform plan...'
                         slackSend(
                                 color: 'good',
-                                message: "Do you approve Terraform deployment for ${env.stage} TDR environment? https://d1is5dxb7gt8v.cloudfront.net/job/${JOB_NAME}/${BUILD_NUMBER}/input/",
+                                message: "Do you approve Terraform deployment for ${env.stage} TDR environment? https://jenkins.tdr-management.nationalarchives.gov.uk/job/${JOB_NAME}/${BUILD_NUMBER}/input/",
                                 channel: '#tdr')
                         input "Do you approve deployment to ${env.stage}?"
                     }
@@ -88,7 +88,7 @@ def getStageFromBranch() {
 def getAccountNumberFromBranch() {
 
     def branchToAccountMap = [
-            "origin/intg": env.INTG_ACCOUNT,
+            "origin/master": env.INTG_ACCOUNT,
             "origin/staging": env.STAGING_ACCOUNT,
             "origin/prod": env.PROD_ACCOUNT
     ]
