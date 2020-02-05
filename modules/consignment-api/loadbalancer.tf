@@ -27,7 +27,7 @@ resource "aws_alb_target_group" "consignment_api_target" {
     protocol            = "HTTP"
     matcher             = "200,303"
     timeout             = "3"
-    path                = "/"
+    path                = "/healthcheck"
     unhealthy_threshold = "2"
   }
 
