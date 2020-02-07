@@ -8,3 +8,4 @@ variable "database_availability_zones" {}
 variable "region" {}
 variable "db_migration_sg" {}
 variable "environment_full_name" {}
+variable "auth_url" {}
