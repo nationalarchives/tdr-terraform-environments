@@ -21,6 +21,7 @@ data "template_file" "app" {
     url_path        = aws_ssm_parameter.database_url.name
     username_path   = aws_ssm_parameter.database_username.name
     password_path   = aws_ssm_parameter.database_password.name
+    auth_url        = var.auth_url
   }
 }
 
