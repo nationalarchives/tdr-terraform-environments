@@ -3,6 +3,12 @@
     "name": "consignmentapi",
     "image": "${app_image}",
     "cpu": 0,
+    "environment": [
+      {
+        "name" : "AUTH_URL",
+        "value" : "${auth_url}"
+      }
+    ],
     "secrets": [
       {
         "valueFrom": "${url_path}",

@@ -70,6 +70,7 @@ module "consignment_api" {
   vpc_id                      = module.shared_vpc.vpc_id
   region                      = local.region
   db_migration_sg             = module.database_migrations.db_migration_security_group
+  auth_url                    = module.keycloak.auth_url
 }
 
 module "frontend" {
