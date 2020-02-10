@@ -38,13 +38,18 @@ provider "aws" {
   }
 }
 
-
 module "shared_vpc" {
   source                      = "./modules/shared-vpc"
   az_count                    = 2
   common_tags                 = local.common_tags
   environment                 = local.environment
   database_availability_zones = local.database_availability_zones
+}
+
+module "shared_resources" {
+  source      = "./modules/shared-resources"
+  common_tags = local.common_tags
+  environment = local.environment
 }
 
 module "database_migrations" {
@@ -71,6 +76,7 @@ module "consignment_api" {
   region                      = local.region
   db_migration_sg             = module.database_migrations.db_migration_security_group
   auth_url                    = module.keycloak.auth_url
+  kms_key_id                  = module.shared_resources.kms_key_arn
 }
 
 module "frontend" {
