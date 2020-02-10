@@ -9,3 +9,4 @@ variable "region" {}
 variable "db_migration_sg" {}
 variable "environment_full_name" {}
 variable "auth_url" {}
+variable "kms_key_id" {}
