@@ -37,7 +37,7 @@ pipeline {
                         slackSend(
                                 color: 'good',
                                 message: "Terraform plan complete for ${params.STAGE} TDR environment. View here for plan: https://jenkins.tdr-management.nationalarchives.gov.uk/job/${JOB_NAME}/${BUILD_NUMBER}/console",
-                                channel: '#tdr'
+                                channel: '#tdr-releases'
                         )
                     }
                 }
@@ -47,7 +47,7 @@ pipeline {
                         slackSend(
                                 color: 'good',
                                 message: "Do you approve Terraform deployment for ${params.STAGE} TDR environment? https://jenkins.tdr-management.nationalarchives.gov.uk/job/${JOB_NAME}/${BUILD_NUMBER}/input/",
-                                channel: '#tdr')
+                                channel: '#tdr-releases')
                         input "Do you approve deployment to ${params.STAGE}?"
                     }
                 }
@@ -59,7 +59,7 @@ pipeline {
                         slackSend(
                                 color: 'good',
                                 message: "Deployment complete for ${params.STAGE} TDR environment",
-                                channel: '#tdr'
+                                channel: '#tdr-releases'
                         )
                     }
                 }
