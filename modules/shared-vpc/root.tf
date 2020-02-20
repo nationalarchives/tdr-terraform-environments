@@ -10,6 +10,11 @@ resource "aws_vpc" "main" {
   )
 }
 
+# Bring default security group under Terraform management and remove all rules
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.main.id
+}
+
 # Create var.az_count private subnets, each in a different AZ
 resource "aws_subnet" "private" {
   count             = var.az_count
