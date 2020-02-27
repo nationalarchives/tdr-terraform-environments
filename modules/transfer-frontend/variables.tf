@@ -1,8 +1,23 @@
-variable "environment" {}
-variable "common_tags" {}
+variable "alb_dns_name" {}
+
+variable "alb_target_group_arn" {}
+
+variable "alb_zone_id" {}
+
 variable "app_name" {}
-variable "region" {}
-variable "vpc_id" {}
-variable "public_subnets" {}
-variable "private_subnets" {}
+
+variable "common_tags" {}
+
+variable "dns_zone_id" {}
+
+variable "environment" {}
+
 variable "environment_full_name" {}
+
+variable "private_subnets" {}
+
+variable "public_subnets" {}
+
+variable "region" {}
+
+variable "vpc_id" {}

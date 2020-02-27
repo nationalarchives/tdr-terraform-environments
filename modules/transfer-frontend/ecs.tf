@@ -52,7 +52,7 @@ resource "aws_ecs_service" "frontend_service" {
   }
 
   load_balancer {
-    target_group_arn = aws_alb_target_group.frontend_target.arn
+    target_group_arn = var.alb_target_group_arn
     container_name   = var.app_name
     container_port   = 9000
   }
