@@ -54,7 +54,12 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
 
 2. In command terminal navigate to the folder where the project has been cloned to
 
-3. Create Terraform workspaces corresponding to the TDR environments:
+3. Clone Terraform modules repository
+   ```
+   [location of project] $ git clone git@github.com:nationalarchives/tdr-terraform-environments.git
+   ```
+
+4. Create Terraform workspaces corresponding to the TDR environments:
 
    ```
    [location of project] $ terraform workspace new intg
@@ -63,30 +68,30 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
    
    [location of project] $ terraform workspace new prod
    ```
-4. Switch to the Terraform workspace corresponding to the TDR environment to be worked on:
+5. Switch to the Terraform workspace corresponding to the TDR environment to be worked on:
 
    ```
    [location of project] $ terraform workspace select intg
    ```
    
-5. Run the following command to ensure Terraform uses the correct credentials:
+6. Run the following command to ensure Terraform uses the correct credentials:
 
    ```
    [location of project] $ export AWS_PROFILE=terraform
    ```
       
-6. Set the following Terraform environment variables on the local environment:
+7. Set the following Terraform environment variables on the local environment:
 
     * TF_VAR_tdr_account_number=*[account number of the environment to update]*
     * TF_VAR_tdr_environment=*[name of the TDR environment to update]*
      
-7. Initialize Terraform (if not done so previously):
+8. Initialize Terraform (if not done so previously):
 
    ```
    [location of project] $ terraform init   
    ```
    
-8. Run Terraform to make changes to the TDR environment AWS resources
+9. Run Terraform to make changes to the TDR environment AWS resources
 
    ```
    [location of project] $ terraform plan
