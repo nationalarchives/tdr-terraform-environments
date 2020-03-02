@@ -56,10 +56,12 @@ resource "aws_ecs_service" "consignment_api_service" {
   }
 
   load_balancer {
-    target_group_arn = aws_alb_target_group.consignment_api_target.arn
+    target_group_arn = var.alb_target_group_arn
     container_name   = var.app_name
     container_port   = local.app_port
   }
+
+  depends_on = [var.alb_target_group_arn]
 }
 
 

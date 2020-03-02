@@ -5,3 +5,6 @@
 **.tfstate
 **.tfstate.backup
 *.tfvars
+
+# external modules
+tdr-terraform-modules
