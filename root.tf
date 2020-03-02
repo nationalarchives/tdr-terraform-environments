@@ -115,8 +115,8 @@ module "keycloak_alb" {
   health_check_matcher  = "200,303"
   health_check_path     = "healthcheck"
   http_listener         = false
-  public_subnets        = module.shared_vpc.public_subnets
-  vpc_id                = module.shared_vpc.vpc_id
+  public_subnets        = module.keycloak.public_subnets
+  vpc_id                = module.keycloak.vpc_id
   common_tags           = local.common_tags
 }
 
