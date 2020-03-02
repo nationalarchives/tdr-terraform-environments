@@ -56,6 +56,8 @@ resource "aws_ecs_service" "frontend_service" {
     container_name   = var.app_name
     container_port   = 9000
   }
+
+  depends_on = [var.alb_target_group_arn]
 }
 
 

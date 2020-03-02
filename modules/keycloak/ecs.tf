@@ -61,6 +61,8 @@ resource "aws_ecs_service" "keycloak_service" {
     container_name   = var.app_name
     container_port   = 8080
   }
+
+  depends_on = [var.alb_target_group_arn]
 }
 
 resource "aws_iam_role" "keycloak_ecs_execution" {

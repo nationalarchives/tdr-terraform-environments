@@ -60,6 +60,8 @@ resource "aws_ecs_service" "consignment_api_service" {
     container_name   = var.app_name
     container_port   = local.app_port
   }
+
+  depends_on = [var.alb_target_group_arn]
 }
 
 
