@@ -77,7 +77,7 @@ module "keycloak" {
 
 module "alb_logs_s3" {
   source        = "./tdr-terraform-modules/s3"
-  project       = "tdr"
+  project       = var.project
   function      = "alb-logs"
   access_logs   = false
   bucket_policy = "alb_logging_euwest2"
