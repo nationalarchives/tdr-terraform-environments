@@ -6,6 +6,9 @@ pipeline {
         choice(name: "STAGE", choices: ["intg", "staging", "prod"], description: "The stage you are deploying Terraform changes to")
     }
     stages {
+        stage('Clone module repositories') {
+            sh "git clone https://github.com/nationalarchives/tdr-terraform-modules.git"
+        }
         stage('Run Terraform build') {
             agent {
                 ecs {
