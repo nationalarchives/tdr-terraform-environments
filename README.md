@@ -56,7 +56,7 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
 
 3. Clone Terraform modules repository
    ```
-   [location of project] $ git clone git@github.com:nationalarchives/tdr-terraform-environments.git
+   [location of project] $ git clone git@github.com:nationalarchives/tdr-terraform-modules.git
    ```
 
 4. Create Terraform workspaces corresponding to the TDR environments:
