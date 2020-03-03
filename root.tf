@@ -6,12 +6,6 @@ module "shared_vpc" {
   database_availability_zones = local.database_availability_zones
 }
 
-module "shared_resources" {
-  source      = "./modules/shared-resources"
-  common_tags = local.common_tags
-  environment = local.environment
-}
-
 module "database_migrations" {
   source          = "./modules/database-migrations"
   environment     = local.environment
@@ -40,7 +34,7 @@ module "consignment_api" {
   region                      = local.region
   db_migration_sg             = module.database_migrations.db_migration_security_group
   auth_url                    = module.keycloak.auth_url
-  kms_key_id                  = module.shared_resources.kms_key_arn
+  kms_key_id                  = module.encryption_key.kms_key_arn
 }
 
 module "frontend" {
@@ -134,5 +128,13 @@ module "frontend_alb" {
   health_check_path     = ""
   public_subnets        = module.shared_vpc.public_subnets
   vpc_id                = module.shared_vpc.vpc_id
+  common_tags           = local.common_tags
+}
+
+module "encryption_key" {
+  source                = "./tdr-terraform-modules/kms"
+  project               = var.project
+  function              = "encryption"
+  environment           = local.environment
   common_tags           = local.common_tags
 }
