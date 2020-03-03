@@ -138,3 +138,14 @@ module "encryption_key" {
   environment           = local.environment
   common_tags           = local.common_tags
 }
+
+module "keycloak_waf" {
+  source                = "./tdr-terraform-modules/waf"
+  project               = var.project
+  function              = "keycloak-admin"
+  environment           = local.environment
+  common_tags           = local.common_tags
+  alb_target_group_arn  = module.keycloak_alb.alb_arn
+  trusted_ips           = split(",", data.aws_ssm_parameter.trusted_ips.value)
+  restricted_uri        = "auth/admin"
+}
