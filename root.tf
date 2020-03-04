@@ -144,7 +144,7 @@ module "waf" {
   # uses AWS classic WAF - should upgrade to WAFv2 once supported by Terraform
   source            = "./tdr-terraform-modules/waf"
   project           = var.project
-  function          = "keycloak-admin"
+  function          = "apps"
   environment       = local.environment
   common_tags       = local.common_tags
   alb_target_groups = [module.keycloak_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn]
