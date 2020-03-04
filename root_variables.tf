@@ -5,5 +5,10 @@ variable "tdr_account_number" {
 
 variable "project" {
   description = "abbreviation for the project, e.g. tdr, forms the first part of resource names"
-  default = "tdr"
+  default     = "tdr"
+}
+
+variable "geo_match" {
+  description = "countries to allow through web application firewall in csv format"
+  default     = "GB"
 }
