@@ -132,20 +132,23 @@ module "frontend_alb" {
 }
 
 module "encryption_key" {
-  source                = "./tdr-terraform-modules/kms"
-  project               = var.project
-  function              = "encryption"
-  environment           = local.environment
-  common_tags           = local.common_tags
+  source      = "./tdr-terraform-modules/kms"
+  project     = var.project
+  function    = "encryption"
+  environment = local.environment
+  common_tags = local.common_tags
 }
 
-module "keycloak_waf" {
-  source                = "./tdr-terraform-modules/waf"
-  project               = var.project
-  function              = "keycloak-admin"
-  environment           = local.environment
-  common_tags           = local.common_tags
-  alb_target_group_arn  = module.keycloak_alb.alb_arn
-  trusted_ips           = split(",", data.aws_ssm_parameter.trusted_ips.value)
-  restricted_uri        = "auth/admin"
+module "waf" {
+  # a single WAF web acl and rules are used for all services to minimise AWS costs
+  # uses AWS classic WAF - should upgrade to WAFv2 once supported by Terraform
+  source            = "./tdr-terraform-modules/waf"
+  project           = var.project
+  function          = "keycloak-admin"
+  environment       = local.environment
+  common_tags       = local.common_tags
+  alb_target_groups = [module.keycloak_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn]
+  trusted_ips       = split(",", data.aws_ssm_parameter.trusted_ips.value)
+  geo_match         = split(",", var.geo_match)
+  restricted_uri    = "auth/admin"
 }
