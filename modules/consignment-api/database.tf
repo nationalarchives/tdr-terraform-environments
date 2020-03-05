@@ -22,18 +22,19 @@ resource "random_string" "snapshot_prefix" {
 }
 
 resource "aws_rds_cluster" "consignment_api_database" {
-  cluster_identifier_prefix = "consignment-api-db-${var.environment}"
-  engine                    = "aurora-mysql"
-  engine_version            = "5.7.12"
-  availability_zones        = var.database_availability_zones
-  database_name             = var.app_name
-  master_username           = "api_admin"
-  master_password           = random_password.password.result
-  final_snapshot_identifier = "user-db-final-snapshot-${random_string.snapshot_prefix.result}-${var.environment}"
-  storage_encrypted         = true
-  kms_key_id                = var.kms_key_id
-  vpc_security_group_ids    = aws_security_group.database.*.id
-  db_subnet_group_name      = aws_db_subnet_group.consignment_api_subnet_group.name
+  cluster_identifier_prefix       = "consignment-api-db-${var.environment}"
+  engine                          = "aurora-mysql"
+  engine_version                  = "5.7.12"
+  availability_zones              = var.database_availability_zones
+  database_name                   = var.app_name
+  master_username                 = "api_admin"
+  master_password                 = random_password.password.result
+  final_snapshot_identifier       = "user-db-final-snapshot-${random_string.snapshot_prefix.result}-${var.environment}"
+  storage_encrypted               = true
+  kms_key_id                      = var.kms_key_id
+  vpc_security_group_ids          = aws_security_group.database.*.id
+  db_subnet_group_name            = aws_db_subnet_group.consignment_api_subnet_group.name
+  enabled_cloudwatch_logs_exports = ["audit", "error", "general", "slowquery"]
   tags = merge(
     var.common_tags,
     map(
