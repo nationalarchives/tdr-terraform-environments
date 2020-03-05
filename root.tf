@@ -107,7 +107,7 @@ module "keycloak_alb" {
   alb_target_type       = "ip"
   domain_name           = "auth.${local.dns_zone_name_trimmed}"
   health_check_matcher  = "200,303"
-  health_check_path     = "healthcheck"
+  health_check_path     = ""
   http_listener         = false
   public_subnets        = module.keycloak.public_subnets
   vpc_id                = module.keycloak.vpc_id
