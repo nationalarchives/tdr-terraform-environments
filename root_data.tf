@@ -7,5 +7,5 @@ data "aws_ssm_parameter" "trusted_ips" {
 }
 
 data "aws_route53_zone" "tdr_dns_zone" {
-  name = "tdr-${local.environment_full_name}.nationalarchives.gov.uk"
+  name = local.environment == "prod" ? "${var.project}.${var.domain}" : "${var.project}-${local.environment_full_name}.${var.domain}"
 }

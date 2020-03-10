@@ -12,3 +12,8 @@ variable "geo_match" {
   description = "countries to allow through web application firewall in csv format"
   default     = "GB"
 }
+
+variable "domain" {
+  description = "domain, e.g. example.com"
+  default     = "nationalarchives.gov.uk"
+}
