@@ -3,5 +3,5 @@ output alb_security_group_id {
 }
 
 output "frontend_url" {
-  value = "https://${aws_route53_record.frontend_dns.name}.${var.dns_zone_name_trimmed}/"
+  value = "https://${aws_route53_record.frontend_dns.name}.${var.dns_zone_name_trimmed}"
 }
