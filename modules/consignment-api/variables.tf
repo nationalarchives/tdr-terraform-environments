@@ -8,6 +8,8 @@ variable "app_name" {}
 
 variable "auth_url" {}
 
+variable "frontend_url" {}
+
 variable "common_tags" {}
 
 variable "database_availability_zones" {}
