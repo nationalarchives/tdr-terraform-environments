@@ -7,6 +7,10 @@
       {
         "name" : "AUTH_URL",
         "value" : "${auth_url}"
+      },
+      {
+        "name" : "FRONTEND_URL",
+        "value" : "${frontend_url}"
       }
     ],
     "secrets": [
