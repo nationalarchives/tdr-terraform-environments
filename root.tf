@@ -35,6 +35,7 @@ module "consignment_api" {
   db_migration_sg             = module.database_migrations.db_migration_security_group
   auth_url                    = module.keycloak.auth_url
   kms_key_id                  = module.encryption_key.kms_key_arn
+  frontend_url                = module.frontend.frontend_url
 }
 
 module "frontend" {
@@ -51,6 +52,7 @@ module "frontend" {
   vpc_id                = module.shared_vpc.vpc_id
   public_subnets        = module.shared_vpc.public_subnets
   private_subnets       = module.shared_vpc.private_subnets
+  dns_zone_name_trimmed = local.dns_zone_name_trimmed
 }
 
 module "keycloak" {
