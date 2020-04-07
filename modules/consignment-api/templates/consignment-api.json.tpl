@@ -11,6 +11,10 @@
       {
         "name" : "FRONTEND_URL",
         "value" : "${frontend_url}"
+      },
+      {
+        "name" : "DB_PORT",
+        "value" : 5432
       }
     ],
     "secrets": [
