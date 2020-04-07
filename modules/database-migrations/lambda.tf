@@ -66,7 +66,7 @@ resource "aws_lambda_function" "database_migration_function" {
   }
   environment {
     variables = {
-      DB_URL      = "jdbc:mysql://${var.db_url}/consignmentapi"
+      DB_URL      = "jdbc:postgresql://${var.db_url}/consignmentapi"
       DB_USER     = var.db_user
       DB_PASSWORD = var.db_password
       STAGE       = var.environment
