@@ -14,7 +14,7 @@
       },
       {
         "name" : "DB_PORT",
-        "value" : 5432
+        "value" : "5432"
       }
     ],
     "secrets": [

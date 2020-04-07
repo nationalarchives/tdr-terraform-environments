@@ -58,7 +58,7 @@ resource "aws_lambda_function" "database_migration_function" {
   role          = aws_iam_role.lambda_assume_role.arn
   runtime       = "java8"
   filename      = "${path.module}/temp.zip"
-  memory_size   = 128
+  memory_size   = 512
   timeout       = 60
   vpc_config {
     security_group_ids = [aws_security_group.db_migration.id]
@@ -66,7 +66,7 @@ resource "aws_lambda_function" "database_migration_function" {
   }
   environment {
     variables = {
-      DB_URL      = "jdbc:postgresql://${var.db_url}/consignmentapi"
+      DB_URL      = "jdbc:postgresql://${var.db_url}:5432/consignmentapi"
       DB_USER     = var.db_user
       DB_PASSWORD = var.db_password
       STAGE       = var.environment
