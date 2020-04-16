@@ -11,7 +11,7 @@
       "Condition": {
         "StringLike": {
           "s3:prefix": [
-            "\\$\\{cognito-identity.amazonaws.com:sub\\}"
+            "$${cognito-identity.amazonaws.com:sub}"
           ]
         }
       }
@@ -24,7 +24,7 @@
         "s3:PutObject"
       ],
       "Resource": [
-        "arn:aws:s3:::tdr-upload-files-${environment}/\\$\\{cognito-identity.amazonaws.com:sub\\}/*"
+        "arn:aws:s3:::tdr-upload-files-${environment}/$${cognito-identity.amazonaws.com:sub}/*"
       ]
     },
     {
