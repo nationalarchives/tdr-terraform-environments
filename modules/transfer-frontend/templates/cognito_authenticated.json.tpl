@@ -6,7 +6,7 @@
       "Effect": "Allow",
       "Action": "s3:ListBucket",
       "Resource": [
-        "arn:aws:s3:::tdr-upload-files"
+        "arn:aws:s3:::tdr-upload-files-${environment}"
       ],
       "Condition": {
         "StringLike": {

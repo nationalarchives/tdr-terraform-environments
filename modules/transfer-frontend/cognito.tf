@@ -25,7 +25,7 @@ resource "aws_iam_role_policy_attachment" "tdr_frontend_role_attachment" {
 data "template_file" "cognito_auth_role_template" {
   template = file("${path.module}/templates/cognito_authenticated.json.tpl")
   vars  = {
-    environment = title(var.environment)
+    environment = var.environment
   }
 }
 
