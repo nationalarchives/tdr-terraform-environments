@@ -1,6 +1,6 @@
 resource "aws_iam_openid_connect_provider" "tdr_frontend_provider" {
   url = "${var.auth_url}/realms/tdr"
-  client_id_list = ["tdr"]
+  client_id_list = ["tdr-fe"]
   thumbprint_list = [data.aws_ssm_parameter.auth_server_thumbprint.value]
 }
 
