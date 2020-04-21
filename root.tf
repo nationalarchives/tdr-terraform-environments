@@ -81,6 +81,15 @@ module "alb_logs_s3" {
   common_tags   = local.common_tags
 }
 
+module "upload_file_s3" {
+  source        = "./tdr-terraform-modules/s3"
+  project       = var.project
+  function      = "upload-files"
+  access_logs   = false
+  bucket_policy = "alb_logging_euwest2"
+  common_tags   = local.common_tags
+}
+
 module "consignment_api_alb" {
   source                = "./tdr-terraform-modules/alb"
   project               = var.project
