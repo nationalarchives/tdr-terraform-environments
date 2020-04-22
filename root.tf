@@ -79,6 +79,7 @@ module "alb_logs_s3" {
   access_logs   = false
   bucket_policy = "alb_logging_euwest2"
   common_tags   = local.common_tags
+  kms_key_id = 1
 }
 
 module "upload_bucket" {
