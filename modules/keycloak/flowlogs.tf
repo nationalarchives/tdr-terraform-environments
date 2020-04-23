@@ -47,7 +47,6 @@ resource "aws_iam_policy" "keycloak_flowlog_policy" {
 data "aws_iam_policy_document" "keycloak_flowlog_policy" {
   statement {
     actions = [
-      "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
       "logs:DescribeLogGroups",
