@@ -25,3 +25,5 @@ variable "vpc_id" {}
 variable "dns_zone_name_trimmed" {}
 
 variable "auth_url" {}
+
+variable "client_secret_path" {}
