@@ -70,6 +70,7 @@ module "keycloak" {
   database_availability_zones = local.database_availability_zones
   az_count                    = 2
   region                      = local.region
+  frontend_url                = module.frontend.frontend_url
 }
 
 module "alb_logs_s3" {
