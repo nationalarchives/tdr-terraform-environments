@@ -81,6 +81,16 @@ module "alb_logs_s3" {
   access_logs   = false
   bucket_policy = "alb_logging_euwest2"
   common_tags   = local.common_tags
+  kms_key_id = 1
+}
+
+module "upload_bucket" {
+  source       = "./tdr-terraform-modules/s3"
+  project      = var.project
+  function     = "upload-files"
+  common_tags  = local.common_tags
+  cors         = true
+  frontend_url = module.frontend.frontend_url
 }
 
 module "upload_file_dirty_s3" {

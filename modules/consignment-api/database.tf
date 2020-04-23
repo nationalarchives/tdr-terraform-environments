@@ -36,10 +36,10 @@ resource "aws_rds_cluster" "consignment_api_database" {
   db_subnet_group_name            = aws_db_subnet_group.consignment_api_subnet_group.name
   enabled_cloudwatch_logs_exports = ["postgresql"]
   tags = merge(
-  var.common_tags,
-  map(
-  "Name", "content-db-cluster-${var.environment}"
-  )
+    var.common_tags,
+    map(
+      "Name", "content-db-cluster-${var.environment}"
+    )
   )
 
   lifecycle {
@@ -57,7 +57,7 @@ resource "aws_rds_cluster_instance" "content_database" {
   identifier_prefix    = "content-db-postgres-instance-${var.environment}"
   cluster_identifier   = aws_rds_cluster.consignment_api_database.id
   engine               = "aurora-postgresql"
-  engine_version                  = "11.6"
+  engine_version       = "11.6"
   instance_class       = "db.t3.medium"
   db_subnet_group_name = aws_db_subnet_group.consignment_api_subnet_group.name
 }
