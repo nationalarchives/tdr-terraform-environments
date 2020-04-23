@@ -21,3 +21,5 @@ variable "environment" {}
 variable "environment_full_name" {}
 
 variable "region" {}
+
+variable "frontend_url" {}
