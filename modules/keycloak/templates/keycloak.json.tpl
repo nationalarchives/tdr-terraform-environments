@@ -37,6 +37,10 @@
       {
         "name" : "DB_VENDOR",
         "value" : "mysql"
+      },
+      {
+        "name" : "KEYCLOAK_IMPORT",
+        "value": "/tmp/realm.json"
       }
     ],
     "networkMode": "awsvpc",
