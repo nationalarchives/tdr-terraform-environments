@@ -24,4 +24,6 @@ locals {
   dns_zone_id = data.aws_route53_zone.tdr_dns_zone.zone_id
 
   dns_zone_name_trimmed = trimsuffix(data.aws_route53_zone.tdr_dns_zone.name, ".")
+
+  environment_domain = local.environment == "prod" ? "${var.project}.${var.domain}" : "${var.project}-${local.environment_full_name}.${var.domain}"
 }

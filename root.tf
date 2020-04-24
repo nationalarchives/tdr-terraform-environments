@@ -81,7 +81,7 @@ module "alb_logs_s3" {
   access_logs   = false
   bucket_policy = "alb_logging_euwest2"
   common_tags   = local.common_tags
-  kms_key_id = 1
+  kms_key_id    = 1
 }
 
 module "upload_bucket" {
@@ -100,6 +100,15 @@ module "upload_file_dirty_s3" {
   common_tags = local.common_tags
 }
 
+module "consignment_api_certificate" {
+  source      = "./tdr-terraform-modules/certificatemanager"
+  project     = var.project
+  function    = "consignment-api"
+  dns_zone    = local.environment_domain
+  domain_name = "api.${local.environment_domain}"
+  common_tags = local.common_tags
+}
+
 module "consignment_api_alb" {
   source                = "./tdr-terraform-modules/alb"
   project               = var.project
@@ -109,6 +118,7 @@ module "consignment_api_alb" {
   alb_security_group_id = module.consignment_api.alb_security_group_id
   alb_target_group_port = 8080
   alb_target_type       = "ip"
+  certificate_arn       = module.consignment_api_certificate.certificate_arn
   domain_name           = "api.${local.dns_zone_name_trimmed}"
   health_check_matcher  = "200,303"
   health_check_path     = "healthcheck"
@@ -116,6 +126,15 @@ module "consignment_api_alb" {
   public_subnets        = module.shared_vpc.public_subnets
   vpc_id                = module.shared_vpc.vpc_id
   common_tags           = local.common_tags
+}
+
+module "keycloak_certificate" {
+  source      = "./tdr-terraform-modules/certificatemanager"
+  project     = var.project
+  function    = "keycloak"
+  dns_zone    = local.environment_domain
+  domain_name = "auth.${local.environment_domain}"
+  common_tags = local.common_tags
 }
 
 module "keycloak_alb" {
@@ -127,6 +146,7 @@ module "keycloak_alb" {
   alb_security_group_id = module.keycloak.alb_security_group_id
   alb_target_group_port = 8080
   alb_target_type       = "ip"
+  certificate_arn       = module.keycloak_certificate.certificate_arn
   domain_name           = "auth.${local.dns_zone_name_trimmed}"
   health_check_matcher  = "200,303"
   health_check_path     = ""
@@ -134,6 +154,15 @@ module "keycloak_alb" {
   public_subnets        = module.keycloak.public_subnets
   vpc_id                = module.keycloak.vpc_id
   common_tags           = local.common_tags
+}
+
+module "frontend_certificate" {
+  source      = "./tdr-terraform-modules/certificatemanager"
+  project     = var.project
+  function    = "frontend"
+  dns_zone    = local.environment_domain
+  domain_name = local.environment_domain
+  common_tags = local.common_tags
 }
 
 module "frontend_alb" {
@@ -145,6 +174,7 @@ module "frontend_alb" {
   alb_security_group_id = module.frontend.alb_security_group_id
   alb_target_group_port = 9000
   alb_target_type       = "ip"
+  certificate_arn       = module.frontend_certificate.certificate_arn
   domain_name           = local.dns_zone_name_trimmed
   health_check_matcher  = "200,303"
   health_check_path     = ""
