@@ -23,12 +23,24 @@
       {
         "valueFrom": "${admin_password_path}",
         "name": "KEYCLOAK_PASSWORD"
+      },
+      {
+        "valueFrom" : "${client_secret_path}",
+        "name": "CLIENT_SECRET"
       }
     ],
     "environment": [
       {
+        "name" : "FRONTEND_URL",
+        "value" : "${frontend_url}"
+      },
+      {
         "name" : "DB_VENDOR",
         "value" : "mysql"
+      },
+      {
+        "name" : "KEYCLOAK_IMPORT",
+        "value": "/tmp/realm.json"
       }
     ],
     "networkMode": "awsvpc",

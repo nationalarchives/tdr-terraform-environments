@@ -54,6 +54,7 @@ module "frontend" {
   private_subnets       = module.shared_vpc.private_subnets
   dns_zone_name_trimmed = local.dns_zone_name_trimmed
   auth_url              = module.keycloak.auth_url
+  client_secret_path    = module.keycloak.client_secret_path
 }
 
 module "keycloak" {
@@ -70,6 +71,7 @@ module "keycloak" {
   database_availability_zones = local.database_availability_zones
   az_count                    = 2
   region                      = local.region
+  frontend_url                = module.frontend.frontend_url
 }
 
 module "alb_logs_s3" {
@@ -92,10 +94,10 @@ module "upload_bucket" {
 }
 
 module "upload_file_dirty_s3" {
-  source        = "./tdr-terraform-modules/s3"
-  project       = var.project
-  function      = "upload-files-dirty"
-  common_tags   = local.common_tags
+  source      = "./tdr-terraform-modules/s3"
+  project     = var.project
+  function    = "upload-files-dirty"
+  common_tags = local.common_tags
 }
 
 module "consignment_api_alb" {
