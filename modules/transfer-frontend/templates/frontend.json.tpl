@@ -13,7 +13,7 @@
         "name": "REDIS_HOST"
       },
       {
-        "valueFrom": "/${app_environment}/auth/secret",
+        "valueFrom": "${client_secret_path}",
         "name": "AUTH_SECRET"
       }
     ],
@@ -21,6 +21,10 @@
       {
         "name" : "ENVIRONMENT",
         "value" : "${app_environment}"
+      },
+      {
+        "name": "IDENTITY_POOL_ID",
+        "value": "${identity_pool_id}"
       }
     ],
     "networkMode": "awsvpc",
