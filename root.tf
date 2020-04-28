@@ -89,8 +89,6 @@ module "upload_bucket" {
   project      = var.project
   function     = "upload-files"
   common_tags  = local.common_tags
-  cors         = true
-  frontend_url = module.frontend.frontend_url
 }
 
 module "upload_file_dirty_s3" {
@@ -98,6 +96,8 @@ module "upload_file_dirty_s3" {
   project     = var.project
   function    = "upload-files-dirty"
   common_tags = local.common_tags
+  cors         = true
+  frontend_url = module.frontend.frontend_url
 }
 
 module "consignment_api_certificate" {
