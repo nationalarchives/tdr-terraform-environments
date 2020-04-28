@@ -6,7 +6,7 @@
       "Effect": "Allow",
       "Action": "s3:ListBucket",
       "Resource": [
-        "arn:aws:s3:::tdr-upload-files-${environment}"
+        "arn:aws:s3:::tdr-upload-files-dirty-${environment}"
       ],
       "Condition": {
         "StringLike": {
@@ -24,7 +24,7 @@
         "s3:PutObject"
       ],
       "Resource": [
-        "arn:aws:s3:::tdr-upload-files-${environment}/$${cognito-identity.amazonaws.com:sub}/*"
+        "arn:aws:s3:::tdr-upload-files-dirty-${environment}/$${cognito-identity.amazonaws.com:sub}/*"
       ]
     },
     {
