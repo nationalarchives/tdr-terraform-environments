@@ -45,7 +45,7 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
    aws_access_key_id = ... terraform user access key ...
    aws_secret_access_key = ... terraform user secret access key ...
    ```
-   
+
 ## Running Terraform Project Locally
 
 **NOTE: Running Terraform locally should only be used to check the Terraform plan. Updating the TDR environments should only ever be done through Jenkins**
@@ -63,9 +63,9 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
 
    ```
    [location of project] $ terraform workspace new intg
-   
+
    [location of project] $ terraform workspace new staging
-   
+
    [location of project] $ terraform workspace new prod
    ```
 5. Switch to the Terraform workspace corresponding to the TDR environment to be worked on:
@@ -73,24 +73,23 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
    ```
    [location of project] $ terraform workspace select intg
    ```
-   
+
 6. Run the following command to ensure Terraform uses the correct credentials:
 
    ```
    [location of project] $ export AWS_PROFILE=terraform
    ```
-      
+
 7. Set the following Terraform environment variables on the local environment:
 
     * TF_VAR_tdr_account_number=*[account number of the environment to update]*
-    * TF_VAR_tdr_environment=*[name of the TDR environment to update]*
-     
+
 8. Initialize Terraform (if not done so previously):
 
    ```
    [location of project] $ terraform init   
    ```
-   
+
 9. Run Terraform to make changes to the TDR environment AWS resources
 
    ```
