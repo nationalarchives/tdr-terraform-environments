@@ -5,6 +5,10 @@
     "cpu": 0,
     "environment": [
       {
+        "name" : "ENVIRONMENT",
+        "value" : "${app_environment}"
+      },
+      {
         "name" : "AUTH_URL",
         "value" : "${auth_url}"
       },
