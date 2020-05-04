@@ -227,7 +227,7 @@ module "av_lambda" {
   function = "yara-av"
   environment = local.environment
   common_tags = local.common_tags
-  handler = "main.analyze_lambda_handler"
+  handler = "matcher.matcher_lambda_handler"
   runtime = "python3.7"
   policy = "av_lambda"
   lambda_subnets = module.shared_vpc.private_subnets
