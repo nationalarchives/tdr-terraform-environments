@@ -226,7 +226,5 @@ module "av_lambda" {
   project = var.project
   environment = local.environment
   common_tags = local.common_tags
-  lambda_subnets = module.shared_vpc.private_subnets
-  vpc_id = module.shared_vpc.vpc_id
   lambda_yara_av = true
 }
