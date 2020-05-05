@@ -224,12 +224,9 @@ module "backend_lambda_function_bucket" {
 module "av_lambda" {
   source            = "./tdr-terraform-modules/lambda"
   project = var.project
-  function = "yara-av"
   environment = local.environment
   common_tags = local.common_tags
-  handler = "matcher.matcher_lambda_handler"
-  runtime = "python3.7"
-  policy = "av_lambda"
   lambda_subnets = module.shared_vpc.private_subnets
   vpc_id = module.shared_vpc.vpc_id
+  lambda_yara_av = true
 }
