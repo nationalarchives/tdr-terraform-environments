@@ -15,6 +15,10 @@
       {
         "valueFrom": "${client_secret_path}",
         "name": "AUTH_SECRET"
+      },
+      {
+        "valueFrom": "${backend_checks_client_secret_path}",
+        "name": "BACKEND_CHECKS_AUTH_SECRET"
       }
     ],
     "environment": [

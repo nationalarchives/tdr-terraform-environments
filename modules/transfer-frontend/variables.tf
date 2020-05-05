@@ -27,3 +27,5 @@ variable "dns_zone_name_trimmed" {}
 variable "auth_url" {}
 
 variable "client_secret_path" {}
+
+variable "backend_checks_client_secret_path" {}

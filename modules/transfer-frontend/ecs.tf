@@ -14,12 +14,13 @@ data "template_file" "app" {
   template = file("modules/transfer-frontend/templates/frontend.json.tpl")
 
   vars = {
-    app_image          = "nationalarchives/tdr-transfer-frontend:${var.environment}"
-    app_port           = local.app_port
-    app_environment    = var.environment
-    aws_region         = var.region
-    client_secret_path = var.client_secret_path
-    identity_pool_id   = aws_cognito_identity_pool.tdr_frontend_identity_pool.id
+    app_image                         = "nationalarchives/tdr-transfer-frontend:${var.environment}"
+    app_port                          = local.app_port
+    app_environment                   = var.environment
+    aws_region                        = var.region
+    client_secret_path                = var.client_secret_path
+    identity_pool_id                  = aws_cognito_identity_pool.tdr_frontend_identity_pool.id
+    backend_checks_client_secret_path = var.backend_checks_client_secret_path
   }
 }
 

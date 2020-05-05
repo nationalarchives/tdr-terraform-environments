@@ -17,3 +17,7 @@ output "auth_url" {
 output "client_secret_path" {
   value = aws_ssm_parameter.keycloak_client_secret.name
 }
+
+output "backend_checks_client_secret_path" {
+  value = aws_ssm_parameter.keycloak_backend_checks_client_secret.name
+}
