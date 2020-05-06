@@ -224,7 +224,6 @@ module "backend_lambda_function_bucket" {
 module "av_lambda" {
   source            = "./tdr-terraform-modules/lambda"
   project = var.project
-  environment = local.environment
   common_tags = local.common_tags
   lambda_yara_av = true
 }
