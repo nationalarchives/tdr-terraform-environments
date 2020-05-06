@@ -215,15 +215,15 @@ module "waf" {
 }
 
 module "backend_lambda_function_bucket" {
-  source = "./tdr-terraform-modules/s3"
+  source      = "./tdr-terraform-modules/s3"
   common_tags = local.common_tags
-  function = "backend-checks"
-  project = var.project
+  function    = "backend-checks"
+  project     = var.project
 }
 
-module "av_lambda" {
-  source            = "./tdr-terraform-modules/lambda"
-  project = var.project
-  common_tags = local.common_tags
+module "antivirus_lambda" {
+  source         = "./tdr-terraform-modules/lambda"
+  project        = var.project
+  common_tags    = local.common_tags
   lambda_yara_av = true
 }
