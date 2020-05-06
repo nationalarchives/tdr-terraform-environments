@@ -18,7 +18,7 @@ data "template_file" "app" {
     app_port           = local.app_port
     app_environment    = var.environment
     aws_region         = var.region
-    client_secret_path = var.client_secret_path
+    frontend_app_client_secret_path = var.frontend_app_client_secret_path
     identity_pool_id   = aws_cognito_identity_pool.tdr_frontend_identity_pool.id
   }
 }
