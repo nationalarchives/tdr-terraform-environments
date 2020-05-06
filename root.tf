@@ -92,6 +92,13 @@ module "upload_bucket" {
   version_lifecycle = true
 }
 
+module "upload_bucket_quarantine" {
+  source      = "./tdr-terraform-modules/s3"
+  project     = var.project
+  function    = "upload-files-quarantine"
+  common_tags = local.common_tags
+}
+
 module "upload_file_dirty_s3" {
   source            = "./tdr-terraform-modules/s3"
   project           = var.project
@@ -205,4 +212,18 @@ module "waf" {
   trusted_ips       = split(",", data.aws_ssm_parameter.trusted_ips.value)
   geo_match         = split(",", var.geo_match)
   restricted_uri    = "auth/admin"
+}
+
+module "backend_lambda_function_bucket" {
+  source      = "./tdr-terraform-modules/s3"
+  common_tags = local.common_tags
+  function    = "backend-checks"
+  project     = var.project
+}
+
+module "antivirus_lambda" {
+  source         = "./tdr-terraform-modules/lambda"
+  project        = var.project
+  common_tags    = local.common_tags
+  lambda_yara_av = true
 }
