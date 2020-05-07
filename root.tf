@@ -39,22 +39,22 @@ module "consignment_api" {
 }
 
 module "frontend" {
-  app_name                        = "frontend"
-  source                          = "./modules/transfer-frontend"
-  alb_dns_name                    = module.frontend_alb.alb_dns_name
-  alb_target_group_arn            = module.frontend_alb.alb_target_group_arn
-  alb_zone_id                     = module.frontend_alb.alb_zone_id
-  dns_zone_id                     = local.dns_zone_id
-  environment                     = local.environment
-  environment_full_name           = local.environment_full_name_map[local.environment]
-  common_tags                     = local.common_tags
-  region                          = local.region
-  vpc_id                          = module.shared_vpc.vpc_id
-  public_subnets                  = module.shared_vpc.public_subnets
-  private_subnets                 = module.shared_vpc.private_subnets
-  dns_zone_name_trimmed           = local.dns_zone_name_trimmed
-  auth_url                        = module.keycloak.auth_url
-  client_secret_path = module.keycloak.client_secret_path
+  app_name              = "frontend"
+  source                = "./modules/transfer-frontend"
+  alb_dns_name          = module.frontend_alb.alb_dns_name
+  alb_target_group_arn  = module.frontend_alb.alb_target_group_arn
+  alb_zone_id           = module.frontend_alb.alb_zone_id
+  dns_zone_id           = local.dns_zone_id
+  environment           = local.environment
+  environment_full_name = local.environment_full_name_map[local.environment]
+  common_tags           = local.common_tags
+  region                = local.region
+  vpc_id                = module.shared_vpc.vpc_id
+  public_subnets        = module.shared_vpc.public_subnets
+  private_subnets       = module.shared_vpc.private_subnets
+  dns_zone_name_trimmed = local.dns_zone_name_trimmed
+  auth_url              = module.keycloak.auth_url
+  client_secret_path    = module.keycloak.client_secret_path
 }
 
 module "keycloak" {
