@@ -23,7 +23,7 @@ data "template_file" "app" {
     password_path                     = aws_ssm_parameter.database_password.name
     admin_user_path                   = aws_ssm_parameter.keycloak_admin_user.name
     admin_password_path               = aws_ssm_parameter.keycloak_admin_password.name
-    frontend_app_client_secret_path   = aws_ssm_parameter.keycloak_frontend_app_client_secret.name
+    client_secret_path   = aws_ssm_parameter.keycloak_client_secret.name
     backend_checks_client_secret_path = aws_ssm_parameter.keycloak_backend_checks_client_secret.name
     frontend_url                      = var.frontend_url
 

@@ -26,4 +26,4 @@ variable "dns_zone_name_trimmed" {}
 
 variable "auth_url" {}
 
-variable "frontend_app_client_secret_path" {}
+variable "client_secret_path" {}

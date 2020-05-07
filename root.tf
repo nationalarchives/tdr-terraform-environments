@@ -54,7 +54,7 @@ module "frontend" {
   private_subnets                 = module.shared_vpc.private_subnets
   dns_zone_name_trimmed           = local.dns_zone_name_trimmed
   auth_url                        = module.keycloak.auth_url
-  frontend_app_client_secret_path = module.keycloak.frontend_app_client_secret_path
+  client_secret_path = module.keycloak.client_secret_path
 }
 
 module "keycloak" {

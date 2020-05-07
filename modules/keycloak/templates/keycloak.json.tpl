@@ -25,8 +25,8 @@
         "name": "KEYCLOAK_PASSWORD"
       },
       {
-        "valueFrom" : "${frontend_app_client_secret_path}",
-        "name": "FRONTEND_APP_CLIENT_SECRET"
+        "valueFrom" : "${client_secret_path}",
+        "name": "CLIENT_SECRET"
       },
       {
         "valueFrom": "${backend_checks_client_secret_path}",
