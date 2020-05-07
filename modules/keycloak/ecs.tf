@@ -14,17 +14,18 @@ data "template_file" "app" {
   template = file("modules/keycloak/templates/keycloak.json.tpl")
 
   vars = {
-    app_image           = "nationalarchives/tdr-auth-server:${var.environment}"
-    app_port            = local.app_port
-    app_environment     = var.environment
-    aws_region          = var.region
-    url_path            = aws_ssm_parameter.database_url.name
-    username_path       = aws_ssm_parameter.database_username.name
-    password_path       = aws_ssm_parameter.database_password.name
-    admin_user_path     = aws_ssm_parameter.keycloak_admin_user.name
-    admin_password_path = aws_ssm_parameter.keycloak_admin_password.name
-    client_secret_path  = aws_ssm_parameter.keycloak_client_secret.name
-    frontend_url        = var.frontend_url
+    app_image                         = "nationalarchives/tdr-auth-server:${var.environment}"
+    app_port                          = local.app_port
+    app_environment                   = var.environment
+    aws_region                        = var.region
+    url_path                          = aws_ssm_parameter.database_url.name
+    username_path                     = aws_ssm_parameter.database_username.name
+    password_path                     = aws_ssm_parameter.database_password.name
+    admin_user_path                   = aws_ssm_parameter.keycloak_admin_user.name
+    admin_password_path               = aws_ssm_parameter.keycloak_admin_password.name
+    frontend_app_client_secret_path   = aws_ssm_parameter.keycloak_frontend_app_client_secret.name
+    backend_checks_client_secret_path = aws_ssm_parameter.keycloak_backend_checks_client_secret.name
+    frontend_url                      = var.frontend_url
 
   }
 }
