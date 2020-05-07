@@ -3,7 +3,8 @@ resource "random_password" "keycloak_password" {
   special = false
 }
 
-resource "random_uuid" "client_secret" {}
+resource "random_uuid" "frontend_app_client_secret" {}
+resource "random_uuid" "backend_checks_client_secret" {}
 
 resource "aws_ssm_parameter" "database_url" {
   name  = "/${var.environment}/keycloak/database/url"
@@ -35,8 +36,14 @@ resource "aws_ssm_parameter" "keycloak_admin_user" {
   value = "tdr-keycloak-admin-${var.environment}"
 }
 
-resource "aws_ssm_parameter" "keycloak_client_secret" {
-  name  = "/${var.environment}/keycloak/client/secret"
+resource "aws_ssm_parameter" "keycloak_frontend_app_client_secret" {
+  name  = "/${var.environment}/keycloak/frontend_app_client/secret"
   type  = "SecureString"
-  value = random_uuid.client_secret.result
+  value = random_uuid.frontend_app_client_secret.result
+}
+
+resource "aws_ssm_parameter" "keycloak_backend_checks_client_secret" {
+  name  = "/${var.environment}/keycloak/backend_checks_client/secret"
+  type  = "SecureString"
+  value = random_uuid.backend_checks_client_secret.result
 }
