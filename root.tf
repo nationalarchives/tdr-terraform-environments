@@ -227,3 +227,12 @@ module "antivirus_lambda" {
   common_tags    = local.common_tags
   lambda_yara_av = true
 }
+
+module "backend_checks" {
+  source                     = "./modules/backend-checks"
+  environment                = local.environment
+  common_tags                = local.common_tags
+  s3_dirty_upload_bucket_arn = module.upload_file_dirty_s3.s3_bucket_arn
+  s3_dirty_upload_bucket_id  = module.upload_file_dirty_s3.s3_bucket_id
+  sns_topic_name_prefix      = "s3-dirty-upload"
+}
