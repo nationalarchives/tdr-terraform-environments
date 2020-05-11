@@ -13,7 +13,7 @@
         "name": "REDIS_HOST"
       },
       {
-        "valueFrom": "${frontend_app_client_secret_path}",
+        "valueFrom": "${client_secret_path}",
         "name": "AUTH_SECRET"
       }
     ],
