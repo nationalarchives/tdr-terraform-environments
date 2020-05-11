@@ -40,10 +40,18 @@ resource "aws_ssm_parameter" "keycloak_client_secret" {
   name  = "/${var.environment}/keycloak/client/secret"
   type  = "SecureString"
   value = random_uuid.client_secret.result
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 resource "aws_ssm_parameter" "keycloak_backend_checks_client_secret" {
   name  = "/${var.environment}/keycloak/backend_checks_client/secret"
   type  = "SecureString"
   value = random_uuid.backend_checks_client_secret.result
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
