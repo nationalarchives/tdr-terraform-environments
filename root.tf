@@ -228,7 +228,7 @@ module "antivirus_lambda" {
   lambda_yara_av = true
 }
 
-module "backend-checks-sns-topic" {
+module "dirty-upload-sns-topic" {
   source      = "./tdr-terraform-modules/sns"
   common_tags = local.common_tags
   project     = var.project
