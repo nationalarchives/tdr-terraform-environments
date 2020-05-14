@@ -107,7 +107,7 @@ module "upload_file_dirty_s3" {
   cors              = true
   frontend_url      = module.frontend.frontend_url
   version_lifecycle = true
-  sns_topic_arn     = module.dirty-upload-sns-topic.sns_arn
+  sns_topic_arn     = module.dirty_upload_sns_topic.sns_arn
   sns_notification  = true
 }
 
