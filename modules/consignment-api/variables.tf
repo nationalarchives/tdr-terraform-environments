@@ -16,6 +16,8 @@ variable "database_availability_zones" {}
 
 variable "db_migration_sg" {}
 
+variable "developer_ips" {}
+
 variable "dns_zone_id" {}
 
 variable "environment" {}

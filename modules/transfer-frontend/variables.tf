@@ -10,6 +10,8 @@ variable "common_tags" {}
 
 variable "dns_zone_id" {}
 
+variable "developer_ips" {}
+
 variable "environment" {}
 
 variable "environment_full_name" {}

@@ -12,6 +12,8 @@ variable "common_tags" {}
 
 variable "database_availability_zones" {}
 
+variable "developer_ips" {}
+
 variable "dns_zone_id" {}
 
 variable "dns_zone_name_trimmed" {}
