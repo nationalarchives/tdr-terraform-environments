@@ -27,9 +27,9 @@ locals {
 
   environment_domain = local.environment == "prod" ? "${var.project}.${var.domain}" : "${var.project}-${local.environment_full_name}.${var.domain}"
 
-  developer_ip_list = split(", ", module.global_parameters.developer_ips)
+  developer_ip_list = split(",", module.global_parameters.developer_ips)
 
-  trusted_ip_list = split(", ", module.global_parameters.trusted_ips)
+  trusted_ip_list = split(",", module.global_parameters.trusted_ips)
 
   ip_whitelist = concat(local.developer_ip_list, local.trusted_ip_list)
 }
