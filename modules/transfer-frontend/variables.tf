@@ -10,11 +10,11 @@ variable "common_tags" {}
 
 variable "dns_zone_id" {}
 
-variable "developer_ips" {}
-
 variable "environment" {}
 
 variable "environment_full_name" {}
+
+variable "ip_whitelist" {}
 
 variable "private_subnets" {}
 
