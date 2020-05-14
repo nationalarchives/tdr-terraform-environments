@@ -16,13 +16,13 @@ variable "database_availability_zones" {}
 
 variable "db_migration_sg" {}
 
-variable "developer_ips" {}
-
 variable "dns_zone_id" {}
 
 variable "environment" {}
 
 variable "environment_full_name" {}
+
+variable "ip_whitelist" {}
 
 variable "kms_key_id" {}
 
