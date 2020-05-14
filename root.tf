@@ -244,6 +244,7 @@ module "antivirus_sqs_queue" {
   project        = var.project
   function       = "antivirus"
   sns_topic_arns = [module.dirty_upload_sns_topic.sns_arn]
+  sqs_policy     = "sns_topic"
 }
 
 module "checksum_sqs_queue" {
@@ -252,6 +253,7 @@ module "checksum_sqs_queue" {
   project        = var.project
   function       = "checksum"
   sns_topic_arns = [module.dirty_upload_sns_topic.sns_arn]
+  sqs_policy     = "sns_topic"
 }
 
 module "file_format_sqs_queue" {
@@ -260,4 +262,5 @@ module "file_format_sqs_queue" {
   project        = var.project
   function       = "file-format"
   sns_topic_arns = [module.dirty_upload_sns_topic.sns_arn]
+  sqs_policy     = "sns_topic"
 }
