@@ -36,6 +36,7 @@ module "consignment_api" {
   auth_url                    = module.keycloak.auth_url
   kms_key_id                  = module.encryption_key.kms_key_arn
   frontend_url                = module.frontend.frontend_url
+  dns_zone_name_trimmed       = local.dns_zone_name_trimmed
 }
 
 module "frontend" {
@@ -263,4 +264,14 @@ module "file_format_sqs_queue" {
   function       = "file-format"
   sns_topic_arns = [module.dirty_upload_sns_topic.sns_arn]
   sqs_policy     = "sns_topic"
+}
+
+
+module "api_update_antivirus_lambda" {
+  source               = "./tdr-terraform-modules/lambda"
+  project              = var.project
+  common_tags          = local.common_tags
+  lambda_api_update_av = true
+  auth_url             = module.keycloak.auth_url
+  api_url              = module.consignment_api.api_url
 }
