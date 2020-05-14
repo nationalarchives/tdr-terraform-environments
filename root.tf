@@ -228,10 +228,34 @@ module "antivirus_lambda" {
   lambda_yara_av = true
 }
 
-module "dirty-upload-sns-topic" {
+module "dirty_upload_sns_topic" {
   source      = "./tdr-terraform-modules/sns"
   common_tags = local.common_tags
   project     = var.project
   function    = "s3-dirty-upload"
   sns_policy  = "s3_upload"
+}
+
+module "antivirus_sqs_queue" {
+  source         = "./tdr-terraform-modules/sqs"
+  common_tags    = local.common_tags
+  project        = var.project
+  function       = "antivirus"
+  sns_topic_arns = [module.dirty_upload_sns_topic.sns_arn]
+}
+
+module "checksum_sqs_queue" {
+  source         = "./tdr-terraform-modules/sqs"
+  common_tags    = local.common_tags
+  project        = var.project
+  function       = "checksum"
+  sns_topic_arns = [module.dirty_upload_sns_topic.sns_arn]
+}
+
+module "file_format_sqs_queue" {
+  source         = "./tdr-terraform-modules/sqs"
+  common_tags    = local.common_tags
+  project        = var.project
+  function       = "file-format"
+  sns_topic_arns = [module.dirty_upload_sns_topic.sns_arn]
 }
