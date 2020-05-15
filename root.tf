@@ -267,11 +267,11 @@ module "file_format_sqs_queue" {
 }
 
 module "api_update_antivirus_queue" {
-  source         = "./tdr-terraform-modules/sqs"
-  common_tags    = local.common_tags
-  project        = var.project
-  function = "api-update-antivirus"
-  sqs_policy = "api_update_antivirus"
+  source      = "./tdr-terraform-modules/sqs"
+  common_tags = local.common_tags
+  project     = var.project
+  function    = "api-update-antivirus"
+  sqs_policy  = "api_update_antivirus"
 }
 
 
