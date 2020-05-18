@@ -31,3 +31,5 @@ variable "public_subnets" {}
 variable "region" {}
 
 variable "vpc_id" {}
+
+variable "dns_zone_name_trimmed" {}

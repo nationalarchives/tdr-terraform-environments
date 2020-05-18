@@ -14,3 +14,7 @@ output "database_password" {
   value     = aws_rds_cluster.consignment_api_database.master_password
   sensitive = true
 }
+
+output "api_url" {
+  value = "https://${aws_route53_record.api_dns.name}.${var.dns_zone_name_trimmed}"
+}
