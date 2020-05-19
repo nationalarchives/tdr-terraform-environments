@@ -105,8 +105,7 @@ module "upload_file_dirty_s3" {
   project           = var.project
   function          = "upload-files-dirty"
   common_tags       = local.common_tags
-  cors              = true
-  frontend_url      = module.frontend.frontend_url
+  cors_urls         = local.upload_cors_urls
   version_lifecycle = true
   sns_topic_arn     = module.dirty_upload_sns_topic.sns_arn
   sns_notification  = true
