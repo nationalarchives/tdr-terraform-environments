@@ -22,8 +22,6 @@ variable "environment" {}
 
 variable "environment_full_name" {}
 
-variable "ip_whitelist" {}
-
 variable "kms_key_id" {}
 
 variable "private_subnets" {}
@@ -35,3 +33,8 @@ variable "region" {}
 variable "vpc_id" {}
 
 variable "dns_zone_name_trimmed" {}
+
+variable "ip_whitelist" {
+  description = "IP addresses allowed to access"
+  default     = ["0.0.0.0/0"]
+}

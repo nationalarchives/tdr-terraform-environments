@@ -14,8 +14,6 @@ variable "environment" {}
 
 variable "environment_full_name" {}
 
-variable "ip_whitelist" {}
-
 variable "private_subnets" {}
 
 variable "public_subnets" {}
@@ -29,3 +27,8 @@ variable "dns_zone_name_trimmed" {}
 variable "auth_url" {}
 
 variable "client_secret_path" {}
+
+variable "ip_whitelist" {
+  description = "IP addresses allowed to access"
+  default     = ["0.0.0.0/0"]
+}
