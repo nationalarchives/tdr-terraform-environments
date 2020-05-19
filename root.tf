@@ -41,6 +41,7 @@ module "consignment_api" {
   auth_url                    = module.keycloak.auth_url
   kms_key_id                  = module.encryption_key.kms_key_arn
   frontend_url                = module.frontend.frontend_url
+  dns_zone_name_trimmed       = local.dns_zone_name_trimmed
 }
 
 module "frontend" {
@@ -111,8 +112,7 @@ module "upload_file_dirty_s3" {
   project           = var.project
   function          = "upload-files-dirty"
   common_tags       = local.common_tags
-  cors              = true
-  frontend_url      = module.frontend.frontend_url
+  cors_urls         = local.upload_cors_urls
   version_lifecycle = true
   sns_topic_arn     = module.dirty_upload_sns_topic.sns_arn
   sns_notification  = true
@@ -270,4 +270,22 @@ module "file_format_sqs_queue" {
   function       = "file-format"
   sns_topic_arns = [module.dirty_upload_sns_topic.sns_arn]
   sqs_policy     = "sns_topic"
+}
+
+module "api_update_antivirus_queue" {
+  source      = "./tdr-terraform-modules/sqs"
+  common_tags = local.common_tags
+  project     = var.project
+  function    = "api-update-antivirus"
+  sqs_policy  = "api_update_antivirus"
+}
+
+
+module "api_update_antivirus_lambda" {
+  source               = "./tdr-terraform-modules/lambda"
+  project              = var.project
+  common_tags          = local.common_tags
+  lambda_api_update_av = true
+  auth_url             = module.keycloak.auth_url
+  api_url              = module.consignment_api.api_url
 }
