@@ -37,7 +37,6 @@ module "consignment_api" {
   vpc_id                      = module.shared_vpc.vpc_id
   region                      = local.region
   db_migration_sg             = module.database_migrations.db_migration_security_group
-  ip_whitelist                = local.ip_whitelist
   auth_url                    = module.keycloak.auth_url
   kms_key_id                  = module.encryption_key.kms_key_arn
   frontend_url                = module.frontend.frontend_url
@@ -54,7 +53,7 @@ module "frontend" {
   environment           = local.environment
   environment_full_name = local.environment_full_name_map[local.environment]
   common_tags           = local.common_tags
-  ip_whitelist          = local.ip_whitelist
+  ip_whitelist          = local.environment == "intg" ? local.ip_whitelist : ["0.0.0.0/0"]
   region                = local.region
   vpc_id                = module.shared_vpc.vpc_id
   public_subnets        = module.shared_vpc.public_subnets
@@ -76,7 +75,6 @@ module "keycloak" {
   environment_full_name       = local.environment_full_name_map[local.environment]
   common_tags                 = local.common_tags
   database_availability_zones = local.database_availability_zones
-  ip_whitelist                = local.ip_whitelist
   az_count                    = 2
   region                      = local.region
   frontend_url                = module.frontend.frontend_url

@@ -7,14 +7,14 @@ resource "aws_security_group" "lb" {
     protocol    = "tcp"
     from_port   = 443
     to_port     = 443
-    cidr_blocks = local.environment == "intg" ? var.ip_whitelist : ["0.0.0.0/0"]
+    cidr_blocks = var.ip_whitelist
   }
 
   ingress {
     protocol    = "tcp"
     from_port   = 80
     to_port     = 80
-    cidr_blocks = local.environment == "intg" ? var.ip_whitelist : ["0.0.0.0/0"]
+    cidr_blocks = var.ip_whitelist
   }
 
   egress {
