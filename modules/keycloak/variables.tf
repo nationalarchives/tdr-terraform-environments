@@ -23,3 +23,8 @@ variable "environment_full_name" {}
 variable "region" {}
 
 variable "frontend_url" {}
+
+variable "ip_whitelist" {
+  description = "IP addresses allowed to access"
+  default     = ["0.0.0.0/0"]
+}

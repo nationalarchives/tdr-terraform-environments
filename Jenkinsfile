@@ -24,6 +24,9 @@ pipeline {
                     steps {
                         echo 'Initializing Terraform...'
                         sh "git clone https://github.com/nationalarchives/tdr-terraform-modules.git"
+                        sshagent(['github-jenkins']) {
+                            sh("git clone git@github.com:nationalarchives/tdr-configurations.git")
+                        }
                         sh 'terraform init'
                         //If Terraform workspace exists continue
                         sh "terraform workspace new ${params.STAGE} || true"

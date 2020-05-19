@@ -1,3 +1,7 @@
+module "global_parameters" {
+  source = "./tdr-configurations/terraform"
+}
+
 module "shared_vpc" {
   source                      = "./modules/shared-vpc"
   az_count                    = 2
@@ -49,6 +53,7 @@ module "frontend" {
   environment           = local.environment
   environment_full_name = local.environment_full_name_map[local.environment]
   common_tags           = local.common_tags
+  ip_whitelist          = local.environment == "intg" ? local.ip_whitelist : ["0.0.0.0/0"]
   region                = local.region
   vpc_id                = module.shared_vpc.vpc_id
   public_subnets        = module.shared_vpc.public_subnets
