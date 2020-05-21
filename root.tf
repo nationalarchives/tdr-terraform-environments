@@ -278,7 +278,6 @@ module "api_update_antivirus_queue" {
   sqs_policy  = "api_update_antivirus"
 }
 
-
 module "api_update_antivirus_lambda" {
   source                                = "./tdr-terraform-modules/lambda"
   project                               = var.project
