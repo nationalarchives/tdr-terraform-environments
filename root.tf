@@ -280,10 +280,11 @@ module "api_update_antivirus_queue" {
 
 
 module "api_update_antivirus_lambda" {
-  source               = "./tdr-terraform-modules/lambda"
-  project              = var.project
-  common_tags          = local.common_tags
-  lambda_api_update_av = true
-  auth_url             = module.keycloak.auth_url
-  api_url              = module.consignment_api.api_url
+  source                                = "./tdr-terraform-modules/lambda"
+  project                               = var.project
+  common_tags                           = local.common_tags
+  lambda_api_update_av                  = true
+  auth_url                              = module.keycloak.auth_url
+  api_url                               = module.consignment_api.api_url
+  keycloak_backend_checks_client_secret = data.aws_ssm_parameter.keycloak_backend_checks_client_secret.value
 }
