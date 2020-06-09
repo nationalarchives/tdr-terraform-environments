@@ -1,3 +1,5 @@
+library("tdr-jenkinslib")
+
 pipeline {
     agent {
         label "master"
@@ -14,7 +16,7 @@ pipeline {
                 }
             }
             environment {
-                TF_VAR_tdr_account_number = getAccountNumberFromStage()
+                TF_VAR_tdr_account_number = tdr.getAccountNumberFromStage(params.STAGE)
                 //no-color option set for Terraform commands as Jenkins console unable to output the colour
                 //making output difficult to read
                 TF_CLI_ARGS="-no-color"
@@ -75,15 +77,12 @@ pipeline {
             echo 'Deleting Jenkins workspace...'
             deleteDir()
         }
+        success {
+            script {
+                if (params.STAGE == "intg"){
+                    tdr.runEndToEndTests(300, params.STAGE, BUILD_URL)
+                }
+            }
+        }
     }
-}
-
-def getAccountNumberFromStage() {
-    def stageToAccountMap = [
-            "intg": env.INTG_ACCOUNT,
-            "staging": env.STAGING_ACCOUNT,
-            "prod": env.PROD_ACCOUNT
-    ]
-
-    return stageToAccountMap.get(params.STAGE)
 }
