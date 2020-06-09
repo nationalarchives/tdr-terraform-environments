@@ -235,6 +235,13 @@ module "antivirus_lambda" {
   lambda_yara_av = true
 }
 
+module "checksum_lambda" {
+  source         = "./tdr-terraform-modules/lambda"
+  project        = var.project
+  common_tags    = local.common_tags
+  lambda_checksum = true
+}
+
 module "dirty_upload_sns_topic" {
   source      = "./tdr-terraform-modules/sns"
   common_tags = local.common_tags
@@ -276,6 +283,14 @@ module "api_update_antivirus_queue" {
   project     = var.project
   function    = "api-update-antivirus"
   sqs_policy  = "api_update_antivirus"
+}
+
+module "api_update_checksum_queue" {
+  source      = "./tdr-terraform-modules/sqs"
+  common_tags = local.common_tags
+  project     = var.project
+  function    = "api-update-checksum"
+  sqs_policy  = "api_update_checksum"
 }
 
 module "api_update_antivirus_lambda" {
