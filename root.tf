@@ -236,9 +236,9 @@ module "antivirus_lambda" {
 }
 
 module "checksum_lambda" {
-  source         = "./tdr-terraform-modules/lambda"
-  project        = var.project
-  common_tags    = local.common_tags
+  source          = "./tdr-terraform-modules/lambda"
+  project         = var.project
+  common_tags     = local.common_tags
   lambda_checksum = true
 }
 
@@ -250,47 +250,64 @@ module "dirty_upload_sns_topic" {
   sns_policy  = "s3_upload"
 }
 
+module "backend_check_sqs_queue" {
+  source      = "./tdr-terraform-modules/sqs"
+  common_tags = local.common_tags
+  project     = var.project
+  function    = "backend-check-failure"
+}
+
 module "antivirus_sqs_queue" {
-  source         = "./tdr-terraform-modules/sqs"
-  common_tags    = local.common_tags
-  project        = var.project
-  function       = "antivirus"
-  sns_topic_arns = [module.dirty_upload_sns_topic.sns_arn]
-  sqs_policy     = "sns_topic"
+  source                   = "./tdr-terraform-modules/sqs"
+  common_tags              = local.common_tags
+  project                  = var.project
+  function                 = "antivirus"
+  sns_topic_arns           = [module.dirty_upload_sns_topic.sns_arn]
+  sqs_policy               = "sns_topic"
+  dead_letter_queues       = [module.backend_check_sqs_queue.sqs_arn]
+  redrive_maximum_receives = 3
 }
 
 module "checksum_sqs_queue" {
-  source         = "./tdr-terraform-modules/sqs"
-  common_tags    = local.common_tags
-  project        = var.project
-  function       = "checksum"
-  sns_topic_arns = [module.dirty_upload_sns_topic.sns_arn]
-  sqs_policy     = "sns_topic"
+  source                   = "./tdr-terraform-modules/sqs"
+  common_tags              = local.common_tags
+  project                  = var.project
+  function                 = "checksum"
+  sns_topic_arns           = [module.dirty_upload_sns_topic.sns_arn]
+  sqs_policy               = "sns_topic"
+  dead_letter_queues       = [module.backend_check_sqs_queue.sqs_arn]
+  redrive_maximum_receives = 3
 }
 
 module "file_format_sqs_queue" {
-  source         = "./tdr-terraform-modules/sqs"
-  common_tags    = local.common_tags
-  project        = var.project
-  function       = "file-format"
-  sns_topic_arns = [module.dirty_upload_sns_topic.sns_arn]
-  sqs_policy     = "sns_topic"
+  source                   = "./tdr-terraform-modules/sqs"
+  common_tags              = local.common_tags
+  project                  = var.project
+  function                 = "file-format"
+  sns_topic_arns           = [module.dirty_upload_sns_topic.sns_arn]
+  sqs_policy               = "sns_topic"
+  dead_letter_queues       = [module.backend_check_sqs_queue.sqs_arn]
+  redrive_maximum_receives = 3
 }
 
 module "api_update_antivirus_queue" {
-  source      = "./tdr-terraform-modules/sqs"
-  common_tags = local.common_tags
-  project     = var.project
-  function    = "api-update-antivirus"
-  sqs_policy  = "api_update_antivirus"
+  source                   = "./tdr-terraform-modules/sqs"
+  common_tags              = local.common_tags
+  project                  = var.project
+  function                 = "api-update-antivirus"
+  sqs_policy               = "api_update_antivirus"
+  dead_letter_queues       = [module.backend_check_sqs_queue.sqs_arn]
+  redrive_maximum_receives = 3
 }
 
 module "api_update_checksum_queue" {
-  source      = "./tdr-terraform-modules/sqs"
-  common_tags = local.common_tags
-  project     = var.project
-  function    = "api-update-checksum"
-  sqs_policy  = "api_update_checksum"
+  source                   = "./tdr-terraform-modules/sqs"
+  common_tags              = local.common_tags
+  project                  = var.project
+  function                 = "api-update-checksum"
+  sqs_policy               = "api_update_checksum"
+  dead_letter_queues       = [module.backend_check_sqs_queue.sqs_arn]
+  redrive_maximum_receives = 3
 }
 
 module "api_update_antivirus_lambda" {
