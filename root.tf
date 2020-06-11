@@ -264,7 +264,7 @@ module "antivirus_sqs_queue" {
   function                 = "antivirus"
   sns_topic_arns           = [module.dirty_upload_sns_topic.sns_arn]
   sqs_policy               = "sns_topic"
-  dead_letter_queues       = [module.backend_check_failure_sqs_queue.sqs_arn]
+  dead_letter_queue       = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
 }
 
@@ -275,7 +275,7 @@ module "checksum_sqs_queue" {
   function                 = "checksum"
   sns_topic_arns           = [module.dirty_upload_sns_topic.sns_arn]
   sqs_policy               = "sns_topic"
-  dead_letter_queues       = [module.backend_check_failure_sqs_queue.sqs_arn]
+  dead_letter_queue       = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
 }
 
@@ -286,7 +286,7 @@ module "file_format_sqs_queue" {
   function                 = "file-format"
   sns_topic_arns           = [module.dirty_upload_sns_topic.sns_arn]
   sqs_policy               = "sns_topic"
-  dead_letter_queues       = [module.backend_check_failure_sqs_queue.sqs_arn]
+  dead_letter_queue       = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
 }
 
@@ -296,7 +296,7 @@ module "api_update_antivirus_queue" {
   project                  = var.project
   function                 = "api-update-antivirus"
   sqs_policy               = "api_update_antivirus"
-  dead_letter_queues       = [module.backend_check_failure_sqs_queue.sqs_arn]
+  dead_letter_queue       = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
 }
 
@@ -306,7 +306,7 @@ module "api_update_checksum_queue" {
   project                  = var.project
   function                 = "api-update-checksum"
   sqs_policy               = "api_update_checksum"
-  dead_letter_queues       = [module.backend_check_failure_sqs_queue.sqs_arn]
+  dead_letter_queue       = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
 }
 
