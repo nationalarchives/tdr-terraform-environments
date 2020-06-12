@@ -290,31 +290,21 @@ module "file_format_sqs_queue" {
   redrive_maximum_receives = 3
 }
 
-module "api_update_antivirus_queue" {
+module "api_update_queue" {
   source                   = "./tdr-terraform-modules/sqs"
   common_tags              = local.common_tags
   project                  = var.project
-  function                 = "api-update-antivirus"
+  function                 = "api-update"
   sqs_policy               = "api_update_antivirus"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
 }
 
-module "api_update_checksum_queue" {
-  source                   = "./tdr-terraform-modules/sqs"
-  common_tags              = local.common_tags
-  project                  = var.project
-  function                 = "api-update-checksum"
-  sqs_policy               = "api_update_checksum"
-  dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
-  redrive_maximum_receives = 3
-}
-
-module "api_update_antivirus_lambda" {
+module "api_update_lambda" {
   source                                = "./tdr-terraform-modules/lambda"
   project                               = var.project
   common_tags                           = local.common_tags
-  lambda_api_update_av                  = true
+  lambda_api_update                  = true
   auth_url                              = module.keycloak.auth_url
   api_url                               = module.consignment_api.api_url
   keycloak_backend_checks_client_secret = data.aws_ssm_parameter.keycloak_backend_checks_client_secret.value
