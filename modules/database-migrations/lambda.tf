@@ -31,6 +31,14 @@ data "aws_iam_policy_document" "lambda_migration_document" {
   statement {
     effect = "Allow"
     actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = [aws_cloudwatch_log_group.db_migration_log_group.arn]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
       "ec2:DeleteNetworkInterface",
       "ec2:DescribeInstances",
       "ec2:CreateNetworkInterface",
@@ -90,4 +98,9 @@ resource "aws_security_group" "db_migration" {
     var.common_tags,
     map("Name", "db-migration-security-group-${var.environment}")
   )
+}
+
+resource "aws_cloudwatch_log_group" "db_migration_log_group" {
+  name              = "/aws/lambda/${aws_lambda_function.database_migration_function.function_name}"
+  retention_in_days = 30
 }
