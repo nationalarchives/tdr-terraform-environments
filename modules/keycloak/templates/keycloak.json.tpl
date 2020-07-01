@@ -35,6 +35,10 @@
     ],
     "environment": [
       {
+        "name" : "KEYCLOAK_CONFIGURATION_PROPERTIES",
+        "value" : "${app_environment}_properties.json"
+      },
+      {
         "name" : "FRONTEND_URL",
         "value" : "${frontend_url}"
       },
