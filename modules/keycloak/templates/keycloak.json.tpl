@@ -35,6 +35,10 @@
     ],
     "environment": [
       {
+        "name" : "ENVIRONMENT",
+        "value" : "${app_environment}"
+      },
+      {
         "name" : "FRONTEND_URL",
         "value" : "${frontend_url}"
       },
