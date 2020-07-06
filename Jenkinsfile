@@ -42,7 +42,7 @@ pipeline {
                         sh 'terraform plan'
                         script {
                             tdr.postToDaTdrSlackChannel(colour: "good",
-                                                        message: "Terraform plan complete for ${params.STAGE} TDR environment." +
+                                                        message: "Terraform plan complete for ${params.STAGE} TDR environment. " +
                                                                  "View here for plan: https://jenkins.tdr-management.nationalarchives.gov.uk/job/" +
                                                                  "${JOB_NAME.replaceAll(' ', '%20')}/${BUILD_NUMBER}/console"
                             )
@@ -54,7 +54,7 @@ pipeline {
                         echo 'Sending request for approval of Terraform plan...'
                         script {
                             tdr.postToDaTdrSlackChannel(colour: "good",
-                                                        message: "Do you approve Terraform deployment for ${params.STAGE} TDR environment?" +
+                                                        message: "Do you approve Terraform deployment for ${params.STAGE} TDR environment? " +
                                                                  "https://jenkins.tdr-management.nationalarchives.gov.uk/job/" +
                                                                  "${JOB_NAME.replaceAll(' ', '%20')}/${BUILD_NUMBER}/input/"
                             )
