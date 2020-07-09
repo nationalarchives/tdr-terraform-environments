@@ -266,6 +266,7 @@ module "antivirus_sqs_queue" {
   sqs_policy               = "sns_topic"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
+  visibility_timeout       = 180
 }
 
 module "checksum_sqs_queue" {
