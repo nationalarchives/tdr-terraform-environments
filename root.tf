@@ -322,7 +322,7 @@ module "file_format_lambda" {
   keycloak_backend_checks_client_secret = data.aws_ssm_parameter.keycloak_backend_checks_client_secret.value
   file_system                           = module.file_format_efs.file_system
   file_format_efs_access_point          = module.file_format_efs.access_point
-  vpc_id = module.shared_vpc.vpc_id
+  vpc_id                                = module.shared_vpc.vpc_id
 }
 
 module "file_format_efs" {
@@ -335,9 +335,9 @@ module "file_format_efs" {
 }
 
 module "file_format_build_task" {
-  source          = "./tdr-terraform-modules/ecs"
-  common_tags     = local.common_tags
-  file_system     = module.file_format_efs.file_system
-  access_point    = module.file_format_efs.access_point
+  source            = "./tdr-terraform-modules/ecs"
+  common_tags       = local.common_tags
+  file_system       = module.file_format_efs.file_system
+  access_point      = module.file_format_efs.access_point
   file_format_build = true
 }
