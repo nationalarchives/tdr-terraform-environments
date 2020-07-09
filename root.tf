@@ -288,6 +288,7 @@ module "file_format_sqs_queue" {
   sqs_policy               = "sns_topic"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
+  visibility_timeout       = 180
 }
 
 module "api_update_queue" {
@@ -308,4 +309,34 @@ module "api_update_lambda" {
   auth_url                              = module.keycloak.auth_url
   api_url                               = module.consignment_api.api_url
   keycloak_backend_checks_client_secret = data.aws_ssm_parameter.keycloak_backend_checks_client_secret.value
+}
+
+module "file_format_lambda" {
+  source                                = "./tdr-terraform-modules/lambda"
+  project                               = var.project
+  common_tags                           = local.common_tags
+  lambda_file_format                    = true
+  auth_url                              = module.keycloak.auth_url
+  api_url                               = module.consignment_api.api_url
+  keycloak_backend_checks_client_secret = data.aws_ssm_parameter.keycloak_backend_checks_client_secret.value
+  file_system                           = module.file_format_efs.file_system
+  file_format_efs_access_point          = module.file_format_efs.access_point
+  vpc_id = module.shared_vpc.vpc_id
+}
+
+module "file_format_efs" {
+  source            = "./tdr-terraform-modules/efs"
+  common_tags       = local.common_tags
+  function          = "file-format-efs"
+  project           = "tdr"
+  access_point_path = "/fileformat"
+  policy            = "file_format_access_policy"
+}
+
+module "file_format_build_task" {
+  source          = "./tdr-terraform-modules/ecs"
+  common_tags     = local.common_tags
+  file_system     = module.file_format_efs.file_system
+  access_point    = module.file_format_efs.access_point
+  file_format_build = true
 }
