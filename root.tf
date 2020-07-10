@@ -329,7 +329,7 @@ module "file_format_efs" {
   source            = "./tdr-terraform-modules/efs"
   common_tags       = local.common_tags
   function          = "file-format-efs"
-  project           = "tdr"
+  project           = var.project
   access_point_path = "/fileformat"
   policy            = "file_format_access_policy"
 }
