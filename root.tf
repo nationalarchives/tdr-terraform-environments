@@ -340,4 +340,5 @@ module "file_format_build_task" {
   file_system       = module.file_format_efs.file_system
   access_point      = module.file_format_efs.access_point
   file_format_build = true
+  project = var.project
 }
