@@ -47,7 +47,7 @@
         "value" : "mysql"
       },
       {
-        "name" : "KEYCLOAK_IMPORT",
+        "name" : "TDR_KEYCLOAK_IMPORT",
         "value": "/tmp/realm.json"
       }
     ],
