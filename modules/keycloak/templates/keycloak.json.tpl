@@ -48,7 +48,7 @@
       },
       {
         "name" : "TDR_KEYCLOAK_IMPORT",
-        "value": "/tmp/realm.json"
+        "value": "/tmp/tdr-realm.json"
       }
     ],
     "networkMode": "awsvpc",
