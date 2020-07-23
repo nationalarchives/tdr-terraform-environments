@@ -47,8 +47,8 @@
         "value" : "mysql"
       },
       {
-        "name" : "TDR_KEYCLOAK_IMPORT",
-        "value": "/tmp/realm.json"
+        "name" : "KEYCLOAK_IMPORT",
+        "value": "/tmp/tdr-realm.json"
       }
     ],
     "networkMode": "awsvpc",
