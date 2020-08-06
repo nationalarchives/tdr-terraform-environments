@@ -31,6 +31,10 @@
       {
         "valueFrom": "${backend_checks_client_secret_path}",
         "name": "BACKEND_CHECKS_CLIENT_SECRET"
+      },
+      {
+        "valueFrom": "${realm_admin_client_secret_path}",
+        "name": "REALM_ADMIN_CLIENT_SECRET"
       }
     ],
     "environment": [
