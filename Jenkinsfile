@@ -1,4 +1,5 @@
 library("tdr-jenkinslib")
+def repo = "tdr-terraform-environments"
 
 pipeline {
   agent {
@@ -8,6 +9,13 @@ pipeline {
     choice(name: "STAGE", choices: ["intg", "staging", "prod"], description: "The stage you are deploying Terraform changes to")
   }
   stages {
+    stage("Run git secrets") {
+      steps {
+        script {
+          tdr.runGitSecrets(repo)
+        }
+      }
+    }
     stage('Run Terraform build') {
       agent {
         ecs {
