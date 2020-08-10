@@ -55,3 +55,13 @@ resource "aws_ssm_parameter" "keycloak_backend_checks_client_secret" {
     ignore_changes = [value]
   }
 }
+
+resource "aws_ssm_parameter" "keycloak_realm_admin_client_secret" {
+  name  = "/${var.environment}/keycloak/realm_admin_client/secret"
+  type  = "SecureString"
+  value = random_uuid.backend_checks_client_secret.result
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
