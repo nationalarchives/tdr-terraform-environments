@@ -39,8 +39,8 @@
     ],
     "environment": [
       {
-        "name" : "KEYCLOAK_CONFIGURATION_PROPERTIES",
-        "value" : "${app_environment}_properties.json"
+        "valueFrom": "${configuration_properties_path}",
+        "name" : "KEYCLOAK_CONFIGURATION_PROPERTIES"
       },
       {
         "name" : "FRONTEND_URL",

@@ -65,3 +65,9 @@ resource "aws_ssm_parameter" "keycloak_realm_admin_client_secret" {
     ignore_changes = [value]
   }
 }
+
+resource "aws_ssm_parameter" "keycloak_configuration_properties" {
+  name  = "/${var.environment}/keycloak/configuration_properties"
+  type  = "String"
+  value = "${var.environment}_properties.json"
+}
