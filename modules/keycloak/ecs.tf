@@ -27,7 +27,7 @@ data "template_file" "app" {
     backend_checks_client_secret_path = aws_ssm_parameter.keycloak_backend_checks_client_secret.name
     realm_admin_client_secret_path    = aws_ssm_parameter.keycloak_realm_admin_client_secret.name
     frontend_url                      = var.frontend_url
-
+    configuration_properties_path     = aws_ssm_parameter.keycloak_configuration_properties.name
   }
 }
 
