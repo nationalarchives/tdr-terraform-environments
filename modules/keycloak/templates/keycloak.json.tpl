@@ -35,13 +35,13 @@
       {
         "valueFrom": "${realm_admin_client_secret_path}",
         "name": "REALM_ADMIN_CLIENT_SECRET"
-      }
-    ],
-    "environment": [
+      },
       {
         "valueFrom": "${configuration_properties_path}",
         "name" : "KEYCLOAK_CONFIGURATION_PROPERTIES"
-      },
+      }
+    ],
+    "environment": [
       {
         "name" : "FRONTEND_URL",
         "value" : "${frontend_url}"
