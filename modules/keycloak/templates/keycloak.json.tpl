@@ -48,7 +48,7 @@
       },
       {
         "name" : "DB_VENDOR",
-        "value" : "mysql"
+        "value" : "postgres"
       },
       {
         "name" : "KEYCLOAK_IMPORT",
