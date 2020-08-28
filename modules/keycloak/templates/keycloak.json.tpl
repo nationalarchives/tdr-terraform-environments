@@ -38,7 +38,11 @@
       },
       {
         "valueFrom": "${configuration_properties_path}",
-        "name" : "KEYCLOAK_CONFIGURATION_PROPERTIES"
+        "name": "KEYCLOAK_CONFIGURATION_PROPERTIES"
+      },
+      {
+        "valueFrom": "${user_admin_client_secret_path}",
+        "name": "USER_ADMIN_CLIENT_SECRET"
       }
     ],
     "environment": [
