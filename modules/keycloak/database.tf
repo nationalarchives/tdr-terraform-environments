@@ -27,7 +27,7 @@ resource "aws_rds_cluster" "keycloak_database" {
   engine_version                  = "11.6"
   availability_zones              = var.database_availability_zones
   database_name                   = var.app_name
-  master_username                 = "api_admin"
+  master_username                 = "keycloak_admin"
   master_password                 = random_password.password.result
   final_snapshot_identifier       = "keycloak-db-final-snapshot-${random_string.snapshot_prefix.result}-${var.environment}"
   storage_encrypted               = true
@@ -36,10 +36,10 @@ resource "aws_rds_cluster" "keycloak_database" {
   db_subnet_group_name            = aws_db_subnet_group.user_subnet_group.name
   enabled_cloudwatch_logs_exports = ["postgresql"]
   tags = merge(
-  var.common_tags,
-  map(
-  "Name", "content-db-cluster-${var.environment}"
-  )
+    var.common_tags,
+    map(
+      "Name", "keycloak-db-cluster-${var.environment}"
+    )
   )
 
   lifecycle {
