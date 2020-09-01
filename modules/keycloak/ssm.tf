@@ -71,3 +71,13 @@ resource "aws_ssm_parameter" "keycloak_configuration_properties" {
   type  = "String"
   value = "${var.environment}_properties.json"
 }
+
+resource "aws_ssm_parameter" "keycloak_user_admin_client_secret" {
+  name  = "/${var.environment}/keycloak/user_admin_client/secret"
+  type  = "SecureString"
+  value = random_uuid.backend_checks_client_secret.result
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
