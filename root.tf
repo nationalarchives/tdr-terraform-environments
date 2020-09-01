@@ -78,6 +78,7 @@ module "keycloak" {
   az_count                    = 2
   region                      = local.region
   frontend_url                = module.frontend.frontend_url
+  kms_key_id                  = module.encryption_key.kms_key_arn
 }
 
 module "alb_logs_s3" {

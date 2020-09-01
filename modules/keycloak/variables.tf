@@ -28,3 +28,7 @@ variable "ip_whitelist" {
   description = "IP addresses allowed to access"
   default     = ["0.0.0.0/0"]
 }
+
+variable "kms_key_id" {
+  description = "KMS ID for the database encryption key"
+}
