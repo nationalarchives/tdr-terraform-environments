@@ -22,22 +22,23 @@ resource "random_string" "snapshot_prefix" {
 }
 
 resource "aws_rds_cluster" "keycloak_database" {
-  cluster_identifier_prefix = "keycloak-db-${var.environment}"
-  engine                    = "aurora"
-  engine_mode               = "serverless"
-  engine_version            = "5.6.10a"
-  availability_zones        = var.database_availability_zones
-  database_name             = "keycloak"
-  master_username           = "keycloak_admin"
-  master_password           = random_password.password.result
-  final_snapshot_identifier = "user-db-final-snapshot-${random_string.snapshot_prefix.result}-${var.environment}"
-  vpc_security_group_ids    = aws_security_group.database.*.id
-  db_subnet_group_name      = aws_db_subnet_group.user_subnet_group.name
-
+  cluster_identifier_prefix       = "keycloak-db-postgres-${var.environment}"
+  engine                          = "aurora-postgresql"
+  engine_version                  = "11.6"
+  availability_zones              = var.database_availability_zones
+  database_name                   = var.app_name
+  master_username                 = "keycloak_admin"
+  master_password                 = random_password.password.result
+  final_snapshot_identifier       = "keycloak-db-final-snapshot-${random_string.snapshot_prefix.result}-${var.environment}"
+  storage_encrypted               = true
+  kms_key_id                      = var.kms_key_id
+  vpc_security_group_ids          = aws_security_group.database.*.id
+  db_subnet_group_name            = aws_db_subnet_group.user_subnet_group.name
+  enabled_cloudwatch_logs_exports = ["postgresql"]
   tags = merge(
     var.common_tags,
     map(
-      "Name", "content-db-cluster-${var.environment}"
+      "Name", "keycloak-db-cluster-${var.environment}"
     )
   )
 
@@ -51,3 +52,12 @@ resource "aws_rds_cluster" "keycloak_database" {
   }
 }
 
+resource "aws_rds_cluster_instance" "user_database_instance" {
+  count                = 1
+  identifier_prefix    = "content-db-postgres-instance-${var.environment}"
+  cluster_identifier   = aws_rds_cluster.keycloak_database.id
+  engine               = "aurora-postgresql"
+  engine_version       = "11.6"
+  instance_class       = "db.t3.medium"
+  db_subnet_group_name = aws_db_subnet_group.user_subnet_group.name
+}
