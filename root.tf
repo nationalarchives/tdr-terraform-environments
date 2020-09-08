@@ -276,7 +276,7 @@ module "download_files_sqs_queue" {
   project                  = var.project
   function                 = "download-files"
   sns_topic_arns           = [module.dirty_upload_sns_topic.sns_arn]
-  sqs_policy               = "sns_topic"
+  sqs_policy               = "download_files"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
   visibility_timeout       = 180
