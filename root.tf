@@ -270,6 +270,18 @@ module "antivirus_sqs_queue" {
   visibility_timeout       = 180
 }
 
+module "download_files_sqs_queue" {
+  source                   = "./tdr-terraform-modules/sqs"
+  common_tags              = local.common_tags
+  project                  = var.project
+  function                 = "download-files"
+  sns_topic_arns           = [module.dirty_upload_sns_topic.sns_arn]
+  sqs_policy               = "sns_topic"
+  dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
+  redrive_maximum_receives = 3
+  visibility_timeout       = 180
+}
+
 module "checksum_sqs_queue" {
   source                   = "./tdr-terraform-modules/sqs"
   common_tags              = local.common_tags
@@ -286,8 +298,7 @@ module "file_format_sqs_queue" {
   common_tags              = local.common_tags
   project                  = var.project
   function                 = "file-format"
-  sns_topic_arns           = [module.dirty_upload_sns_topic.sns_arn]
-  sqs_policy               = "sns_topic"
+  sqs_policy               = "lambda"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
   visibility_timeout       = 180
@@ -321,9 +332,22 @@ module "file_format_lambda" {
   auth_url                              = module.keycloak.auth_url
   api_url                               = module.consignment_api.api_url
   keycloak_backend_checks_client_secret = data.aws_ssm_parameter.keycloak_backend_checks_client_secret.value
-  file_system                           = module.file_format_efs.file_system
+  file_system_id                        = module.file_format_efs.file_system_id
   file_format_efs_access_point          = module.file_format_efs.access_point
   vpc_id                                = module.shared_vpc.vpc_id
+  use_efs                               = true
+}
+
+module "download_files_lambda" {
+  source                       = "./tdr-terraform-modules/lambda"
+  common_tags                  = local.common_tags
+  project                      = var.project
+  lambda_download_files        = true
+  s3_sns_topic                 = module.dirty_upload_sns_topic.sns_arn
+  file_system_id               = module.file_format_efs.file_system_id
+  file_format_efs_access_point = module.file_format_efs.access_point
+  vpc_id                       = module.shared_vpc.vpc_id
+  use_efs                      = true
 }
 
 module "file_format_efs" {
@@ -338,8 +362,8 @@ module "file_format_efs" {
 module "file_format_build_task" {
   source            = "./tdr-terraform-modules/ecs"
   common_tags       = local.common_tags
-  file_system       = module.file_format_efs.file_system
+  file_system_id    = module.file_format_efs.file_system_id
   access_point      = module.file_format_efs.access_point
   file_format_build = true
-  project = var.project
+  project           = var.project
 }
