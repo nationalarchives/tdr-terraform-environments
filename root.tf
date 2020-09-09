@@ -276,7 +276,7 @@ module "download_files_sqs_queue" {
   project                  = var.project
   function                 = "download-files"
   sns_topic_arns           = [module.dirty_upload_sns_topic.sns_arn]
-  sqs_policy               = "download_files"
+  sqs_policy               = "sns_topic"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
   visibility_timeout       = 180
@@ -325,17 +325,14 @@ module "api_update_lambda" {
 }
 
 module "file_format_lambda" {
-  source                                = "./tdr-terraform-modules/lambda"
-  project                               = var.project
-  common_tags                           = local.common_tags
-  lambda_file_format                    = true
-  auth_url                              = module.keycloak.auth_url
-  api_url                               = module.consignment_api.api_url
-  keycloak_backend_checks_client_secret = data.aws_ssm_parameter.keycloak_backend_checks_client_secret.value
-  file_system_id                        = module.file_format_efs.file_system_id
-  file_format_efs_access_point          = module.file_format_efs.access_point
-  vpc_id                                = module.shared_vpc.vpc_id
-  use_efs                               = true
+  source                       = "./tdr-terraform-modules/lambda"
+  project                      = var.project
+  common_tags                  = local.common_tags
+  lambda_file_format           = true
+  file_system_id               = module.file_format_efs.file_system_id
+  file_format_efs_access_point = module.file_format_efs.access_point
+  vpc_id                       = module.shared_vpc.vpc_id
+  use_efs                      = true
 }
 
 module "download_files_lambda" {
@@ -348,6 +345,8 @@ module "download_files_lambda" {
   file_format_efs_access_point = module.file_format_efs.access_point
   vpc_id                       = module.shared_vpc.vpc_id
   use_efs                      = true
+  auth_url                     = module.keycloak.auth_url
+  api_url                      = module.consignment_api.api_url
 }
 
 module "file_format_efs" {
