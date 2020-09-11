@@ -349,12 +349,13 @@ module "download_files_lambda" {
 }
 
 module "file_format_efs" {
-  source            = "./tdr-terraform-modules/efs"
-  common_tags       = local.common_tags
-  function          = "file-format-efs"
-  project           = var.project
-  access_point_path = "/fileformat"
-  policy            = "file_format_access_policy"
+  source                       = "./tdr-terraform-modules/efs"
+  common_tags                  = local.common_tags
+  function                     = "file-format-efs"
+  project                      = var.project
+  access_point_path            = "/fileformat"
+  policy                       = "file_format_access_policy"
+  mount_target_security_groups = [module.file_format_lambda.file_format_lambda_sg_id, module.download_files_lambda.download_files_lambda_sg_id, module.file_format_build_task.file_format_build_sg_id]
 }
 
 module "file_format_build_task" {
