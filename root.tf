@@ -298,7 +298,6 @@ module "file_format_sqs_queue" {
   common_tags              = local.common_tags
   project                  = var.project
   function                 = "file-format"
-  sqs_policy               = "lambda"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
   visibility_timeout       = 180
