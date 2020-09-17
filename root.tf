@@ -355,7 +355,7 @@ module "file_format_efs" {
   project                      = var.project
   access_point_path            = "/fileformat"
   policy                       = "file_format_access_policy"
-  mount_target_security_groups = [module.file_format_lambda.file_format_lambda_sg_id, module.download_files_lambda.download_files_lambda_sg_id, module.file_format_build_task.file_format_build_sg_id]
+  mount_target_security_groups = flatten([module.file_format_lambda.file_format_lambda_sg_id, module.download_files_lambda.download_files_lambda_sg_id, module.file_format_build_task.file_format_build_sg_id])
 }
 
 module "file_format_build_task" {
