@@ -136,7 +136,7 @@ data "aws_iam_policy_document" "frontend_ecs_execution" {
     ]
   }
   statement {
-    actions = ["ecr:GetAuthorizationToken"]
+    actions   = ["ecr:GetAuthorizationToken"]
     resources = ["*"]
   }
 }

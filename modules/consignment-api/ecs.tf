@@ -139,7 +139,7 @@ data "aws_iam_policy_document" "consignment_api_ecs_execution" {
     ]
   }
   statement {
-    actions = ["ecr:GetAuthorizationToken"]
+    actions   = ["ecr:GetAuthorizationToken"]
     resources = ["*"]
   }
 }
