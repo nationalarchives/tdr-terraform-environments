@@ -14,7 +14,7 @@ data "template_file" "app" {
   template = file("modules/consignment-api/templates/consignment-api.json.tpl")
 
   vars = {
-    app_image       = "nationalarchives/consignment-api:${var.environment}"
+    app_image       = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/consignment-api:${var.environment}"
     app_port        = local.app_port
     app_environment = var.environment
     aws_region      = var.region
@@ -120,12 +120,26 @@ resource "aws_iam_policy" "consignment_api_ecs_execution" {
   policy = data.aws_iam_policy_document.consignment_api_ecs_execution.json
 }
 
+data "aws_ssm_parameter" "mgmt_account_number" {
+  name = "/mgmt/management_account"
+}
+
 data "aws_iam_policy_document" "consignment_api_ecs_execution" {
   statement {
     actions = [
       "logs:CreateLogStream",
-      "logs:PutLogEvents"
+      "logs:PutLogEvents",
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:BatchGetImage",
+      "ecr:GetDownloadUrlForLayer"
     ]
-    resources = [aws_cloudwatch_log_group.consignment_api_log_group.arn]
+    resources = [
+      aws_cloudwatch_log_group.consignment_api_log_group.arn,
+      "arn:aws:ecr:eu-west-2:${data.aws_ssm_parameter.mgmt_account_number.value}:repository/consignment-api"
+    ]
+  }
+  statement {
+    actions = ["ecr:GetAuthorizationToken"]
+    resources = ["*"]
   }
 }
