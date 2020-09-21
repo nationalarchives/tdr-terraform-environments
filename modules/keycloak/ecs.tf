@@ -14,7 +14,7 @@ data "template_file" "app" {
   template = file("modules/keycloak/templates/keycloak.json.tpl")
 
   vars = {
-    app_image       = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/auth-server:${var.environment}"
+    app_image                         = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/auth-server:${var.environment}"
     app_port                          = local.app_port
     app_environment                   = var.environment
     aws_region                        = var.region
@@ -144,7 +144,7 @@ data "aws_iam_policy_document" "keycloak_ecs_execution" {
     ]
   }
   statement {
-    actions = ["ecr:GetAuthorizationToken"]
+    actions   = ["ecr:GetAuthorizationToken"]
     resources = ["*"]
   }
 }
