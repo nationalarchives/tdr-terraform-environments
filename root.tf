@@ -231,9 +231,10 @@ module "backend_lambda_function_bucket" {
 
 module "antivirus_lambda" {
   source         = "./tdr-terraform-modules/lambda"
-  project        = var.project
   common_tags    = local.common_tags
+  file_system_id = module.backend_checks_efs.file_system_id
   lambda_yara_av = true
+  project        = var.project
 }
 
 module "checksum_lambda" {
