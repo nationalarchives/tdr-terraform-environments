@@ -29,16 +29,15 @@ resource "aws_security_group" "bastion_security_group" {
   vpc_id      = var.vpc_id
 
   tags = merge(
-  var.common_tags,
-  map("Name", "${var.app_name}-database-bastion-security-group-${var.environment}")
+    var.common_tags,
+    map("Name", "${var.app_name}-database-bastion-security-group-${var.environment}")
   )
 
   egress {
-    protocol        = "-1"
-    from_port       = 0
-    to_port         = 0
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
-
   }
 
   lifecycle {
