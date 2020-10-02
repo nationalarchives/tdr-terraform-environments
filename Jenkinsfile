@@ -5,5 +5,6 @@ terraformDeployJob(
   repo: "tdr-terraform-environments",
   taskRoleName: "TDRTerraformAssumeRole${params.STAGE.capitalize()}",
   deployment: "Environment",
-  terraformDirectoryPath: "."
+  terraformDirectoryPath: ".",
+  testDelaySeconds: 300
 )
