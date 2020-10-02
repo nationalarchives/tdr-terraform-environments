@@ -230,11 +230,15 @@ module "backend_lambda_function_bucket" {
 }
 
 module "antivirus_lambda" {
-  source         = "./tdr-terraform-modules/lambda"
-  common_tags    = local.common_tags
-  file_system_id = module.backend_checks_efs.file_system_id
-  lambda_yara_av = true
-  project        = var.project
+  source                                 = "./tdr-terraform-modules/lambda"
+  backend_checks_efs_access_point        = module.backend_checks_efs.access_point
+  backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
+  common_tags                            = local.common_tags
+  file_system_id                         = module.backend_checks_efs.file_system_id
+  lambda_yara_av                         = true
+  project                                = var.project
+  use_efs                                = true
+  vpc_id                                 = module.shared_vpc.vpc_id
 }
 
 module "checksum_lambda" {
@@ -264,8 +268,6 @@ module "antivirus_sqs_queue" {
   common_tags              = local.common_tags
   project                  = var.project
   function                 = "antivirus"
-  sns_topic_arns           = [module.dirty_upload_sns_topic.sns_arn]
-  sqs_policy               = "sns_topic"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
   visibility_timeout       = 180
