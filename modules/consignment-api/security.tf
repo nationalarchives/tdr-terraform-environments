@@ -7,7 +7,7 @@ resource "aws_security_group" "database" {
     protocol        = "tcp"
     from_port       = 5432
     to_port         = 5432
-    security_groups = [aws_security_group.ecs_tasks.id, var.db_migration_sg]
+    security_groups = [aws_security_group.ecs_tasks.id, var.db_migration_sg, aws_security_group.bastion_security_group.id]
   }
 
   egress {
@@ -21,6 +21,28 @@ resource "aws_security_group" "database" {
     var.common_tags,
     map("Name", "${var.app_name}-database-security-group-${var.environment}")
   )
+}
+
+resource "aws_security_group" "bastion_security_group" {
+  name        = "${var.app_name}-database-bastion-security-group-${var.environment}"
+  description = "Security group which will be used by the bastion EC2 instance."
+  vpc_id      = var.vpc_id
+
+  tags = merge(
+    var.common_tags,
+    map("Name", "${var.app_name}-database-bastion-security-group-${var.environment}")
+  )
+
+  egress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  lifecycle {
+    ignore_changes = [ingress]
+  }
 }
 
 resource "aws_security_group" "lb" {
