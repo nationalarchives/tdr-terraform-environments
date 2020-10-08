@@ -360,7 +360,7 @@ module "backend_checks_efs" {
   project                      = var.project
   access_point_path            = "/backend-checks"
   policy                       = "backend_checks_access_policy"
-  mount_target_security_groups = flatten([module.file_format_lambda.file_format_lambda_sg_id, module.download_files_lambda.download_files_lambda_sg_id, module.file_format_build_task.file_format_build_sg_id])
+  mount_target_security_groups = flatten([module.file_format_lambda.file_format_lambda_sg_id, module.download_files_lambda.download_files_lambda_sg_id, module.file_format_build_task.file_format_build_sg_id, module.antivirus_lambda.antivirus_lambda_sg_id])
 }
 
 module "file_format_build_task" {
