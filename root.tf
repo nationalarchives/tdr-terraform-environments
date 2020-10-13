@@ -242,10 +242,15 @@ module "antivirus_lambda" {
 }
 
 module "checksum_lambda" {
-  source          = "./tdr-terraform-modules/lambda"
-  project         = var.project
-  common_tags     = local.common_tags
-  lambda_checksum = true
+  source                                 = "./tdr-terraform-modules/lambda"
+  project                                = var.project
+  common_tags                            = local.common_tags
+  lambda_checksum                        = true
+  file_system_id                         = module.backend_checks_efs.file_system_id
+  backend_checks_efs_access_point        = module.backend_checks_efs.access_point
+  vpc_id                                 = module.shared_vpc.vpc_id
+  use_efs                                = true
+  backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
 }
 
 module "dirty_upload_sns_topic" {
@@ -290,7 +295,6 @@ module "checksum_sqs_queue" {
   common_tags              = local.common_tags
   project                  = var.project
   function                 = "checksum"
-  sns_topic_arns           = [module.dirty_upload_sns_topic.sns_arn]
   sqs_policy               = "sns_topic"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
@@ -360,7 +364,7 @@ module "backend_checks_efs" {
   project                      = var.project
   access_point_path            = "/backend-checks"
   policy                       = "backend_checks_access_policy"
-  mount_target_security_groups = flatten([module.file_format_lambda.file_format_lambda_sg_id, module.download_files_lambda.download_files_lambda_sg_id, module.file_format_build_task.file_format_build_sg_id, module.antivirus_lambda.antivirus_lambda_sg_id])
+  mount_target_security_groups = flatten([module.file_format_lambda.file_format_lambda_sg_id, module.download_files_lambda.download_files_lambda_sg_id, module.file_format_build_task.file_format_build_sg_id, module.antivirus_lambda.antivirus_lambda_sg_id, module.checksum_lambda.checksum_lambda_sg_id])
 }
 
 module "file_format_build_task" {
