@@ -331,7 +331,7 @@ module "api_update_lambda" {
 }
 
 module "file_format_lambda" {
-  source              = "./tdr-terraform-modules/lambda"
+  source                                 = "./tdr-terraform-modules/lambda"
   project                                = var.project
   common_tags                            = local.common_tags
   lambda_file_format                     = true
