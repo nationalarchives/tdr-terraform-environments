@@ -1,0 +1,7 @@
+library("tdr-jenkinslib")
+
+terraformCheckJob(
+  repo: "tdr-terraform-environments",
+  taskRoleName: "TDRTerraformAssumeRole${params.STAGE.capitalize()}",
+  terraformDirectoryPath: "."
+)
