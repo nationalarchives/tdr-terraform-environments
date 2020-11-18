@@ -61,6 +61,7 @@ module "frontend" {
   dns_zone_name_trimmed = local.dns_zone_name_trimmed
   auth_url              = module.keycloak.auth_url
   client_secret_path    = module.keycloak.client_secret_path
+  export_api_url = module.export_api.api_url
 }
 
 module "keycloak" {
@@ -177,15 +178,6 @@ module "frontend_certificate" {
   source      = "./tdr-terraform-modules/certificatemanager"
   project     = var.project
   function    = "frontend"
-  dns_zone    = local.environment_domain
-  domain_name = local.environment_domain
-  common_tags = local.common_tags
-}
-
-module "export_api_certificate" {
-  source      = "./tdr-terraform-modules/certificatemanager"
-  project     = var.project
-  function    = "exportapi"
   dns_zone    = local.environment_domain
   domain_name = local.environment_domain
   common_tags = local.common_tags
@@ -392,9 +384,6 @@ module "export_api" {
   template_params = { lambda_arn = module.export_authoriser_lambda.export_api_authoriser_arn, state_machine_arn = module.export_step_function.state_machine_arn }
   environment     = local.environment
   common_tags     = local.common_tags
-  certificate_arn = module.export_api_certificate.certificate_arn
-  dns_name = "exportapi"
-  zone_id = local.dns_zone_id
 }
 
 module "export_authoriser_lambda" {
