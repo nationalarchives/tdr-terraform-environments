@@ -61,7 +61,7 @@ module "frontend" {
   dns_zone_name_trimmed = local.dns_zone_name_trimmed
   auth_url              = module.keycloak.auth_url
   client_secret_path    = module.keycloak.client_secret_path
-  export_api_url = module.export_api.api_url
+  export_api_url        = module.export_api.api_url
 }
 
 module "keycloak" {

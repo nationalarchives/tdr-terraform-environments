@@ -20,7 +20,7 @@ data "template_file" "app" {
     aws_region         = var.region
     client_secret_path = var.client_secret_path
     identity_pool_id   = aws_cognito_identity_pool.tdr_frontend_identity_pool.id
-    export_api_url = var.export_api_url
+    export_api_url     = var.export_api_url
   }
 }
 
