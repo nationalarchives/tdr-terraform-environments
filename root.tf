@@ -240,6 +240,7 @@ module "antivirus_lambda" {
   project                                = var.project
   use_efs                                = true
   vpc_id                                 = module.shared_vpc.vpc_id
+  private_subnet_ids = module.backend_checks_efs.private_subnets
 }
 
 module "checksum_lambda" {
@@ -252,6 +253,7 @@ module "checksum_lambda" {
   vpc_id                                 = module.shared_vpc.vpc_id
   use_efs                                = true
   backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
+  private_subnet_ids = module.backend_checks_efs.private_subnets
 }
 
 module "dirty_upload_sns_topic" {
@@ -341,6 +343,7 @@ module "file_format_lambda" {
   vpc_id                                 = module.shared_vpc.vpc_id
   use_efs                                = true
   backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
+  private_subnet_ids = module.backend_checks_efs.private_subnets
 }
 
 module "download_files_lambda" {
@@ -356,6 +359,7 @@ module "download_files_lambda" {
   auth_url                               = module.keycloak.auth_url
   api_url                                = module.consignment_api.api_url
   backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
+  private_subnet_ids = module.backend_checks_efs.private_subnets
 }
 
 module "backend_checks_efs" {
@@ -379,8 +383,8 @@ module "file_format_build_task" {
 
 module "export_api" {
   source          = "./tdr-terraform-modules/apigateway"
-  name            = "ExportAPI"
-  template        = "export_api"
+  api_name            = "ExportAPI"
+  api_template        = "export_api"
   template_params = { lambda_arn = module.export_authoriser_lambda.export_api_authoriser_arn, state_machine_arn = module.export_step_function.state_machine_arn }
   environment     = local.environment
   common_tags     = local.common_tags
@@ -392,6 +396,7 @@ module "export_authoriser_lambda" {
   project                  = "tdr"
   lambda_export_authoriser = true
   api_url                  = module.consignment_api.api_url
+  api_gateway_arn = module.export_api.api_arn
 }
 
 //create a new efs volume, ECS task attached to the volume and pass in the proper variables and create ECR repository in the backend project
