@@ -32,3 +32,6 @@ variable "ip_whitelist" {
   description = "IP addresses allowed to access"
   default     = ["0.0.0.0/0"]
 }
+
+variable "export_api_url" {}
+
