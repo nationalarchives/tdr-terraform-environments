@@ -25,6 +25,10 @@
       {
         "name": "IDENTITY_POOL_ID",
         "value": "${identity_pool_id}"
+      },
+      {
+        "name": "EXPORT_API_URL",
+        "value": "${export_api_url}"
       }
     ],
     "networkMode": "awsvpc",

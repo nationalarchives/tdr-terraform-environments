@@ -61,6 +61,7 @@ module "frontend" {
   dns_zone_name_trimmed = local.dns_zone_name_trimmed
   auth_url              = module.keycloak.auth_url
   client_secret_path    = module.keycloak.client_secret_path
+  export_api_url        = module.export_api.api_url
 }
 
 module "keycloak" {
@@ -239,6 +240,7 @@ module "antivirus_lambda" {
   project                                = var.project
   use_efs                                = true
   vpc_id                                 = module.shared_vpc.vpc_id
+  private_subnet_ids                     = module.backend_checks_efs.private_subnets
 }
 
 module "checksum_lambda" {
@@ -251,6 +253,7 @@ module "checksum_lambda" {
   vpc_id                                 = module.shared_vpc.vpc_id
   use_efs                                = true
   backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
+  private_subnet_ids                     = module.backend_checks_efs.private_subnets
 }
 
 module "dirty_upload_sns_topic" {
@@ -340,6 +343,7 @@ module "file_format_lambda" {
   vpc_id                                 = module.shared_vpc.vpc_id
   use_efs                                = true
   backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
+  private_subnet_ids                     = module.backend_checks_efs.private_subnets
 }
 
 module "download_files_lambda" {
@@ -355,6 +359,7 @@ module "download_files_lambda" {
   auth_url                               = module.keycloak.auth_url
   api_url                                = module.consignment_api.api_url
   backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
+  private_subnet_ids                     = module.backend_checks_efs.private_subnets
 }
 
 module "backend_checks_efs" {
@@ -374,4 +379,69 @@ module "file_format_build_task" {
   access_point      = module.backend_checks_efs.access_point
   file_format_build = true
   project           = var.project
+}
+
+module "export_api" {
+  source          = "./tdr-terraform-modules/apigateway"
+  api_name        = "ExportAPI"
+  api_template    = "export_api"
+  template_params = { lambda_arn = module.export_authoriser_lambda.export_api_authoriser_arn, state_machine_arn = module.export_step_function.state_machine_arn }
+  environment     = local.environment
+  common_tags     = local.common_tags
+}
+
+module "export_authoriser_lambda" {
+  source                   = "./tdr-terraform-modules/lambda"
+  common_tags              = local.common_tags
+  project                  = "tdr"
+  lambda_export_authoriser = true
+  api_url                  = module.consignment_api.api_url
+  api_gateway_arn          = module.export_api.api_arn
+}
+
+//create a new efs volume, ECS task attached to the volume and pass in the proper variables and create ECR repository in the backend project
+
+module "export_efs" {
+  source                       = "./tdr-terraform-modules/efs"
+  common_tags                  = local.common_tags
+  function                     = "export-efs"
+  project                      = var.project
+  access_point_path            = "/export"
+  policy                       = "export_access_policy"
+  mount_target_security_groups = flatten([module.export_task.consignment_export_sg_id])
+  netnum_offset                = 6
+}
+
+module "export_task" {
+  source                     = "./tdr-terraform-modules/ecs"
+  common_tags                = local.common_tags
+  project                    = var.project
+  consignment_export         = true
+  file_system_id             = module.export_efs.file_system_id
+  access_point               = module.export_efs.access_point
+  backend_client_secret_path = data.aws_ssm_parameter.keycloak_backend_checks_client_secret.name
+  clean_bucket               = module.upload_bucket.s3_bucket_name
+  output_bucket              = module.export_bucket.s3_bucket_name
+  api_url                    = module.consignment_api.api_url
+  auth_url                   = module.keycloak.auth_url
+}
+
+module "export_step_function" {
+  source               = "./tdr-terraform-modules/stepfunctions"
+  project              = var.project
+  common_tags          = local.common_tags
+  definition           = "consignment_export"
+  environment          = local.environment
+  step_function_name   = "ConsignmentExport"
+  definition_variables = { security_groups = jsonencode(module.export_task.consignment_export_sg_id), subnet_ids = jsonencode(module.export_efs.private_subnets), cluster_arn = module.export_task.consignment_export_cluster_arn, task_arn = module.export_task.consignment_export_task_arn, task_name = "consignment-export" }
+  policy               = "consignment_export"
+  policy_variables     = { task_arn = module.export_task.consignment_export_task_arn, execution_role = module.export_task.consignment_export_execution_role_arn, task_role = module.export_task.consignment_export_task_role_arn }
+}
+
+module "export_bucket" {
+  source            = "./tdr-terraform-modules/s3"
+  project           = var.project
+  function          = "consignment-export"
+  common_tags       = local.common_tags
+  version_lifecycle = true
 }
