@@ -62,6 +62,7 @@ module "frontend" {
   auth_url              = module.keycloak.auth_url
   client_secret_path    = module.keycloak.client_secret_path
   export_api_url        = module.export_api.api_url
+  alb_id                = module.frontend_alb.alb_id
 }
 
 module "keycloak" {

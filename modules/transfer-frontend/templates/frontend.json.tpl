@@ -29,6 +29,14 @@
       {
         "name": "EXPORT_API_URL",
         "value": "${export_api_url}"
+      },
+      {
+        "name": "ALB_IP_A",
+        "value": "${alb_ip_a}"
+      },
+      {
+        "name": "ALB_IP_B",
+        "value": "${alb_ip_b}"
       }
     ],
     "networkMode": "awsvpc",
