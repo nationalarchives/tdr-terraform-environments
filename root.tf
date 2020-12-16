@@ -184,6 +184,8 @@ module "frontend_certificate" {
   common_tags = local.common_tags
 }
 
+# The frontend uses the network interface IPs which are created for this load balancer.
+# If any changes are made to this load balancer which will cause a redeploy then the front end will also need to be deployed.
 module "frontend_alb" {
   source                = "./tdr-terraform-modules/alb"
   project               = var.project
