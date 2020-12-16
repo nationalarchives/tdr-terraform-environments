@@ -30,7 +30,8 @@ resource "aws_subnet" "private" {
 }
 
 
-
+# The frontend uses the network interface IPs which come from the range in this subnet.
+# If any changes are made to this subnets IP range, the front end will need to be re-deployed.
 # Create var.az_count public subnets, each in a different AZ
 resource "aws_subnet" "public" {
   count                   = var.az_count
