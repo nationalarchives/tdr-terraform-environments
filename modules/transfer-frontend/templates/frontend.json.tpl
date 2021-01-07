@@ -37,6 +37,10 @@
       {
         "name": "ALB_IP_B",
         "value": "${alb_ip_b}"
+      },
+      {
+        "name": "COGNITO_ROLE_ARN",
+        "value": "${cognito_role_arn}"
       }
     ],
     "networkMode": "awsvpc",
