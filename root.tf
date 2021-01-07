@@ -109,14 +109,15 @@ module "upload_bucket_quarantine" {
 }
 
 module "upload_file_dirty_s3" {
-  source            = "./tdr-terraform-modules/s3"
-  project           = var.project
-  function          = "upload-files-dirty"
-  common_tags       = local.common_tags
-  cors_urls         = local.upload_cors_urls
-  version_lifecycle = true
-  sns_topic_arn     = module.dirty_upload_sns_topic.sns_arn
-  sns_notification  = true
+  source                   = "./tdr-terraform-modules/s3"
+  project                  = var.project
+  function                 = "upload-files-dirty"
+  common_tags              = local.common_tags
+  cors_urls                = local.upload_cors_urls
+  version_lifecycle        = true
+  sns_topic_arn            = module.dirty_upload_sns_topic.sns_arn
+  sns_notification         = true
+  abort_incomplete_uploads = true
 }
 
 module "consignment_api_certificate" {
