@@ -25,7 +25,7 @@ data "template_file" "app" {
     export_api_url     = var.export_api_url
     alb_ip_a           = data.aws_network_interface.alb_network_interface_a.private_ip
     alb_ip_b           = data.aws_network_interface.alb_network_interface_b.private_ip
-    cognito_role_arn = aws_iam_role.cognito_authorised_role.arn
+    cognito_role_arn   = aws_iam_role.cognito_authorised_role.arn
   }
 }
 
