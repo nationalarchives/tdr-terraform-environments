@@ -45,7 +45,7 @@ resource "aws_iam_role" "cognito_authorised_role" {
   name                 = "TDRCognitoAuthorisedRole${title(var.environment)}"
   description          = "Role for authenticated users for the ${title(var.environment)} environment"
   assume_role_policy   = data.template_file.cognito_assume_role_policy.rendered
-  max_session_duration = 12 * 60 * 60
+  max_session_duration = 3 * 60 * 60
   tags = merge(
     var.common_tags,
     map(
