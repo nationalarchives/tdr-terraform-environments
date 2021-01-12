@@ -42,10 +42,10 @@ resource "aws_iam_policy" "cognito_auth_policy" {
 }
 
 resource "aws_iam_role" "cognito_authorised_role" {
-  name               = "TDRCognitoAuthorisedRole${title(var.environment)}"
-  description        = "Role for authenticated users for the ${title(var.environment)} environment"
-  assume_role_policy = data.template_file.cognito_assume_role_policy.rendered
-
+  name                 = "TDRCognitoAuthorisedRole${title(var.environment)}"
+  description          = "Role for authenticated users for the ${title(var.environment)} environment"
+  assume_role_policy   = data.template_file.cognito_assume_role_policy.rendered
+  max_session_duration = 3 * 60 * 60
   tags = merge(
     var.common_tags,
     map(
