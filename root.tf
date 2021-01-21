@@ -437,9 +437,10 @@ module "export_step_function" {
   definition           = "consignment_export"
   environment          = local.environment
   step_function_name   = "ConsignmentExport"
-  definition_variables = { security_groups = jsonencode(module.export_task.consignment_export_sg_id), subnet_ids = jsonencode(module.export_efs.private_subnets), cluster_arn = module.export_task.consignment_export_cluster_arn, task_arn = module.export_task.consignment_export_task_arn, task_name = "consignment-export" }
+  definition_variables = { security_groups = jsonencode(module.export_task.consignment_export_sg_id), subnet_ids = jsonencode(module.export_efs.private_subnets), cluster_arn = module.export_task.consignment_export_cluster_arn, task_arn = module.export_task.consignment_export_task_arn, task_name = "consignment-export", sns_topic = module.notifications_topic.sns_arn }
   policy               = "consignment_export"
   policy_variables     = { task_arn = module.export_task.consignment_export_task_arn, execution_role = module.export_task.consignment_export_execution_role_arn, task_role = module.export_task.consignment_export_task_role_arn }
+  notification_sns_topic = module.notifications_topic.sns_arn
 }
 
 module "export_bucket" {
@@ -448,4 +449,12 @@ module "export_bucket" {
   function          = "consignment-export"
   common_tags       = local.common_tags
   version_lifecycle = true
+}
+
+module "notifications_topic" {
+  source = "./tdr-terraform-modules/sns"
+  common_tags = local.common_tags
+  function = "notifications"
+  project = var.project
+  sns_policy = "notifications"
 }
