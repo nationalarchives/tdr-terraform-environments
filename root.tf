@@ -222,7 +222,7 @@ module "waf" {
   environment       = local.environment
   common_tags       = local.common_tags
   alb_target_groups = [module.keycloak_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn]
-  trusted_ips       = split(",", data.aws_ssm_parameter.trusted_ips.value)
+  trusted_ips       = concat(split(",", data.aws_ssm_parameter.trusted_ips.value), list("${data.aws_nat_gateway.main_one.public_ip}/32", "${data.aws_nat_gateway.main_zero.public_ip}/32"))
   geo_match         = split(",", var.geo_match)
   restricted_uri    = "auth/admin"
 }
