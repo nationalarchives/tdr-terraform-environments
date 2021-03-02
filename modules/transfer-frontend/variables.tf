@@ -37,3 +37,6 @@ variable "export_api_url" {}
 
 variable "alb_id" {}
 
+variable "public_subnet_ranges" {
+  type = list(string)
+}
