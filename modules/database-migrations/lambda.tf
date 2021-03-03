@@ -80,6 +80,7 @@ resource "aws_lambda_function" "database_migration_function" {
       STAGE       = var.environment
     }
   }
+  depends_on = [aws_iam_role_policy_attachment.lambda_role_attach_migration_policy]
 }
 
 resource "aws_security_group" "db_migration" {
@@ -101,6 +102,6 @@ resource "aws_security_group" "db_migration" {
 }
 
 resource "aws_cloudwatch_log_group" "db_migration_log_group" {
-  name              = "/aws/lambda/${aws_lambda_function.database_migration_function.function_name}"
+  name              = "/aws/lambda/tdr-database-migrations-${var.environment}"
   retention_in_days = 30
 }
