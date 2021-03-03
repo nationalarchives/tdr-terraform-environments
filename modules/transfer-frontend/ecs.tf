@@ -23,31 +23,9 @@ data "template_file" "app" {
     client_secret_path = var.client_secret_path
     identity_pool_id   = aws_cognito_identity_pool.tdr_frontend_identity_pool.id
     export_api_url     = var.export_api_url
-    alb_ip_a           = data.aws_network_interface.alb_network_interface_a.private_ip
-    alb_ip_b           = data.aws_network_interface.alb_network_interface_b.private_ip
+    alb_ip_a           = var.public_subnet_ranges[0]
+    alb_ip_b           = var.public_subnet_ranges[1]
     cognito_role_arn   = aws_iam_role.cognito_authorised_role.arn
-  }
-}
-
-data aws_network_interface alb_network_interface_a {
-  filter {
-    name   = "description"
-    values = ["ELB ${replace(var.alb_id, "arn:aws:elasticloadbalancing:${var.region}:${data.aws_caller_identity.current.account_id}:loadbalancer/", "")}"]
-  }
-  filter {
-    name   = "availability-zone"
-    values = ["${var.region}a"]
-  }
-}
-
-data aws_network_interface alb_network_interface_b {
-  filter {
-    name   = "description"
-    values = ["ELB ${replace(var.alb_id, "arn:aws:elasticloadbalancing:${var.region}:${data.aws_caller_identity.current.account_id}:loadbalancer/", "")}"]
-  }
-  filter {
-    name   = "availability-zone"
-    values = ["${var.region}b"]
   }
 }
 
