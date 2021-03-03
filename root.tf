@@ -63,6 +63,7 @@ module "frontend" {
   client_secret_path    = module.keycloak.client_secret_path
   export_api_url        = module.export_api.api_url
   alb_id                = module.frontend_alb.alb_id
+  public_subnet_ranges  = module.shared_vpc.public_subnet_ranges
 }
 
 module "keycloak" {
