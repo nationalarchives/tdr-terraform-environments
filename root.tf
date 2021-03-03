@@ -246,6 +246,8 @@ module "antivirus_lambda" {
   use_efs                                = true
   vpc_id                                 = module.shared_vpc.vpc_id
   private_subnet_ids                     = module.backend_checks_efs.private_subnets
+  mount_target_zero = module.backend_checks_efs.mount_target_zero
+  mount_target_one = module.backend_checks_efs.mount_target_one
 }
 
 module "checksum_lambda" {
@@ -259,6 +261,8 @@ module "checksum_lambda" {
   use_efs                                = true
   backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
   private_subnet_ids                     = module.backend_checks_efs.private_subnets
+  mount_target_zero = module.backend_checks_efs.mount_target_zero
+  mount_target_one = module.backend_checks_efs.mount_target_one
 }
 
 module "dirty_upload_sns_topic" {
@@ -350,6 +354,8 @@ module "file_format_lambda" {
   use_efs                                = true
   backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
   private_subnet_ids                     = module.backend_checks_efs.private_subnets
+  mount_target_zero = module.backend_checks_efs.mount_target_zero
+  mount_target_one = module.backend_checks_efs.mount_target_one
 }
 
 module "download_files_lambda" {
