@@ -439,7 +439,7 @@ module "export_task" {
   consignment_export         = true
   file_system_id             = module.export_efs.file_system_id
   access_point               = module.export_efs.access_point
-  backend_client_secret_path = module.keycloak.backend_checks_client_secret
+  backend_client_secret_path = module.keycloak.backend_checks_client_secret_path
   clean_bucket               = module.upload_bucket.s3_bucket_name
   output_bucket              = module.export_bucket.s3_bucket_name
   api_url                    = module.consignment_api.api_url
