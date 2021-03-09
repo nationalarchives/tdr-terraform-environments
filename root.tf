@@ -95,10 +95,10 @@ module "alb_logs_s3" {
 }
 
 module "upload_bucket" {
-  source            = "./tdr-terraform-modules/s3"
-  project           = var.project
-  function          = "upload-files"
-  common_tags       = local.common_tags
+  source      = "./tdr-terraform-modules/s3"
+  project     = var.project
+  function    = "upload-files"
+  common_tags = local.common_tags
 }
 
 module "upload_bucket_quarantine" {
@@ -443,10 +443,10 @@ module "export_step_function" {
 }
 
 module "export_bucket" {
-  source            = "./tdr-terraform-modules/s3"
-  project           = var.project
-  function          = "consignment-export"
-  common_tags       = local.common_tags
+  source      = "./tdr-terraform-modules/s3"
+  project     = var.project
+  function    = "consignment-export"
+  common_tags = local.common_tags
 }
 
 module "notifications_topic" {
