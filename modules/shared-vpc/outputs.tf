@@ -13,3 +13,15 @@ output "public_subnet_ranges" {
 output "private_subnets" {
   value = aws_subnet.private.*.id
 }
+
+output "nat_gateway_ids" {
+  value = aws_nat_gateway.gw.*.id
+}
+
+output "vpc_cidr_block" {
+  value = aws_vpc.main.cidr_block
+}
+
+output "nat_gateway_public_ips" {
+  value = aws_nat_gateway.gw.*.public_ip
+}

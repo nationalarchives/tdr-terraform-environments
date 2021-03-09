@@ -221,7 +221,7 @@ module "waf" {
   environment       = local.environment
   common_tags       = local.common_tags
   alb_target_groups = [module.keycloak_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn]
-  trusted_ips       = concat(split(",", data.aws_ssm_parameter.trusted_ips.value), list("${data.aws_nat_gateway.main_one.public_ip}/32", "${data.aws_nat_gateway.main_zero.public_ip}/32"))
+  trusted_ips       = concat(split(",", data.aws_ssm_parameter.trusted_ips.value), list("${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"))
   geo_match         = split(",", var.geo_match)
   restricted_uri    = "auth/admin"
 }
@@ -244,6 +244,8 @@ module "antivirus_lambda" {
   use_efs                                = true
   vpc_id                                 = module.shared_vpc.vpc_id
   private_subnet_ids                     = module.backend_checks_efs.private_subnets
+  mount_target_zero                      = module.backend_checks_efs.mount_target_zero
+  mount_target_one                       = module.backend_checks_efs.mount_target_one
 }
 
 module "checksum_lambda" {
@@ -257,6 +259,8 @@ module "checksum_lambda" {
   use_efs                                = true
   backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
   private_subnet_ids                     = module.backend_checks_efs.private_subnets
+  mount_target_zero                      = module.backend_checks_efs.mount_target_zero
+  mount_target_one                       = module.backend_checks_efs.mount_target_one
 }
 
 module "dirty_upload_sns_topic" {
@@ -304,6 +308,7 @@ module "checksum_sqs_queue" {
   sqs_policy               = "sns_topic"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
+  visibility_timeout       = 180
 }
 
 module "file_format_sqs_queue" {
@@ -313,7 +318,9 @@ module "file_format_sqs_queue" {
   function                 = "file-format"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
-  visibility_timeout       = 180
+  // Terraform will fail if the visibility timeout is shorter than the lambda timeout.
+  // The timeout for the file format lambda is set to 900 seconds, more than the other backend check lambdas because the file format lambda is slower than the others
+  visibility_timeout = 900
 }
 
 module "api_update_queue" {
@@ -333,7 +340,7 @@ module "api_update_lambda" {
   lambda_api_update                     = true
   auth_url                              = module.keycloak.auth_url
   api_url                               = module.consignment_api.api_url
-  keycloak_backend_checks_client_secret = data.aws_ssm_parameter.keycloak_backend_checks_client_secret.value
+  keycloak_backend_checks_client_secret = module.keycloak.backend_checks_client_secret
 }
 
 module "file_format_lambda" {
@@ -347,6 +354,8 @@ module "file_format_lambda" {
   use_efs                                = true
   backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
   private_subnet_ids                     = module.backend_checks_efs.private_subnets
+  mount_target_zero                      = module.backend_checks_efs.mount_target_zero
+  mount_target_one                       = module.backend_checks_efs.mount_target_one
 }
 
 module "download_files_lambda" {
@@ -363,6 +372,7 @@ module "download_files_lambda" {
   api_url                                = module.consignment_api.api_url
   backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
   private_subnet_ids                     = module.backend_checks_efs.private_subnets
+  backend_checks_client_secret           = module.keycloak.backend_checks_client_secret
 }
 
 module "backend_checks_efs" {
@@ -373,6 +383,9 @@ module "backend_checks_efs" {
   access_point_path            = "/backend-checks"
   policy                       = "backend_checks_access_policy"
   mount_target_security_groups = flatten([module.file_format_lambda.file_format_lambda_sg_id, module.download_files_lambda.download_files_lambda_sg_id, module.file_format_build_task.file_format_build_sg_id, module.antivirus_lambda.antivirus_lambda_sg_id, module.checksum_lambda.checksum_lambda_sg_id])
+  nat_gateway_ids              = module.shared_vpc.nat_gateway_ids
+  vpc_cidr_block               = module.shared_vpc.vpc_cidr_block
+  vpc_id                       = module.shared_vpc.vpc_id
 }
 
 module "file_format_build_task" {
@@ -382,6 +395,7 @@ module "file_format_build_task" {
   access_point      = module.backend_checks_efs.access_point
   file_format_build = true
   project           = var.project
+  vpc_id            = module.shared_vpc.vpc_id
 }
 
 module "export_api" {
@@ -413,6 +427,9 @@ module "export_efs" {
   policy                       = "export_access_policy"
   mount_target_security_groups = flatten([module.export_task.consignment_export_sg_id])
   netnum_offset                = 6
+  nat_gateway_ids              = module.shared_vpc.nat_gateway_ids
+  vpc_cidr_block               = module.shared_vpc.vpc_cidr_block
+  vpc_id                       = module.shared_vpc.vpc_id
 }
 
 module "export_task" {
@@ -422,11 +439,12 @@ module "export_task" {
   consignment_export         = true
   file_system_id             = module.export_efs.file_system_id
   access_point               = module.export_efs.access_point
-  backend_client_secret_path = data.aws_ssm_parameter.keycloak_backend_checks_client_secret.name
+  backend_client_secret_path = module.keycloak.backend_checks_client_secret_path
   clean_bucket               = module.upload_bucket.s3_bucket_name
   output_bucket              = module.export_bucket.s3_bucket_name
   api_url                    = module.consignment_api.api_url
   auth_url                   = module.keycloak.auth_url
+  vpc_id                     = module.shared_vpc.vpc_id
 }
 
 module "export_step_function" {
