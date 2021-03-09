@@ -95,11 +95,10 @@ module "alb_logs_s3" {
 }
 
 module "upload_bucket" {
-  source            = "./tdr-terraform-modules/s3"
-  project           = var.project
-  function          = "upload-files"
-  common_tags       = local.common_tags
-  version_lifecycle = true
+  source      = "./tdr-terraform-modules/s3"
+  project     = var.project
+  function    = "upload-files"
+  common_tags = local.common_tags
 }
 
 module "upload_bucket_quarantine" {
@@ -115,7 +114,6 @@ module "upload_file_dirty_s3" {
   function                 = "upload-files-dirty"
   common_tags              = local.common_tags
   cors_urls                = local.upload_cors_urls
-  version_lifecycle        = true
   sns_topic_arn            = module.dirty_upload_sns_topic.sns_arn
   sns_notification         = true
   abort_incomplete_uploads = true
@@ -463,11 +461,10 @@ module "export_step_function" {
 }
 
 module "export_bucket" {
-  source            = "./tdr-terraform-modules/s3"
-  project           = var.project
-  function          = "consignment-export"
-  common_tags       = local.common_tags
-  version_lifecycle = true
+  source      = "./tdr-terraform-modules/s3"
+  project     = var.project
+  function    = "consignment-export"
+  common_tags = local.common_tags
 }
 
 module "notifications_topic" {
