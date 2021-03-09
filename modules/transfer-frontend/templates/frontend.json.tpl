@@ -50,7 +50,7 @@
         "awslogs-group": "/ecs/frontend-${app_environment}",
         "awslogs-region": "${aws_region}",
         "awslogs-stream-prefix": "ecs",
-        "awslogs-datetime-format": "%Y-%m-%d %H:%M:%S,%L"
+        "awslogs-datetime-format": "%Y-%m-%d %H:%M:%S%L"
       }
     },
     "portMappings": [

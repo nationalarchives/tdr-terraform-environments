@@ -42,7 +42,7 @@
         "awslogs-group": "/ecs/consignment-api-${app_environment}",
         "awslogs-region": "${aws_region}",
         "awslogs-stream-prefix": "ecs",
-        "awslogs-datetime-format": "%H:%M:%S.%L"
+        "awslogs-datetime-format": "%H:%M:%S%L"
       }
     },
     "portMappings": [
