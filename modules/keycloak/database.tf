@@ -36,7 +36,7 @@ resource "aws_rds_cluster" "keycloak_database" {
   db_subnet_group_name            = aws_db_subnet_group.user_subnet_group.name
   enabled_cloudwatch_logs_exports = ["postgresql"]
   backup_retention_period         = 7
-  delete_protection               = true
+  deletion_protection             = true
   tags = merge(
     var.common_tags,
     map(
