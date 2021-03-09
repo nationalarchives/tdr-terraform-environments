@@ -99,7 +99,6 @@ module "upload_bucket" {
   project           = var.project
   function          = "upload-files"
   common_tags       = local.common_tags
-  version_lifecycle = true
 }
 
 module "upload_bucket_quarantine" {
@@ -115,7 +114,6 @@ module "upload_file_dirty_s3" {
   function                 = "upload-files-dirty"
   common_tags              = local.common_tags
   cors_urls                = local.upload_cors_urls
-  version_lifecycle        = true
   sns_topic_arn            = module.dirty_upload_sns_topic.sns_arn
   sns_notification         = true
   abort_incomplete_uploads = true
@@ -449,7 +447,6 @@ module "export_bucket" {
   project           = var.project
   function          = "consignment-export"
   common_tags       = local.common_tags
-  version_lifecycle = true
 }
 
 module "notifications_topic" {
