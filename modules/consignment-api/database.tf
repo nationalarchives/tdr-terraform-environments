@@ -35,6 +35,7 @@ resource "aws_rds_cluster" "consignment_api_database" {
   vpc_security_group_ids          = aws_security_group.database.*.id
   db_subnet_group_name            = aws_db_subnet_group.consignment_api_subnet_group.name
   enabled_cloudwatch_logs_exports = ["postgresql"]
+  backup_retention_period         = 7
   tags = merge(
     var.common_tags,
     map(
