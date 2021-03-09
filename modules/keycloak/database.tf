@@ -55,7 +55,7 @@ resource "aws_rds_cluster" "keycloak_database" {
 }
 
 resource "aws_rds_cluster_instance" "user_database_instance" {
-  count                = 1
+  count                = 2
   identifier_prefix    = "content-db-postgres-instance-${var.environment}"
   cluster_identifier   = aws_rds_cluster.keycloak_database.id
   engine               = "aurora-postgresql"
