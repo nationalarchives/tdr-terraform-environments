@@ -320,7 +320,9 @@ module "file_format_sqs_queue" {
   function                 = "file-format"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
-  visibility_timeout       = 900
+  // Terraform will fail if the visibility timeout is shorter than the lambda timeout.
+  // The timeout for the file format lambda is set to 900 seconds, more than the other backend check lambdas because the file format lambda is slower than the others
+  visibility_timeout = 900
 }
 
 module "api_update_queue" {
