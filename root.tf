@@ -41,6 +41,7 @@ module "consignment_api" {
   kms_key_id                  = module.encryption_key.kms_key_arn
   frontend_url                = module.frontend.frontend_url
   dns_zone_name_trimmed       = local.dns_zone_name_trimmed
+  create_users_security_group = module.create_db_users_lambda.create_users_lambda_security_group_id
 }
 
 module "frontend" {
@@ -261,6 +262,20 @@ module "checksum_lambda" {
   private_subnet_ids                     = module.backend_checks_efs.private_subnets
   mount_target_zero                      = module.backend_checks_efs.mount_target_zero
   mount_target_one                       = module.backend_checks_efs.mount_target_one
+}
+
+module "create_db_users_lambda" {
+  source                     = "./tdr-terraform-modules/lambda"
+  project                    = var.project
+  common_tags                = local.common_tags
+  lambda_create_db_users     = true
+  vpc_id                     = module.shared_vpc.vpc_id
+  private_subnet_ids         = module.backend_checks_efs.private_subnets
+  consignment_database_sg_id = module.consignment_api.consignment_db_security_group_id
+  db_admin_user              = module.consignment_api.database_username
+  db_admin_password          = module.consignment_api.database_password
+  db_url                     = module.consignment_api.database_url
+
 }
 
 module "dirty_upload_sns_topic" {
