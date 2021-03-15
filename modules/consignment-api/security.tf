@@ -7,7 +7,7 @@ resource "aws_security_group" "database" {
     protocol        = "tcp"
     from_port       = 5432
     to_port         = 5432
-    security_groups = flatten([[aws_security_group.ecs_tasks.id, var.db_migration_sg, aws_security_group.bastion_security_group.id], var.create_users_security_group])
+    security_groups = flatten([[aws_security_group.ecs_tasks.id, var.db_migration_sg, aws_security_group.bastion_security_group.id], var.create_users_security_group_id])
   }
 
   egress {
