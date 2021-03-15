@@ -38,3 +38,7 @@ variable "ip_whitelist" {
   description = "IP addresses allowed to access"
   default     = ["0.0.0.0/0"]
 }
+
+variable "create_users_security_group_id" {
+  type = list(string)
+}

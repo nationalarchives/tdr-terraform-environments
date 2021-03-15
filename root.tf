@@ -22,25 +22,26 @@ module "database_migrations" {
 }
 
 module "consignment_api" {
-  source                      = "./modules/consignment-api"
-  dns_zone_id                 = local.dns_zone_id
-  alb_dns_name                = module.consignment_api_alb.alb_dns_name
-  alb_target_group_arn        = module.consignment_api_alb.alb_target_group_arn
-  alb_zone_id                 = module.consignment_api_alb.alb_zone_id
-  app_name                    = "consignmentapi"
-  common_tags                 = local.common_tags
-  database_availability_zones = local.database_availability_zones
-  environment                 = local.environment
-  environment_full_name       = local.environment_full_name_map[local.environment]
-  private_subnets             = module.shared_vpc.private_subnets
-  public_subnets              = module.shared_vpc.public_subnets
-  vpc_id                      = module.shared_vpc.vpc_id
-  region                      = local.region
-  db_migration_sg             = module.database_migrations.db_migration_security_group
-  auth_url                    = module.keycloak.auth_url
-  kms_key_id                  = module.encryption_key.kms_key_arn
-  frontend_url                = module.frontend.frontend_url
-  dns_zone_name_trimmed       = local.dns_zone_name_trimmed
+  source                         = "./modules/consignment-api"
+  dns_zone_id                    = local.dns_zone_id
+  alb_dns_name                   = module.consignment_api_alb.alb_dns_name
+  alb_target_group_arn           = module.consignment_api_alb.alb_target_group_arn
+  alb_zone_id                    = module.consignment_api_alb.alb_zone_id
+  app_name                       = "consignmentapi"
+  common_tags                    = local.common_tags
+  database_availability_zones    = local.database_availability_zones
+  environment                    = local.environment
+  environment_full_name          = local.environment_full_name_map[local.environment]
+  private_subnets                = module.shared_vpc.private_subnets
+  public_subnets                 = module.shared_vpc.public_subnets
+  vpc_id                         = module.shared_vpc.vpc_id
+  region                         = local.region
+  db_migration_sg                = module.database_migrations.db_migration_security_group
+  auth_url                       = module.keycloak.auth_url
+  kms_key_id                     = module.encryption_key.kms_key_arn
+  frontend_url                   = module.frontend.frontend_url
+  dns_zone_name_trimmed          = local.dns_zone_name_trimmed
+  create_users_security_group_id = module.create_db_users_lambda.create_users_lambda_security_group_id
 }
 
 module "frontend" {
@@ -261,6 +262,19 @@ module "checksum_lambda" {
   private_subnet_ids                     = module.backend_checks_efs.private_subnets
   mount_target_zero                      = module.backend_checks_efs.mount_target_zero
   mount_target_one                       = module.backend_checks_efs.mount_target_one
+}
+
+module "create_db_users_lambda" {
+  source                     = "./tdr-terraform-modules/lambda"
+  project                    = var.project
+  common_tags                = local.common_tags
+  lambda_create_db_users     = true
+  vpc_id                     = module.shared_vpc.vpc_id
+  private_subnet_ids         = module.backend_checks_efs.private_subnets
+  consignment_database_sg_id = module.consignment_api.consignment_db_security_group_id
+  db_admin_user              = module.consignment_api.database_username
+  db_admin_password          = module.consignment_api.database_password
+  db_url                     = module.consignment_api.database_url
 }
 
 module "dirty_upload_sns_topic" {

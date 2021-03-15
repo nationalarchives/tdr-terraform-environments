@@ -22,21 +22,22 @@ resource "random_string" "snapshot_prefix" {
 }
 
 resource "aws_rds_cluster" "consignment_api_database" {
-  cluster_identifier_prefix       = "consignment-api-db-postgres-${var.environment}"
-  engine                          = "aurora-postgresql"
-  engine_version                  = "11.6"
-  availability_zones              = var.database_availability_zones
-  database_name                   = var.app_name
-  master_username                 = "api_admin"
-  master_password                 = random_password.password.result
-  final_snapshot_identifier       = "consignment-api-db-final-snapshot-${random_string.snapshot_prefix.result}-${var.environment}"
-  storage_encrypted               = true
-  kms_key_id                      = var.kms_key_id
-  vpc_security_group_ids          = aws_security_group.database.*.id
-  db_subnet_group_name            = aws_db_subnet_group.consignment_api_subnet_group.name
-  enabled_cloudwatch_logs_exports = ["postgresql"]
-  backup_retention_period         = 7
-  deletion_protection             = true
+  cluster_identifier_prefix           = "consignment-api-db-postgres-${var.environment}"
+  engine                              = "aurora-postgresql"
+  engine_version                      = "11.6"
+  availability_zones                  = var.database_availability_zones
+  database_name                       = var.app_name
+  master_username                     = "api_admin"
+  master_password                     = random_password.password.result
+  final_snapshot_identifier           = "consignment-api-db-final-snapshot-${random_string.snapshot_prefix.result}-${var.environment}"
+  storage_encrypted                   = true
+  kms_key_id                          = var.kms_key_id
+  vpc_security_group_ids              = aws_security_group.database.*.id
+  db_subnet_group_name                = aws_db_subnet_group.consignment_api_subnet_group.name
+  enabled_cloudwatch_logs_exports     = ["postgresql"]
+  backup_retention_period             = 7
+  deletion_protection                 = true
+  iam_database_authentication_enabled = true
   tags = merge(
     var.common_tags,
     map(
