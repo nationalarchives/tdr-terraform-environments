@@ -39,6 +39,6 @@ variable "ip_whitelist" {
   default     = ["0.0.0.0/0"]
 }
 
-variable "create_users_security_group" {
+variable "create_users_security_group_id" {
   type = list(string)
 }
