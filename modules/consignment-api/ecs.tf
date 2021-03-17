@@ -1,6 +1,9 @@
 locals {
   app_port = 8080
 }
+
+data "aws_caller_identity" "current" {}
+
 resource "aws_ecs_cluster" "consignment_api_ecs" {
   name = "${var.app_name}_${var.environment}"
 
@@ -65,7 +68,6 @@ resource "aws_ecs_service" "consignment_api_service" {
   depends_on = [var.alb_target_group_arn]
 }
 
-
 resource "aws_iam_role" "consignment_api_ecs_execution" {
   name               = "${var.app_name}_ecs_execution_role_${var.environment}"
   assume_role_policy = data.aws_iam_policy_document.ecs_assume_role.json
@@ -76,6 +78,16 @@ resource "aws_iam_role" "consignment_api_ecs_execution" {
       "Name", "api-ecs-execution-iam-role-${var.environment}",
     )
   )
+}
+
+resource "aws_iam_role_policy_attachment" "assume_iam_auth_attach" {
+  policy_arn = aws_iam_policy.consignment_api_ecs_task_allow_iam_auth.arn
+  role       = aws_iam_role.consignment_api_ecs_task.id
+}
+
+resource "aws_iam_policy" "consignment_api_ecs_task_allow_iam_auth" {
+  name   = "TDRConsignmentApiAllowIAMAuthPolicy${title(var.environment)}"
+  policy = templatefile("${path.module}/templates/allow_iam_db_auth.json.tpl", { cluster_id = aws_rds_cluster.consignment_api_database.cluster_resource_id, account_id = data.aws_caller_identity.current.account_id })
 }
 
 resource "aws_iam_role" "consignment_api_ecs_task" {
