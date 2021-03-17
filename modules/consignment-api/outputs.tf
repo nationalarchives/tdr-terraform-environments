@@ -26,3 +26,4 @@ output "consignment_db_security_group_id" {
 output "database_cluster_id" {
   value = aws_rds_cluster.consignment_api_database.cluster_resource_id
 }
+
