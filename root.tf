@@ -19,6 +19,7 @@ module "database_migrations" {
   db_url          = module.consignment_api.database_url
   db_user         = module.consignment_api.database_username
   db_password     = module.consignment_api.database_password
+  db_cluster_id   = module.consignment_api.database_cluster_id
 }
 
 module "consignment_api" {
