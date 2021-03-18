@@ -2,8 +2,6 @@ locals {
   app_port = 8080
 }
 
-data "aws_caller_identity" "current" {}
-
 resource "aws_ecs_cluster" "consignment_api_ecs" {
   name = "${var.app_name}_${var.environment}"
 
@@ -80,7 +78,7 @@ resource "aws_iam_role" "consignment_api_ecs_execution" {
   )
 }
 
-resource "aws_iam_role_policy_attachment" "assume_iam_auth_attach" {
+resource "aws_iam_role_policy_attachment" "assume_iam_auth" {
   policy_arn = aws_iam_policy.consignment_api_ecs_task_allow_iam_auth.arn
   role       = aws_iam_role.consignment_api_ecs_task.id
 }

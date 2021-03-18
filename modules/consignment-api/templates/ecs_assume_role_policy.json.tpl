@@ -7,7 +7,6 @@
         "Service": "ecs-tasks.amazonaws.com"
       },
       "Effect": "Allow",
-      "Sid": ""
     }
   ]
 }
