@@ -40,7 +40,7 @@ resource "aws_lambda_function" "database_migration_function" {
   }
   environment {
     variables = {
-      DB_HOST     = var.db_url
+      DB_HOST = var.db_url
     }
   }
   depends_on = [aws_iam_role_policy_attachment.lambda_role_attach_migration_policy]
