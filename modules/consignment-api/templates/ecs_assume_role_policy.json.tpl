@@ -6,7 +6,7 @@
       "Principal": {
         "Service": "ecs-tasks.amazonaws.com"
       },
-      "Effect": "Allow",
+      "Effect": "Allow"
     }
   ]
 }
