@@ -40,10 +40,7 @@ resource "aws_lambda_function" "database_migration_function" {
   }
   environment {
     variables = {
-      DB_URL      = "jdbc:postgresql://${var.db_url}:5432/consignmentapi"
-      DB_USER     = var.db_user
-      DB_PASSWORD = var.db_password
-      STAGE       = var.environment
+      DB_HOST     = var.db_url
     }
   }
   depends_on = [aws_iam_role_policy_attachment.lambda_role_attach_migration_policy]
