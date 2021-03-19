@@ -16,43 +16,9 @@ data "aws_iam_policy_document" "lambda_assume_role_document" {
   }
 }
 
-data "aws_iam_policy_document" "lambda_migration_document" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:ListBucket"
-    ]
-    resources = [
-      "arn:aws:s3:::tdr-database-migrations/*",
-      "arn:aws:s3:::tdr-database-migrations"
-    ]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
-    ]
-    resources = [aws_cloudwatch_log_group.db_migration_log_group.arn]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
-      "ec2:DeleteNetworkInterface",
-      "ec2:DescribeInstances",
-      "ec2:CreateNetworkInterface",
-      "ec2:AttachNetworkInterface",
-      "ec2:DescribeNetworkInterfaces",
-      "autoscaling:CompleteLifecycleAction"
-    ]
-    resources = ["*"]
-  }
-}
-
 resource "aws_iam_policy" "lambda_migration_policy" {
   name   = "TDRDbMigrationLambdaPolicy${title(var.environment)}"
-  policy = data.aws_iam_policy_document.lambda_migration_document.json
+  policy = templatefile("${path.module}/templates/migration_lambda.json.tpl", { account_id = data.aws_caller_identity.current.account_id, cluster_id = var.db_cluster_id, log_group_arn = aws_cloudwatch_log_group.db_migration_log_group.arn })
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_role_attach_migration_policy" {
@@ -74,10 +40,7 @@ resource "aws_lambda_function" "database_migration_function" {
   }
   environment {
     variables = {
-      DB_URL      = "jdbc:postgresql://${var.db_url}:5432/consignmentapi"
-      DB_USER     = var.db_user
-      DB_PASSWORD = var.db_password
-      STAGE       = var.environment
+      DB_HOST = var.db_url
     }
   }
   depends_on = [aws_iam_role_policy_attachment.lambda_role_attach_migration_policy]
