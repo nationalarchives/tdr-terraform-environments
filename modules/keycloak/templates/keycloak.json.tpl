@@ -43,6 +43,14 @@
       {
         "valueFrom": "${user_admin_client_secret_path}",
         "name": "USER_ADMIN_CLIENT_SECRET"
+      },
+      {
+        "valueFrom": "${govuk_notify_api_key_path}",
+        "name": "GOVUK_NOTIFY_API_KEY"
+      },
+      {
+        "valueFrom": "${govuk_notify_template_id_path}",
+        "name": "GOVUK_NOTIFY_TEMPLATE_ID"
       }
     ],
     "environment": [
