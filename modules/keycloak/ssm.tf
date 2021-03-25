@@ -86,8 +86,8 @@ resource "aws_ssm_parameter" "keycloak_user_admin_client_secret" {
 //Use Terraform to add the parameter and update value manually
 //As added by Terraform won't be removed when Terraform apply run
 resource "aws_ssm_parameter" "keycloak_govuk_notify_api_key" {
-  name = "/${var.environment}/keycloak/govuk_notify/api_key"
-  type = "SecureString"
+  name  = "/${var.environment}/keycloak/govuk_notify/api_key"
+  type  = "SecureString"
   value = "to_be_manually_added"
 
   lifecycle {
@@ -99,8 +99,8 @@ resource "aws_ssm_parameter" "keycloak_govuk_notify_api_key" {
 //Use Terraform to add the parameter and update value manually
 //As added by Terraform won't be removed when Terraform apply run
 resource "aws_ssm_parameter" "keycloak_govuk_notify_template_id" {
-  name = "/${var.environment}/keycloak/govuk_notify/template_id"
-  type = "SecureString"
+  name  = "/${var.environment}/keycloak/govuk_notify/template_id"
+  type  = "SecureString"
   value = "to_be_manually_added"
 
   lifecycle {
