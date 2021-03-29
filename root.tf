@@ -207,6 +207,7 @@ module "frontend_alb" {
 module "encryption_key" {
   source      = "./tdr-terraform-modules/kms"
   project     = var.project
+  key_policy  = "lambda"
   function    = "encryption"
   environment = local.environment
   common_tags = local.common_tags
@@ -246,6 +247,7 @@ module "antivirus_lambda" {
   private_subnet_ids                     = module.backend_checks_efs.private_subnets
   mount_target_zero                      = module.backend_checks_efs.mount_target_zero
   mount_target_one                       = module.backend_checks_efs.mount_target_one
+  kms_key_arn                            = module.encryption_key.kms_key_arn
 }
 
 module "checksum_lambda" {
@@ -261,6 +263,7 @@ module "checksum_lambda" {
   private_subnet_ids                     = module.backend_checks_efs.private_subnets
   mount_target_zero                      = module.backend_checks_efs.mount_target_zero
   mount_target_one                       = module.backend_checks_efs.mount_target_one
+  kms_key_arn                            = module.encryption_key.kms_key_arn
 }
 
 module "create_db_users_lambda" {
@@ -274,6 +277,7 @@ module "create_db_users_lambda" {
   db_admin_user              = module.consignment_api.database_username
   db_admin_password          = module.consignment_api.database_password
   db_url                     = module.consignment_api.database_url
+  kms_key_arn                = module.encryption_key.kms_key_arn
 }
 
 module "dirty_upload_sns_topic" {
@@ -354,6 +358,7 @@ module "api_update_lambda" {
   auth_url                              = module.keycloak.auth_url
   api_url                               = module.consignment_api.api_url
   keycloak_backend_checks_client_secret = module.keycloak.backend_checks_client_secret
+  kms_key_arn                           = module.encryption_key.kms_key_arn
 }
 
 module "file_format_lambda" {
@@ -369,6 +374,7 @@ module "file_format_lambda" {
   private_subnet_ids                     = module.backend_checks_efs.private_subnets
   mount_target_zero                      = module.backend_checks_efs.mount_target_zero
   mount_target_one                       = module.backend_checks_efs.mount_target_one
+  kms_key_arn                            = module.encryption_key.kms_key_arn
 }
 
 module "download_files_lambda" {
@@ -386,6 +392,7 @@ module "download_files_lambda" {
   backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
   private_subnet_ids                     = module.backend_checks_efs.private_subnets
   backend_checks_client_secret           = module.keycloak.backend_checks_client_secret
+  kms_key_arn                            = module.encryption_key.kms_key_arn
 }
 
 module "backend_checks_efs" {
@@ -427,6 +434,7 @@ module "export_authoriser_lambda" {
   lambda_export_authoriser = true
   api_url                  = module.consignment_api.api_url
   api_gateway_arn          = module.export_api.api_arn
+  kms_key_arn              = module.encryption_key.kms_key_arn
 }
 
 //create a new efs volume, ECS task attached to the volume and pass in the proper variables and create ECR repository in the backend project
