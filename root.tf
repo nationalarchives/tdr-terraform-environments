@@ -207,7 +207,6 @@ module "frontend_alb" {
 module "encryption_key" {
   source      = "./tdr-terraform-modules/kms"
   project     = var.project
-  key_policy  = "lambda"
   function    = "encryption"
   environment = local.environment
   common_tags = local.common_tags
