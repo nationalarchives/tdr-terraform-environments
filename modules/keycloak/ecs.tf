@@ -29,6 +29,8 @@ data "template_file" "app" {
     frontend_url                      = var.frontend_url
     configuration_properties_path     = aws_ssm_parameter.keycloak_configuration_properties.name
     user_admin_client_secret_path     = aws_ssm_parameter.keycloak_user_admin_client_secret.name
+    govuk_notify_api_key_path         = aws_ssm_parameter.keycloak_govuk_notify_api_key.name
+    govuk_notify_template_id_path     = aws_ssm_parameter.keycloak_govuk_notify_template_id.name
   }
 }
 
