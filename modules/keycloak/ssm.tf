@@ -81,3 +81,29 @@ resource "aws_ssm_parameter" "keycloak_user_admin_client_secret" {
     ignore_changes = [value]
   }
 }
+
+//No programmatical method to retrieve value from GoUk Notify service
+//Use Terraform to add the parameter and update value manually
+//As added by Terraform won't be removed when Terraform apply run
+resource "aws_ssm_parameter" "keycloak_govuk_notify_api_key" {
+  name  = "/${var.environment}/keycloak/govuk_notify/api_key"
+  type  = "SecureString"
+  value = "to_be_manually_added"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+//No programmatical method to retrieve value from GoUk Notify service
+//Use Terraform to add the parameter and update value manually
+//As added by Terraform won't be removed when Terraform apply run
+resource "aws_ssm_parameter" "keycloak_govuk_notify_template_id" {
+  name  = "/${var.environment}/keycloak/govuk_notify/template_id"
+  type  = "SecureString"
+  value = "to_be_manually_added"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
