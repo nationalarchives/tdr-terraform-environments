@@ -285,6 +285,8 @@ module "dirty_upload_sns_topic" {
   project     = var.project
   function    = "s3-dirty-upload"
   sns_policy  = "s3_upload"
+  kms_key_arn = module.encryption_key.kms_key_arn
+
 }
 
 module "backend_check_failure_sqs_queue" {
@@ -292,6 +294,7 @@ module "backend_check_failure_sqs_queue" {
   common_tags = local.common_tags
   project     = var.project
   function    = "backend-check-failure"
+  kms_key_id  = module.encryption_key.kms_key_arn
 }
 
 module "antivirus_sqs_queue" {
@@ -302,6 +305,7 @@ module "antivirus_sqs_queue" {
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
   visibility_timeout       = 180
+  kms_key_id               = module.encryption_key.kms_key_arn
 }
 
 module "download_files_sqs_queue" {
@@ -314,6 +318,7 @@ module "download_files_sqs_queue" {
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
   visibility_timeout       = 180
+  kms_key_id               = module.encryption_key.kms_key_arn
 }
 
 module "checksum_sqs_queue" {
@@ -325,6 +330,7 @@ module "checksum_sqs_queue" {
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
   visibility_timeout       = 180
+  kms_key_id               = module.encryption_key.kms_key_arn
 }
 
 module "file_format_sqs_queue" {
@@ -337,6 +343,7 @@ module "file_format_sqs_queue" {
   // Terraform will fail if the visibility timeout is shorter than the lambda timeout.
   // The timeout for the file format lambda is set to 900 seconds, more than the other backend check lambdas because the file format lambda is slower than the others
   visibility_timeout = 900
+  kms_key_id         = module.encryption_key.kms_key_arn
 }
 
 module "api_update_queue" {
@@ -347,6 +354,7 @@ module "api_update_queue" {
   sqs_policy               = "api_update_antivirus"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
+  kms_key_id               = module.encryption_key.kms_key_arn
 }
 
 module "api_update_lambda" {
@@ -476,7 +484,7 @@ module "export_step_function" {
   step_function_name     = "ConsignmentExport"
   definition_variables   = { security_groups = jsonencode(module.export_task.consignment_export_sg_id), subnet_ids = jsonencode(module.export_efs.private_subnets), cluster_arn = module.export_task.consignment_export_cluster_arn, task_arn = module.export_task.consignment_export_task_arn, task_name = "consignment-export", sns_topic = module.notifications_topic.sns_arn }
   policy                 = "consignment_export"
-  policy_variables       = { task_arn = module.export_task.consignment_export_task_arn, execution_role = module.export_task.consignment_export_execution_role_arn, task_role = module.export_task.consignment_export_task_role_arn }
+  policy_variables       = { task_arn = module.export_task.consignment_export_task_arn, execution_role = module.export_task.consignment_export_execution_role_arn, task_role = module.export_task.consignment_export_task_role_arn, kms_key_arn = module.encryption_key.kms_key_arn }
   notification_sns_topic = module.notifications_topic.sns_arn
 }
 
@@ -493,4 +501,5 @@ module "notifications_topic" {
   function    = "notifications"
   project     = var.project
   sns_policy  = "notifications"
+  kms_key_arn = module.encryption_key.kms_key_arn
 }
