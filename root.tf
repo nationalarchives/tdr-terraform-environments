@@ -173,8 +173,8 @@ module "keycloak_alb" {
   public_subnets        = module.keycloak.public_subnets
   vpc_id                = module.keycloak.vpc_id
   common_tags           = local.common_tags
-  own_host_header_only = true
-  host = module.keycloak.auth_host
+  own_host_header_only  = true
+  host                  = module.keycloak.auth_host
 }
 
 module "frontend_certificate" {
