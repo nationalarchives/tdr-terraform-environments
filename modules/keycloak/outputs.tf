@@ -6,6 +6,10 @@ output "public_subnets" {
   value = aws_subnet.public.*.id
 }
 
+output "private_subnets" {
+  value = aws_subnet.private.*.id
+}
+
 output alb_security_group_id {
   value = aws_security_group.lb.id
 }
@@ -28,4 +32,16 @@ output "backend_checks_client_secret_path" {
 
 output "backend_checks_client_secret" {
   value = aws_ssm_parameter.keycloak_backend_checks_client_secret.value
+}
+
+output "db_username" {
+  value = aws_rds_cluster.keycloak_database.master_username
+}
+
+output "db_password" {
+  value = aws_rds_cluster.keycloak_database.master_password
+}
+
+output "db_url" {
+  value = aws_rds_cluster.keycloak_database.endpoint
 }
