@@ -67,21 +67,21 @@ module "frontend" {
 }
 
 module "keycloak" {
-  app_name                    = "keycloak"
-  source                      = "./modules/keycloak"
-  alb_dns_name                = module.keycloak_alb.alb_dns_name
-  alb_target_group_arn        = module.keycloak_alb.alb_target_group_arn
-  alb_zone_id                 = module.keycloak_alb.alb_zone_id
-  dns_zone_id                 = local.dns_zone_id
-  dns_zone_name_trimmed       = local.dns_zone_name_trimmed
-  environment                 = local.environment
-  environment_full_name       = local.environment_full_name_map[local.environment]
-  common_tags                 = local.common_tags
-  database_availability_zones = local.database_availability_zones
-  az_count                    = 2
-  region                      = local.region
-  frontend_url                = module.frontend.frontend_url
-  kms_key_id                  = module.encryption_key.kms_key_arn
+  app_name                      = "keycloak"
+  source                        = "./modules/keycloak"
+  alb_dns_name                  = module.keycloak_alb.alb_dns_name
+  alb_target_group_arn          = module.keycloak_alb.alb_target_group_arn
+  alb_zone_id                   = module.keycloak_alb.alb_zone_id
+  dns_zone_id                   = local.dns_zone_id
+  dns_zone_name_trimmed         = local.dns_zone_name_trimmed
+  environment                   = local.environment
+  environment_full_name         = local.environment_full_name_map[local.environment]
+  common_tags                   = local.common_tags
+  database_availability_zones   = local.database_availability_zones
+  az_count                      = 2
+  region                        = local.region
+  frontend_url                  = module.frontend.frontend_url
+  kms_key_id                    = module.encryption_key.kms_key_arn
   create_user_security_group_id = module.create_keycloak_db_users_lambda.create_keycloak_user_lambda_security_group
 }
 
@@ -283,18 +283,18 @@ module "create_db_users_lambda" {
 }
 
 module "create_keycloak_db_users_lambda" {
-  source                     = "./tdr-terraform-modules/lambda"
-  project                    = var.project
-  common_tags                = local.common_tags
+  source                          = "./tdr-terraform-modules/lambda"
+  project                         = var.project
+  common_tags                     = local.common_tags
   lambda_create_keycloak_db_users = true
-  vpc_id                     = module.keycloak.vpc_id
-  private_subnet_ids =  module.keycloak.private_subnets
-  keycloak_admin_user = module.keycloak.db_username
-  keycloak_admin_password = module.keycloak.db_password
-  keycloak_db_url = module.keycloak.db_url
-  db_admin_password          = module.consignment_api.database_password
-  db_url                     = module.consignment_api.database_url
-  kms_key_arn                = module.encryption_key.kms_key_arn
+  vpc_id                          = module.keycloak.vpc_id
+  private_subnet_ids              = module.keycloak.private_subnets
+  keycloak_admin_user             = module.keycloak.db_username
+  keycloak_admin_password         = module.keycloak.db_password
+  keycloak_db_url                 = module.keycloak.db_url
+  db_admin_password               = module.consignment_api.database_password
+  db_url                          = module.consignment_api.database_url
+  kms_key_arn                     = module.encryption_key.kms_key_arn
 }
 
 module "dirty_upload_sns_topic" {
