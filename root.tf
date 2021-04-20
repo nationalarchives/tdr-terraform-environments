@@ -293,6 +293,7 @@ module "create_keycloak_db_users_lambda" {
   db_admin_password               = module.keycloak.db_password
   db_url                          = module.keycloak.db_url
   kms_key_arn                     = module.encryption_key.kms_key_arn
+  keycloak_password               = module.keycloak.keycloak_user_password
 }
 
 module "dirty_upload_sns_topic" {

@@ -45,3 +45,7 @@ output "db_password" {
 output "db_url" {
   value = aws_rds_cluster.keycloak_database.endpoint
 }
+
+output "keycloak_user_password" {
+  value = random_password.keycloak_password.result
+}
