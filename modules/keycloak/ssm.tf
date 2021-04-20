@@ -36,6 +36,12 @@ resource "aws_ssm_parameter" "keycloak_admin_user" {
   value = "tdr-keycloak-admin-${var.environment}"
 }
 
+resource "aws_ssm_parameter" "keycloak_user_password" {
+  name  = "/${var.environment}/keycloak/password"
+  type  = "SecureString"
+  value = random_password.keycloak_password.result
+}
+
 resource "aws_ssm_parameter" "keycloak_client_secret" {
   name  = "/${var.environment}/keycloak/client/secret"
   type  = "SecureString"
