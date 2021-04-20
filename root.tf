@@ -82,6 +82,7 @@ module "keycloak" {
   region                      = local.region
   frontend_url                = module.frontend.frontend_url
   kms_key_id                  = module.encryption_key.kms_key_arn
+  create_user_security_group_id = module.create_keycloak_db_users_lambda.create_keycloak_user_lambda_security_group
 }
 
 module "alb_logs_s3" {
@@ -276,6 +277,21 @@ module "create_db_users_lambda" {
   private_subnet_ids         = module.backend_checks_efs.private_subnets
   consignment_database_sg_id = module.consignment_api.consignment_db_security_group_id
   db_admin_user              = module.consignment_api.database_username
+  db_admin_password          = module.consignment_api.database_password
+  db_url                     = module.consignment_api.database_url
+  kms_key_arn                = module.encryption_key.kms_key_arn
+}
+
+module "create_keycloak_db_users_lambda" {
+  source                     = "./tdr-terraform-modules/lambda"
+  project                    = var.project
+  common_tags                = local.common_tags
+  lambda_create_keycloak_db_users = true
+  vpc_id                     = module.keycloak.vpc_id
+  private_subnet_ids =  module.keycloak.private_subnets
+  keycloak_admin_user = module.keycloak.db_username
+  keycloak_admin_password = module.keycloak.db_password
+  keycloak_db_url = module.keycloak.db_url
   db_admin_password          = module.consignment_api.database_password
   db_url                     = module.consignment_api.database_url
   kms_key_arn                = module.encryption_key.kms_key_arn
