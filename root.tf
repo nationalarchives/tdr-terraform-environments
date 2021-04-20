@@ -289,11 +289,9 @@ module "create_keycloak_db_users_lambda" {
   lambda_create_keycloak_db_users = true
   vpc_id                          = module.keycloak.vpc_id
   private_subnet_ids              = module.keycloak.private_subnets
-  keycloak_admin_user             = module.keycloak.db_username
-  keycloak_admin_password         = module.keycloak.db_password
-  keycloak_db_url                 = module.keycloak.db_url
-  db_admin_password               = module.consignment_api.database_password
-  db_url                          = module.consignment_api.database_url
+  db_admin_user                   = module.keycloak.db_username
+  db_admin_password               = module.keycloak.db_password
+  db_url                          = module.keycloak.db_url
   kms_key_arn                     = module.encryption_key.kms_key_arn
 }
 
