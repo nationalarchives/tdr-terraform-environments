@@ -7,7 +7,7 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true
   tags = merge(
     var.common_tags,
-    map("Name", "tdr-vpc-${var.environment}")
+    tomap({"Name" = "tdr-vpc-${var.environment}"})
   )
 }
 
@@ -25,7 +25,7 @@ resource "aws_subnet" "private" {
 
   tags = merge(
     var.common_tags,
-    map("Name", "tdr-private-subnet-${count.index}-${var.environment}")
+    tomap({"Name" = "tdr-private-subnet-${count.index}-${var.environment}"})
   )
 }
 
@@ -42,7 +42,7 @@ resource "aws_subnet" "public" {
 
   tags = merge(
     var.common_tags,
-    map("Name", "tdr-public-subnet-${count.index}-${var.environment}")
+    tomap({"Name" = "tdr-public-subnet-${count.index}-${var.environment}"})
   )
 }
 
@@ -76,7 +76,7 @@ resource "aws_nat_gateway" "gw" {
 
   tags = merge(
     var.common_tags,
-    map("Name", "nat-gateway-${count.index}-tdr-${var.environment}")
+    tomap({"Name" = "nat-gateway-${count.index}-tdr-${var.environment}"})
   )
 }
 
@@ -92,7 +92,7 @@ resource "aws_route_table" "private" {
 
   tags = merge(
     var.common_tags,
-    map("Name", "route-table-${count.index}-tdr-${var.environment}")
+    tomap({"Name" = "route-table-${count.index}-tdr-${var.environment}"})
   )
 }
 

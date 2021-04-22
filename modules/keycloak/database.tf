@@ -9,9 +9,7 @@ resource "aws_db_subnet_group" "user_subnet_group" {
 
   tags = merge(
     var.common_tags,
-    map(
-      "Name", "user-db-subnet-group-${var.environment}"
-    )
+    tomap({"Name" = "user-db-subnet-group-${var.environment}"})
   )
 }
 
@@ -39,9 +37,7 @@ resource "aws_rds_cluster" "keycloak_database" {
   deletion_protection             = true
   tags = merge(
     var.common_tags,
-    map(
-      "Name", "keycloak-db-cluster-${var.environment}"
-    )
+    tomap({"Name" = "keycloak-db-cluster-${var.environment}"})
   )
 
   lifecycle {
