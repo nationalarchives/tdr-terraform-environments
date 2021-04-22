@@ -32,3 +32,7 @@ variable "ip_whitelist" {
 variable "kms_key_id" {
   description = "KMS ID for the database encryption key"
 }
+
+variable "create_user_security_group_id" {
+  default = ""
+}

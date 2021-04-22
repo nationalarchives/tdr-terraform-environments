@@ -9,10 +9,6 @@
         "name": "DB_ADDR"
       },
       {
-        "valueFrom": "${username_path}",
-        "name": "DB_USER"
-      },
-      {
         "valueFrom": "${password_path}",
         "name": "DB_PASSWORD"
       },
@@ -65,6 +61,10 @@
       {
         "name" : "KEYCLOAK_IMPORT",
         "value": "/tmp/tdr-realm.json"
+      },
+      {
+        "name": "DB_USER",
+        "value": "${username}"
       }
     ],
     "networkMode": "awsvpc",
