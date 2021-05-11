@@ -49,3 +49,7 @@ output "db_url" {
 output "keycloak_user_password" {
   value = random_password.keycloak_password.result
 }
+
+output "database_security_group" {
+  value = aws_security_group.database.id
+}

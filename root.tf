@@ -250,6 +250,7 @@ module "antivirus_lambda" {
   mount_target_zero                      = module.backend_checks_efs.mount_target_zero
   mount_target_one                       = module.backend_checks_efs.mount_target_one
   kms_key_arn                            = module.encryption_key.kms_key_arn
+  efs_security_group_id                  = module.backend_checks_efs.security_group_id
 }
 
 module "checksum_lambda" {
@@ -266,34 +267,37 @@ module "checksum_lambda" {
   mount_target_zero                      = module.backend_checks_efs.mount_target_zero
   mount_target_one                       = module.backend_checks_efs.mount_target_one
   kms_key_arn                            = module.encryption_key.kms_key_arn
+  efs_security_group_id                  = module.backend_checks_efs.security_group_id
 }
 
 module "create_db_users_lambda" {
-  source                     = "./tdr-terraform-modules/lambda"
-  project                    = var.project
-  common_tags                = local.common_tags
-  lambda_create_db_users     = true
-  vpc_id                     = module.shared_vpc.vpc_id
-  private_subnet_ids         = module.backend_checks_efs.private_subnets
-  consignment_database_sg_id = module.consignment_api.consignment_db_security_group_id
-  db_admin_user              = module.consignment_api.database_username
-  db_admin_password          = module.consignment_api.database_password
-  db_url                     = module.consignment_api.database_url
-  kms_key_arn                = module.encryption_key.kms_key_arn
+  source                      = "./tdr-terraform-modules/lambda"
+  project                     = var.project
+  common_tags                 = local.common_tags
+  lambda_create_db_users      = true
+  vpc_id                      = module.shared_vpc.vpc_id
+  private_subnet_ids          = module.backend_checks_efs.private_subnets
+  consignment_database_sg_id  = module.consignment_api.consignment_db_security_group_id
+  db_admin_user               = module.consignment_api.database_username
+  db_admin_password           = module.consignment_api.database_password
+  db_url                      = module.consignment_api.database_url
+  kms_key_arn                 = module.encryption_key.kms_key_arn
+  api_database_security_group = module.consignment_api.database_security_group
 }
 
 module "create_keycloak_db_users_lambda" {
-  source                          = "./tdr-terraform-modules/lambda"
-  project                         = var.project
-  common_tags                     = local.common_tags
-  lambda_create_keycloak_db_users = true
-  vpc_id                          = module.keycloak.vpc_id
-  private_subnet_ids              = module.keycloak.private_subnets
-  db_admin_user                   = module.keycloak.db_username
-  db_admin_password               = module.keycloak.db_password
-  db_url                          = module.keycloak.db_url
-  kms_key_arn                     = module.encryption_key.kms_key_arn
-  keycloak_password               = module.keycloak.keycloak_user_password
+  source                           = "./tdr-terraform-modules/lambda"
+  project                          = var.project
+  common_tags                      = local.common_tags
+  lambda_create_keycloak_db_users  = true
+  vpc_id                           = module.keycloak.vpc_id
+  private_subnet_ids               = module.keycloak.private_subnets
+  db_admin_user                    = module.keycloak.db_username
+  db_admin_password                = module.keycloak.db_password
+  db_url                           = module.keycloak.db_url
+  kms_key_arn                      = module.encryption_key.kms_key_arn
+  keycloak_password                = module.keycloak.keycloak_user_password
+  keycloak_database_security_group = module.keycloak.database_security_group
 }
 
 module "dirty_upload_sns_topic" {
@@ -383,6 +387,8 @@ module "api_update_lambda" {
   api_url                               = module.consignment_api.api_url
   keycloak_backend_checks_client_secret = module.keycloak.backend_checks_client_secret
   kms_key_arn                           = module.encryption_key.kms_key_arn
+  private_subnet_ids                    = module.backend_checks_efs.private_subnets
+  vpc_id                                = module.shared_vpc.vpc_id
 }
 
 module "file_format_lambda" {
@@ -399,6 +405,7 @@ module "file_format_lambda" {
   mount_target_zero                      = module.backend_checks_efs.mount_target_zero
   mount_target_one                       = module.backend_checks_efs.mount_target_one
   kms_key_arn                            = module.encryption_key.kms_key_arn
+  efs_security_group_id                  = module.backend_checks_efs.security_group_id
 }
 
 module "download_files_lambda" {
@@ -417,6 +424,7 @@ module "download_files_lambda" {
   private_subnet_ids                     = module.backend_checks_efs.private_subnets
   backend_checks_client_secret           = module.keycloak.backend_checks_client_secret
   kms_key_arn                            = module.encryption_key.kms_key_arn
+  efs_security_group_id                  = module.backend_checks_efs.security_group_id
 }
 
 module "backend_checks_efs" {
@@ -459,6 +467,10 @@ module "export_authoriser_lambda" {
   api_url                  = module.consignment_api.api_url
   api_gateway_arn          = module.export_api.api_arn
   kms_key_arn              = module.encryption_key.kms_key_arn
+  private_subnet_ids       = module.backend_checks_efs.private_subnets
+  vpc_id                   = module.shared_vpc.vpc_id
+  efs_security_group_id    = module.backend_checks_efs.security_group_id
+
 }
 
 //create a new efs volume, ECS task attached to the volume and pass in the proper variables and create ECR repository in the backend project
