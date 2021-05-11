@@ -28,7 +28,7 @@ variable "auth_url" {}
 
 variable "client_secret_path" {}
 
-variable "ip_whitelist" {
+variable "ip_allowlist" {
   description = "IP addresses allowed to access"
   default     = ["0.0.0.0/0"]
 }
