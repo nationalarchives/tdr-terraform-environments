@@ -266,6 +266,8 @@ module "checksum_lambda" {
   mount_target_zero                      = module.backend_checks_efs.mount_target_zero
   mount_target_one                       = module.backend_checks_efs.mount_target_one
   kms_key_arn                            = module.encryption_key.kms_key_arn
+  efs_security_group_id = module.backend_checks_efs.efs_security_group
+  sqs_endpoint_security_group = module.sqs_vpc_endpoint.endpoint_security_group
 }
 
 module "create_db_users_lambda" {
@@ -294,6 +296,7 @@ module "create_keycloak_db_users_lambda" {
   db_url                          = module.keycloak.db_url
   kms_key_arn                     = module.encryption_key.kms_key_arn
   keycloak_password               = module.keycloak.keycloak_user_password
+  keycloak_db_security_group_id = module.keycloak.keycloak_db_security_group_id
 }
 
 module "dirty_upload_sns_topic" {
@@ -519,4 +522,15 @@ module "notifications_topic" {
   project     = var.project
   sns_policy  = "notifications"
   kms_key_arn = module.encryption_key.kms_key_arn
+}
+
+module "sqs_vpc_endpoint" {
+  source = "./tdr-terraform-modules/vpc_endpoint"
+  common_tags = local.common_tags
+  endpoint_policy = "sqs"
+  security_group_ids = flatten([module.checksum_lambda.checksum_lambda_sg_id])
+  policy_variables = {checksum_queue_arn = module.checksum_sqs_queue.sqs_arn, checksum_role_arn = module.checksum_lambda.checksum_lambda_role_arn}
+  service_name = "sqs"
+  vpc_id = module.shared_vpc.vpc_id
+  vpc_name = "tdr"
 }
