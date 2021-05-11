@@ -35,5 +35,5 @@ locals {
 
   trusted_ip_list = split(",", module.global_parameters.trusted_ips)
 
-  ip_whitelist = concat(local.developer_ip_list, local.trusted_ip_list)
+  ip_allowlist = concat(local.developer_ip_list, local.trusted_ip_list)
 }
