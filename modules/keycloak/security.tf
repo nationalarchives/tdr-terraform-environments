@@ -7,7 +7,7 @@ resource "aws_security_group" "lb" {
     protocol    = "tcp"
     from_port   = 443
     to_port     = 443
-    cidr_blocks = var.ip_whitelist
+    cidr_blocks = var.ip_allowlist
   }
 
   egress {

@@ -53,7 +53,7 @@ module "frontend" {
   environment           = local.environment
   environment_full_name = local.environment_full_name_map[local.environment]
   common_tags           = local.common_tags
-  ip_whitelist          = local.environment == "intg" ? local.ip_whitelist : ["0.0.0.0/0"]
+  ip_allowlist          = local.environment == "intg" ? local.ip_allowlist : ["0.0.0.0/0"]
   region                = local.region
   vpc_id                = module.shared_vpc.vpc_id
   public_subnets        = module.shared_vpc.public_subnets
@@ -224,7 +224,7 @@ module "waf" {
   environment       = local.environment
   common_tags       = local.common_tags
   alb_target_groups = [module.keycloak_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn]
-  trusted_ips       = concat(split(",", data.aws_ssm_parameter.trusted_ips.value), list("${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"))
+  trusted_ips       = concat(local.ip_allowlist, list("${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"))
   geo_match         = split(",", var.geo_match)
   restricted_uri    = "auth/admin"
 }
