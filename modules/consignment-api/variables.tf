@@ -34,7 +34,7 @@ variable "vpc_id" {}
 
 variable "dns_zone_name_trimmed" {}
 
-variable "ip_whitelist" {
+variable "ip_allowlist" {
   description = "IP addresses allowed to access"
   default     = ["0.0.0.0/0"]
 }
