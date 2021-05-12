@@ -24,7 +24,7 @@ variable "region" {}
 
 variable "frontend_url" {}
 
-variable "ip_whitelist" {
+variable "ip_allowlist" {
   description = "IP addresses allowed to access"
   default     = ["0.0.0.0/0"]
 }
