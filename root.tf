@@ -211,6 +211,7 @@ module "encryption_key" {
   source      = "./tdr-terraform-modules/kms"
   project     = var.project
   function    = "encryption"
+  key_policy  = "message_system_access"
   environment = local.environment
   common_tags = local.common_tags
 }
