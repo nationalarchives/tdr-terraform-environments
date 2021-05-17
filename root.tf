@@ -519,10 +519,12 @@ module "export_step_function" {
 }
 
 module "export_bucket" {
-  source      = "./tdr-terraform-modules/s3"
-  project     = var.project
-  function    = "consignment-export"
-  common_tags = local.common_tags
+  source              = "./tdr-terraform-modules/s3"
+  project             = var.project
+  function            = "consignment-export"
+  common_tags         = local.common_tags
+  ip_restriction      = local.ip_s3_export_restriction
+  ip_bucket_allowlist = local.ip_s3_export_allowlist
 }
 
 module "notifications_topic" {

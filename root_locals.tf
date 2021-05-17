@@ -35,5 +35,11 @@ locals {
 
   trusted_ip_list = split(",", module.global_parameters.trusted_ips)
 
+  tna_corporate_ip_list = split(",", module.global_parameters.tna_corporate_ips)
+
   ip_allowlist = concat(local.developer_ip_list, local.trusted_ip_list)
+
+  ip_s3_export_restriction = local.environment == "prod" ? true : false
+
+  ip_s3_export_allowlist = local.environment == "prod" ? local.tna_corporate_ip_list : concat(local.developer_ip_list, local.trusted_ip_list)
 }
