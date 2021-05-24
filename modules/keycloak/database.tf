@@ -24,7 +24,7 @@ resource "random_string" "snapshot_prefix" {
 resource "aws_rds_cluster" "keycloak_database" {
   cluster_identifier_prefix       = "keycloak-db-postgres-${var.environment}"
   engine                          = "aurora-postgresql"
-  engine_version                  = "11.6"
+  engine_version                  = "11.9"
   availability_zones              = var.database_availability_zones
   database_name                   = var.app_name
   master_username                 = "keycloak_admin"
@@ -59,7 +59,7 @@ resource "aws_rds_cluster_instance" "user_database_instance" {
   identifier_prefix    = "content-db-postgres-instance-${var.environment}"
   cluster_identifier   = aws_rds_cluster.keycloak_database.id
   engine               = "aurora-postgresql"
-  engine_version       = "11.6"
+  engine_version       = "11.9"
   instance_class       = "db.t3.medium"
   db_subnet_group_name = aws_db_subnet_group.user_subnet_group.name
 }
