@@ -139,7 +139,6 @@ module "consignment_api_alb" {
   alb_target_group_port = 8080
   alb_target_type       = "ip"
   certificate_arn       = module.consignment_api_certificate.certificate_arn
-  domain_name           = "api.${local.dns_zone_name_trimmed}"
   health_check_matcher  = "200,303"
   health_check_path     = "healthcheck"
   http_listener         = false
@@ -167,7 +166,6 @@ module "keycloak_alb" {
   alb_target_group_port = 8080
   alb_target_type       = "ip"
   certificate_arn       = module.keycloak_certificate.certificate_arn
-  domain_name           = "auth.${local.dns_zone_name_trimmed}"
   health_check_matcher  = "200,303"
   health_check_path     = ""
   http_listener         = false
@@ -199,7 +197,6 @@ module "frontend_alb" {
   alb_target_group_port = 9000
   alb_target_type       = "ip"
   certificate_arn       = module.frontend_certificate.certificate_arn
-  domain_name           = local.dns_zone_name_trimmed
   health_check_matcher  = "200,303"
   health_check_path     = ""
   public_subnets        = module.shared_vpc.public_subnets
