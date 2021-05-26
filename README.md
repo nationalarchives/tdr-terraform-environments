@@ -12,15 +12,29 @@ The different modules are used by Terraform workspaces which represent three AWS
 * staging
 * prod
 
-## Getting Started
+## Deployment
 
-### Terraform Backend
+These scripts assume that the [Terraform backend has been created in the management account][tf-backend]. This project uses the S3 Terraform backend to store the Terraform state for the different TDR environments.
 
-Ensure that the Terraform backend has been created.
+To start a deployment, run the [TDR Terraform Environments Deploy job in Jenkins][jenkins-job] by clicking 'Buid with Parameters' and selecting the environment you want to deploy to. All changes must be deployed first to integration, then staging, then production.
 
-See here: https://github.com/nationalarchives/tdr-dev-documentation/tree/master/manual/tdr-create-aws-instructure-setup.md
+The deployment will pause when Terraform has determined which changes need to be applied. Review the Terraform plan output by opening the job's console output.
 
-This project creates an s3 Terraform backend that stores the Terraform state for the different TDR environments.
+Check whether the changes look correct, then open the build input page and accept or reject them. To find the build input page, follow the link from the Slack notification:
+
+![Terraform deployment link in Slack](docs/images/slack-deployment-link.png)
+
+Or click the "Paused for input" link in the Jenkins job detail:
+
+![Paused for input link in Jenkins](docs/images/jenkins-paused-for-input.png)
+
+Integration and staging deployments will automatically start the [end-to-end tests]. Wait for these to succeed before deploying the Terraform to the next environment, as well as doing any manual checks you need to make sure the deployment made the change you expected.
+
+[tf-backend]: https://github.com/nationalarchives/tdr-dev-documentation/tree/master/manual/tdr-create-aws-instructure-setup.md
+[jenkins-job]: https://jenkins.tdr-management.nationalarchives.gov.uk/job/TerraformEnvironmentsDeploy/
+[end-to-end tests]: https://jenkins.tdr-management.nationalarchives.gov.uk/job/TDRAcceptanceTest/
+
+## Local development
 
 ### Install Terraform locally
 
