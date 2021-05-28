@@ -530,3 +530,14 @@ module "notifications_topic" {
   sns_policy  = "notifications"
   kms_key_arn = module.encryption_key.kms_key_arn
 }
+
+module "notification_lambda" {
+  source                        = "./tdr-terraform-modules/lambda"
+  common_tags                   = local.common_tags
+  project                       = "tdr"
+  lambda_ecr_scan_notifications = true
+  event_rule_arns               = []
+  sns_topic_arns                = [module.notifications_topic.sns_arn]
+  muted_scan_alerts             = module.global_parameters.muted_ecr_scan_alerts
+}
+
