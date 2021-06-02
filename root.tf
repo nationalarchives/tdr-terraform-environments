@@ -313,6 +313,7 @@ module "backend_check_failure_sqs_queue" {
   common_tags = local.common_tags
   project     = var.project
   function    = "backend-check-failure"
+  sqs_policy  = "failure_queue"
   kms_key_id  = module.encryption_key.kms_key_arn
 }
 
@@ -321,6 +322,7 @@ module "antivirus_sqs_queue" {
   common_tags              = local.common_tags
   project                  = var.project
   function                 = "antivirus"
+  sqs_policy               = "file_checks"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
   visibility_timeout       = 180
@@ -345,7 +347,7 @@ module "checksum_sqs_queue" {
   common_tags              = local.common_tags
   project                  = var.project
   function                 = "checksum"
-  sqs_policy               = "sns_topic"
+  sqs_policy               = "file_checks"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
   visibility_timeout       = 180
@@ -357,6 +359,7 @@ module "file_format_sqs_queue" {
   common_tags              = local.common_tags
   project                  = var.project
   function                 = "file-format"
+  sqs_policy               = "file_checks"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
   // Terraform will fail if the visibility timeout is shorter than the lambda timeout.
