@@ -197,6 +197,7 @@ module "frontend_alb" {
   alb_target_group_port = 9000
   alb_target_type       = "ip"
   certificate_arn       = module.frontend_certificate.certificate_arn
+  // The front end returns 308 for any non https requests and the health checks are not https. The play app needs to be running to return 308 so this still works as a health check.
   health_check_matcher  = "308"
   health_check_path     = ""
   public_subnets        = module.shared_vpc.public_subnets
