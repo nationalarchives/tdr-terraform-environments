@@ -40,7 +40,7 @@ module "consignment_api" {
   kms_key_id                     = module.encryption_key.kms_key_arn
   frontend_url                   = module.frontend.frontend_url
   dns_zone_name_trimmed          = local.dns_zone_name_trimmed
-  create_users_security_group_id = module.create_db_users_lambda.create_users_lambda_security_group_id
+  create_users_security_group_id = flatten([module.create_db_users_lambda.create_users_lambda_security_group_id, module.create_bastion_user_lambda.create_users_lambda_security_group_id])
 }
 
 module "frontend" {
