@@ -40,7 +40,7 @@ module "consignment_api" {
   kms_key_id                     = module.encryption_key.kms_key_arn
   frontend_url                   = module.frontend.frontend_url
   dns_zone_name_trimmed          = local.dns_zone_name_trimmed
-  create_users_security_group_id = module.create_db_users_lambda.create_users_lambda_security_group_id
+  create_users_security_group_id = flatten([module.create_db_users_lambda.create_users_lambda_security_group_id, module.create_bastion_user_lambda.create_users_lambda_security_group_id])
 }
 
 module "frontend" {
@@ -282,6 +282,25 @@ module "create_db_users_lambda" {
   db_url                      = module.consignment_api.database_url
   kms_key_arn                 = module.encryption_key.kms_key_arn
   api_database_security_group = module.consignment_api.database_security_group
+  lambda_name                 = "create-db-users"
+  database_name               = "consignmentapi"
+}
+
+module "create_bastion_user_lambda" {
+  source                      = "./tdr-terraform-modules/lambda"
+  project                     = var.project
+  common_tags                 = local.common_tags
+  lambda_create_db_users      = true
+  vpc_id                      = module.shared_vpc.vpc_id
+  private_subnet_ids          = module.backend_checks_efs.private_subnets
+  consignment_database_sg_id  = module.consignment_api.consignment_db_security_group_id
+  db_admin_user               = module.consignment_api.database_username
+  db_admin_password           = module.consignment_api.database_password
+  db_url                      = module.consignment_api.database_url
+  kms_key_arn                 = module.encryption_key.kms_key_arn
+  api_database_security_group = module.consignment_api.database_security_group
+  lambda_name                 = "create-bastion-user"
+  database_name               = "bastion"
 }
 
 module "create_keycloak_db_users_lambda" {
