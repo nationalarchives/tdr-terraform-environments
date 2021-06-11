@@ -5,6 +5,7 @@ resource "random_password" "keycloak_password" {
 
 resource "random_uuid" "client_secret" {}
 resource "random_uuid" "backend_checks_client_secret" {}
+resource "random_uuid" "reporting_client_secret" {}
 
 resource "aws_ssm_parameter" "database_url" {
   name  = "/${var.environment}/keycloak/database/url"
@@ -82,6 +83,16 @@ resource "aws_ssm_parameter" "keycloak_user_admin_client_secret" {
   name  = "/${var.environment}/keycloak/user_admin_client/secret"
   type  = "SecureString"
   value = random_uuid.backend_checks_client_secret.result
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "reporting_client_secret" {
+  name  = "/${var.environment}/keycloak/reporting_client/secret"
+  type  = "SecureString"
+  value = random_uuid.reporting_client_secret.result
 
   lifecycle {
     ignore_changes = [value]
