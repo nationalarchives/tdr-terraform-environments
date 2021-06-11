@@ -47,6 +47,10 @@
       {
         "valueFrom": "${govuk_notify_template_id_path}",
         "name": "GOVUK_NOTIFY_TEMPLATE_ID"
+      },
+      {
+        "valueFrom": "${reporting_client_secret_path}",
+        "name": "REPORTING_CLIENT_SECRET"
       }
     ],
     "environment": [

@@ -89,7 +89,7 @@ resource "aws_ssm_parameter" "keycloak_user_admin_client_secret" {
   }
 }
 
-resource "aws_ssm_parameter" "reporting_client_secret" {
+resource "aws_ssm_parameter" "keycloak_reporting_client_secret" {
   name  = "/${var.environment}/keycloak/reporting_client/secret"
   type  = "SecureString"
   value = random_uuid.reporting_client_secret.result
