@@ -623,11 +623,11 @@ module "tdr_private_nacl" {
 }
 
 module "tdr_default_nacl" {
-  source = "./tdr-terraform-modules/default_nacl"
+  source                 = "./tdr-terraform-modules/default_nacl"
   default_network_acl_id = module.shared_vpc.default_nacl_id
 }
 
 module "keycloak_default_nacl" {
-  source = "./tdr-terraform-modules/default_nacl"
+  source                 = "./tdr-terraform-modules/default_nacl"
   default_network_acl_id = module.keycloak.default_nacl_id
 }
