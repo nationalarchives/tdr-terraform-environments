@@ -577,3 +577,33 @@ module "tdr_public_nacl" {
   subnet_ids  = module.shared_vpc.public_subnets
   common_tags = local.common_tags
 }
+
+module "keycloak_public_nacl" {
+  source = "./tdr-terraform-modules/nacl"
+  name   = "keycloak-public-nacl-${local.environment}"
+  vpc_id = module.keycloak.vpc_id
+  ingress_rules = [
+    { rule_no = 100, cidr_block = "0.0.0.0/0", action = "allow", from_port = 443, to_port = 443, egress = false },
+    { rule_no = 200, cidr_block = "0.0.0.0/0", action = "allow", from_port = 1024, to_port = 65535, egress = false },
+    { rule_no = 100, cidr_block = "0.0.0.0/0", action = "allow", from_port = 443, to_port = 443, egress = true },
+    { rule_no = 200, cidr_block = "0.0.0.0/0", action = "allow", from_port = 1024, to_port = 65535, egress = true },
+  ]
+  subnet_ids  = module.keycloak.public_subnets
+  common_tags = local.common_tags
+}
+
+module "keycloak_private_nacl" {
+  source = "./tdr-terraform-modules/nacl"
+  name   = "keycloak-private-nacl-${local.environment}"
+  vpc_id = module.keycloak.vpc_id
+  ingress_rules = [
+    # The task needs a port to communicate with ssm over the internet but I can't find which one so all ephemeral ports need to be open to the internet
+    # Using a VPC endpoint for SSM should allow us to restrict this to traffic inside the VPC
+    { rule_no = 100, cidr_block = "0.0.0.0/0", action = "allow", from_port = 1024, to_port = 65535, egress = false },
+    { rule_no = 200, cidr_block = "0.0.0.0/0", action = "allow", from_port = 443, to_port = 443, egress = false },
+    { rule_no = 100, cidr_block = "0.0.0.0/0", action = "allow", from_port = 443, to_port = 443, egress = true },
+    { rule_no = 200, cidr_block = module.keycloak.vpc_cidr_block, action = "allow", from_port = 1024, to_port = 65535, egress = true }
+  ]
+  subnet_ids  = module.keycloak.private_subnets
+  common_tags = local.common_tags
+}
