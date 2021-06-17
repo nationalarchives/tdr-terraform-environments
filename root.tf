@@ -621,3 +621,13 @@ module "tdr_private_nacl" {
   subnet_ids  = flatten([module.backend_checks_efs.private_subnets, module.export_efs.private_subnets, module.shared_vpc.private_subnets])
   common_tags = local.common_tags
 }
+
+module "tdr_default_nacl" {
+  source = "./tdr-terraform-modules/default_nacl"
+  default_network_acl_id = module.shared_vpc.default_nacl_id
+}
+
+module "keycloak_default_nacl" {
+  source = "./tdr-terraform-modules/default_nacl"
+  default_network_acl_id = module.keycloak.default_nacl_id
+}
