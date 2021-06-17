@@ -564,3 +564,16 @@ module "notification_lambda" {
   muted_scan_alerts             = module.global_parameters.muted_ecr_scan_alerts
 }
 
+module "tdr_public_nacl" {
+  source = "./tdr-terraform-modules/nacl"
+  name   = "tdr-public-nacl-${local.environment}"
+  vpc_id = module.shared_vpc.vpc_id
+  ingress_rules = [
+    { rule_no = 100, cidr_block = "0.0.0.0/0", action = "allow", from_port = 443, to_port = 443, egress = false },
+    { rule_no = 200, cidr_block = "0.0.0.0/0", action = "allow", from_port = 1024, to_port = 65535, egress = false },
+    { rule_no = 100, cidr_block = "0.0.0.0/0", action = "allow", from_port = 443, to_port = 443, egress = true },
+    { rule_no = 200, cidr_block = "0.0.0.0/0", action = "allow", from_port = 1024, to_port = 65535, egress = true },
+  ]
+  subnet_ids  = module.shared_vpc.public_subnets
+  common_tags = local.common_tags
+}
