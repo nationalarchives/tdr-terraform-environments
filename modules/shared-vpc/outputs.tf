@@ -25,3 +25,7 @@ output "vpc_cidr_block" {
 output "nat_gateway_public_ips" {
   value = aws_nat_gateway.gw.*.public_ip
 }
+
+output "default_nacl_id" {
+  value = aws_vpc.main.default_network_acl_id
+}
