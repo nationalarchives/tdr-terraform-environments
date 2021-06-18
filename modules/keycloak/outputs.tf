@@ -2,6 +2,14 @@ output "vpc_id" {
   value = aws_vpc.main.id
 }
 
+output "vpc_cidr_block" {
+  value = aws_vpc.main.cidr_block
+}
+
+output "default_nacl_id" {
+  value = aws_vpc.main.default_network_acl_id
+}
+
 output "public_subnets" {
   value = aws_subnet.public.*.id
 }
