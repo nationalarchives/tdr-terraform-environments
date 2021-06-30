@@ -39,7 +39,8 @@ output "backend_checks_client_secret_path" {
 }
 
 output "backend_checks_client_secret" {
-  value = aws_ssm_parameter.keycloak_backend_checks_client_secret.value
+  value     = aws_ssm_parameter.keycloak_backend_checks_client_secret.value
+  sensitive = true
 }
 
 output "db_username" {
