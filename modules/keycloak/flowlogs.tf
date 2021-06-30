@@ -9,8 +9,8 @@ resource "aws_cloudwatch_log_group" "keycloak_flowlog_log_group" {
   name = "/flowlogs/keycloak-vpc-${var.environment}"
   tags = merge(
     var.common_tags,
-    map(
-      "Name", "flowlogs/keycloak-vpc-${var.environment}",
+    tomap(
+      {"Name" = "flowlogs/keycloak-vpc-${var.environment}"}
     )
   )
 }
@@ -20,8 +20,8 @@ resource "aws_iam_role" "keycloak_flowlog_role" {
   assume_role_policy = data.aws_iam_policy_document.keycloak_flowlog_assume_role_policy.json
   tags = merge(
     var.common_tags,
-    map(
-      "Name", "keycloak-flowlog-role-${var.environment}",
+    tomap(
+      {"Name" = "keycloak-flowlog-role-${var.environment}"}
     )
   )
 }
