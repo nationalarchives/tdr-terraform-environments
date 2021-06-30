@@ -6,7 +6,9 @@ resource "aws_ecs_cluster" "frontend_ecs" {
 
   tags = merge(
     var.common_tags,
-    map("Name", "frontend_${var.environment}")
+    tomap(
+      {"Name" = "frontend_${var.environment}"}
+    )
   )
 }
 
@@ -41,7 +43,9 @@ resource "aws_ecs_task_definition" "frontend_task" {
 
   tags = merge(
     var.common_tags,
-    map("Name", "${var.app_name}-task-definition")
+    tomap(
+      {"Name" = "${var.app_name}-task-definition"}
+    )
   )
 }
 
@@ -75,8 +79,8 @@ resource "aws_iam_role" "frontend_ecs_execution" {
 
   tags = merge(
     var.common_tags,
-    map(
-      "Name", "api-ecs-execution-iam-role-${var.environment}",
+    tomap(
+      {"Name" = "api-ecs-execution-iam-role-${var.environment}"}
     )
   )
 }
@@ -87,8 +91,8 @@ resource "aws_iam_role" "frontend_ecs_task" {
 
   tags = merge(
     var.common_tags,
-    map(
-      "Name", "api-ecs-task-iam-role-${var.environment}",
+    tomap(
+      {"Name" = "api-ecs-task-iam-role-${var.environment}"}
     )
   )
 }

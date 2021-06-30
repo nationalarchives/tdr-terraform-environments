@@ -9,8 +9,8 @@ resource "aws_cloudwatch_log_group" "tdr_flowlog_log_group" {
   name = "/flowlogs/tdr-vpc-${var.environment}"
   tags = merge(
     var.common_tags,
-    map(
-      "Name", "flowlogs/tdr-vpc-${var.environment}",
+    tomap(
+      {"Name" = "flowlogs/tdr-vpc-${var.environment}"}
     )
   )
 }
@@ -20,8 +20,8 @@ resource "aws_iam_role" "tdr_flowlog_role" {
   assume_role_policy = data.aws_iam_policy_document.tdr_flowlog_assume_role_policy.json
   tags = merge(
     var.common_tags,
-    map(
-      "Name", "tdr-flowlog-role-${var.environment}",
+    tomap(
+      {"Name" = "tdr-flowlog-role-${var.environment}"}
     )
   )
 }
