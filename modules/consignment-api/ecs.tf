@@ -8,7 +8,7 @@ resource "aws_ecs_cluster" "consignment_api_ecs" {
   tags = merge(
     var.common_tags,
     tomap(
-      {"Name" = "consignment_api_${var.environment}"}
+      { "Name" = "consignment_api_${var.environment}" }
     )
   )
 }
@@ -42,7 +42,7 @@ resource "aws_ecs_task_definition" "consignment_api_task" {
   tags = merge(
     var.common_tags,
     tomap(
-      {"Name" = "${var.app_name}-task-definition"}
+      { "Name" = "${var.app_name}-task-definition" }
     )
   )
 }
@@ -77,7 +77,7 @@ resource "aws_iam_role" "consignment_api_ecs_execution" {
   tags = merge(
     var.common_tags,
     tomap(
-      {"Name" = "api-ecs-execution-iam-role-${var.environment}"}
+      { "Name" = "api-ecs-execution-iam-role-${var.environment}" }
     )
   )
 }
@@ -99,7 +99,7 @@ resource "aws_iam_role" "consignment_api_ecs_task" {
   tags = merge(
     var.common_tags,
     tomap(
-      {"Name" = "api-ecs-task-iam-role-${var.environment}"}
+      { "Name" = "api-ecs-task-iam-role-${var.environment}" }
     )
   )
 }
