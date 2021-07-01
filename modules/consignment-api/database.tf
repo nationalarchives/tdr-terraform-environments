@@ -10,7 +10,7 @@ resource "aws_db_subnet_group" "consignment_api_subnet_group" {
   tags = merge(
     var.common_tags,
     tomap(
-      {"Name" = "user-db-subnet-group-${var.environment}"}
+      { "Name" = "user-db-subnet-group-${var.environment}" }
     )
   )
 }
@@ -41,7 +41,7 @@ resource "aws_rds_cluster" "consignment_api_database" {
   tags = merge(
     var.common_tags,
     tomap(
-      {"Name" = "content-db-cluster-${var.environment}"}
+      { "Name" = "content-db-cluster-${var.environment}" }
     )
   )
 

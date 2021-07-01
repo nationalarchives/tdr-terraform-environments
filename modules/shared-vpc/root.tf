@@ -8,7 +8,7 @@ resource "aws_vpc" "main" {
   tags = merge(
     var.common_tags,
     tomap(
-      {"Name" = "tdr-vpc-${var.environment}"}
+      { "Name" = "tdr-vpc-${var.environment}" }
     )
   )
 }
@@ -28,7 +28,7 @@ resource "aws_subnet" "private" {
   tags = merge(
     var.common_tags,
     tomap(
-      {"Name" = "tdr-private-subnet-${count.index}-${var.environment}"}
+      { "Name" = "tdr-private-subnet-${count.index}-${var.environment}" }
     )
   )
 }
@@ -47,7 +47,7 @@ resource "aws_subnet" "public" {
   tags = merge(
     var.common_tags,
     tomap(
-      {"Name" = "tdr-public-subnet-${count.index}-${var.environment}"}
+      { "Name" = "tdr-public-subnet-${count.index}-${var.environment}" }
     )
   )
 }
@@ -83,7 +83,7 @@ resource "aws_nat_gateway" "gw" {
   tags = merge(
     var.common_tags,
     tomap(
-      {"Name" = "nat-gateway-${count.index}-tdr-${var.environment}"}
+      { "Name" = "nat-gateway-${count.index}-tdr-${var.environment}" }
     )
   )
 }
@@ -101,7 +101,7 @@ resource "aws_route_table" "private" {
   tags = merge(
     var.common_tags,
     tomap(
-      {"Name" = "route-table-${count.index}-tdr-${var.environment}"}
+      { "Name" = "route-table-${count.index}-tdr-${var.environment}" }
     )
   )
 }

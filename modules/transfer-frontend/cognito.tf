@@ -49,7 +49,7 @@ resource "aws_iam_role" "cognito_authorised_role" {
   tags = merge(
     var.common_tags,
     tomap(
-      {"Name" = "${title(var.environment)} Terraform Role"}
+      { "Name" = "${title(var.environment)} Terraform Role" }
     )
   )
 }

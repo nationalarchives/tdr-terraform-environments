@@ -10,7 +10,7 @@ resource "aws_db_subnet_group" "user_subnet_group" {
   tags = merge(
     var.common_tags,
     tomap(
-      {"Name" = "user-db-subnet-group-${var.environment}"}
+      { "Name" = "user-db-subnet-group-${var.environment}" }
     )
   )
 }
@@ -40,7 +40,7 @@ resource "aws_rds_cluster" "keycloak_database" {
   tags = merge(
     var.common_tags,
     tomap(
-      {"Name" = "keycloak-db-cluster-${var.environment}"}
+      { "Name" = "keycloak-db-cluster-${var.environment}" }
     )
   )
 

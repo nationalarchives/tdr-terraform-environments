@@ -10,7 +10,7 @@ resource "aws_cloudwatch_log_group" "tdr_flowlog_log_group" {
   tags = merge(
     var.common_tags,
     tomap(
-      {"Name" = "flowlogs/tdr-vpc-${var.environment}"}
+      { "Name" = "flowlogs/tdr-vpc-${var.environment}" }
     )
   )
 }
@@ -21,7 +21,7 @@ resource "aws_iam_role" "tdr_flowlog_role" {
   tags = merge(
     var.common_tags,
     tomap(
-      {"Name" = "tdr-flowlog-role-${var.environment}"}
+      { "Name" = "tdr-flowlog-role-${var.environment}" }
     )
   )
 }
