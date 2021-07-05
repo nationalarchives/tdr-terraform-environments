@@ -19,7 +19,9 @@ resource "aws_security_group" "database" {
 
   tags = merge(
     var.common_tags,
-    map("Name", "${var.app_name}-database-security-group-${var.environment}")
+    tomap(
+      { "Name" = "${var.app_name}-database-security-group-${var.environment}" }
+    )
   )
 }
 
@@ -30,7 +32,9 @@ resource "aws_security_group" "bastion_security_group" {
 
   tags = merge(
     var.common_tags,
-    map("Name", "${var.app_name}-database-bastion-security-group-${var.environment}")
+    tomap(
+      { "Name" = "${var.app_name}-database-bastion-security-group-${var.environment}" }
+    )
   )
 
   egress {
@@ -66,7 +70,9 @@ resource "aws_security_group" "lb" {
 
   tags = merge(
     var.common_tags,
-    map("Name", "${var.app_name}-load-balancer-security-group-${var.environment}")
+    tomap(
+      { "Name" = "${var.app_name}-load-balancer-security-group-${var.environment}" }
+    )
   )
 }
 
@@ -92,6 +98,8 @@ resource "aws_security_group" "ecs_tasks" {
 
   tags = merge(
     var.common_tags,
-    map("Name", "${var.app_name}-ecs-task-security-group-${var.environment}")
+    tomap(
+      { "Name" = "${var.app_name}-ecs-task-security-group-${var.environment}" }
+    )
   )
 }

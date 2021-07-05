@@ -11,12 +11,14 @@ locals {
 
   environment_full_name = local.environment_full_name_map[local.environment]
 
-  common_tags = map(
-    "Environment", local.environment,
-    "Owner", "TDR",
-    "Terraform", true,
-    "TerraformSource", "https://github.com/nationalarchives/tdr-terraform-environments",
-    "CostCentre", data.aws_ssm_parameter.cost_centre.value,
+  common_tags = tomap(
+    {
+      "Environment"     = local.environment,
+      "Owner"           = "TDR",
+      "Terraform"       = true,
+      "TerraformSource" = "https://github.com/nationalarchives/tdr-terraform-environments",
+      "CostCentre"      = data.aws_ssm_parameter.cost_centre.value
+    }
   )
   database_availability_zones = ["eu-west-2a", "eu-west-2b"]
 

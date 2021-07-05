@@ -9,8 +9,8 @@ resource "aws_db_subnet_group" "consignment_api_subnet_group" {
 
   tags = merge(
     var.common_tags,
-    map(
-      "Name", "user-db-subnet-group-${var.environment}"
+    tomap(
+      { "Name" = "user-db-subnet-group-${var.environment}" }
     )
   )
 }
@@ -40,8 +40,8 @@ resource "aws_rds_cluster" "consignment_api_database" {
   iam_database_authentication_enabled = true
   tags = merge(
     var.common_tags,
-    map(
-      "Name", "content-db-cluster-${var.environment}"
+    tomap(
+      { "Name" = "content-db-cluster-${var.environment}" }
     )
   )
 
