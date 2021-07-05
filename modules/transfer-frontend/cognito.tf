@@ -48,8 +48,8 @@ resource "aws_iam_role" "cognito_authorised_role" {
   max_session_duration = 3 * 60 * 60
   tags = merge(
     var.common_tags,
-    map(
-      "Name", "${title(var.environment)} Terraform Role",
+    tomap(
+      { "Name" = "${title(var.environment)} Terraform Role" }
     )
   )
 }

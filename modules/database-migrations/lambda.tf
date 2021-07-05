@@ -60,7 +60,9 @@ resource "aws_security_group" "db_migration" {
 
   tags = merge(
     var.common_tags,
-    map("Name", "db-migration-security-group-${var.environment}")
+    tomap(
+      { "Name" = "db-migration-security-group-${var.environment}" }
+    )
   )
 }
 
