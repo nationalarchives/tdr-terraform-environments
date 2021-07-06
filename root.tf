@@ -242,7 +242,7 @@ module "antivirus_lambda" {
   common_tags                            = local.common_tags
   file_system_id                         = module.backend_checks_efs.file_system_id
   lambda_yara_av                         = true
-  timeout_seconds                        = 180
+  timeout_seconds                        = local.file_check_lambda_timeouts_in_seconds["antivirus"]
   project                                = var.project
   use_efs                                = true
   vpc_id                                 = module.shared_vpc.vpc_id
@@ -258,7 +258,7 @@ module "checksum_lambda" {
   project                                = var.project
   common_tags                            = local.common_tags
   lambda_checksum                        = true
-  timeout_seconds                        = 180
+  timeout_seconds                        = local.file_check_lambda_timeouts_in_seconds["checksum"]
   file_system_id                         = module.backend_checks_efs.file_system_id
   backend_checks_efs_access_point        = module.backend_checks_efs.access_point
   vpc_id                                 = module.shared_vpc.vpc_id
@@ -406,7 +406,7 @@ module "api_update_lambda" {
   project                               = var.project
   common_tags                           = local.common_tags
   lambda_api_update                     = true
-  timeout_seconds                       = 20
+  timeout_seconds                        = local.file_check_lambda_timeouts_in_seconds["api_update"]
   auth_url                              = module.keycloak.auth_url
   api_url                               = module.consignment_api.api_url
   keycloak_backend_checks_client_secret = module.keycloak.backend_checks_client_secret
@@ -420,7 +420,7 @@ module "file_format_lambda" {
   project                                = var.project
   common_tags                            = local.common_tags
   lambda_file_format                     = true
-  timeout_seconds                        = 900
+  timeout_seconds                        = local.file_check_lambda_timeouts_in_seconds["file_format"]
   file_system_id                         = module.backend_checks_efs.file_system_id
   backend_checks_efs_access_point        = module.backend_checks_efs.access_point
   vpc_id                                 = module.shared_vpc.vpc_id
@@ -438,7 +438,7 @@ module "download_files_lambda" {
   common_tags                            = local.common_tags
   project                                = var.project
   lambda_download_files                  = true
-  timeout_seconds                        = 180
+  timeout_seconds                        = local.file_check_lambda_timeouts_in_seconds["download_files"]
   s3_sns_topic                           = module.dirty_upload_sns_topic.sns_arn
   file_system_id                         = module.backend_checks_efs.file_system_id
   backend_checks_efs_access_point        = module.backend_checks_efs.access_point
