@@ -242,6 +242,7 @@ module "antivirus_lambda" {
   common_tags                            = local.common_tags
   file_system_id                         = module.backend_checks_efs.file_system_id
   lambda_yara_av                         = true
+  timeout_seconds                        = 180
   project                                = var.project
   use_efs                                = true
   vpc_id                                 = module.shared_vpc.vpc_id
@@ -257,6 +258,7 @@ module "checksum_lambda" {
   project                                = var.project
   common_tags                            = local.common_tags
   lambda_checksum                        = true
+  timeout_seconds                        = 180
   file_system_id                         = module.backend_checks_efs.file_system_id
   backend_checks_efs_access_point        = module.backend_checks_efs.access_point
   vpc_id                                 = module.shared_vpc.vpc_id
@@ -404,6 +406,7 @@ module "api_update_lambda" {
   project                               = var.project
   common_tags                           = local.common_tags
   lambda_api_update                     = true
+  timeout_seconds                       = 20
   auth_url                              = module.keycloak.auth_url
   api_url                               = module.consignment_api.api_url
   keycloak_backend_checks_client_secret = module.keycloak.backend_checks_client_secret
@@ -417,6 +420,7 @@ module "file_format_lambda" {
   project                                = var.project
   common_tags                            = local.common_tags
   lambda_file_format                     = true
+  timeout_seconds                        = 900
   file_system_id                         = module.backend_checks_efs.file_system_id
   backend_checks_efs_access_point        = module.backend_checks_efs.access_point
   vpc_id                                 = module.shared_vpc.vpc_id
@@ -434,6 +438,7 @@ module "download_files_lambda" {
   common_tags                            = local.common_tags
   project                                = var.project
   lambda_download_files                  = true
+  timeout_seconds                        = 180
   s3_sns_topic                           = module.dirty_upload_sns_topic.sns_arn
   file_system_id                         = module.backend_checks_efs.file_system_id
   backend_checks_efs_access_point        = module.backend_checks_efs.access_point
@@ -485,6 +490,7 @@ module "export_authoriser_lambda" {
   common_tags              = local.common_tags
   project                  = "tdr"
   lambda_export_authoriser = true
+  timeout_seconds          = 10
   api_url                  = module.consignment_api.api_url
   api_gateway_arn          = module.export_api.api_arn
   kms_key_arn              = module.encryption_key.kms_key_arn
