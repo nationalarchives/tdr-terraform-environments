@@ -34,6 +34,14 @@ locals {
 
   upload_cors_urls = local.environment == "intg" ? [module.frontend.frontend_url, local.local_dev_frontend_url] : [module.frontend.frontend_url]
 
+  file_check_lambda_timeouts_in_seconds = {
+    "antivirus"      = 180,
+    "api_update"     = 20,
+    "checksum"       = 180,
+    "download_files" = 180,
+    "file_format"    = 900
+  }
+
   developer_ip_list = split(",", module.global_parameters.developer_ips)
 
   trusted_ip_list = split(",", module.global_parameters.trusted_ips)
