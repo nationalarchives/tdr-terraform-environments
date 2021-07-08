@@ -448,6 +448,15 @@ module "download_files_lambda" {
   efs_security_group_id                  = module.backend_checks_efs.security_group_id
 }
 
+module "service_unavailable_lambda" {
+  source                                 = "./tdr-terraform-modules/lambda"
+  project                                = var.project
+  common_tags                            = local.common_tags
+  lambda_service_unavailable = true
+  vpc_id                                 = module.shared_vpc.vpc_id
+  private_subnet_ids                     = module.backend_checks_efs.private_subnets
+}
+
 module "backend_checks_efs" {
   source                       = "./tdr-terraform-modules/efs"
   common_tags                  = local.common_tags
