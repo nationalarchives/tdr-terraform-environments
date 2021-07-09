@@ -148,7 +148,7 @@ data "aws_iam_policy_document" "consignment_api_ecs_execution" {
       "ecr:GetDownloadUrlForLayer"
     ]
     resources = [
-      aws_cloudwatch_log_group.consignment_api_log_group.arn,
+      "${aws_cloudwatch_log_group.consignment_api_log_group.arn}:*",
       "arn:aws:ecr:eu-west-2:${data.aws_ssm_parameter.mgmt_account_number.value}:repository/consignment-api"
     ]
   }
