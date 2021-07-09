@@ -75,11 +75,10 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
    [location of project] $ git clone git@github.com/nationalarchives/tdr-configurations.git
    ```
 
-4. Clone Terraform modules repository and switch to branch `terraform-v13` in the cloned Terraform modules repository.
-    **Note**: tdr-terraform-environments uses Terraform v13. To provide backwards compatibility for other projects not yet upgraded, tdr-terraform-modules branch `terraform-v13` should be used until all projects are upgraded to use Terraform v13.
+4. Clone Terraform modules repository.
+   
    ```
-   [location of project] $ git clone git@github.com:nationalarchives/tdr-terraform-modules.git
-   [location of project] $ git checkout -b terraform-v13
+   [location of project] $ git clone git@github.com:nationalarchives/tdr-terraform-modules.git   
    ```
 
 5. Create Terraform workspaces corresponding to the TDR environments:
