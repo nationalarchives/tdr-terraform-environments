@@ -242,6 +242,7 @@ module "antivirus_lambda" {
   common_tags                            = local.common_tags
   file_system_id                         = module.backend_checks_efs.file_system_id
   lambda_yara_av                         = true
+  timeout_seconds                        = local.file_check_lambda_timeouts_in_seconds["antivirus"]
   project                                = var.project
   use_efs                                = true
   vpc_id                                 = module.shared_vpc.vpc_id
@@ -257,6 +258,7 @@ module "checksum_lambda" {
   project                                = var.project
   common_tags                            = local.common_tags
   lambda_checksum                        = true
+  timeout_seconds                        = local.file_check_lambda_timeouts_in_seconds["checksum"]
   file_system_id                         = module.backend_checks_efs.file_system_id
   backend_checks_efs_access_point        = module.backend_checks_efs.access_point
   vpc_id                                 = module.shared_vpc.vpc_id
@@ -345,7 +347,7 @@ module "antivirus_sqs_queue" {
   sqs_policy               = "file_checks"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
-  visibility_timeout       = 180
+  visibility_timeout       = local.file_check_lambda_timeouts_in_seconds["antivirus"] * 3
   kms_key_id               = module.encryption_key.kms_key_arn
 }
 
@@ -358,7 +360,7 @@ module "download_files_sqs_queue" {
   sqs_policy               = "sns_topic"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
-  visibility_timeout       = 180
+  visibility_timeout       = local.file_check_lambda_timeouts_in_seconds["download_files"] * 3
   kms_key_id               = module.encryption_key.kms_key_arn
 }
 
@@ -370,7 +372,7 @@ module "checksum_sqs_queue" {
   sqs_policy               = "file_checks"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
-  visibility_timeout       = 180
+  visibility_timeout       = local.file_check_lambda_timeouts_in_seconds["checksum"] * 3
   kms_key_id               = module.encryption_key.kms_key_arn
 }
 
@@ -382,10 +384,8 @@ module "file_format_sqs_queue" {
   sqs_policy               = "file_checks"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
-  // Terraform will fail if the visibility timeout is shorter than the lambda timeout.
-  // The timeout for the file format lambda is set to 900 seconds, more than the other backend check lambdas because the file format lambda is slower than the others
-  visibility_timeout = 900
-  kms_key_id         = module.encryption_key.kms_key_arn
+  visibility_timeout       = local.file_check_lambda_timeouts_in_seconds["file_format"] * 3
+  kms_key_id               = module.encryption_key.kms_key_arn
 }
 
 module "api_update_queue" {
@@ -396,6 +396,7 @@ module "api_update_queue" {
   sqs_policy               = "api_update_antivirus"
   dead_letter_queue        = module.backend_check_failure_sqs_queue.sqs_arn
   redrive_maximum_receives = 3
+  visibility_timeout       = local.file_check_lambda_timeouts_in_seconds["api_update"] * 3
   kms_key_id               = module.encryption_key.kms_key_arn
 }
 
@@ -404,6 +405,7 @@ module "api_update_lambda" {
   project                               = var.project
   common_tags                           = local.common_tags
   lambda_api_update                     = true
+  timeout_seconds                       = local.file_check_lambda_timeouts_in_seconds["api_update"]
   auth_url                              = module.keycloak.auth_url
   api_url                               = module.consignment_api.api_url
   keycloak_backend_checks_client_secret = module.keycloak.backend_checks_client_secret
@@ -417,6 +419,7 @@ module "file_format_lambda" {
   project                                = var.project
   common_tags                            = local.common_tags
   lambda_file_format                     = true
+  timeout_seconds                        = local.file_check_lambda_timeouts_in_seconds["file_format"]
   file_system_id                         = module.backend_checks_efs.file_system_id
   backend_checks_efs_access_point        = module.backend_checks_efs.access_point
   vpc_id                                 = module.shared_vpc.vpc_id
@@ -434,6 +437,7 @@ module "download_files_lambda" {
   common_tags                            = local.common_tags
   project                                = var.project
   lambda_download_files                  = true
+  timeout_seconds                        = local.file_check_lambda_timeouts_in_seconds["download_files"]
   s3_sns_topic                           = module.dirty_upload_sns_topic.sns_arn
   file_system_id                         = module.backend_checks_efs.file_system_id
   backend_checks_efs_access_point        = module.backend_checks_efs.access_point
@@ -494,6 +498,7 @@ module "export_authoriser_lambda" {
   common_tags              = local.common_tags
   project                  = "tdr"
   lambda_export_authoriser = true
+  timeout_seconds          = 10
   api_url                  = module.consignment_api.api_url
   api_gateway_arn          = module.export_api.api_arn
   kms_key_arn              = module.encryption_key.kms_key_arn
