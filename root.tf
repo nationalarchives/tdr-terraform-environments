@@ -450,6 +450,7 @@ module "download_files_lambda" {
   backend_checks_client_secret           = module.keycloak.backend_checks_client_secret
   kms_key_arn                            = module.encryption_key.kms_key_arn
   efs_security_group_id                  = module.backend_checks_efs.security_group_id
+  reserved_concurrency                   = 3
 }
 
 module "service_unavailable_lambda" {
