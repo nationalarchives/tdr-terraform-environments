@@ -646,3 +646,21 @@ module "keycloak_default_nacl" {
   source                 = "./tdr-terraform-modules/default_nacl"
   default_network_acl_id = module.keycloak.default_nacl_id
 }
+
+module "athena_s3" {
+  source         = "./tdr-terraform-modules/s3"
+  project        = var.project
+  common_tags    = local.common_tags
+  function       = "athena"
+  access_logs    = false
+}
+
+module "athena" {
+  source         = "./tdr-terraform-modules/athena"
+  project        = var.project
+  common_tags    = local.common_tags
+  function       = "security_logs"
+  bucket         = module.athena_s3.s3_bucket_id
+  environment = local.environment
+  queries        = ["keycloak_alb_logs"]
+}
