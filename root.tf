@@ -648,19 +648,37 @@ module "keycloak_default_nacl" {
 }
 
 module "athena_s3" {
-  source         = "./tdr-terraform-modules/s3"
-  project        = var.project
-  common_tags    = local.common_tags
-  function       = "athena"
-  access_logs    = false
+  source      = "./tdr-terraform-modules/s3"
+  project     = var.project
+  common_tags = local.common_tags
+  function    = "athena"
+  access_logs = false
 }
 
 module "athena" {
-  source         = "./tdr-terraform-modules/athena"
-  project        = var.project
-  common_tags    = local.common_tags
-  function       = "security_logs"
-  bucket         = module.athena_s3.s3_bucket_id
+  source      = "./tdr-terraform-modules/athena"
+  project     = var.project
+  common_tags = local.common_tags
+  function    = "security_logs"
+  bucket      = module.athena_s3.s3_bucket_id
   environment = local.environment
-  queries        = ["keycloak_alb_logs"]
+  queries = [
+    "create_table_keycloak_alb_logs",
+    "create_table_frontend_alb_logs",
+    "create_table_consignmentapi_alb_logs",
+    "create_table_tdr_cloudtrail_logs",
+    "create_table_tdr_s3_upload_logs",
+    "tdr_alb_client_ip_count",
+    "tdr_alb_error_counts",
+    "tdr_cloudtrail_action_for_iam_user",
+    "tdr_cloudtrail_action_for_principal",
+    "tdr_cloudtrail_action_for_role_name",
+    "tdr_cloudtrail_action_on_date",
+    "tdr_cloudtrail_ip_for_access_key",
+    "tdr_cloudtrail_update_resource",
+    "tdr_cloudtrail_user_for_access_key",
+    "tdr_s3_deleted_objects",
+    "tdr_s3_object_operations",
+    "tdr_s3_request_errors"
+  ]
 }
