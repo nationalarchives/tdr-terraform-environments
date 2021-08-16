@@ -34,6 +34,7 @@ data "template_file" "app" {
     govuk_notify_api_key_path         = aws_ssm_parameter.keycloak_govuk_notify_api_key.name
     govuk_notify_template_id_path     = aws_ssm_parameter.keycloak_govuk_notify_template_id.name
     reporting_client_secret_path      = aws_ssm_parameter.keycloak_reporting_client_secret.name
+    sns_topic_arn                     = var.notification_sns_topic
   }
 }
 
