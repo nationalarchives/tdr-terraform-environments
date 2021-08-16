@@ -73,6 +73,10 @@
       {
         "name": "SNS_TOPIC_ARN",
         "value": "${sns_topic_arn}"
+      },
+      {
+        "name": "TDR_ENV",
+        "value": "${app_environment}"
       }
     ],
     "networkMode": "awsvpc",
