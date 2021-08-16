@@ -69,6 +69,10 @@
       {
         "name": "DB_USER",
         "value": "${username}"
+      },
+      {
+        "name": "SNS_TOPIC_ARN",
+        "value": "${sns_topic_arn}"
       }
     ],
     "networkMode": "awsvpc",
