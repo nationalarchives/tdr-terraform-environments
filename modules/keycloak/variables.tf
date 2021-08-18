@@ -36,3 +36,7 @@ variable "kms_key_id" {
 variable "create_user_security_group_id" {
   default = ""
 }
+
+variable "notification_sns_topic" {
+  description = "SNS topic arn for notifications"
+}

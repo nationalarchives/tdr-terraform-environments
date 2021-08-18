@@ -83,6 +83,7 @@ module "keycloak" {
   frontend_url                  = module.frontend.frontend_url
   kms_key_id                    = module.encryption_key.kms_key_arn
   create_user_security_group_id = module.create_keycloak_db_users_lambda.create_keycloak_user_lambda_security_group
+  notification_sns_topic        = module.notifications_topic.sns_arn
 }
 
 module "alb_logs_s3" {
