@@ -34,6 +34,7 @@ data "template_file" "app" {
     govuk_notify_api_key_path         = aws_ssm_parameter.keycloak_govuk_notify_api_key.name
     govuk_notify_template_id_path     = aws_ssm_parameter.keycloak_govuk_notify_template_id.name
     reporting_client_secret_path      = aws_ssm_parameter.keycloak_reporting_client_secret.name
+    sns_topic_arn                     = var.notification_sns_topic
   }
 }
 
@@ -126,10 +127,20 @@ resource "aws_iam_role_policy_attachment" "keycloak_ecs_execution" {
   policy_arn = aws_iam_policy.keycloak_ecs_execution.arn
 }
 
+resource "aws_iam_role_policy_attachment" "keycloak_ecs_task" {
+  role       = aws_iam_role.keycloak_ecs_task.name
+  policy_arn = aws_iam_policy.keycloak_ecs_task.arn
+}
+
 resource "aws_iam_policy" "keycloak_ecs_execution" {
   name   = "keycloak_ecs_execution_policy_${var.environment}"
   path   = "/"
   policy = data.aws_iam_policy_document.keycloak_ecs_execution.json
+}
+
+resource "aws_iam_policy" "keycloak_ecs_task" {
+  name   = "TDRKeycloakECSTaskPolicy${title(var.environment)}"
+  policy = templatefile("${path.module}/templates/keycloak_ecs_task_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, environment = var.environment })
 }
 
 data "aws_ssm_parameter" "mgmt_account_number" {
