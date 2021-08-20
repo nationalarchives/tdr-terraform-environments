@@ -30,3 +30,7 @@ output "database_cluster_id" {
 output "database_security_group" {
   value = aws_security_group.database.id
 }
+
+output "bastion_security_group_id" {
+  value = aws_security_group.bastion_security_group.id
+}

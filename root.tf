@@ -470,7 +470,7 @@ module "backend_checks_efs" {
   project                      = var.project
   access_point_path            = "/backend-checks"
   policy                       = "backend_checks_access_policy"
-  mount_target_security_groups = flatten([module.file_format_lambda.file_format_lambda_sg_id, module.download_files_lambda.download_files_lambda_sg_id, module.file_format_build_task.file_format_build_sg_id, module.antivirus_lambda.antivirus_lambda_sg_id, module.checksum_lambda.checksum_lambda_sg_id])
+  mount_target_security_groups = flatten([module.file_format_lambda.file_format_lambda_sg_id, module.download_files_lambda.download_files_lambda_sg_id, module.file_format_build_task.file_format_build_sg_id, module.antivirus_lambda.antivirus_lambda_sg_id, module.checksum_lambda.checksum_lambda_sg_id, module.consignment_api.bastion_security_group_id])
   nat_gateway_ids              = module.shared_vpc.nat_gateway_ids
   vpc_cidr_block               = module.shared_vpc.vpc_cidr_block
   vpc_id                       = module.shared_vpc.vpc_id
@@ -519,7 +519,7 @@ module "export_efs" {
   project                      = var.project
   access_point_path            = "/export"
   policy                       = "export_access_policy"
-  mount_target_security_groups = flatten([module.export_task.consignment_export_sg_id])
+  mount_target_security_groups = flatten([module.export_task.consignment_export_sg_id, module.consignment_api.bastion_security_group_id])
   netnum_offset                = 6
   nat_gateway_ids              = module.shared_vpc.nat_gateway_ids
   vpc_cidr_block               = module.shared_vpc.vpc_cidr_block
