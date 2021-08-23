@@ -140,7 +140,7 @@ resource "aws_iam_policy" "keycloak_ecs_execution" {
 
 resource "aws_iam_policy" "keycloak_ecs_task" {
   name   = "TDRKeycloakECSTaskPolicy${title(var.environment)}"
-  policy = templatefile("${path.module}/templates/keycloak_ecs_task_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, environment = var.environment })
+  policy = templatefile("${path.module}/templates/keycloak_ecs_task_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, environment = var.environment, kms_arn = var.kms_key_id })
 }
 
 data "aws_ssm_parameter" "mgmt_account_number" {
