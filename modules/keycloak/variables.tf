@@ -40,3 +40,7 @@ variable "create_user_security_group_id" {
 variable "notification_sns_topic" {
   description = "SNS topic arn for notifications"
 }
+
+variable "kms_key_arn" {
+  description = "The KMS arn to encrypt environment variables."
+}
