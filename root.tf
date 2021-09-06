@@ -471,6 +471,8 @@ module "backend_checks_efs" {
   project                      = var.project
   access_point_path            = "/backend-checks"
   policy                       = "backend_checks_access_policy"
+  policy_roles                 = jsonencode(flatten([module.download_files_lambda.download_files_lambda_role, module.file_format_lambda.file_format_lambda_role, module.file_format_build_task.file_format_build_role, module.checksum_lambda.checksum_lambda_role, module.antivirus_lambda.antivirus_lambda_role]))
+  bastion_role                 = module.bastion_role.role.arn
   mount_target_security_groups = flatten([module.file_format_lambda.file_format_lambda_sg_id, module.download_files_lambda.download_files_lambda_sg_id, module.file_format_build_task.file_format_build_sg_id, module.antivirus_lambda.antivirus_lambda_sg_id, module.checksum_lambda.checksum_lambda_sg_id])
   nat_gateway_ids              = module.shared_vpc.nat_gateway_ids
   vpc_cidr_block               = module.shared_vpc.vpc_cidr_block
@@ -683,4 +685,13 @@ module "athena" {
     "tdr_s3_object_operations",
     "tdr_s3_request_errors"
   ]
+}
+// Create bastion role here so we can attach it to the EFS file system policy as you can't add roles that don't exist
+// We'll attach policies to the role when the bastion is created.
+module "bastion_role" {
+  source             = "./tdr-terraform-modules/iam_role"
+  assume_role_policy = templatefile("./tdr-terraform-modules/ec2/templates/ec2_assume_role.json.tpl", {})
+  common_tags        = local.common_tags
+  name               = "BastionEC2Role${title(local.environment)}"
+  policy_attachments = {}
 }
