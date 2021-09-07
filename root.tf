@@ -470,8 +470,8 @@ module "backend_checks_efs" {
   function                     = "backend-checks-efs"
   project                      = var.project
   access_point_path            = "/backend-checks"
-  policy                       = "backend_checks_access_policy"
-  policy_roles                 = jsonencode(flatten([module.download_files_lambda.download_files_lambda_role, module.file_format_lambda.file_format_lambda_role, module.file_format_build_task.file_format_build_role, module.checksum_lambda.checksum_lambda_role, module.antivirus_lambda.antivirus_lambda_role]))
+  policy                       = "efs_access_policy"
+  policy_roles                 = jsonencode(flatten([module.file_format_build_task.file_format_build_role, module.checksum_lambda.checksum_lambda_role, module.antivirus_lambda.antivirus_lambda_role, module.download_files_lambda.download_files_lambda_role, module.file_format_lambda.file_format_lambda_role]))
   bastion_role                 = module.bastion_role.role.arn
   mount_target_security_groups = flatten([module.file_format_lambda.file_format_lambda_sg_id, module.download_files_lambda.download_files_lambda_sg_id, module.file_format_build_task.file_format_build_sg_id, module.antivirus_lambda.antivirus_lambda_sg_id, module.checksum_lambda.checksum_lambda_sg_id])
   nat_gateway_ids              = module.shared_vpc.nat_gateway_ids
@@ -521,8 +521,10 @@ module "export_efs" {
   function                     = "export-efs"
   project                      = var.project
   access_point_path            = "/export"
-  policy                       = "export_access_policy"
+  policy                       = "efs_access_policy"
+  policy_roles                 = jsonencode(module.export_task.consignment_export_task_role_arn)
   mount_target_security_groups = flatten([module.export_task.consignment_export_sg_id])
+  bastion_role                 = module.bastion_role.role.arn
   netnum_offset                = 6
   nat_gateway_ids              = module.shared_vpc.nat_gateway_ids
   vpc_cidr_block               = module.shared_vpc.vpc_cidr_block
