@@ -122,6 +122,23 @@ module "upload_file_dirty_s3" {
   abort_incomplete_uploads = true
 }
 
+module "upload_file_cloudfront_dirty_s3" {
+  source                   = "./tdr-terraform-modules/s3"
+  project                  = var.project
+  function                 = "upload-files-cloudfront-dirty"
+  common_tags              = local.common_tags
+  cors_urls                = local.upload_cors_urls
+  sns_topic_arn            = module.dirty_upload_sns_topic.sns_arn
+  bucket_policy            = "cloudfront_oai"
+  sns_notification         = true
+  abort_incomplete_uploads = true
+  cloudfront_oai           = module.cloudwatch_upload.oai_iam_arn
+}
+
+module "cloudwatch_upload" {
+  source = "./tdr-terraform-modules/cloudfront"
+}
+
 module "consignment_api_certificate" {
   source      = "./tdr-terraform-modules/certificatemanager"
   project     = var.project
