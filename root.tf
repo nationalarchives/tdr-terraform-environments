@@ -159,6 +159,9 @@ module "cloudfront_upload_dns" {
   project               = var.project
   create_hosted_zone    = false
   a_record_name         = "upload"
+  hosted_zone_id        = data.aws_route53_zone.tdr_dns_zone.id
+  alb_dns_name          = module.cloudwatch_upload.cloudfront_domain_name
+  alb_zone_id           = module.cloudwatch_upload.cloudfront_hosted_zone_id
 }
 
 module "consignment_api_certificate" {
