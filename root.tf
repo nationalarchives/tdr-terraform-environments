@@ -132,7 +132,7 @@ module "upload_file_cloudfront_dirty_s3" {
   bucket_policy            = "cloudfront_oai"
   sns_notification         = true
   abort_incomplete_uploads = true
-  cloudfront_oai           = module.cloudwatch_upload.oai_iam_arn
+  cloudfront_oai           = module.cloudwatch_upload.cloudfront_oai_iam_arn
 }
 
 module "cloudwatch_upload" {
