@@ -132,7 +132,7 @@ module "upload_file_cloudfront_dirty_s3" {
   bucket_policy            = "cloudfront_oai"
   sns_notification         = true
   abort_incomplete_uploads = true
-  cloudfront_oai           = module.cloudwatch_upload.cloudfront_oai_iam_arn
+  cloudfront_oai           = module.cloudfront_upload.cloudfront_oai_iam_arn
 }
 
 module "upload_file_cloudfront_logs" {
@@ -143,7 +143,7 @@ module "upload_file_cloudfront_logs" {
   access_logs = false
 }
 
-module "cloudwatch_upload" {
+module "cloudfront_upload" {
   source                              = "./tdr-terraform-modules/cloudfront"
   s3_regional_domain_name             = module.upload_file_cloudfront_dirty_s3.s3_bucket_regional_domain_name
   environment                         = local.environment
@@ -160,8 +160,8 @@ module "cloudfront_upload_dns" {
   create_hosted_zone    = false
   a_record_name         = "upload"
   hosted_zone_id        = data.aws_route53_zone.tdr_dns_zone.id
-  alb_dns_name          = module.cloudwatch_upload.cloudfront_domain_name
-  alb_zone_id           = module.cloudwatch_upload.cloudfront_hosted_zone_id
+  alb_dns_name          = module.cloudfront_upload.cloudfront_domain_name
+  alb_zone_id           = module.cloudfront_upload.cloudfront_hosted_zone_id
 }
 
 module "consignment_api_certificate" {
