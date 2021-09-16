@@ -552,6 +552,15 @@ module "export_api" {
   common_tags     = local.common_tags
 }
 
+module "signed_cookies_api" {
+  source          = "./tdr-terraform-modules/apigateway"
+  api_name        = "SignedCookiesAPI"
+  api_template    = "sign_cookies_api"
+  template_params = { lambda_arn = module.sign_cookies_lambda.sign_cookies_arn, upload_cors_urls = format("'%s'", join("','", local.upload_cors_urls)) }
+  environment     = local.environment
+  common_tags     = local.common_tags
+}
+
 module "export_authoriser_lambda" {
   source                   = "./tdr-terraform-modules/lambda"
   common_tags              = local.common_tags
@@ -565,6 +574,18 @@ module "export_authoriser_lambda" {
   vpc_id                   = module.shared_vpc.vpc_id
   efs_security_group_id    = module.backend_checks_efs.security_group_id
 
+}
+
+module "sign_cookies_lambda" {
+  source              = "./tdr-terraform-modules/lambda"
+  common_tags         = local.common_tags
+  project             = "tdr"
+  lambda_sign_cookies = true
+  timeout_seconds     = 10
+  api_gateway_arn     = module.signed_cookies_api.api_arn
+  kms_key_arn         = module.encryption_key.kms_key_arn
+  private_subnet_ids  = module.backend_checks_efs.private_subnets
+  vpc_id              = module.shared_vpc.vpc_id
 }
 
 //create a new efs volume, ECS task attached to the volume and pass in the proper variables and create ECR repository in the backend project
