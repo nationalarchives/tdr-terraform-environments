@@ -30,6 +30,8 @@ locals {
 
   environment_domain = local.environment == "prod" ? "${var.project}.${var.domain}" : "${var.project}-${local.environment_full_name}.${var.domain}"
 
+  upload_domain = "upload.${local.environment_domain}"
+
   local_dev_frontend_url = "http://localhost:9000"
 
   upload_cors_urls = local.environment == "intg" ? [module.frontend.frontend_url, local.local_dev_frontend_url] : [module.frontend.frontend_url]
