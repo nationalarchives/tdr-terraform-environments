@@ -135,8 +135,19 @@ module "upload_file_cloudfront_dirty_s3" {
   cloudfront_oai           = module.cloudwatch_upload.cloudfront_oai_iam_arn
 }
 
+module "upload_file_cloudfront_logs" {
+  source      = "./tdr-terraform-modules/s3"
+  project     = var.project
+  function    = "upload-cloudfront-logs"
+  common_tags = local.common_tags
+  access_logs = false
+}
+
 module "cloudwatch_upload" {
-  source = "./tdr-terraform-modules/cloudfront"
+  source                              = "./tdr-terraform-modules/cloudfront"
+  s3_regional_domain_name             = module.upload_file_cloudfront_dirty_s3.s3_bucket_regional_domain_name
+  environment                         = local.environment
+  logging_bucket_regional_domain_name = module.upload_file_cloudfront_dirty_s3.s3_bucket_regional_domain_name
 }
 
 module "consignment_api_certificate" {
