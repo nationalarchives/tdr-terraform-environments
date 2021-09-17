@@ -150,6 +150,7 @@ module "cloudfront_upload" {
   logging_bucket_regional_domain_name = module.upload_file_cloudfront_logs.s3_bucket_regional_domain_name
   alias_domain_name                   = local.upload_domain
   certificate_arn                     = module.cloudfront_certificate.certificate_arn
+  api_gateway_url                     = module.signed_cookies_api.api_url
 }
 
 module "cloudfront_upload_dns" {
@@ -556,7 +557,7 @@ module "signed_cookies_api" {
   source          = "./tdr-terraform-modules/apigateway"
   api_name        = "SignedCookiesAPI"
   api_template    = "sign_cookies_api"
-  template_params = { lambda_arn = module.sign_cookies_lambda.sign_cookies_arn, upload_cors_urls = format("'%s'", join("','", local.upload_cors_urls)) }
+  template_params = { lambda_arn = module.sign_cookies_lambda.sign_cookies_arn, upload_cors_urls = module.frontend.frontend_url }
   environment     = local.environment
   common_tags     = local.common_tags
 }
