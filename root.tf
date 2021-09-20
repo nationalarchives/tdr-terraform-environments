@@ -148,6 +148,20 @@ module "cloudfront_upload" {
   s3_regional_domain_name             = module.upload_file_cloudfront_dirty_s3.s3_bucket_regional_domain_name
   environment                         = local.environment
   logging_bucket_regional_domain_name = module.upload_file_cloudfront_logs.s3_bucket_regional_domain_name
+  alias_domain_name                   = local.upload_domain
+  certificate_arn                     = module.cloudfront_certificate.certificate_arn
+}
+
+module "cloudfront_upload_dns" {
+  source                = "./tdr-terraform-modules/route53"
+  common_tags           = local.common_tags
+  environment_full_name = local.environment_full_name
+  project               = var.project
+  create_hosted_zone    = false
+  a_record_name         = "upload"
+  hosted_zone_id        = data.aws_route53_zone.tdr_dns_zone.id
+  alb_dns_name          = module.cloudfront_upload.cloudfront_domain_name
+  alb_zone_id           = module.cloudfront_upload.cloudfront_hosted_zone_id
 }
 
 module "consignment_api_certificate" {
@@ -157,6 +171,18 @@ module "consignment_api_certificate" {
   dns_zone    = local.environment_domain
   domain_name = "api.${local.environment_domain}"
   common_tags = local.common_tags
+}
+
+module "cloudfront_certificate" {
+  source      = "./tdr-terraform-modules/certificatemanager"
+  common_tags = local.common_tags
+  dns_zone    = local.environment_domain
+  domain_name = local.upload_domain
+  function    = "cloudfront-upload"
+  project     = var.project
+  providers = {
+    aws = aws.useast1
+  }
 }
 
 module "consignment_api_alb" {
