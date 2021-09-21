@@ -582,6 +582,7 @@ module "sign_cookies_lambda" {
   common_tags         = local.common_tags
   project             = "tdr"
   lambda_sign_cookies = true
+  auth_url            = module.keycloak.auth_url
   timeout_seconds     = 10
   api_gateway_arn     = module.signed_cookies_api.api_arn
   kms_key_arn         = module.encryption_key.kms_key_arn
