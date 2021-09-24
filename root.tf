@@ -586,7 +586,7 @@ module "sign_cookies_lambda" {
   frontend_url           = module.frontend.frontend_url
   upload_domain          = local.upload_domain
   cloudfront_key_pair_id = module.cloudfront_upload.cloudfront_key_pair_id
-  timeout_seconds        = 10
+  timeout_seconds        = 60
   api_gateway_arn        = module.signed_cookies_api.api_arn
   kms_key_arn            = module.encryption_key.kms_key_arn
   private_subnet_ids     = module.backend_checks_efs.private_subnets
