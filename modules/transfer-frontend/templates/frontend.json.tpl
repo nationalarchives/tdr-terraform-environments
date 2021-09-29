@@ -23,10 +23,6 @@
         "value" : "${app_environment}"
       },
       {
-        "name": "IDENTITY_POOL_ID",
-        "value": "${identity_pool_id}"
-      },
-      {
         "name": "EXPORT_API_URL",
         "value": "${export_api_url}"
       },
@@ -37,10 +33,6 @@
       {
         "name": "ALB_IP_B",
         "value": "${alb_ip_b}"
-      },
-      {
-        "name": "COGNITO_ROLE_ARN",
-        "value": "${cognito_role_arn}"
       }
     ],
     "networkMode": "awsvpc",

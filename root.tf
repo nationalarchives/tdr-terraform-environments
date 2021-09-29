@@ -117,7 +117,6 @@ module "upload_file_dirty_s3" {
   function                 = "upload-files-dirty"
   common_tags              = local.common_tags
   cors_urls                = local.upload_cors_urls
-  sns_topic_arn            = module.dirty_upload_sns_topic.sns_arn
   sns_notification         = true
   abort_incomplete_uploads = true
 }
