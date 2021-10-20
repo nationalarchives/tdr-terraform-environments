@@ -1,5 +1,6 @@
 locals {
   app_port = 8080
+  ecr_account_number = var.environment == "sbox" ? data.aws_caller_identity.current.account_id : data.aws_ssm_parameter.mgmt_account_number.value
 }
 resource "aws_ecs_cluster" "keycloak_ecs" {
   name = "keycloak_${var.environment}"
@@ -13,10 +14,10 @@ resource "aws_ecs_cluster" "keycloak_ecs" {
 }
 
 data "template_file" "app" {
-  template = file("modules/keycloak/templates/keycloak.json.tpl")
+  template = file("${path.module}/templates/keycloak.json.tpl")
 
   vars = {
-    app_image                         = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/auth-server:${var.environment}"
+    app_image                         = "${local.ecr_account_number}.dkr.ecr.eu-west-2.amazonaws.com/auth-server:${var.environment}"
     app_port                          = local.app_port
     app_environment                   = var.environment
     aws_region                        = var.region
@@ -158,7 +159,7 @@ data "aws_iam_policy_document" "keycloak_ecs_execution" {
     ]
     resources = [
       "${aws_cloudwatch_log_group.keycloak_log_group.arn}:*",
-      "arn:aws:ecr:eu-west-2:${data.aws_ssm_parameter.mgmt_account_number.value}:repository/auth-server"
+      "arn:aws:ecr:eu-west-2:${local.ecr_account_number}:repository/auth-server"
     ]
   }
   statement {
