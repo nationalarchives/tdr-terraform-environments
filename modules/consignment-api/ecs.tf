@@ -1,5 +1,6 @@
 locals {
   app_port = 8080
+  ecr_account_number = var.environment == "sbox" ? data.aws_caller_identity.current.account_id : data.aws_ssm_parameter.mgmt_account_number.value
 }
 
 resource "aws_ecs_cluster" "consignment_api_ecs" {
@@ -14,10 +15,10 @@ resource "aws_ecs_cluster" "consignment_api_ecs" {
 }
 
 data "template_file" "app" {
-  template = file("modules/consignment-api/templates/consignment-api.json.tpl")
+  template = file("${path.module}/templates/consignment-api.json.tpl")
 
   vars = {
-    app_image       = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/consignment-api:${var.environment}"
+    app_image       = "${local.ecr_account_number}.dkr.ecr.eu-west-2.amazonaws.com/consignment-api:${var.environment}"
     app_port        = local.app_port
     app_environment = var.environment
     aws_region      = var.region
@@ -149,7 +150,7 @@ data "aws_iam_policy_document" "consignment_api_ecs_execution" {
     ]
     resources = [
       "${aws_cloudwatch_log_group.consignment_api_log_group.arn}:*",
-      "arn:aws:ecr:eu-west-2:${data.aws_ssm_parameter.mgmt_account_number.value}:repository/consignment-api"
+      "arn:aws:ecr:eu-west-2:${local.ecr_account_number}:repository/consignment-api"
     ]
   }
   statement {

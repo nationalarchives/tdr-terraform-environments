@@ -1,12 +1,13 @@
 locals {
   environment = terraform.workspace
 
-  assume_role = "arn:aws:iam::${var.tdr_account_number}:role/TDRTerraformRole${title(local.environment)}"
+  assume_role = local.environment == "sbox" ? "arn:aws:iam::${var.tdr_account_number}:role/IAM_Admin_Role" : "arn:aws:iam::${var.tdr_account_number}:role/TDRTerraformRole${title(local.environment)}"
 
   environment_full_name_map = {
     "intg"    = "integration",
     "staging" = "staging",
-    "prod"    = "production"
+    "prod"    = "production",
+    "sbox" = "sandbox"
   }
 
   environment_full_name = local.environment_full_name_map[local.environment]
@@ -17,7 +18,7 @@ locals {
       "Owner"           = "TDR",
       "Terraform"       = true,
       "TerraformSource" = "https://github.com/nationalarchives/tdr-terraform-environments",
-      "CostCentre"      = data.aws_ssm_parameter.cost_centre.value
+      "CostCentre"      = module.global_parameters.cost_centre
     }
   )
   database_availability_zones = ["eu-west-2a", "eu-west-2b"]
@@ -49,4 +50,6 @@ locals {
   trusted_ip_list = split(",", module.global_parameters.trusted_ips)
 
   ip_allowlist = concat(local.developer_ip_list, local.trusted_ip_list)
+
+  sandbox_count = local.environment == "sbox" ? 0 : 1
 }
