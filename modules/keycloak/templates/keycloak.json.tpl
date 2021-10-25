@@ -55,6 +55,10 @@
     ],
     "environment": [
       {
+        "name": "PROXY_ADDRESS_FORWARDING",
+        "value": "true"
+      },
+      {
         "name" : "FRONTEND_URL",
         "value" : "${frontend_url}"
       },
