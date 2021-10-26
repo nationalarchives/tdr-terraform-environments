@@ -7,7 +7,7 @@ locals {
     "intg"    = "integration",
     "staging" = "staging",
     "prod"    = "production",
-    "sbox" = "sandbox"
+    "sbox"    = "sandbox"
   }
 
   environment_full_name = local.environment_full_name_map[local.environment]
