@@ -1,5 +1,5 @@
 locals {
-  app_port = 8080
+  app_port           = 8080
   ecr_account_number = var.environment == "sbox" ? data.aws_caller_identity.current.account_id : data.aws_ssm_parameter.mgmt_account_number.value
 }
 
