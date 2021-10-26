@@ -17,7 +17,7 @@ locals {
       "Owner"           = "TDR",
       "Terraform"       = true,
       "TerraformSource" = "https://github.com/nationalarchives/tdr-terraform-environments",
-      "CostCentre"      = data.aws_ssm_parameter.cost_centre.value
+      "CostCentre"      = module.global_parameters.cost_centre
     }
   )
   database_availability_zones = ["eu-west-2a", "eu-west-2b"]
