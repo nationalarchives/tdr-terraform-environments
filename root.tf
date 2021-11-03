@@ -846,7 +846,7 @@ module "keycloak_ecs_security_group" {
   vpc_id      = module.shared_vpc.vpc_id
   common_tags = local.common_tags
   ingress_security_group_rules = [
-    { port = 80, security_group_id = module.keycloak_alb_security_group.security_group_id, description = "Allow the load balancer to access the task" }
+    { port = 8080, security_group_id = module.keycloak_alb_security_group.security_group_id, description = "Allow the load balancer to access the task" }
   ]
   egress_cidr_rules = [{ port = 0, cidr_blocks = ["0.0.0.0/0"], description = "Allow outbound access on all ports", protocol = "-1" }]
 }
