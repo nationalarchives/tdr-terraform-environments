@@ -776,11 +776,6 @@ module "bastion_role" {
   name               = "BastionEC2Role${title(local.environment)}"
   policy_attachments = {}
 }
-#resource "aws_iam_policy" "keycloak_ecs_execution" {
-#  name   = "keycloak_ecs_execution_policy_${var.environment}"
-#  path   = "/"
-#  policy = data.aws_iam_policy_document.keycloak_ecs_execution.json
-#}
 
 module "keycloak_cloudwatch" {
   source      = "./tdr-terraform-modules/cloudwatch_logs"
