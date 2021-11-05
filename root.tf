@@ -837,7 +837,7 @@ module "keycloak_ssm_parameters" {
 module "keycloak_ecs_security_group" {
   source      = "./tdr-terraform-modules/security_group"
   description = "Controls access within our network for the Keycloak ECS Task"
-  name        = "tdr-keycloak-ecs-security-group"
+  name        = "tdr-keycloak-ecs-security-group-new"
   vpc_id      = module.shared_vpc.vpc_id
   common_tags = local.common_tags
   ingress_security_group_rules = [
@@ -849,7 +849,7 @@ module "keycloak_ecs_security_group" {
 module "keycloak_alb_security_group" {
   source      = "./tdr-terraform-modules/security_group"
   description = "Controls access to the keycloak load balancer"
-  name        = "keycloak-load-balancer-security-group"
+  name        = "keycloak-load-balancer-security-group-new"
   vpc_id      = module.shared_vpc.vpc_id
   common_tags = local.common_tags
   ingress_cidr_rules = [
@@ -861,7 +861,7 @@ module "keycloak_alb_security_group" {
 module "keycloak_database_security_group" {
   source      = "./tdr-terraform-modules/security_group"
   description = "Controls access to the keycloak database"
-  name        = "keycloak-database-security-group-${local.environment}"
+  name        = "keycloak-database-security-group-new-${local.environment}"
   vpc_id      = module.shared_vpc.vpc_id
   common_tags = local.common_tags
   ingress_security_group_rules = [
