@@ -188,5 +188,4 @@ module "keycloak_route53" {
   alb_zone_id           = module.keycloak_tdr_alb.alb_zone_id
   create_hosted_zone    = false
   hosted_zone_id        = data.aws_route53_zone.tdr_dns_zone.id
-
 }
