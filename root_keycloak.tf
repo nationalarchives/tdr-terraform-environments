@@ -148,7 +148,7 @@ module "keycloak_tdr_alb" {
   vpc_id                = module.shared_vpc.vpc_id
   common_tags           = local.common_tags
   own_host_header_only  = true
-  host                  = "auth.tdr-${local.environment_full_name}.nationalarchives.gov.uk" //Will set this correctly in another PR when we move the DNS over
+  host                  = "auth.${local.environment_domain}"
 }
 
 module "keycloak_database" {
