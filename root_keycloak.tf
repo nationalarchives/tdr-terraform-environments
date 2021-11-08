@@ -177,3 +177,16 @@ module "create_keycloak_db_users_lambda_new" {
   keycloak_password                   = module.keycloak_ssm_parameters.params[local.keycloak_user_password_name].value
   keycloak_database_security_group    = module.keycloak_database_security_group.security_group_id
 }
+
+module "keycloak_route53" {
+  source                = "./tdr-terraform-modules/route53"
+  common_tags           = local.common_tags
+  environment_full_name = local.environment_full_name
+  project               = "tdr"
+  a_record_name         = "auth"
+  alb_dns_name          = module.keycloak_tdr_alb.alb_dns_name
+  alb_zone_id           = module.keycloak_tdr_alb.alb_zone_id
+  create_hosted_zone    = false
+  hosted_zone_id        = data.aws_route53_zone.tdr_dns_zone.id
+
+}
