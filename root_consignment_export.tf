@@ -1,6 +1,6 @@
 module "consignment_export_ecs_security_group" {
   source            = "./tdr-terraform-modules/security_group"
-  description       = "Controls access within our network for the Keycloak ECS Task"
+  description       = "Allow Consignment Export ECS task to mount EFS volume"
   name              = "consignment-export-allow-ecs-mount-efs"
   vpc_id            = module.shared_vpc.vpc_id
   common_tags       = local.common_tags
@@ -17,7 +17,7 @@ module "consignment_export_execution_role" {
   source             = "./tdr-terraform-modules/iam_role"
   assume_role_policy = templatefile("./tdr-terraform-modules/ecs/templates/ecs_assume_role_policy.json.tpl", {})
   common_tags        = local.common_tags
-  name               = "ConsignmentExportECSExecutionRole${title(local.environment)}"
+  name               = "TDRConsignmentExportECSExecutionRole${title(local.environment)}"
   policy_attachments = {
     execution_policy = module.consignment_export_execution_policy.policy_arn,
     ssm_policy       = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
@@ -28,7 +28,7 @@ module "consignment_export_task_role" {
   source             = "./tdr-terraform-modules/iam_role"
   assume_role_policy = templatefile("./tdr-terraform-modules/ecs/templates/ecs_assume_role_policy.json.tpl", {})
   common_tags        = local.common_tags
-  name               = "ConsignmentExportECSTaskRole${title(local.environment)}"
+  name               = "TDRConsignmentExportEcsTaskRole${title(local.environment)}"
   policy_attachments = {
     task_policy = module.consignment_export_task_policy.policy_arn
   }
@@ -36,13 +36,13 @@ module "consignment_export_task_role" {
 
 module "consignment_export_execution_policy" {
   source        = "./tdr-terraform-modules/iam_policy"
-  name          = "ConsignmentExportECSExecutionPolicy${title(local.environment)}"
+  name          = "TDRConsignmentExportECSExecutionPolicy${title(local.environment)}"
   policy_string = templatefile("./tdr-terraform-modules/iam_policy/templates/consignment_export_execution_policy.json.tpl", { log_group_arn = "${module.consignment_export_cloudwatch.log_group_arn}:*", file_system_arn = module.export_efs.file_system_arn, management_account_number = data.aws_ssm_parameter.mgmt_account_number.value })
 }
 
 module "consignment_export_task_policy" {
   source        = "./tdr-terraform-modules/iam_policy"
-  name          = "ConsignmentExportECSTaskPolicy${title(local.environment)}"
+  name          = "TDRConsignmentExportECSTaskPolicy${title(local.environment)}"
   policy_string = templatefile("./tdr-terraform-modules/iam_policy/templates/consignment_export_task_policy.json.tpl", { environment = local.environment, titleEnvironment = title(local.environment), aws_region = local.region, account = data.aws_caller_identity.current.account_id })
 }
 
