@@ -23,11 +23,11 @@ output alb_security_group_id {
 }
 
 output "auth_host" {
-  value = "${aws_route53_record.keycloak_dns.name}.${var.dns_zone_name_trimmed}"
+  value = "auth.${var.dns_zone_name_trimmed}"
 }
 
 output "auth_url" {
-  value = "https://${aws_route53_record.keycloak_dns.name}.${var.dns_zone_name_trimmed}/auth"
+  value = "https://auth.${var.dns_zone_name_trimmed}/auth"
 }
 
 output "client_secret_path" {
