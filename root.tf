@@ -601,28 +601,13 @@ module "export_efs" {
   project                      = var.project
   access_point_path            = "/export"
   policy                       = "efs_access_policy"
-  policy_roles                 = jsonencode(module.export_task.consignment_export_task_role_arn)
-  mount_target_security_groups = flatten([module.export_task.consignment_export_sg_id])
+  policy_roles                 = jsonencode(module.consignment_export_task_role.role.arn)
+  mount_target_security_groups = flatten([module.consignment_export_ecs_security_group.security_group_id])
   bastion_role                 = module.bastion_role.role.arn
   netnum_offset                = 6
   nat_gateway_ids              = module.shared_vpc.nat_gateway_ids
   vpc_cidr_block               = module.shared_vpc.vpc_cidr_block
   vpc_id                       = module.shared_vpc.vpc_id
-}
-
-module "export_task" {
-  source                     = "./tdr-terraform-modules/ecs"
-  common_tags                = local.common_tags
-  project                    = var.project
-  consignment_export         = true
-  file_system_id             = module.export_efs.file_system_id
-  access_point               = module.export_efs.access_point
-  backend_client_secret_path = module.keycloak.backend_checks_client_secret_path
-  clean_bucket               = module.upload_bucket.s3_bucket_name
-  output_bucket              = module.export_bucket.s3_bucket_name
-  api_url                    = module.consignment_api.api_url
-  auth_url                   = module.keycloak.auth_url
-  vpc_id                     = module.shared_vpc.vpc_id
 }
 
 module "export_step_function" {
@@ -632,9 +617,9 @@ module "export_step_function" {
   definition             = "consignment_export"
   environment            = local.environment
   step_function_name     = "ConsignmentExport"
-  definition_variables   = { security_groups = jsonencode(module.export_task.consignment_export_sg_id), subnet_ids = jsonencode(module.export_efs.private_subnets), cluster_arn = module.export_task.consignment_export_cluster_arn, task_arn = module.export_task.consignment_export_task_arn, task_name = "consignment-export", sns_topic = module.notifications_topic.sns_arn }
+  definition_variables   = { security_groups = jsonencode(module.consignment_export_ecs_security_group.security_group_id), subnet_ids = jsonencode(module.export_efs.private_subnets), cluster_arn = module.consignment_export_ecs_task.cluster_arn, task_arn = module.consignment_export_ecs_task.task_definition_arn, task_name = "consignment-export", sns_topic = module.notifications_topic.sns_arn }
   policy                 = "consignment_export"
-  policy_variables       = { task_arn = module.export_task.consignment_export_task_arn, execution_role = module.export_task.consignment_export_execution_role_arn, task_role = module.export_task.consignment_export_task_role_arn, kms_key_arn = module.encryption_key.kms_key_arn }
+  policy_variables       = { task_arn = module.consignment_export_ecs_task.task_definition_arn, execution_role = module.consignment_export_execution_role.role.arn, task_role = module.consignment_export_task_role.role.arn, kms_key_arn = module.encryption_key.kms_key_arn }
   notification_sns_topic = module.notifications_topic.sns_arn
 }
 
