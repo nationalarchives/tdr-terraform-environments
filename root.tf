@@ -617,7 +617,7 @@ module "export_step_function" {
   definition             = "consignment_export"
   environment            = local.environment
   step_function_name     = "ConsignmentExport"
-  definition_variables   = { security_groups = jsonencode(module.consignment_export_ecs_security_group.security_group_id), subnet_ids = jsonencode(module.export_efs.private_subnets), cluster_arn = module.consignment_export_ecs_task.cluster_arn, task_arn = module.consignment_export_ecs_task.task_definition_arn, task_name = "consignment-export", sns_topic = module.notifications_topic.sns_arn }
+  definition_variables   = { security_groups = jsonencode([module.consignment_export_ecs_security_group.security_group_id]), subnet_ids = jsonencode(module.export_efs.private_subnets), cluster_arn = module.consignment_export_ecs_task.cluster_arn, task_arn = module.consignment_export_ecs_task.task_definition_arn, task_name = "consignment-export", sns_topic = module.notifications_topic.sns_arn }
   policy                 = "consignment_export"
   policy_variables       = { task_arn = module.consignment_export_ecs_task.task_definition_arn, execution_role = module.consignment_export_execution_role.role.arn, task_role = module.consignment_export_task_role.role.arn, kms_key_arn = module.encryption_key.kms_key_arn }
   notification_sns_topic = module.notifications_topic.sns_arn
