@@ -52,6 +52,8 @@ locals {
 
   ecr_account_number = local.environment == "sbox" ? data.aws_caller_identity.current.account_id : data.aws_ssm_parameter.mgmt_account_number.value
 
+  keycloak_auth_url = "https://auth.${local.dns_zone_name_trimmed}/auth"
+
   keycloak_backend_checks_secret_name     = "/${local.environment}/keycloak/new/backend_checks_client/secret"
   keycloak_tdr_client_secret_name         = "/${local.environment}/keycloak/new/client/secret"
   keycloak_user_password_name             = "/${local.environment}/keycloak/new/password"
