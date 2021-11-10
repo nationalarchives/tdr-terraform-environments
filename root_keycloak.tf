@@ -44,9 +44,7 @@ module "keycloak_ssm_parameters" {
     { name = local.keycloak_user_password_name, description = "The Keycloak user password", value = random_password.keycloak_password.result, type = "SecureString" },
     { name = local.keycloak_admin_password_name, description = "The Keycloak admin password", value = random_password.password.result, type = "SecureString" },
     { name = local.keycloak_govuk_notify_api_key_name, description = "The GovUK Notify API key", value = "to_be_manually_added", type = "SecureString" },
-    { name = local.keycloak_govuk_notify_template_id_name, description = "The GovUK Notify Template ID", value = "to_be_manually_added", type = "SecureString" }
-  ]
-  parameters = [
+    { name = local.keycloak_govuk_notify_template_id_name, description = "The GovUK Notify Template ID", value = "to_be_manually_added", type = "SecureString" },
     { name = local.keycloak_admin_user_name, description = "The Keycloak admin user", value = "tdr-keycloak-admin-${local.environment}", type = "SecureString" },
     { name = local.keycloak_configuration_properties_name, description = "The Keycloak configuration properties file ", value = "${local.environment}_properties.json", type = "SecureString" },
     { name = local.keycloak_user_admin_client_secret_name, description = "The Keycloak user admin secret", value = random_uuid.backend_checks_client_secret.result, type = "SecureString" },
