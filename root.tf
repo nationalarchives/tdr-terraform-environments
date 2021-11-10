@@ -114,11 +114,12 @@ module "upload_file_cloudfront_dirty_s3" {
 }
 
 module "upload_file_cloudfront_logs" {
-  source      = "./tdr-terraform-modules/s3"
-  project     = var.project
-  function    = "upload-cloudfront-logs"
-  common_tags = local.common_tags
-  access_logs = false
+  source                     = "./tdr-terraform-modules/s3"
+  project                    = var.project
+  function                   = "upload-cloudfront-logs"
+  common_tags                = local.common_tags
+  access_logs                = false
+  full_control_canonical_ids = [local.logs_delivery_canonical_user_id, data.aws_canonical_user_id.canonical_user.id]
 }
 
 module "cloudfront_upload" {
