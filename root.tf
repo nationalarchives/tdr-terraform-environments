@@ -36,7 +36,7 @@ module "consignment_api" {
   vpc_id                         = module.shared_vpc.vpc_id
   region                         = local.region
   db_migration_sg                = module.database_migrations.db_migration_security_group
-  auth_url                       = module.keycloak.auth_url
+  auth_url                       = local.keycloak_auth_url
   kms_key_id                     = module.encryption_key.kms_key_arn
   frontend_url                   = module.frontend.frontend_url
   dns_zone_name_trimmed          = local.dns_zone_name_trimmed
@@ -59,32 +59,11 @@ module "frontend" {
   public_subnets        = module.shared_vpc.public_subnets
   private_subnets       = module.shared_vpc.private_subnets
   dns_zone_name_trimmed = local.dns_zone_name_trimmed
-  auth_url              = module.keycloak.auth_url
-  client_secret_path    = module.keycloak.client_secret_path
+  auth_url              = local.keycloak_auth_url
+  client_secret_path    = module.keycloak_ssm_parameters.params[local.keycloak_tdr_client_secret_name].name
   export_api_url        = module.export_api.api_url
   alb_id                = module.frontend_alb.alb_id
   public_subnet_ranges  = module.shared_vpc.public_subnet_ranges
-}
-
-module "keycloak" {
-  app_name                      = "keycloak"
-  source                        = "./modules/keycloak"
-  alb_dns_name                  = module.keycloak_alb.alb_dns_name
-  alb_target_group_arn          = module.keycloak_alb.alb_target_group_arn
-  alb_zone_id                   = module.keycloak_alb.alb_zone_id
-  dns_zone_id                   = local.dns_zone_id
-  dns_zone_name_trimmed         = local.dns_zone_name_trimmed
-  environment                   = local.environment
-  environment_full_name         = local.environment_full_name_map[local.environment]
-  common_tags                   = local.common_tags
-  database_availability_zones   = local.database_availability_zones
-  az_count                      = 2
-  region                        = local.region
-  frontend_url                  = module.frontend.frontend_url
-  kms_key_id                    = module.encryption_key.kms_key_arn
-  create_user_security_group_id = module.create_keycloak_db_users_lambda.create_keycloak_user_lambda_security_group
-  notification_sns_topic        = module.notifications_topic.sns_arn
-  kms_key_arn                   = module.encryption_key.kms_key_arn
 }
 
 module "alb_logs_s3" {
@@ -212,26 +191,6 @@ module "keycloak_certificate" {
   common_tags = local.common_tags
 }
 
-module "keycloak_alb" {
-  source                = "./tdr-terraform-modules/alb"
-  project               = var.project
-  function              = "keycloak"
-  environment           = local.environment
-  alb_log_bucket        = module.alb_logs_s3.s3_bucket_id
-  alb_security_group_id = module.keycloak.alb_security_group_id
-  alb_target_group_port = 8080
-  alb_target_type       = "ip"
-  certificate_arn       = module.keycloak_certificate.certificate_arn
-  health_check_matcher  = "200,303"
-  health_check_path     = ""
-  http_listener         = false
-  public_subnets        = module.keycloak.public_subnets
-  vpc_id                = module.keycloak.vpc_id
-  common_tags           = local.common_tags
-  own_host_header_only  = true
-  host                  = module.keycloak.auth_host
-}
-
 module "frontend_certificate" {
   source      = "./tdr-terraform-modules/certificatemanager"
   project     = var.project
@@ -278,7 +237,7 @@ module "waf" {
   function          = "apps"
   environment       = local.environment
   common_tags       = local.common_tags
-  alb_target_groups = [module.keycloak_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn]
+  alb_target_groups = [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn]
   trusted_ips       = concat(local.ip_allowlist, list("${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"))
   geo_match         = split(",", var.geo_match)
   restricted_uri    = "auth/admin"
@@ -359,21 +318,6 @@ module "create_bastion_user_lambda" {
   api_database_security_group = module.consignment_api.database_security_group
   lambda_name                 = "create-bastion-user"
   database_name               = "bastion"
-}
-
-module "create_keycloak_db_users_lambda" {
-  source                           = "./tdr-terraform-modules/lambda"
-  project                          = var.project
-  common_tags                      = local.common_tags
-  lambda_create_keycloak_db_users  = true
-  vpc_id                           = module.keycloak.vpc_id
-  private_subnet_ids               = module.keycloak.private_subnets
-  db_admin_user                    = module.keycloak.db_username
-  db_admin_password                = module.keycloak.db_password
-  db_url                           = module.keycloak.db_url
-  kms_key_arn                      = module.encryption_key.kms_key_arn
-  keycloak_password                = module.keycloak.keycloak_user_password
-  keycloak_database_security_group = module.keycloak.database_security_group
 }
 
 module "dirty_upload_sns_topic" {
@@ -462,9 +406,9 @@ module "api_update_lambda" {
   common_tags                           = local.common_tags
   lambda_api_update                     = true
   timeout_seconds                       = local.file_check_lambda_timeouts_in_seconds["api_update"]
-  auth_url                              = module.keycloak.auth_url
+  auth_url                              = local.keycloak_auth_url
   api_url                               = module.consignment_api.api_url
-  keycloak_backend_checks_client_secret = module.keycloak.backend_checks_client_secret
+  keycloak_backend_checks_client_secret = module.keycloak_ssm_parameters.params[local.keycloak_backend_checks_secret_name].value
   kms_key_arn                           = module.encryption_key.kms_key_arn
   private_subnet_ids                    = module.backend_checks_efs.private_subnets
   vpc_id                                = module.shared_vpc.vpc_id
@@ -499,11 +443,11 @@ module "download_files_lambda" {
   backend_checks_efs_access_point        = module.backend_checks_efs.access_point
   vpc_id                                 = module.shared_vpc.vpc_id
   use_efs                                = true
-  auth_url                               = module.keycloak.auth_url
+  auth_url                               = local.keycloak_auth_url
   api_url                                = module.consignment_api.api_url
   backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
   private_subnet_ids                     = module.backend_checks_efs.private_subnets
-  backend_checks_client_secret           = module.keycloak.backend_checks_client_secret
+  backend_checks_client_secret           = module.keycloak_ssm_parameters.params[local.keycloak_backend_checks_secret_name].value
   kms_key_arn                            = module.encryption_key.kms_key_arn
   efs_security_group_id                  = module.backend_checks_efs.security_group_id
   reserved_concurrency                   = 3
@@ -581,7 +525,7 @@ module "sign_cookies_lambda" {
   common_tags            = local.common_tags
   project                = "tdr"
   lambda_sign_cookies    = true
-  auth_url               = module.keycloak.auth_url
+  auth_url               = local.keycloak_auth_url
   frontend_url           = module.frontend.frontend_url
   upload_domain          = local.upload_domain
   cloudfront_key_pair_id = module.cloudfront_upload.cloudfront_key_pair_id
@@ -663,35 +607,6 @@ module "tdr_public_nacl" {
   common_tags = local.common_tags
 }
 
-module "keycloak_public_nacl" {
-  source = "./tdr-terraform-modules/nacl"
-  name   = "keycloak-public-nacl-${local.environment}"
-  vpc_id = module.keycloak.vpc_id
-  ingress_rules = [
-    { rule_no = 100, cidr_block = "0.0.0.0/0", action = "allow", from_port = 443, to_port = 443, egress = false },
-    { rule_no = 200, cidr_block = "0.0.0.0/0", action = "allow", from_port = 1024, to_port = 65535, egress = false },
-    { rule_no = 100, cidr_block = "0.0.0.0/0", action = "allow", from_port = 443, to_port = 443, egress = true },
-    { rule_no = 200, cidr_block = "0.0.0.0/0", action = "allow", from_port = 1024, to_port = 65535, egress = true },
-  ]
-  subnet_ids  = module.keycloak.public_subnets
-  common_tags = local.common_tags
-}
-
-module "keycloak_private_nacl" {
-  source = "./tdr-terraform-modules/nacl"
-  name   = "keycloak-private-nacl-${local.environment}"
-  vpc_id = module.keycloak.vpc_id
-  ingress_rules = [
-    # The task needs a port to communicate with ssm over the internet but I can't find which one so all ephemeral ports need to be open to the internet
-    # Using a VPC endpoint for SSM should allow us to restrict this to traffic inside the VPC
-    { rule_no = 100, cidr_block = "0.0.0.0/0", action = "allow", from_port = 1024, to_port = 65535, egress = false },
-    { rule_no = 200, cidr_block = "0.0.0.0/0", action = "allow", from_port = 443, to_port = 443, egress = false },
-    { rule_no = 100, cidr_block = "0.0.0.0/0", action = "allow", from_port = 443, to_port = 443, egress = true },
-    { rule_no = 200, cidr_block = module.keycloak.vpc_cidr_block, action = "allow", from_port = 1024, to_port = 65535, egress = true }
-  ]
-  subnet_ids  = module.keycloak.private_subnets
-  common_tags = local.common_tags
-}
 
 module "tdr_private_nacl" {
   source = "./tdr-terraform-modules/nacl"
@@ -701,7 +616,7 @@ module "tdr_private_nacl" {
     { rule_no = 100, cidr_block = "0.0.0.0/0", action = "allow", from_port = 1024, to_port = 65535, egress = false },
     { rule_no = 200, cidr_block = "0.0.0.0/0", action = "allow", from_port = 443, to_port = 443, egress = false },
     { rule_no = 100, cidr_block = "0.0.0.0/0", action = "allow", from_port = 443, to_port = 443, egress = true },
-    { rule_no = 200, cidr_block = module.keycloak.vpc_cidr_block, action = "allow", from_port = 1024, to_port = 65535, egress = true }
+    { rule_no = 200, cidr_block = module.shared_vpc.vpc_cidr_block, action = "allow", from_port = 1024, to_port = 65535, egress = true }
   ]
   subnet_ids  = flatten([module.backend_checks_efs.private_subnets, module.export_efs.private_subnets, module.shared_vpc.private_subnets])
   common_tags = local.common_tags
@@ -710,11 +625,6 @@ module "tdr_private_nacl" {
 module "tdr_default_nacl" {
   source                 = "./tdr-terraform-modules/default_nacl"
   default_network_acl_id = module.shared_vpc.default_nacl_id
-}
-
-module "keycloak_default_nacl" {
-  source                 = "./tdr-terraform-modules/default_nacl"
-  default_network_acl_id = module.keycloak.default_nacl_id
 }
 
 module "athena_s3" {
