@@ -119,6 +119,10 @@ module "upload_file_cloudfront_logs" {
   function    = "upload-cloudfront-logs"
   common_tags = local.common_tags
   access_logs = false
+  canonical_user_grants = [
+    { id = local.logs_delivery_canonical_user_id, permissions = ["FULL_CONTROL"] },
+    { id = data.aws_canonical_user_id.canonical_user.id, permissions = ["FULL_CONTROL"] }
+  ]
 }
 
 module "cloudfront_upload" {

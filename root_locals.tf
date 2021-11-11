@@ -65,4 +65,7 @@ locals {
   keycloak_govuk_notify_api_key_name      = "/${local.environment}/keycloak/govuk_notify/api_key"
   keycloak_govuk_notify_template_id_name  = "/${local.environment}/keycloak/govuk_notify/template_id"
   keycloak_reporting_client_secret_name   = "/${local.environment}/keycloak/reporting_client/secret"
+
+  //Used for allowing full access for Cloudfront logging. More information at https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html#AccessLogsBucketAndFileOwnership
+  logs_delivery_canonical_user_id = "c4c1ede66af53448b93c283ce9448c4ba468c9432aa01d700d3878632f77d2d0"
 }
