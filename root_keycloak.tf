@@ -129,6 +129,45 @@ module "tdr_keycloak" {
   task_role                    = module.keycloak_task_role.role.arn
 }
 
+module "tdr_keycloak_ecs" {
+  source               = "./tdr-terraform-modules/generic_ecs"
+  alb_target_group_arn = module.keycloak_tdr_alb.alb_target_group_arn
+  cluster_name         = "keycloak_${local.environment}"
+  common_tags          = local.common_tags
+  container_definition = templatefile("${path.module}/templates/ecs_tasks/keycloak.json.tpl", {
+    app_image                         = "${local.ecr_account_number}.dkr.ecr.eu-west-2.amazonaws.com/auth-server:${local.environment}"
+    app_port                          = 8080
+    app_environment                   = local.environment
+    aws_region                        = local.region
+    url_path                          = module.keycloak_database.db_url_parameter_name
+    username                          = "keycloak_user"
+    password_path                     = local.keycloak_user_password_name
+    admin_user_path                   = local.keycloak_admin_user_name
+    admin_password_path               = local.keycloak_admin_password_name
+    client_secret_path                = local.keycloak_tdr_client_secret_name
+    backend_checks_client_secret_path = local.keycloak_backend_checks_secret_name
+    realm_admin_client_secret_path    = local.keycloak_realm_admin_client_secret_name
+    frontend_url                      = module.frontend.frontend_url
+    configuration_properties_path     = local.keycloak_configuration_properties_name
+    user_admin_client_secret_path     = local.keycloak_user_admin_client_secret_name
+    govuk_notify_api_key_path         = local.keycloak_govuk_notify_api_key_name
+    govuk_notify_template_id_path     = local.keycloak_govuk_notify_template_id_name
+    reporting_client_secret_path      = local.keycloak_reporting_client_secret_name
+    sns_topic_arn                     = module.notifications_topic.sns_arn
+  })
+  container_name               = "keycloak"
+  cpu                          = 1024
+  environment                  = local.environment
+  execution_role               = module.keycloak_execution_role.role.arn
+  load_balancer_container_port = 8080
+  memory                       = 3072
+  private_subnets              = module.shared_vpc.private_subnets
+  security_groups              = [module.keycloak_ecs_security_group.security_group_id]
+  service_name                 = "keycloak_service_${local.environment}"
+  task_family_name             = "keycloak-${local.environment}"
+  task_role                    = module.keycloak_task_role.role.arn
+}
+
 module "keycloak_tdr_alb" {
   source                = "./tdr-terraform-modules/alb"
   project               = var.project
