@@ -77,17 +77,21 @@ module "alb_logs_s3" {
 }
 
 module "upload_bucket" {
-  source      = "./tdr-terraform-modules/s3"
-  project     = var.project
-  function    = "upload-files"
-  common_tags = local.common_tags
+  source           = "./tdr-terraform-modules/s3"
+  project          = var.project
+  function         = "upload-files"
+  common_tags      = local.common_tags
+  policy_variables = { vpc_endpoint_id = module.s3_vpc_endpoint.vpc_endpoint_id }
+  bucket_policy    = "vpc_endpoint_only"
 }
 
 module "upload_bucket_quarantine" {
-  source      = "./tdr-terraform-modules/s3"
-  project     = var.project
-  function    = "upload-files-quarantine"
-  common_tags = local.common_tags
+  source           = "./tdr-terraform-modules/s3"
+  project          = var.project
+  function         = "upload-files-quarantine"
+  policy_variables = { vpc_endpoint_id = module.s3_vpc_endpoint.vpc_endpoint_id }
+  common_tags      = local.common_tags
+  bucket_policy    = "vpc_endpoint_only"
 }
 
 module "upload_file_dirty_s3" {
@@ -108,6 +112,7 @@ module "upload_file_cloudfront_dirty_s3" {
   cors_urls                = local.upload_cors_urls
   sns_topic_arn            = module.dirty_upload_sns_topic.sns_arn
   bucket_policy            = "cloudfront_oai"
+  policy_variables         = { vpc_endpoint_id = module.s3_vpc_endpoint.vpc_endpoint_id }
   sns_notification         = true
   abort_incomplete_uploads = true
   cloudfront_oai           = module.cloudfront_upload.cloudfront_oai_iam_arn
@@ -572,10 +577,12 @@ module "export_step_function" {
 }
 
 module "export_bucket" {
-  source      = "./tdr-terraform-modules/s3"
-  project     = var.project
-  function    = "consignment-export"
-  common_tags = local.common_tags
+  source           = "./tdr-terraform-modules/s3"
+  project          = var.project
+  function         = "consignment-export"
+  bucket_policy    = "vpc_endpoint_only"
+  policy_variables = { vpc_endpoint_id = module.s3_vpc_endpoint.vpc_endpoint_id }
+  common_tags      = local.common_tags
 }
 
 module "notifications_topic" {
@@ -674,4 +681,22 @@ module "bastion_role" {
   common_tags        = local.common_tags
   name               = "BastionEC2Role${title(local.environment)}"
   policy_attachments = {}
+}
+
+module "s3_vpc_endpoint" {
+  source       = "./tdr-terraform-modules/endpoint"
+  common_tags  = local.common_tags
+  service_name = "com.amazonaws.${local.region}.s3"
+  vpc_id       = module.shared_vpc.vpc_id
+  policy = templatefile("${path.module}/templates/endpoint_policies/s3_endpoint_policy.json.tpl",
+    {
+      upload_bucket_name     = module.upload_bucket.s3_bucket_name,
+      quarantine_bucket_name = module.upload_bucket_quarantine.s3_bucket_name,
+      antivirus_role         = module.antivirus_lambda.antivirus_lambda_role,
+      export_task_role       = module.consignment_export_task_role.role.arn,
+      export_bucket_name     = module.export_bucket.s3_bucket_name,
+      account_id             = data.aws_caller_identity.current.account_id
+    }
+  )
+
 }
