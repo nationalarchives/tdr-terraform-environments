@@ -77,21 +77,17 @@ module "alb_logs_s3" {
 }
 
 module "upload_bucket" {
-  source           = "./tdr-terraform-modules/s3"
-  project          = var.project
-  function         = "upload-files"
-  common_tags      = local.common_tags
-  policy_variables = { vpc_endpoint_id = module.s3_vpc_endpoint.vpc_endpoint_id }
-  bucket_policy    = "vpc_endpoint_only"
+  source      = "./tdr-terraform-modules/s3"
+  project     = var.project
+  function    = "upload-files"
+  common_tags = local.common_tags
 }
 
 module "upload_bucket_quarantine" {
-  source           = "./tdr-terraform-modules/s3"
-  project          = var.project
-  function         = "upload-files-quarantine"
-  policy_variables = { vpc_endpoint_id = module.s3_vpc_endpoint.vpc_endpoint_id }
-  common_tags      = local.common_tags
-  bucket_policy    = "vpc_endpoint_only"
+  source      = "./tdr-terraform-modules/s3"
+  project     = var.project
+  function    = "upload-files-quarantine"
+  common_tags = local.common_tags
 }
 
 module "upload_file_dirty_s3" {
@@ -112,7 +108,6 @@ module "upload_file_cloudfront_dirty_s3" {
   cors_urls                = local.upload_cors_urls
   sns_topic_arn            = module.dirty_upload_sns_topic.sns_arn
   bucket_policy            = "cloudfront_oai"
-  policy_variables         = { vpc_endpoint_id = module.s3_vpc_endpoint.vpc_endpoint_id }
   sns_notification         = true
   abort_incomplete_uploads = true
   cloudfront_oai           = module.cloudfront_upload.cloudfront_oai_iam_arn
@@ -577,12 +572,10 @@ module "export_step_function" {
 }
 
 module "export_bucket" {
-  source           = "./tdr-terraform-modules/s3"
-  project          = var.project
-  function         = "consignment-export"
-  bucket_policy    = "vpc_endpoint_only"
-  policy_variables = { vpc_endpoint_id = module.s3_vpc_endpoint.vpc_endpoint_id }
-  common_tags      = local.common_tags
+  source      = "./tdr-terraform-modules/s3"
+  project     = var.project
+  function    = "consignment-export"
+  common_tags = local.common_tags
 }
 
 module "notifications_topic" {
