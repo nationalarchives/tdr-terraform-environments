@@ -685,7 +685,7 @@ module "s3_vpc_endpoint" {
     {
       upload_bucket_name     = module.upload_bucket.s3_bucket_name,
       quarantine_bucket_name = module.upload_bucket_quarantine.s3_bucket_name,
-      antivirus_role         = module.antivirus_lambda.antivirus_lambda_role,
+      antivirus_role         = module.antivirus_lambda.antivirus_lambda_role[0],
       export_task_role       = module.consignment_export_task_role.role.arn,
       export_bucket_name     = module.export_bucket.s3_bucket_name,
       account_id             = data.aws_caller_identity.current.account_id
