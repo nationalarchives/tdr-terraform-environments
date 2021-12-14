@@ -5,7 +5,7 @@
       "Effect": "Allow",
       "Principal": "*",
       "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::tdr-upload-files-cloudfront-dirty-intg/*",
+      "Resource": "arn:aws:s3:::tdr-upload-files-cloudfront-dirty-${environment}/*",
       "Condition": {
         "ArnEquals": {
           "aws:PrincipalArn": [
@@ -90,7 +90,6 @@
         "s3:ListBucketVersions",
         "s3:PutBucketAcl",
         "s3:PutBucketPublicAccessBlock",
-        "s3:PutBucketTagging",
         "s3:PutBucketTagging",
         "s3:PutObjectAcl",
         "s3:PutObjectVersionAcl"

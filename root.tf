@@ -683,6 +683,7 @@ module "s3_vpc_endpoint" {
   vpc_id       = module.shared_vpc.vpc_id
   policy = templatefile("${path.module}/templates/endpoint_policies/s3_endpoint_policy.json.tpl",
     {
+      environment            = local.environment
       upload_bucket_name     = module.upload_bucket.s3_bucket_name,
       quarantine_bucket_name = module.upload_bucket_quarantine.s3_bucket_name,
       antivirus_role         = module.antivirus_lambda.antivirus_lambda_role[0],
