@@ -675,3 +675,22 @@ module "bastion_role" {
   name               = "BastionEC2Role${title(local.environment)}"
   policy_attachments = {}
 }
+
+module "s3_vpc_endpoint" {
+  source       = "./tdr-terraform-modules/endpoint"
+  common_tags  = local.common_tags
+  service_name = "com.amazonaws.${local.region}.s3"
+  vpc_id       = module.shared_vpc.vpc_id
+  policy = templatefile("${path.module}/templates/endpoint_policies/s3_endpoint_policy.json.tpl",
+    {
+      environment            = local.environment
+      upload_bucket_name     = module.upload_bucket.s3_bucket_name,
+      quarantine_bucket_name = module.upload_bucket_quarantine.s3_bucket_name,
+      antivirus_role         = module.antivirus_lambda.antivirus_lambda_role[0],
+      export_task_role       = module.consignment_export_task_role.role.arn,
+      export_bucket_name     = module.export_bucket.s3_bucket_name,
+      account_id             = data.aws_caller_identity.current.account_id
+    }
+  )
+
+}
