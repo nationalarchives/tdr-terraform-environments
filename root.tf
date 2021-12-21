@@ -578,6 +578,13 @@ module "export_bucket" {
   common_tags = local.common_tags
 }
 
+module "export_bucket_judgment" {
+  source      = "./tdr-terraform-modules/s3"
+  project     = var.project
+  function    = "consignment-export-judgment"
+  common_tags = local.common_tags
+}
+
 module "notifications_topic" {
   source      = "./tdr-terraform-modules/sns"
   common_tags = local.common_tags
