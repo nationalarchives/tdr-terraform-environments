@@ -19,6 +19,10 @@
         "value": "${output_bucket}"
       },
       {
+        "name": "OUTPUT_BUCKET_JUDGMENT",
+        "value": "${output_bucket_judgment}"
+      },
+      {
         "name": "API_URL",
         "value": "${api_url}"
       },
