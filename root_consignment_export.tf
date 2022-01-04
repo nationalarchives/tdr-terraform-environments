@@ -58,6 +58,7 @@ module "consignment_export_ecs_task" {
       backend_client_secret_path = module.keycloak_ssm_parameters.params[local.keycloak_backend_checks_secret_name].name
       clean_bucket               = module.upload_bucket.s3_bucket_name
       output_bucket              = module.export_bucket.s3_bucket_name
+      output_bucket_judgment     = module.export_bucket_judgment.s3_bucket_name
       api_url                    = "${module.consignment_api.api_url}/graphql"
       auth_url                   = local.keycloak_auth_url
       region                     = local.region
