@@ -2,5 +2,6 @@ library("tdr-jenkinslib")
 
 terraformCheckJob(
   repo: "tdr-terraform-environments",
-  terraformDirectoryPath: "."
+  terraformDirectoryPath: ".",
+  terraformNode: "terraform-latest"
 )
