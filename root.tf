@@ -242,7 +242,7 @@ module "waf" {
   environment       = local.environment
   common_tags       = local.common_tags
   alb_target_groups = [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn]
-  trusted_ips       = concat(local.ip_allowlist, list("${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"))
+  trusted_ips       = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
   geo_match         = split(",", var.geo_match)
   restricted_uri    = "auth/admin"
 }
