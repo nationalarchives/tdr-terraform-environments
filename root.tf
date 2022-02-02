@@ -701,3 +701,41 @@ module "s3_vpc_endpoint" {
   )
 
 }
+data "github_repository" "repo" {
+  full_name = "nationalarchives/tdr-e2e-tests"
+}
+
+resource "github_repository_environment" "repo_environment" {
+
+  repository       = data.github_repository.repo.name
+  environment      = local.environment_full_name_map[local.environment]
+}
+
+resource "github_actions_environment_secret" "test_secret" {
+  repository       = data.github_repository.repo.name
+  environment      = github_repository_environment.repo_environment.environment
+  secret_name      = "BACKEND_CHECKS_SECRET"
+  plaintext_value  = module.keycloak_ssm_parameters.params[local.keycloak_backend_checks_secret_name].value
+}
+
+resource "github_actions_environment_secret" "test_secret_user_admin" {
+  repository       = data.github_repository.repo.name
+  environment      = github_repository_environment.repo_environment.environment
+  secret_name      = "USER_ADMIN_SECRET"
+  plaintext_value  = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
+}
+
+resource "github_actions_environment_secret" "test_secret_mgmt_account" {
+  repository       = data.github_repository.repo.name
+  environment      = github_repository_environment.repo_environment.environment
+  secret_name      = "MANAGEMENT_ACCOUNT"
+  plaintext_value  = data.aws_ssm_parameter.mgmt_account_number.value
+}
+
+resource "github_actions_environment_secret" "test_secret_local_account" {
+  repository       = data.github_repository.repo.name
+  environment      = github_repository_environment.repo_environment.environment
+  secret_name      = "${upper(local.environment)}_ACCOUNT"
+  plaintext_value  = data.aws_caller_identity.current.account_id
+}
+
