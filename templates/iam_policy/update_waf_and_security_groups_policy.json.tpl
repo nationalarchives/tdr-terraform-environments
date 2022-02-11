@@ -8,8 +8,7 @@
         "ec2:RevokeSecurityGroupIngress",
         "ec2:AuthorizeSecurityGroupIngress",
         "ec2:CreateTags",
-        "waf-regional:UpdateGeoMatchSet",
-        "waf-regional:UpdateIPSet"
+        "wafv2:UpdateRuleGroup"
       ],
       "Resource": [
         "${ip_set_arn}",
@@ -22,9 +21,8 @@
       "Sid": "",
       "Effect": "Allow",
       "Action": [
-        "waf-regional:GetChangeToken",
-        "waf-regional:ListIPSets",
-        "waf-regional:ListGeoMatchSets",
+        "wafv2:ListRuleGroups",
+        "wafv2:ListIPSets",
         "ec2:DescribeSecurityGroups"
       ],
       "Resource": "*"
