@@ -740,19 +740,61 @@ module "consignment_api_github_environment" {
 }
 
 module "e2e_tests_github_environment" {
-  source = "./tdr-terraform-modules/github_environments"
-  environment = local.environment
+  source          = "./tdr-terraform-modules/github_environments"
+  environment     = local.environment
   repository_name = "nationalarchives/tdr-e2e-tests"
-  team_slug = "transfer-digital-records-admins"
-  secrets = {
+  team_slug       = "transfer-digital-records-admins"
+  secrets         = {
     "${upper(local.environment)}_ACCOUNT" = data.aws_caller_identity.current.account_id
-    MANAGEMENT_ACCOUNT = data.aws_ssm_parameter.mgmt_account_number.value
-    SLACK_FAILURE_WORKFLOW = data.aws_ssm_parameter.slack_e2e_failure_workflow.value
-    SLACK_SUCCESS_WORKFLOW = data.aws_ssm_parameter.slack_e2e_success_workflow.value
-    WORKFLOW_PAT = data.aws_ssm_parameter.workflow_pat.value
-    USER_ADMIN_SECRET = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
-    BACKEND_CHECKS_SECRET = module.keycloak_ssm_parameters.params[local.keycloak_backend_checks_secret_name].value
+    MANAGEMENT_ACCOUNT                    = data.aws_ssm_parameter.mgmt_account_number.value
+    SLACK_FAILURE_WORKFLOW                = data.aws_ssm_parameter.slack_e2e_failure_workflow.value
+    SLACK_SUCCESS_WORKFLOW                = data.aws_ssm_parameter.slack_e2e_success_workflow.value
+    WORKFLOW_PAT                          = data.aws_ssm_parameter.workflow_pat.value
+    USER_ADMIN_SECRET                     = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
+    BACKEND_CHECKS_SECRET                 = module.keycloak_ssm_parameters.params[local.keycloak_backend_checks_secret_name].value
   }
+}
+
+module "create_keycloak_users_api_lambda" {
+  source                          = "./tdr-terraform-modules/lambda"
+  common_tags                     = local.common_tags
+  project                         = var.project
+  user_admin_client_secret        = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
+  kms_key_arn                     = module.encryption_key.kms_key_arn
+  auth_url                        = local.keycloak_auth_url
+  vpc_id                          = module.shared_vpc.vpc_id
+  lambda_create_keycloak_user_api = true
+  private_subnet_ids              = module.backend_checks_efs.private_subnets
+}
+
+module "create_keycloak_users_s3_lambda" {
+  source                         = "./tdr-terraform-modules/lambda"
+  common_tags                    = local.common_tags
+  project                        = var.project
+  user_admin_client_secret       = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
+  kms_key_arn                    = module.encryption_key.kms_key_arn
+  auth_url                       = local.keycloak_auth_url
+  vpc_id                         = module.shared_vpc.vpc_id
+  lambda_create_keycloak_user_s3 = true
+  private_subnet_ids             = module.backend_checks_efs.private_subnets
+  s3_bucket_arn                  = module.create_bulk_users_bucket.s3_bucket_arn
+}
+
+module "create_keycloak_users_api" {
+  source        = "./tdr-terraform-modules/apigatewayv2"
+  body_template = templatefile("${path.module}/templates/api_gateway/create_keycloak_users.json.tpl", { region = local.region, lambda_arn = module.create_keycloak_users_api_lambda.create_keycloak_users_api_lambda_arn, auth_url = local.keycloak_auth_url })
+  environment   = local.environment
+  name          = "CreateKeycloakUsersApi"
+  common_tags   = local.common_tags
+}
+
+module "create_bulk_users_bucket" {
+  source              = "./tdr-terraform-modules/s3"
+  common_tags         = local.common_tags
+  function            = "create-bulk-keycloak-users"
+  project             = var.project
+  lambda_notification = true
+  lambda_arn          = module.create_keycloak_users_s3_lambda.create_keycloak_users_s3_lambda_arn
 }
 
 module "keycloak_user_management_github_environment" {
