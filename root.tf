@@ -90,16 +90,6 @@ module "upload_bucket_quarantine" {
   common_tags = local.common_tags
 }
 
-module "upload_file_dirty_s3" {
-  source                   = "./tdr-terraform-modules/s3"
-  project                  = var.project
-  function                 = "upload-files-dirty"
-  common_tags              = local.common_tags
-  cors_urls                = local.upload_cors_urls
-  sns_notification         = true
-  abort_incomplete_uploads = true
-}
-
 module "upload_file_cloudfront_dirty_s3" {
   source                   = "./tdr-terraform-modules/s3"
   project                  = var.project
