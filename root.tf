@@ -689,5 +689,46 @@ module "s3_vpc_endpoint" {
       account_id             = data.aws_caller_identity.current.account_id
     }
   )
+}
 
+module "create_keycloak_users_api_lambda" {
+  source                          = "./tdr-terraform-modules/lambda"
+  common_tags                     = local.common_tags
+  project                         = var.project
+  user_admin_client_secret        = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
+  kms_key_arn                     = module.encryption_key.kms_key_arn
+  auth_url                        = local.keycloak_auth_url
+  vpc_id                          = module.shared_vpc.vpc_id
+  lambda_create_keycloak_user_api = true
+  private_subnet_ids              = module.backend_checks_efs.private_subnets
+}
+
+module "create_keycloak_users_s3_lambda" {
+  source                         = "./tdr-terraform-modules/lambda"
+  common_tags                    = local.common_tags
+  project                        = var.project
+  user_admin_client_secret       = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
+  kms_key_arn                    = module.encryption_key.kms_key_arn
+  auth_url                       = local.keycloak_auth_url
+  vpc_id                         = module.shared_vpc.vpc_id
+  lambda_create_keycloak_user_s3 = true
+  private_subnet_ids             = module.backend_checks_efs.private_subnets
+  s3_bucket_arn                  = module.create_bulk_users_bucket.s3_bucket_arn
+}
+
+module "create_keycloak_users_api" {
+  source        = "./tdr-terraform-modules/apigatewayv2"
+  body_template = templatefile("${path.module}/templates/api_gateway/create_keycloak_users.json.tpl", { region = local.region, lambda_arn = module.create_keycloak_users_api_lambda.create_keycloak_users_api_lambda_arn, auth_url = local.keycloak_auth_url })
+  environment   = local.environment
+  name          = "CreateKeycloakUsersApi"
+  common_tags   = local.common_tags
+}
+
+module "create_bulk_users_bucket" {
+  source              = "./tdr-terraform-modules/s3"
+  common_tags         = local.common_tags
+  function            = "create-bulk-keycloak-users"
+  project             = var.project
+  lambda_notification = true
+  lambda_arn          = module.create_keycloak_users_s3_lambda.create_keycloak_users_s3_lambda_arn
 }
