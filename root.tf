@@ -764,3 +764,24 @@ module "e2e_tests_github_environment" {
     BACKEND_CHECKS_SECRET = module.keycloak_ssm_parameters.params[local.keycloak_backend_checks_secret_name].value
   }
 }
+
+module "keycloak_user_management_github_environment" {
+  source = "./tdr-terraform-modules/github_environments"
+  environment = local.environment
+  repository_name = "nationalarchives/tdr-keycloak-user-management"
+  team_slug = "transfer-digital-records-admins"
+  secrets = {
+    "${upper(local.environment)}_ACCOUNT" = data.aws_caller_identity.current.account_id
+    MANAGEMENT_ACCOUNT = data.aws_ssm_parameter.mgmt_account_number.value
+    SLACK_FAILURE_WORKFLOW = data.aws_ssm_parameter.slack_failure_workflow.value
+    SLACK_SUCCESS_WORKFLOW = data.aws_ssm_parameter.slack_success_workflow.value
+    WORKFLOW_PAT = data.aws_ssm_parameter.workflow_pat.value
+  }
+}
+
+
+module "deploy_lambda_github_actions_policy" {
+  source = "./tdr-terraform-modules/iam_policy"
+  name   = "TDRGithubActionsDeployLambda${title(local.environment)}"
+  policy_string = templatefile("${path.module}/templates/iam_policy/deploy_lambda_github_actions.json.tpl", {account_id = data.aws_caller_identity.current.account_id, environment = local.environment, region = local.region})
+}
