@@ -777,7 +777,7 @@ module "create_keycloak_users_s3_lambda" {
   vpc_id                         = module.shared_vpc.vpc_id
   lambda_create_keycloak_user_s3 = true
   private_subnet_ids             = module.backend_checks_efs.private_subnets
-  s3_bucket_arn                  = module.create_bulk_users_bucket.s3_bucket_arn
+  s3_bucket_arn                  = "arn:aws:s3:::tdr-create-bulk-keycloak-users-intg"
 }
 
 module "create_keycloak_users_api" {
@@ -803,14 +803,14 @@ module "keycloak_user_management_github_environment" {
   repository_name = "nationalarchives/tdr-keycloak-user-management"
   team_slug = "transfer-digital-records-admins"
   secrets = {
-    "${upper(local.environment)}_ACCOUNT" = data.aws_caller_identity.current.account_id
+    TITLE_STAGE = title(local.environment)
+    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
     MANAGEMENT_ACCOUNT = data.aws_ssm_parameter.mgmt_account_number.value
     SLACK_FAILURE_WORKFLOW = data.aws_ssm_parameter.slack_failure_workflow.value
     SLACK_SUCCESS_WORKFLOW = data.aws_ssm_parameter.slack_success_workflow.value
     WORKFLOW_PAT = data.aws_ssm_parameter.workflow_pat.value
   }
 }
-
 
 module "deploy_lambda_github_actions_policy" {
   source = "./tdr-terraform-modules/iam_policy"
