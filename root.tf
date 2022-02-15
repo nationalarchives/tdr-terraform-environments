@@ -817,3 +817,13 @@ module "deploy_lambda_github_actions_policy" {
   name          = "TDRGithubActionsDeployLambda${title(local.environment)}"
   policy_string = templatefile("${path.module}/templates/iam_policy/deploy_lambda_github_actions.json.tpl", { account_id = data.aws_caller_identity.current.account_id, environment = local.environment, region = local.region })
 }
+
+module "github_actions_role" {
+  source = "./tdr-terraform-modules/iam_role"
+  assume_role_policy = templatefile("${path.module}/templates/iam_role/github_assume_role.json.tpl", {account_id = data.aws_caller_identity.current.account_id, repo_name = "tdr-*"})
+  common_tags = local.common_tags
+  name = "TDRGithubActionsDeployLambda${title(local.environment)}"
+  policy_attachments = {
+    deploy_lambda = module.deploy_lambda_github_actions_policy.policy_arn
+  }
+}
