@@ -674,26 +674,26 @@ module "bastion_role" {
 }
 
 module "update_waf_and_security_groups_policy" {
-  source = "./tdr-terraform-modules/iam_policy"
-  name   = "UpdateWAFAndSecurityGroupsPolicy${title(local.environment)}"
-  policy_string = templatefile("${path.module}/templates/iam_policy/update_waf_and_security_groups_policy.json.tpl", {rule_group_arn = module.waf.rule_group_arn, ip_set_arn = module.waf.ip_set_arn, account_id = data.aws_caller_identity.current.account_id, security_group_id = module.frontend.alb_security_group_id})
+  source        = "./tdr-terraform-modules/iam_policy"
+  name          = "UpdateWAFAndSecurityGroupsPolicy${title(local.environment)}"
+  policy_string = templatefile("${path.module}/templates/iam_policy/update_waf_and_security_groups_policy.json.tpl", { rule_group_arn = module.waf.rule_group_arn, ip_set_arn = module.waf.ip_set_arn, account_id = data.aws_caller_identity.current.account_id, security_group_id = module.frontend.alb_security_group_id })
 }
 
 module "update_waf_and_security_groups_role" {
-  source = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("${path.module}/templates/iam_role/github_assume_role.json.tpl", {account_id = data.aws_caller_identity.current.account_id, repo_name = "tdr-e2e-tests"})
-  common_tags = local.common_tags
-  name = "UpdateWAFAndSecurityGroupsRole${title(local.environment)}"
+  source             = "./tdr-terraform-modules/iam_role"
+  assume_role_policy = templatefile("${path.module}/templates/iam_role/github_assume_role.json.tpl", { account_id = data.aws_caller_identity.current.account_id, repo_name = "tdr-e2e-tests" })
+  common_tags        = local.common_tags
+  name               = "UpdateWAFAndSecurityGroupsRole${title(local.environment)}"
   policy_attachments = {
     update_policy = module.update_waf_and_security_groups_policy.policy_arn
   }
 }
 
 module "update_ecs_role" {
-  source = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("${path.module}/templates/iam_role/github_assume_role.json.tpl", {account_id = data.aws_caller_identity.current.account_id, repo_name = "tdr-"})
-  common_tags = local.common_tags
-  name = "TDRGitHubECSUpdateRole${title(local.environment)}"
+  source             = "./tdr-terraform-modules/iam_role"
+  assume_role_policy = templatefile("${path.module}/templates/iam_role/github_assume_role.json.tpl", { account_id = data.aws_caller_identity.current.account_id, repo_name = "tdr-" })
+  common_tags        = local.common_tags
+  name               = "TDRGitHubECSUpdateRole${title(local.environment)}"
   policy_attachments = {
     update_ecs_policy = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/TDRJenkinsUpdateECS${title(local.environment)}"
   }
@@ -718,24 +718,24 @@ module "s3_vpc_endpoint" {
 }
 
 module "github_oidc_provider" {
-  source = "./tdr-terraform-modules/identity_provider"
-  audience = "sts.amazonaws.com"
-  thumbprint = "6938fd4d98bab03faadb97b34396831e3780aea1"
-  url = "https://token.actions.githubusercontent.com"
+  source      = "./tdr-terraform-modules/identity_provider"
+  audience    = "sts.amazonaws.com"
+  thumbprint  = "6938fd4d98bab03faadb97b34396831e3780aea1"
+  url         = "https://token.actions.githubusercontent.com"
   common_tags = local.common_tags
 }
 
 module "consignment_api_github_environment" {
-  source = "./tdr-terraform-modules/github_environments"
-  environment = local.environment
+  source          = "./tdr-terraform-modules/github_environments"
+  environment     = local.environment
   repository_name = "nationalarchives/tdr-consignment-api"
-  team_slug = "transfer-digital-records-admins"
+  team_slug       = "transfer-digital-records-admins"
   secrets = {
     "${upper(local.environment)}_ACCOUNT" = data.aws_caller_identity.current.account_id
-    MANAGEMENT_ACCOUNT = data.aws_ssm_parameter.mgmt_account_number.value
-    SLACK_FAILURE_WORKFLOW = data.aws_ssm_parameter.slack_failure_workflow.value
-    SLACK_SUCCESS_WORKFLOW = data.aws_ssm_parameter.slack_success_workflow.value
-    WORKFLOW_PAT = data.aws_ssm_parameter.workflow_pat.value
+    MANAGEMENT_ACCOUNT                    = data.aws_ssm_parameter.mgmt_account_number.value
+    SLACK_FAILURE_WORKFLOW                = data.aws_ssm_parameter.slack_failure_workflow.value
+    SLACK_SUCCESS_WORKFLOW                = data.aws_ssm_parameter.slack_success_workflow.value
+    WORKFLOW_PAT                          = data.aws_ssm_parameter.workflow_pat.value
   }
 }
 
@@ -744,7 +744,7 @@ module "e2e_tests_github_environment" {
   environment     = local.environment
   repository_name = "nationalarchives/tdr-e2e-tests"
   team_slug       = "transfer-digital-records-admins"
-  secrets         = {
+  secrets = {
     "${upper(local.environment)}_ACCOUNT" = data.aws_caller_identity.current.account_id
     MANAGEMENT_ACCOUNT                    = data.aws_ssm_parameter.mgmt_account_number.value
     SLACK_FAILURE_WORKFLOW                = data.aws_ssm_parameter.slack_e2e_failure_workflow.value
@@ -798,22 +798,22 @@ module "create_bulk_users_bucket" {
 }
 
 module "keycloak_user_management_github_environment" {
-  source = "./tdr-terraform-modules/github_environments"
-  environment = local.environment
+  source          = "./tdr-terraform-modules/github_environments"
+  environment     = local.environment
   repository_name = "nationalarchives/tdr-keycloak-user-management"
-  team_slug = "transfer-digital-records-admins"
+  team_slug       = "transfer-digital-records-admins"
   secrets = {
-    TITLE_STAGE = title(local.environment)
-    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
-    MANAGEMENT_ACCOUNT = data.aws_ssm_parameter.mgmt_account_number.value
+    TITLE_STAGE            = title(local.environment)
+    ACCOUNT_NUMBER         = data.aws_caller_identity.current.account_id
+    MANAGEMENT_ACCOUNT     = data.aws_ssm_parameter.mgmt_account_number.value
     SLACK_FAILURE_WORKFLOW = data.aws_ssm_parameter.slack_failure_workflow.value
     SLACK_SUCCESS_WORKFLOW = data.aws_ssm_parameter.slack_success_workflow.value
-    WORKFLOW_PAT = data.aws_ssm_parameter.workflow_pat.value
+    WORKFLOW_PAT           = data.aws_ssm_parameter.workflow_pat.value
   }
 }
 
 module "deploy_lambda_github_actions_policy" {
-  source = "./tdr-terraform-modules/iam_policy"
-  name   = "TDRGithubActionsDeployLambda${title(local.environment)}"
-  policy_string = templatefile("${path.module}/templates/iam_policy/deploy_lambda_github_actions.json.tpl", {account_id = data.aws_caller_identity.current.account_id, environment = local.environment, region = local.region})
+  source        = "./tdr-terraform-modules/iam_policy"
+  name          = "TDRGithubActionsDeployLambda${title(local.environment)}"
+  policy_string = templatefile("${path.module}/templates/iam_policy/deploy_lambda_github_actions.json.tpl", { account_id = data.aws_caller_identity.current.account_id, environment = local.environment, region = local.region })
 }
