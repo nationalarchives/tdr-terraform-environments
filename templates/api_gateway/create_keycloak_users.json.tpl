@@ -1,7 +1,7 @@
 {
   "openapi" : "3.0.1",
   "info" : {
-    "title" : "TestKeycloakCreateUsers",
+    "title" : "CreateKeycloakUsersApi",
     "version" : "2022-02-11 12:44:34UTC"
   },
 
