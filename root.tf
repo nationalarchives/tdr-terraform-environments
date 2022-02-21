@@ -692,15 +692,15 @@ module "s3_vpc_endpoint" {
 }
 
 module "create_keycloak_users_api_lambda" {
-  source                          = "./tdr-terraform-modules/lambda"
-  common_tags                     = local.common_tags
-  project                         = var.project
-  user_admin_client_secret        = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
-  kms_key_arn                     = module.encryption_key.kms_key_arn
-  auth_url                        = local.keycloak_auth_url
-  vpc_id                          = module.shared_vpc.vpc_id
-  lambda_create_keycloak_user_api = true
-  private_subnet_ids              = module.backend_checks_efs.private_subnets
+  source                           = "./tdr-terraform-modules/lambda"
+  common_tags                      = local.common_tags
+  project                          = var.project
+  user_admin_client_secret         = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
+  kms_key_arn                      = module.encryption_key.kms_key_arn
+  auth_url                         = local.keycloak_auth_url
+  vpc_id                           = module.shared_vpc.vpc_id
+  lambda_create_keycloak_user_api  = true
+  private_subnet_ids               = module.backend_checks_efs.private_subnets
   keycloak_user_management_api_arn = module.create_keycloak_users_api.api_arn
 }
 
