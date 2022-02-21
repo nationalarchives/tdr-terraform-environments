@@ -721,7 +721,7 @@ module "create_keycloak_users_api" {
   source        = "./tdr-terraform-modules/apigatewayv2"
   body_template = templatefile("${path.module}/templates/api_gateway/create_keycloak_users.json.tpl", { region = local.region, lambda_arn = module.create_keycloak_users_api_lambda.create_keycloak_users_api_lambda_arn, auth_url = local.keycloak_auth_url })
   environment   = local.environment
-  name          = "CreateKeycloakUsersApi"
+  api_name      = "CreateKeycloakUsersApi"
   common_tags   = local.common_tags
 }
 
