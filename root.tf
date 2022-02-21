@@ -765,6 +765,7 @@ module "create_keycloak_users_api_lambda" {
   vpc_id                          = module.shared_vpc.vpc_id
   lambda_create_keycloak_user_api = true
   private_subnet_ids              = module.backend_checks_efs.private_subnets
+  keycloak_user_management_api_arn = module.create_keycloak_users_api.api_arn
 }
 
 module "create_keycloak_users_s3_lambda" {
