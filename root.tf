@@ -731,11 +731,12 @@ module "consignment_api_github_environment" {
   repository_name = "nationalarchives/tdr-consignment-api"
   team_slug       = "transfer-digital-records-admins"
   secrets = {
-    "${upper(local.environment)}_ACCOUNT" = data.aws_caller_identity.current.account_id
-    MANAGEMENT_ACCOUNT                    = data.aws_ssm_parameter.mgmt_account_number.value
-    SLACK_FAILURE_WORKFLOW                = data.aws_ssm_parameter.slack_failure_workflow.value
-    SLACK_SUCCESS_WORKFLOW                = data.aws_ssm_parameter.slack_success_workflow.value
-    WORKFLOW_PAT                          = data.aws_ssm_parameter.workflow_pat.value
+    TITLE_STAGE            = title(local.environment)
+    ACCOUNT_NUMBER         = data.aws_caller_identity.current.account_id
+    MANAGEMENT_ACCOUNT     = data.aws_ssm_parameter.mgmt_account_number.value
+    SLACK_FAILURE_WORKFLOW = data.aws_ssm_parameter.slack_failure_workflow.value
+    SLACK_SUCCESS_WORKFLOW = data.aws_ssm_parameter.slack_success_workflow.value
+    WORKFLOW_PAT           = data.aws_ssm_parameter.workflow_pat.value
   }
 }
 
