@@ -12,7 +12,7 @@
           "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
         },
         "StringLike": {
-          "token.actions.githubusercontent.com:sub": "repo:nationalarchives/${repo_name}:*"
+          "token.actions.githubusercontent.com:sub": "repo:nationalarchives/tdr-*"
         }
       }
     }
