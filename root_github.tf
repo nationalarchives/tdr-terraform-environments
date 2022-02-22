@@ -86,8 +86,8 @@ module "github_update_waf_and_security_groups_role" {
 }
 
 module "github_update_ecs_policy" {
-  source = "./tdr-terraform-modules/iam_policy"
-  name   = "TDRGitHubECSUpdatePolicy${title(local.environment)}"
+  source        = "./tdr-terraform-modules/iam_policy"
+  name          = "TDRGitHubECSUpdatePolicy${title(local.environment)}"
   policy_string = templatefile("${path.module}/templates/iam_policy/github_update_ecs_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, region = local.region, environment = local.environment })
 }
 
