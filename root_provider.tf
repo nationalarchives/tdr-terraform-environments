@@ -16,3 +16,7 @@ provider "aws" {
     session_name = "terraform"
   }
 }
+
+provider "github" {
+  owner = "nationalarchives"
+}
