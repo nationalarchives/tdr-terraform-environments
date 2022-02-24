@@ -585,13 +585,14 @@ module "notifications_topic" {
 }
 
 module "notification_lambda" {
-  source                        = "./tdr-terraform-modules/lambda"
-  common_tags                   = local.common_tags
-  project                       = "tdr"
-  lambda_ecr_scan_notifications = true
-  event_rule_arns               = []
-  sns_topic_arns                = [module.notifications_topic.sns_arn]
-  muted_scan_alerts             = module.global_parameters.muted_ecr_scan_alerts
+  source                         = "./tdr-terraform-modules/lambda"
+  common_tags                    = local.common_tags
+  project                        = "tdr"
+  lambda_ecr_scan_notifications  = true
+  event_rule_arns                = []
+  sns_topic_arns                 = [module.notifications_topic.sns_arn]
+  muted_scan_alerts              = module.global_parameters.muted_ecr_scan_alerts
+  judgment_export_s3_bucket_name = module.export_bucket_judgment.s3_bucket_name
 }
 
 module "tdr_public_nacl" {
