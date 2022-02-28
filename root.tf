@@ -394,6 +394,16 @@ module "api_update_queue" {
   kms_key_id               = module.encryption_key.kms_key_arn
 }
 
+module "transform_engine_retry_queue" {
+  source                   = "./tdr-terraform-modules/sqs"
+  common_tags              = local.common_tags
+  project                  = var.project
+  function                 = "transform-engine-retry"
+  //Temporarily use default policy until know transform engine IAM roles that will send messages to the queue
+  sqs_policy               = "default"
+  kms_key_id               = module.encryption_key.kms_key_arn
+}
+
 module "api_update_lambda" {
   source                                = "./tdr-terraform-modules/lambda"
   project                               = var.project
