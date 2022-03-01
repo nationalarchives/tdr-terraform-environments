@@ -395,12 +395,12 @@ module "api_update_queue" {
 }
 
 module "transform_engine_retry_queue" {
-  source                   = "./tdr-terraform-modules/sqs"
-  common_tags              = local.common_tags
-  project                  = var.project
-  function                 = "transform-engine-retry"
-  sqs_policy               = "transform_engine_retry"
-  kms_key_id               = module.encryption_key.kms_key_arn
+  source      = "./tdr-terraform-modules/sqs"
+  common_tags = local.common_tags
+  project     = var.project
+  function    = "transform-engine-retry"
+  sqs_policy  = "transform_engine_retry"
+  kms_key_id  = module.encryption_key.kms_key_arn
 }
 
 module "api_update_lambda" {
