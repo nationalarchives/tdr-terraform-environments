@@ -96,7 +96,7 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
    [location of project] $ terraform workspace select intg
    ```
 
-7. Run the following commands to ensure Terraform uses the correct credentials:
+7. Run the following command to ensure Terraform uses the correct credentials:
 
    ```
    [location of project] $ export AWS_PROFILE=terraform

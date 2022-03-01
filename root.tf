@@ -399,8 +399,7 @@ module "transform_engine_retry_queue" {
   common_tags              = local.common_tags
   project                  = var.project
   function                 = "transform-engine-retry"
-  //Temporarily use default policy until know transform engine IAM roles that will send messages to the queue
-  sqs_policy               = "default"
+  sqs_policy               = "transform_engine_retry"
   kms_key_id               = module.encryption_key.kms_key_arn
 }
 
