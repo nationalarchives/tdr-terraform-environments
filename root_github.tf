@@ -25,7 +25,7 @@ module "github_e2e_tests_environment" {
   source          = "./tdr-terraform-modules/github_environments"
   environment     = local.environment
   repository_name = "nationalarchives/tdr-e2e-tests"
-  team_slug       = "transfer-digital-records-admins"
+  count           = local.environment != "prod" ? 1 : 0
   secrets = {
     TITLE_STAGE            = title(local.environment)
     ACCOUNT_NUMBER         = data.aws_caller_identity.current.account_id
