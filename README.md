@@ -1,6 +1,6 @@
 # TDR Terraform Environments
 
-**Important Note**: tdr-terraform-environments uses v13 of Terraform. Ensure that Terraform v13 is installed before proceeding.
+**Important Note**: tdr-terraform-environments uses v1.1.3 of Terraform. Ensure that Terraform v1.1.3 is installed before proceeding.
 
 This repository contains the Terraform code to create the AWS resources needed to support the TDR application
 
@@ -18,7 +18,7 @@ The different modules are used by Terraform workspaces which represent three AWS
 
 These scripts assume that the [Terraform backend has been created in the management account][tf-backend]. This project uses the S3 Terraform backend to store the Terraform state for the different TDR environments.
 
-To start a deployment, run the [TDR Terraform Environments Deploy job in Jenkins][jenkins-job] by clicking 'Buid with Parameters' and selecting the environment you want to deploy to. All changes must be deployed first to integration, then staging, then production.
+To start a deployment, run the [TDR Terraform Environments Deploy job in Jenkins][jenkins-job] by clicking 'Build with Parameters' and selecting the environment you want to deploy to. All changes must be deployed first to integration, then staging, then production.
 
 The deployment will pause when Terraform has determined which changes need to be applied. Review the Terraform plan output by opening the job's console output.
 
@@ -105,14 +105,21 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
 8. Set the following Terraform environment variables on the local environment:
 
     * TF_VAR_tdr_account_number=*[account number of the environment to update]*
+    
+9. Set the following environmental variables:
 
-9. Initialize Terraform (if not done so previously):
+   ```
+   [location of project] $ export GITHUB_TOKEN=[valid token with access to TDR GitHub repos. Can use token from SSM parameter store: /mgmt/github/jenkins-api-key]
+   [location of project] $ export GITHUB_OWNER=nationalarchives
+   ```
+   
+10. Initialize Terraform (if not done so previously):
 
    ```
    [location of project] $ terraform init   
    ```
 
-10. Run Terraform to make changes to the TDR environment AWS resources
+11. Run Terraform to make changes to the TDR environment AWS resources
 
    ```
    [location of project] $ terraform plan
