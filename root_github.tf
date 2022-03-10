@@ -12,12 +12,7 @@ module "github_consignment_api_environment" {
   repository_name = "nationalarchives/tdr-consignment-api"
   team_slug       = "transfer-digital-records-admins"
   secrets = {
-    TITLE_STAGE            = title(local.environment)
-    ACCOUNT_NUMBER         = data.aws_caller_identity.current.account_id
-    MANAGEMENT_ACCOUNT     = data.aws_ssm_parameter.mgmt_account_number.value
-    SLACK_FAILURE_WORKFLOW = data.aws_ssm_parameter.slack_failure_workflow.value
-    SLACK_SUCCESS_WORKFLOW = data.aws_ssm_parameter.slack_success_workflow.value
-    WORKFLOW_PAT           = data.aws_ssm_parameter.workflow_pat.value
+    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
   }
 }
 
@@ -35,6 +30,16 @@ module "github_e2e_tests_environment" {
     WORKFLOW_PAT           = data.aws_ssm_parameter.workflow_pat.value
     USER_ADMIN_SECRET      = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
     BACKEND_CHECKS_SECRET  = module.keycloak_ssm_parameters.params[local.keycloak_backend_checks_secret_name].value
+  }
+}
+
+module "github_transfer_frontend_environment" {
+  source          = "./tdr-terraform-modules/github_environments"
+  environment     = local.environment
+  repository_name = "nationalarchives/tdr-file-format"
+  team_slug       = "transfer-digital-records-admins"
+  secrets = {
+    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
   }
 }
 
