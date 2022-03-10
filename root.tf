@@ -215,12 +215,13 @@ module "frontend_alb" {
 }
 
 module "encryption_key" {
-  source      = "./tdr-terraform-modules/kms"
-  project     = var.project
-  function    = "encryption"
-  key_policy  = "message_system_access"
-  environment = local.environment
-  common_tags = local.common_tags
+  source           = "./tdr-terraform-modules/kms"
+  project          = var.project
+  function         = "encryption"
+  key_policy       = "message_system_access"
+  environment      = local.environment
+  common_tags      = local.common_tags
+  policy_variables = { transform_engine_retry_role = data.aws_ssm_parameter.transform_engine_retry_role_arn.value }
 }
 
 module "waf" {
