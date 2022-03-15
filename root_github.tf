@@ -17,19 +17,12 @@ module "github_consignment_api_environment" {
 }
 
 module "github_e2e_tests_environment" {
-  source          = "./tdr-terraform-modules/github_environments"
-  environment     = local.environment
+  source          = "./tdr-terraform-modules/github_repositories"
   repository_name = "nationalarchives/tdr-e2e-tests"
-  count           = local.environment != "prod" ? 1 : 0
   secrets = {
-    TITLE_STAGE            = title(local.environment)
-    ACCOUNT_NUMBER         = data.aws_caller_identity.current.account_id
-    MANAGEMENT_ACCOUNT     = data.aws_ssm_parameter.mgmt_account_number.value
-    SLACK_FAILURE_WORKFLOW = data.aws_ssm_parameter.slack_e2e_failure_workflow.value
-    SLACK_SUCCESS_WORKFLOW = data.aws_ssm_parameter.slack_e2e_success_workflow.value
-    WORKFLOW_PAT           = data.aws_ssm_parameter.workflow_pat.value
-    USER_ADMIN_SECRET      = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
-    BACKEND_CHECKS_SECRET  = module.keycloak_ssm_parameters.params[local.keycloak_backend_checks_secret_name].value
+    "${upper(local.environment)}_ACCOUNT_NUMBER"        = data.aws_caller_identity.current.account_id
+    "${upper(local.environment)}_USER_ADMIN_SECRET"     = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
+    "${upper(local.environment)}_BACKEND_CHECKS_SECRET" = module.keycloak_ssm_parameters.params[local.keycloak_backend_checks_secret_name].value
   }
 }
 
