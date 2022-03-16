@@ -10,8 +10,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Checkout modules
+        uses: actions/checkout@v2
         with:
-          submodules: recursive
+          repository: nationalarchives/tdr-terraform-modules
+      - name: Checkout configuration
+        uses: actions/checkout@v2
+        with:
+          repository: nationalarchives/tdr-configurations
           token: ${{ secrets.WORKFLOW_PAT }}
       - name: Configure AWS credentials for Lambda
         uses: aws-actions/configure-aws-credentials@v1
