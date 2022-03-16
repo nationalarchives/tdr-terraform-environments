@@ -1,8 +1,5 @@
 name: 'Terraform plan'
 on:
-  push:
-    branches-ignore:
-      - master
   pull_request:
 permissions:
   id-token: write
@@ -19,7 +16,7 @@ jobs:
       - name: Configure AWS credentials for Lambda
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.INTG_ACCOUNT_NUMBER }}:role/TDRGithubTerraformRoleIntg
+          role-to-assume: arn:aws:iam::${{ secrets.MANAGEMENT_ACCOUNT }}:role/TDRGithubTerraformAssumeRoleIntg
           aws-region: eu-west-2
           role-session-name: TerraformRole
       - name: Terraform Format
