@@ -1,6 +1,5 @@
 name: 'Terraform plan'
 on:
-  push:
   pull_request:
 jobs:
   terraform-plan:
@@ -28,7 +27,7 @@ jobs:
         id: plan
         if: github.event_name == 'pull_request'
         env:
-          GITHUB_OWNER: ${{ context.repo.owner }}
+          GITHUB_OWNER: ${{ context.github.repo.owner }}
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
         run: terraform plan -no-color
         continue-on-error: true
