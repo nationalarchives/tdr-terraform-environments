@@ -6,6 +6,3 @@
 **.tfstate.backup
 *.tfvars
 
-# external modules
-tdr-terraform-modules
-tdr-configurations
