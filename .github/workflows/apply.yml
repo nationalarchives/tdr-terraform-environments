@@ -1,0 +1,24 @@
+name: 'Terraform plan'
+on:
+  push:
+    branches:
+      - master
+jobs:
+  terraform-apply:
+    name: 'Terraform apply'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.WORKFLOW_PAT }}
+      - name: Configure AWS credentials for Terraform
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.INTG_ACCOUNT_NUMBER }}:role/${{ steps.role-name.outputs.role-name }}
+          aws-region: eu-west-2
+          role-session-name: TerraformRole
+      - name: Terraform Format
+        id: apply
+        run: echo "terraform apply auto-approve"
