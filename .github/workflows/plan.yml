@@ -4,6 +4,9 @@ on:
     branches-ignore:
       - master
   pull_request:
+permissions:
+  id-token: write
+  contents: write
 jobs:
   terraform-plan:
     runs-on: ubuntu-latest
