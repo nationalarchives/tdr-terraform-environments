@@ -31,6 +31,7 @@ jobs:
         env:
           GITHUB_OWNER: nationalarchives
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+          TF_VAR_tdr_account_number: ${{ secrets.INTG_ACCOUNT }}
         run: terraform plan -no-color
         continue-on-error: true
       - name: Update Pull Request
