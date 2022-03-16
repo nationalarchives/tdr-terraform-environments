@@ -1,0 +1,3 @@
+[submodule "tdr-terraform-modules"]
+	path = tdr-terraform-modules
+	url = https://github.com/nationalarchives/tdr-terraform-modules.git

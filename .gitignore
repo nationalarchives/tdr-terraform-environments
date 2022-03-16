@@ -7,5 +7,5 @@
 *.tfvars
 
 # external modules
-tdr-terraform-modules
+# tdr-terraform-modules
 tdr-configurations
