@@ -1,5 +1,6 @@
 name: 'Terraform plan'
 on:
+  push:
   pull_request:
 jobs:
   terraform-plan:
