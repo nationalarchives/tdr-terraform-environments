@@ -24,5 +24,4 @@ encoded_stream_name = quote_plus(quote_plus(log_stream_name))
 fragment = f"logsV2:log-groups/log-group/terraform-plan-outputs/log-events/{encoded_stream_name}"
 url = f"{base_url}?region=eu-west-2#{fragment}"
 
-print("Terraform plan created")
-print(url)
+print(f"::set-output name=log-url::{url}")
