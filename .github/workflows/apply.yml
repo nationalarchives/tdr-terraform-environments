@@ -49,7 +49,7 @@ jobs:
             terraform workspace select ${{ github.event.inputs.environment }}
             pip install boto3
             terraform plan -no-color -out=out > /dev/null
-            terraform show out > out.plan
+            terraform show -no-color out > out.plan
             python .github/scripts/logs.py out.plan "${{ github.run_id }}${{ github.run_attempt }}" ${{ github.event.inputs.environment }}
       - uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@add-terraform-check
         with:
