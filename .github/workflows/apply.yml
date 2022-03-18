@@ -34,7 +34,7 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init
-      - name: Select integration workspace
+      - name: Select workspace
         run: terraform workspace select ${{ github.event.inputs.environment }}
       - name: Terraform Plan
         id: plan
@@ -43,6 +43,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
           TF_VAR_tdr_account_number: ${{ secrets[steps.set-environment-names.outputs.account_number_secret] }}
         run: |
+            pip install boto3
             terraform plan -no-color -out=out > /dev/null
             terraform show out > out.plan
             python .github/scripts/logs.py out.plan
