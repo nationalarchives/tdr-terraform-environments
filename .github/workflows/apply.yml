@@ -14,10 +14,14 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     outputs:
+      account-number-secret: ${{ steps.set-environment-names.outputs.account_number_secret }}
       title-environment: ${{ steps.set-environment-names.outputs.title_environment }}
     steps:
       - id: set-environment-names
-        run: print(f"::set-output name=title_environment::{"${{ github.event.inputs.environment }}".title()}")
+        run: |
+          env = "${{ github.event.inputs.environment }}"
+          print(f"::set-output name=account_number_secret::{env.upper()}_ACCOUNT")
+          print(f"::set-output name=title_environment::{env.title()}")
         shell: python
   plan:
     runs-on: ubuntu-latest
@@ -39,7 +43,7 @@ jobs:
         env:
           GITHUB_OWNER: nationalarchives
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
-          TF_VAR_tdr_account_number: ${{ secrets.ACCOUNT_NUMBER }}
+          TF_VAR_tdr_account_number: ${{ secrets[needs.setup.outputs.account-number-secret] }}
         run: |
             terraform init
             terraform workspace select ${{ github.event.inputs.environment }}
