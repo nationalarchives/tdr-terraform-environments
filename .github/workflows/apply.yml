@@ -84,4 +84,15 @@ jobs:
         run: |
             terraform init
             terraform workspace select ${{ github.event.inputs.environment }}
-            terraform apply --auto-approve
+            terraform apply --auto-approve > /dev/null
+      - name: Send failure message
+        if: failure()
+        uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@add-terraform-check
+        with:
+          message: ":warning: Terraform environment deploy failed for ${{ github.event.inputs.environment }}"
+      - name: Send success message
+        uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@add-terraform-check
+        with:
+          message: ":white_check_mark: Terraform environment deploy successful for ${{ github.event.inputs.environment }}"
+
+
