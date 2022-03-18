@@ -54,9 +54,9 @@ jobs:
       - uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@add-terraform-check
         with:
           message: |
-              Terraform plan ready for environment ${{ github.event.inputs.environment }}
-              Plan logs are at ${{ steps.plan.outputs.log-url }} in the management account.
-              Approve the workflow at https://github.com/nationalarchives/tdr-terraform-environments/actions/runs/${{ github.run_id }}
+              :book: Terraform plan ready for environment ${{ github.event.inputs.environment }}
+              :log: View the [plan logs](${{ steps.plan.outputs.log-url }}) in the management account.
+              :white_check_mark: [Approve the workflow](https://github.com/nationalarchives/tdr-terraform-environments/actions/runs/${{ github.run_id }})
           slack-url: ${{ secrets.SLACK_WEBHOOK }}
   apply:
     runs-on: ubuntu-latest
