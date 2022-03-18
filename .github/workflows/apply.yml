@@ -35,7 +35,7 @@ jobs:
         id: init
         run: terraform init
       - name: Select integration workspace
-        run: terraform workspace select intg
+        run: terraform workspace select ${{ github.event.inputs.environment }}
       - name: Terraform Plan
         id: plan
         env:
