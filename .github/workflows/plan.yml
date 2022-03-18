@@ -1,4 +1,4 @@
-name: 'Terraform plan'
+name: 'Terraform check'
 on:
   push:
   pull_request:
