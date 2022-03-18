@@ -5,8 +5,8 @@ from urllib.parse import quote_plus
 
 client = boto3.client("logs")
 timestamp = int(time.time()) * 1000
-log_group_name = 'terraform-plan-outputs'
-log_stream_name = 'tdr-terraform-backend/pull/162'
+log_group_name = f"terraform-plan-outputs-{sys.argv[3]}"
+log_stream_name = sys.argv[2]
 
 log_stream_response = client.describe_log_streams(logGroupName=log_group_name,
                                                   logStreamNamePrefix=log_stream_name,
@@ -14,27 +14,10 @@ log_stream_response = client.describe_log_streams(logGroupName=log_group_name,
 with open(sys.argv[1]) as file:
     log_event = [{'timestamp': timestamp, 'message': file.read()}]
 
-
-def put_log_events(sequence_token=None):
-    if sequence_token is None:
-        return client.put_log_events(logGroupName=log_group_name,
-                                     logStreamName=log_stream_name,
-                                     logEvents=log_event)
-    else:
-        return client.put_log_events(logGroupName=log_group_name,
-                                     logStreamName=log_stream_name,
-                                     logEvents=log_event,
-                                     sequenceToken=sequence_token)
-
-
-if len(log_stream_response['logStreams']) == 0:
-    client.create_log_stream(logGroupName=log_group_name, logStreamName=log_stream_name)
-    response = put_log_events()
-elif 'logStreams' in log_stream_response and 'uploadSequenceToken' not in log_stream_response["logStreams"][0]:
-    response = put_log_events()
-else:
-    token = log_stream_response['logStreams'][0]['uploadSequenceToken']
-    response = put_log_events(token)
+client.create_log_stream(logGroupName=log_group_name, logStreamName=log_stream_name)
+response = client.put_log_events(logGroupName=log_group_name,
+                                 logStreamName=log_stream_name,
+                                 logEvents=log_event)
 
 base_url = "https://eu-west-2.console.aws.amazon.com/cloudwatch/home"
 encoded_stream_name = quote_plus(quote_plus(log_stream_name))
