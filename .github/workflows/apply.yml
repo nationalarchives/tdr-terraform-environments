@@ -55,8 +55,8 @@ jobs:
         with:
           message: |
               :book: Terraform plan ready for environment ${{ github.event.inputs.environment }}
-              :log: View the [plan logs](${{ steps.plan.outputs.log-url }}) in the management account.
-              :white_check_mark: [Approve the workflow](https://github.com/nationalarchives/tdr-terraform-environments/actions/runs/${{ github.run_id }})
+              :log: View the <${{ steps.plan.outputs.log-url }}|plan logs> in the management account.
+              :white_check_mark: <https://github.com/nationalarchives/tdr-terraform-environments/actions/runs/${{ github.run_id }}|Approve the workflow>
           slack-url: ${{ secrets.SLACK_WEBHOOK }}
   apply:
     runs-on: ubuntu-latest
