@@ -1,24 +1,70 @@
 name: 'Terraform plan'
 on:
   push:
-    branches:
-      - master
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        description: The environment to deploy against.
+        type: string
+        default: staging
+permissions:
+  id-token: write
+  contents: write
 jobs:
-  terraform-apply:
-    name: 'Terraform apply'
+  plan:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
         with:
-          submodules: true
+          submodules: recursive
           token: ${{ secrets.WORKFLOW_PAT }}
-      - name: Configure AWS credentials for Terraform
+      - name: set-environment-names
+        run: |
+            print(f"::set-output name=account_number_secret::{env.upper()}_ACCOUNT")
+            print(f"::set-output name=title_environment::{env.title()}")
+        shell: python
+      - name: Configure AWS credentials for Lambda
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.INTG_ACCOUNT_NUMBER }}:role/${{ steps.role-name.outputs.role-name }}
+          role-to-assume: arn:aws:iam::${{ secrets.MANAGEMENT_ACCOUNT }}:role/TDRGithubTerraformAssumeRole${{ steps.set-environment-names.outputs.title_environment }}
           aws-region: eu-west-2
           role-session-name: TerraformRole
-      - name: Terraform Format
-        id: apply
-        run: echo "terraform apply auto-approve"
+      - name: Terraform Init
+        id: init
+        run: terraform init
+      - name: Select integration workspace
+        run: terraform workspace select intg
+      - name: Terraform Plan
+        id: plan
+        env:
+          GITHUB_OWNER: nationalarchives
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+          TF_VAR_tdr_account_number: ${{ secrets[steps.set-environment-names.outputs.account_number_secret] }}
+        run: |
+            terraform plan -no-color -out=out > /dev/null
+            terraform show out > out.plan
+            python .github/scripts/logs.py out.plan
+  apply:
+    runs-on: ubuntu-latest
+    needs:
+      - plan
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          token: ${{ secrets.WORKFLOW_PAT }}
+      - name: Configure AWS credentials for Lambda
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.MANAGEMENT_ACCOUNT }}:role/TDRGithubTerraformAssumeRole${{ steps.set-environment-names.outputs.title_environment }}
+          aws-region: eu-west-2
+          role-session-name: TerraformRole
+      - name: Run apply
+        run: |
+            terraform init
+            terraform workspace select ${{ github.event.inputs.environment }}
+            echo "terraform apply --auto-approve"
