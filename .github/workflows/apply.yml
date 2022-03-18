@@ -14,8 +14,8 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     outputs:
-      account-number-secret: ${{ steps.set-environment-names.account_number_secret }}
-      title-environment: ${{ steps.set-environment-names.title_environment }}
+      account-number-secret: ${{ steps.set-environment-names.outputs.account_number_secret }}
+      title-environment: ${{ steps.set-environment-names.outputs.title_environment }}
     steps:
       - id: set-environment-names
         run: |
