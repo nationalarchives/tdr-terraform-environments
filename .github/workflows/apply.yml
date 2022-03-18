@@ -19,7 +19,7 @@ jobs:
         with:
           submodules: recursive
           token: ${{ secrets.WORKFLOW_PAT }}
-      - name: set-environment-names
+      - id: set-environment-names
         run: |
             env = "${{ github.event.inputs.environment }}"
             print(f"::set-output name=account_number_secret::{env.upper()}_ACCOUNT")
