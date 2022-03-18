@@ -47,6 +47,14 @@ module "github_terraform_environment" {
   }
 }
 
+module "github_terraform_repository" {
+  source          = "./tdr-terraform-modules/github_repositories"
+  repository_name = "nationalarchives/tdr-terraform-environments"
+  secrets = {
+    "${upper(local.environment)}_ACCOUNT_NUMBER" = data.aws_caller_identity.current.account_id
+  }
+}
+
 module "github_checksum_environment" {
   source          = "./tdr-terraform-modules/github_environments"
   environment     = local.environment
