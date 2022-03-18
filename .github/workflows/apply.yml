@@ -46,7 +46,7 @@ jobs:
             pip install boto3
             terraform plan -no-color -out=out > /dev/null
             terraform show out > out.plan
-            python .github/scripts/logs.py out.plan
+            python .github/scripts/logs.py out.plan ${{ github.run_id }} ${{ github.event.inputs.environment }}
   apply:
     runs-on: ubuntu-latest
     needs:
