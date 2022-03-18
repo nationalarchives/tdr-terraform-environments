@@ -51,7 +51,7 @@ jobs:
             terraform plan -no-color -out=out > /dev/null
             terraform show out > out.plan
             python .github/scripts/logs.py out.plan "${{ github.run_id }}${{ github.run_attempt }}" ${{ github.event.inputs.environment }}
-      - uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@main
+      - uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@add-terraform-check
         with:
           message: |
               Terraform plan ready for environment ${{ github.event.inputs.environment }}
