@@ -41,7 +41,7 @@ module "github_terraform_environment" {
   environment           = local.environment
   repository_name       = "nationalarchives/tdr-terraform-environments"
   team_slug             = "transfer-digital-records-admins"
-  integration_team_slug = "transfer-digital-records"
+  integration_team_slug = ["transfer-digital-records"]
   secrets = {
     ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
   }
