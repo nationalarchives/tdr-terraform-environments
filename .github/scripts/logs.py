@@ -8,9 +8,6 @@ timestamp = int(time.time()) * 1000
 log_group_name = f"terraform-plan-outputs-{sys.argv[3]}"
 log_stream_name = sys.argv[2]
 
-log_stream_response = client.describe_log_streams(logGroupName=log_group_name,
-                                                  logStreamNamePrefix=log_stream_name,
-                                                  descending=True)
 with open(sys.argv[1]) as file:
     log_event = [{'timestamp': timestamp, 'message': file.read()}]
 
