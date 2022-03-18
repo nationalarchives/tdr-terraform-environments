@@ -14,14 +14,10 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     outputs:
-      account-number-secret: ${{ steps.set-environment-names.outputs.account_number_secret }}
       title-environment: ${{ steps.set-environment-names.outputs.title_environment }}
     steps:
       - id: set-environment-names
-        run: |
-          env = "${{ github.event.inputs.environment }}"
-          print(f"::set-output name=account_number_secret::{env.upper()}_ACCOUNT")
-          print(f"::set-output name=title_environment::{env.title()}")
+        run: print(f"::set-output name=title_environment::{"${{ github.event.inputs.environment }}".title()}")
         shell: python
   plan:
     runs-on: ubuntu-latest
@@ -43,7 +39,7 @@ jobs:
         env:
           GITHUB_OWNER: nationalarchives
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
-          TF_VAR_tdr_account_number: ${{ secrets[needs.setup.outputs.account-number-secret] }}
+          TF_VAR_tdr_account_number: ${{ secrets.ACCOUNT_NUMBER }}
         run: |
             terraform init
             terraform workspace select ${{ github.event.inputs.environment }}
@@ -77,7 +73,11 @@ jobs:
           aws-region: eu-west-2
           role-session-name: TerraformRole
       - name: Run apply
+        env:
+          GITHUB_OWNER: nationalarchives
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+          TF_VAR_tdr_account_number: ${{ secrets.ACCOUNT_NUMBER }}
         run: |
             terraform init
             terraform workspace select ${{ github.event.inputs.environment }}
-            echo "terraform apply --auto-approve"
+            terraform apply --auto-approve
