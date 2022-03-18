@@ -22,7 +22,7 @@ jobs:
           token: ${{ secrets.WORKFLOW_PAT }}
       - name: set-environment-names
         run: |
-            env = ${{ github.event.inputs.environment }}
+            env = "${{ github.event.inputs.environment }}"
             print(f"::set-output name=account_number_secret::{env.upper()}_ACCOUNT")
             print(f"::set-output name=title_environment::{env.title()}")
         shell: python
