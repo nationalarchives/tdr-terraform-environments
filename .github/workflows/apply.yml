@@ -103,5 +103,3 @@ jobs:
           inputs: "{\"environment\": \"${{ github.event.inputs.environment }}\"}"
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
-
-
