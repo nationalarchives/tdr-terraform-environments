@@ -17,6 +17,7 @@
         "arn:aws:lambda:${region}:${account_id}:function:tdr-create-keycloak-user-api-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-create-keycloak-user-s3-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-checksum-${environment}",
+        "arn:aws:lambda:${region}:${account_id}:function:tdr-database-migrations-${environment}",
         "arn:aws:s3:::tdr-backend-code-mgmt/*"
       ]
     }
