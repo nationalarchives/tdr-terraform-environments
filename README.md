@@ -18,23 +18,21 @@ The different modules are used by Terraform workspaces which represent three AWS
 
 These scripts assume that the [Terraform backend has been created in the management account][tf-backend]. This project uses the S3 Terraform backend to store the Terraform state for the different TDR environments.
 
-To start a deployment, run the [TDR Terraform Environments Deploy job in Jenkins][jenkins-job] by clicking 'Build with Parameters' and selecting the environment you want to deploy to. All changes must be deployed first to integration, then staging, then production.
+To start a deployment, run the [TDR Terraform Environments Deploy job in GitHub actions][github-actions-job] by clicking 'Run Workflow' and selecting the environment you want to deploy to. All changes must be deployed first to integration, then staging, then production. 
 
-The deployment will pause when Terraform has determined which changes need to be applied. Review the Terraform plan output by opening the job's console output.
+The deployment will pause when Terraform has determined which changes need to be applied. Review the Terraform plan output by clicking the link provided in the Slack notification. This will be a link to Cloudwatch in the management account so you will need to be logged in to the management AWS account to use this.
 
-Check whether the changes look correct, then open the build input page and accept or reject them. To find the build input page, follow the link from the Slack notification:
+Check whether the changes look correct, then open the actions approval page and accept or reject them. To find the actions approval page, follow the link from the Slack notification:
 
 ![Terraform deployment link in Slack](docs/images/slack-deployment-link.png)
 
-Or click the "Paused for input" link in the Jenkins job detail:
-
-![Paused for input link in Jenkins](docs/images/jenkins-paused-for-input.png)
+Integration deployments can be approved by anyone in the `transfer-digital-records` GitHub team. Staging and Production deployments need to be approved by a member of the `transfer-digital-records-admins`
 
 Integration and staging deployments will automatically start the [end-to-end tests]. Wait for these to succeed before deploying the Terraform to the next environment, as well as doing any manual checks you need to make sure the deployment made the change you expected.
 
 [tf-backend]: https://github.com/nationalarchives/tdr-dev-documentation/tree/master/manual/tdr-create-aws-instructure-setup.md
-[jenkins-job]: https://jenkins.tdr-management.nationalarchives.gov.uk/job/TerraformEnvironmentsDeploy/
-[end-to-end tests]: https://jenkins.tdr-management.nationalarchives.gov.uk/job/TDRAcceptanceTest/
+[github-actions-job]: https://github.com/nationalarchives/tdr-terraform-environments/actions/workflows/apply.yml
+[end-to-end tests]: https://github.com/nationalarchives/tdr-e2e-tests/actions/workflows/ci.yml
 
 ## Local development
 

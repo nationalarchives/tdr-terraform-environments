@@ -94,5 +94,14 @@ jobs:
         uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@add-terraform-check
         with:
           message: ":white_check_mark: Terraform environment deploy successful for ${{ github.event.inputs.environment }}"
+      - name: Run E2E tests
+        if: inputs.environment != 'prod'
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/nationalarchives/tdr-e2e-tests/actions/workflows/ci.yml/dispatches
+          ref: master
+          inputs: "{\"environment\": \"${{ github.event.inputs.environment }}\"}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
 
 
