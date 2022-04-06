@@ -138,7 +138,7 @@ module "github_update_ecs_role" {
   }
 }
 
-module "github_transfer_frontend_environment" {
+module "github_auth_server_environment" {
   source          = "./tdr-terraform-modules/github_environments"
   environment     = local.environment
   repository_name = "nationalarchives/tdr-auth-server"
