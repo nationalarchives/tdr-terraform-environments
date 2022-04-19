@@ -90,10 +90,12 @@ jobs:
         uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@main
         with:
           message: ":warning: Terraform environment deploy failed for ${{ github.event.inputs.environment }}"
+          slack-url: ${{ secrets.SLACK_WEBHOOK }}
       - name: Send success message
         uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@main
         with:
           message: ":white_check_mark: Terraform environment deploy successful for ${{ github.event.inputs.environment }}"
+          slack-url: ${{ secrets.SLACK_WEBHOOK }}
       - name: Run E2E tests
         if: inputs.environment != 'prod'
         uses: octokit/request-action@v2.x
