@@ -14,6 +14,7 @@
       ],
       "Resource": [
         "arn:aws:lambda:${region}:${account_id}:event-source-mapping:*",
+        "arn:aws:lambda:${region}:${account_id}:function:tdr-yara-av-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-create-keycloak-user-api-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-create-keycloak-user-s3-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-checksum-${environment}",
