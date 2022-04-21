@@ -29,6 +29,14 @@
       {
         "name": "AUTH_URL",
         "value": "${auth_url}"
+      },
+      {
+        "name": "DOWNLOAD_FILES_BATCH_SIZE",
+        "value": "${download_files_batch_size}"
+      },
+      {
+        "name": "DOWNLOAD_BATCH_DELAY_MS",
+        "value": "${download_batch_delay_ms}"
       }
     ],
     "mountPoints": [
