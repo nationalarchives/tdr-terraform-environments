@@ -225,7 +225,7 @@ module "github_antivirus_server_environment" {
   }
 }
 
-module "github_antivirus_server_environment" {
+module "github_consignment_export_server_environment" {
   source          = "./tdr-terraform-modules/github_environments"
   environment     = local.environment
   repository_name = "nationalarchives/tdr-consignment-export"
