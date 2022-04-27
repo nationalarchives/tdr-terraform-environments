@@ -85,6 +85,15 @@ jobs:
             terraform init
             terraform workspace select ${{ github.event.inputs.environment }}
             terraform apply --auto-approve > /dev/null
+      - id: next-tag
+        uses: nationalarchives/tdr-github-actions/.github/actions/get-next-version@main
+        with:
+          repo-name: tdr-terraform-environments
+      - run: |
+          git tag ${{ steps.next-tag.outputs.next-version }}
+          git push origin ${{ steps.next-tag.outputs.next-version }}
+          git branch -f release-${{ github.event.inputs.environment }} HEAD
+          git push -f origin release-${{ github.event.inputs.environment }}
       - name: Send failure message
         if: failure()
         uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@main
