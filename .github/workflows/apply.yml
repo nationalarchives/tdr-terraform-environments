@@ -12,7 +12,7 @@ permissions:
   contents: write
 jobs:
   apply:
-    uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@add-terraform-apply-job
+    uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@main
     with:
       repo-name: tdr-terraform-environments
       environment: ${{ github.event.inputs.environment }}
