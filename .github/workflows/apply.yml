@@ -1,4 +1,4 @@
-name: 'Terraform plan'
+name: 'Terraform apply'
 on:
   workflow_dispatch:
     inputs:
@@ -11,106 +11,12 @@ permissions:
   id-token: write
   contents: write
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    outputs:
-      account-number-secret: ${{ steps.set-environment-names.outputs.account_number_secret }}
-      title-environment: ${{ steps.set-environment-names.outputs.title_environment }}
-    steps:
-      - id: set-environment-names
-        run: |
-          env = "${{ github.event.inputs.environment }}"
-          print(f"::set-output name=account_number_secret::{env.upper()}_ACCOUNT_NUMBER")
-          print(f"::set-output name=title_environment::{env.title()}")
-        shell: python
-  plan:
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-          token: ${{ secrets.WORKFLOW_PAT }}
-      - name: Configure AWS credentials for Lambda
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: arn:aws:iam::${{ secrets.MANAGEMENT_ACCOUNT }}:role/TDRGithubTerraformAssumeRole${{ needs.setup.outputs.title-environment }}
-          aws-region: eu-west-2
-          role-session-name: TerraformRole
-      - name: Terraform Plan
-        id: plan
-        env:
-          GITHUB_OWNER: nationalarchives
-          GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
-          TF_VAR_tdr_account_number: ${{ secrets[needs.setup.outputs.account-number-secret] }}
-        run: |
-            terraform init
-            terraform workspace select ${{ github.event.inputs.environment }}
-            pip install boto3
-            terraform plan -no-color -out=out > /dev/null
-            terraform show -no-color out > out.plan
-            python .github/scripts/logs.py out.plan "${{ github.run_id }}${{ github.run_attempt }}" ${{ github.event.inputs.environment }}
-      - uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@main
-        with:
-          message: |
-              :book: Terraform plan ready for environment ${{ github.event.inputs.environment }}
-              :log: View the <${{ steps.plan.outputs.log-url }}|plan logs> in the management account.
-              :white_check_mark: <https://github.com/nationalarchives/tdr-terraform-environments/actions/runs/${{ github.run_id }}|Approve the workflow>
-          slack-url: ${{ secrets.SLACK_WEBHOOK }}
   apply:
-    runs-on: ubuntu-latest
-    needs:
-      - plan
-      - setup
-    environment: ${{ github.event.inputs.environment }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-          token: ${{ secrets.WORKFLOW_PAT }}
-      - name: Configure AWS credentials for Lambda
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: arn:aws:iam::${{ secrets.MANAGEMENT_ACCOUNT }}:role/TDRGithubTerraformAssumeRole${{ needs.setup.outputs.title-environment }}
-          aws-region: eu-west-2
-          role-session-name: TerraformRole
-      - name: Run apply
-        env:
-          GITHUB_OWNER: nationalarchives
-          GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
-          TF_VAR_tdr_account_number: ${{ secrets.ACCOUNT_NUMBER }}
-        run: |
-            terraform init
-            terraform workspace select ${{ github.event.inputs.environment }}
-            terraform apply --auto-approve > /dev/null
-      - id: next-tag
-        uses: nationalarchives/tdr-github-actions/.github/actions/get-next-version@main
-        with:
-          repo-name: tdr-terraform-environments
-      - run: |
-          git tag ${{ steps.next-tag.outputs.next-version }}
-          git push origin ${{ steps.next-tag.outputs.next-version }}
-          git branch -f release-${{ github.event.inputs.environment }} HEAD
-          git push -f origin release-${{ github.event.inputs.environment }}
-      - name: Send failure message
-        if: failure()
-        uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@main
-        with:
-          message: ":warning: Terraform environment deploy failed for ${{ github.event.inputs.environment }}"
-          slack-url: ${{ secrets.SLACK_WEBHOOK }}
-      - name: Send success message
-        uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@main
-        with:
-          message: ":white_check_mark: Terraform environment deploy successful for ${{ github.event.inputs.environment }}"
-          slack-url: ${{ secrets.SLACK_WEBHOOK }}
-      - name: Run E2E tests
-        if: inputs.environment != 'prod'
-        uses: octokit/request-action@v2.x
-        with:
-          route: POST /repos/nationalarchives/tdr-e2e-tests/actions/workflows/ci.yml/dispatches
-          ref: master
-          inputs: "{\"environment\": \"${{ github.event.inputs.environment }}\"}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+    uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@add-terraform-apply-job
+    with:
+      repo-name: tdr-terraform-environments
+    secrets:
+      MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
+      WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
+      ACCOUNT_NUMBER: ${{ secrets.ACCOUNT_NUMBER }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
