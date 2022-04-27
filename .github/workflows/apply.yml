@@ -6,7 +6,7 @@ on:
         required: true
         description: The environment to deploy against.
         type: string
-        default: staging
+        default: intg
 permissions:
   id-token: write
   contents: write
