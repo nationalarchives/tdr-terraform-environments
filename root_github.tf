@@ -237,7 +237,7 @@ module "github_api_update_environment" {
   environment     = local.environment
   repository_name = "nationalarchives/tdr-api-update"
   team_slug       = "transfer-digital-records-admins"
-  secrets         = {
+  secrets = {
     ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
   }
 }
