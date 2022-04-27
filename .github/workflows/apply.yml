@@ -15,6 +15,7 @@ jobs:
     uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@add-terraform-apply-job
     with:
       repo-name: tdr-terraform-environments
+      environment: ${{ inputs.environment }}
     secrets:
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
