@@ -21,3 +21,6 @@ jobs:
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
       ACCOUNT_NUMBER: ${{ secrets.ACCOUNT_NUMBER }}
       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      INTG_ACCOUNT_NUMBER: ${{ secrets.INTG_ACCOUNT_NUMBER }}
+      STAGING_ACCOUNT_NUMBER: ${{ secrets.STAGING_ACCOUNT_NUMBER }}
+      PROD_ACCOUNT_NUMBER: ${{ secrets.PROD_ACCOUNT_NUMBER }}
