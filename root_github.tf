@@ -293,3 +293,13 @@ module "github_api_update_environment" {
     ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
   }
 }
+
+module "github_export_authoriser_environment" {
+  source          = "./tdr-terraform-modules/github_environments"
+  environment     = local.environment
+  repository_name = "nationalarchives/tdr-consignment-export-authoriser"
+  team_slug       = "transfer-digital-records-admins"
+  secrets = {
+    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
+  }
+}
