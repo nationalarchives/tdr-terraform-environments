@@ -62,6 +62,8 @@ module "consignment_export_ecs_task" {
       api_url                    = "${module.consignment_api.api_url}/graphql"
       auth_url                   = local.keycloak_auth_url
       region                     = local.region
+      download_files_batch_size  = 40
+      download_batch_delay_ms    = 10
   })
   container_name   = "consignmentexport"
   cpu              = 512
