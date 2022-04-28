@@ -270,7 +270,7 @@ module "github_tdr_scripts_environment" {
   environment           = local.environment
   repository_name       = "nationalarchives/tdr-scripts"
   team_slug             = "transfer-digital-records-admins"
-  integration_team_slug = ["transfer-digtial-records"]
+  integration_team_slug = ["transfer-digital-records"]
   secrets = {
     ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
   }
