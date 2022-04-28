@@ -231,3 +231,13 @@ module "github_consignment_export_server_environment" {
   repository_name = "nationalarchives/tdr-consignment-export"
   team_slug       = "transfer-digital-records-admins"
 }
+
+module "github_api_update_environment" {
+  source          = "./tdr-terraform-modules/github_environments"
+  environment     = local.environment
+  repository_name = "nationalarchives/tdr-api-update"
+  team_slug       = "transfer-digital-records-admins"
+  secrets = {
+    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
+  }
+}
