@@ -231,3 +231,65 @@ module "github_consignment_export_server_environment" {
   repository_name = "nationalarchives/tdr-consignment-export"
   team_slug       = "transfer-digital-records-admins"
 }
+
+module "github_aws_accounts_environment" {
+  source                = "./tdr-terraform-modules/github_environments"
+  environment           = local.environment
+  repository_name       = "nationalarchives/tdr-aws-accounts"
+  team_slug             = "transfer-digital-records-admins"
+  integration_team_slug = ["transfer-digital-records"]
+  secrets = {
+    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
+  }
+}
+
+module "github_aws_accounts_repository" {
+  source          = "./tdr-terraform-modules/github_repositories"
+  repository_name = "nationalarchives/tdr-aws-accounts"
+  secrets = {
+    "${upper(local.environment)}_ACCOUNT_NUMBER" = data.aws_caller_identity.current.account_id
+  }
+}
+
+module "github_create_db_user_policy" {
+  source        = "./tdr-terraform-modules/iam_policy"
+  name          = "TDRGithubActionsInvokeCreateUserLambdaPolicy${title(local.environment)}"
+  policy_string = templatefile("${path.module}/templates/iam_policy/github_invoke_create_user_lambda_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, environment = local.environment })
+}
+
+module "github_create_db_user_role" {
+  source             = "./tdr-terraform-modules/iam_role"
+  assume_role_policy = templatefile("${path.module}/templates/iam_role/github_assume_role.json.tpl", { account_id = data.aws_caller_identity.current.account_id })
+  common_tags        = local.common_tags
+  name               = "TDRGithubActionsInvokeCreateUserLambdaRole${title(local.environment)}"
+  policy_attachments = { create_user_policy = module.github_create_db_user_policy.policy_arn }
+}
+
+module "github_tdr_scripts_environment" {
+  source                = "./tdr-terraform-modules/github_environments"
+  environment           = local.environment
+  repository_name       = "nationalarchives/tdr-scripts"
+  team_slug             = "transfer-digital-records-admins"
+  integration_team_slug = ["transfer-digital-records"]
+  secrets = {
+    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
+  }
+}
+
+module "github_scripts_repository" {
+  source          = "./tdr-terraform-modules/github_repositories"
+  repository_name = "nationalarchives/tdr-scripts"
+  secrets = {
+    "${upper(local.environment)}_ACCOUNT_NUMBER" = data.aws_caller_identity.current.account_id
+  }
+}
+
+module "github_api_update_environment" {
+  source          = "./tdr-terraform-modules/github_environments"
+  environment     = local.environment
+  repository_name = "nationalarchives/tdr-api-update"
+  team_slug       = "transfer-digital-records-admins"
+  secrets = {
+    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
+  }
+}
