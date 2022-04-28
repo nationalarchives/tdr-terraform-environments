@@ -271,6 +271,9 @@ module "github_tdr_scripts_environment" {
   repository_name       = "nationalarchives/tdr-scripts"
   team_slug             = "transfer-digital-records-admins"
   integration_team_slug = ["transfer-digtial-records"]
+  secrets = {
+    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
+  }
 }
 
 module "github_api_update_environment" {
