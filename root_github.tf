@@ -276,6 +276,14 @@ module "github_tdr_scripts_environment" {
   }
 }
 
+module "github_scripts_repository" {
+  source          = "./tdr-terraform-modules/github_repositories"
+  repository_name = "nationalarchives/tdr-scripts"
+  secrets = {
+    "${upper(local.environment)}_ACCOUNT_NUMBER" = data.aws_caller_identity.current.account_id
+  }
+}
+
 module "github_api_update_environment" {
   source          = "./tdr-terraform-modules/github_environments"
   environment     = local.environment
