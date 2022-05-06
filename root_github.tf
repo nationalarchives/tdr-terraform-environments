@@ -303,3 +303,32 @@ module "github_export_authoriser_environment" {
     ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
   }
 }
+
+module "github_create_db_users_environment" {
+  source          = "./tdr-terraform-modules/github_environments"
+  environment     = local.environment
+  repository_name = "nationalarchives/tdr-create-db-users"
+  team_slug       = "transfer-digital-records-admins"
+  secrets = {
+    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
+  }
+}
+
+module "github_custodian_environment" {
+  source                = "./tdr-terraform-modules/github_environments"
+  environment           = local.environment
+  repository_name       = "nationalarchives/tna-custodian"
+  team_slug             = "transfer-digital-records-admins"
+  integration_team_slug = ["transfer-digital-records"]
+  secrets = {
+    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
+  }
+}
+
+module "github_custodian_repository" {
+  source          = "./tdr-terraform-modules/github_repositories"
+  repository_name = "nationalarchives/tna-custodian"
+  secrets = {
+    "${upper(local.environment)}_ACCOUNT_NUMBER" = data.aws_caller_identity.current.account_id
+  }
+}
