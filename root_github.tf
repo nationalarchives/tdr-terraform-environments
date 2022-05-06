@@ -342,3 +342,13 @@ module "github_download_files_environment" {
     ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
   }
 }
+
+module "github_ecr_scan_environment" {
+  source          = "./tdr-terraform-modules/github_environments"
+  environment     = local.environment
+  repository_name = "nationalarchives/tdr-ecr-scan"
+  team_slug       = "transfer-digital-records-admins"
+  secrets = {
+    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
+  }
+}
