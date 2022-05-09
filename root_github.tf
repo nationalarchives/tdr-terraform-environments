@@ -141,7 +141,7 @@ module "github_update_ecs_role" {
 module "github_run_keycloak_update_policy" {
   source        = "./tdr-terraform-modules/iam_policy"
   name          = "TDRGitHubRunKeycloakUpdatePolicy${title(local.environment)}"
-  policy_string = templatefile("${path.module}/templates/iam_policy/github_run_keycloak_update_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, region = local.region, environment = local.environment })
+  policy_string = templatefile("${path.module}/templates/iam_policy/github_run_ecs_policy.json.tpl", { task_definition_arn = module.run_keycloak_update_ecs.task_definition_arn, cluster_arn = module.run_keycloak_update_ecs.cluster_arn, role_arns = "\"${module.run_update_keycloak_execution_role.role.arn}\"" })
 }
 
 module "github_run_keycloak_update_role" {
@@ -337,6 +337,36 @@ module "github_download_files_environment" {
   source          = "./tdr-terraform-modules/github_environments"
   environment     = local.environment
   repository_name = "nationalarchives/tdr-download-files"
+  team_slug       = "transfer-digital-records-admins"
+  secrets = {
+    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
+  }
+}
+
+module "github_file_format_run_ecs_role" {
+  source             = "./tdr-terraform-modules/iam_role"
+  assume_role_policy = templatefile("${path.module}/templates/iam_role/github_assume_role.json.tpl", { account_id = data.aws_caller_identity.current.account_id, repo_name = "tdr-*" })
+  common_tags        = local.common_tags
+  name               = "TDRGithubActionsRunFileFormatECS${title(local.environment)}"
+  policy_attachments = {
+    run_file_format = module.github_run_file_format_build_policy.policy_arn
+  }
+}
+
+module "github_run_file_format_build_policy" {
+  source = "./tdr-terraform-modules/iam_policy"
+  name   = "TDRGitHubRunFileFormatBuildPolicy${title(local.environment)}"
+  policy_string = templatefile("${path.module}/templates/iam_policy/github_run_ecs_policy.json.tpl",
+    {
+      task_definition_arn = "arn:aws:ecs:${local.region}:${data.aws_caller_identity.current.account_id}:task-definition/file-format-build-${local.environment}",
+      cluster_arn         = "arn:aws:ecs:${local.region}:${data.aws_caller_identity.current.account_id}:cluster/file_format_build_${local.environment}",
+  role_arns = "\"arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/TDRFileFormatEcsTaskRole${title(local.environment)}\", \"arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/TDRFileFormatECSExecutionRole${title(local.environment)}\"" })
+}
+
+module "github_file_format_environment" {
+  source          = "./tdr-terraform-modules/github_environments"
+  environment     = local.environment
+  repository_name = "nationalarchives/tdr-file-format"
   team_slug       = "transfer-digital-records-admins"
   secrets = {
     ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
