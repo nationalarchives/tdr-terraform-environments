@@ -344,7 +344,7 @@ module "github_download_files_environment" {
 }
 
 module "github_file_format_run_ecs_role" {
-  source = "./tdr-terraform-modules/iam_role"
+  source             = "./tdr-terraform-modules/iam_role"
   assume_role_policy = templatefile("${path.module}/templates/iam_role/github_assume_role.json.tpl", { account_id = data.aws_caller_identity.current.account_id, repo_name = "tdr-*" })
   common_tags        = local.common_tags
   name               = "TDRGithubActionsRunFileFormatECS${title(local.environment)}"
