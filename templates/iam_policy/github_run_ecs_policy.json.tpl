@@ -12,9 +12,9 @@
         "iam:PassRole"
       ],
       "Resource": [
-        "arn:aws:ecs:eu-west-2:${account_id}:cluster/keycloak_update_${environment}",
-        "arn:aws:ecs:${region}:${account_id}:task-definition/keycloak-update-${environment}",
-        "arn:aws:iam::${account_id}:role/TDRKeycloakUpdateECSExecutionRole${title(environment)}"
+        "${cluster_arn}",
+        "${task_definition_arn}",
+        "${execution_role_arn}"
       ]
     },
     {
