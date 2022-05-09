@@ -14,7 +14,7 @@
       "Resource": [
         "${cluster_arn}",
         "${task_definition_arn}",
-        "${execution_role_arn}"
+        ${role_arns}
       ]
     },
     {
