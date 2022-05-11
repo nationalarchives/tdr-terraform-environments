@@ -395,10 +395,10 @@ module "github_service_unavailable_environment" {
 }
 
 module "github_sign_cookies_environment" {
-  source                = "./tdr-terraform-modules/github_environments"
-  environment           = local.environment
-  repository_name       = "nationalarchives/tdr-sign-cookies"
-  team_slug             = "transfer-digital-records-admins"
+  source          = "./tdr-terraform-modules/github_environments"
+  environment     = local.environment
+  repository_name = "nationalarchives/tdr-sign-cookies"
+  team_slug       = "transfer-digital-records-admins"
   secrets = {
     ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
   }
