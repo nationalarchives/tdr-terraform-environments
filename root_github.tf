@@ -382,3 +382,14 @@ module "github_notifications_environment" {
     ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
   }
 }
+
+module "github_service_unavailable_environment" {
+  source                = "./tdr-terraform-modules/github_environments"
+  environment           = local.environment
+  repository_name       = "nationalarchives/tdr-service-unavailable"
+  team_slug             = "transfer-digital-records-admins"
+  integration_team_slug = ["transfer-digital-records"]
+  secrets = {
+    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
+  }
+}
