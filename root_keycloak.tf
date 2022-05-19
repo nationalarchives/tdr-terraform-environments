@@ -115,6 +115,7 @@ module "tdr_keycloak_ecs" {
     govuk_notify_template_id_path     = local.keycloak_govuk_notify_template_id_name
     reporting_client_secret_path      = local.keycloak_reporting_client_secret_name
     sns_topic_arn                     = module.notifications_topic.sns_arn
+    keycloak_host                     = "auth.${local.environment_domain}"
   })
   container_name               = "keycloak"
   cpu                          = 1024
