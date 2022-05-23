@@ -403,3 +403,13 @@ module "github_sign_cookies_environment" {
     ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
   }
 }
+
+module "github_signed_cookies_environment" {
+  source          = "./tdr-terraform-modules/github_environments"
+  environment     = local.environment
+  repository_name = "nationalarchives/tdr-signed-cookies"
+  team_slug       = "transfer-digital-records-admins"
+  secrets = {
+    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
+  }
+}

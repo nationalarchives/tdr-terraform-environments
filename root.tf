@@ -541,6 +541,22 @@ module "sign_cookies_lambda" {
   vpc_id                 = module.shared_vpc.vpc_id
 }
 
+module "signed_cookies_lambda" {
+  source                 = "./tdr-terraform-modules/lambda"
+  common_tags            = local.common_tags
+  project                = "tdr"
+  lambda_signed_cookies  = true
+  auth_url               = local.keycloak_auth_url
+  frontend_url           = module.frontend.frontend_url
+  cloudfront_key_pair_id = module.cloudfront_upload.cloudfront_key_pair_id
+  timeout_seconds        = 60
+  api_gateway_arn        = module.signed_cookies_api.api_arn
+  kms_key_arn            = module.encryption_key.kms_key_arn
+  private_subnet_ids     = module.backend_checks_efs.private_subnets
+  vpc_id                 = module.shared_vpc.vpc_id
+  environment_full       = local.environment_full_name
+}
+
 //create a new efs volume, ECS task attached to the volume and pass in the proper variables and create ECR repository in the backend project
 
 module "export_efs" {
