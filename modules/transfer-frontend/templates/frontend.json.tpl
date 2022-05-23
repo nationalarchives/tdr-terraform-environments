@@ -33,6 +33,10 @@
       {
         "name": "ALB_IP_B",
         "value": "${alb_ip_b}"
+      },
+      {
+        "name": "AUTH_URL",
+        "value": "${auth_url}"
       }
     ],
     "networkMode": "awsvpc",
