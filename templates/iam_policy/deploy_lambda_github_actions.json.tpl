@@ -28,7 +28,6 @@
         "arn:aws:lambda:${region}:${account_id}:function:tdr-log-data-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-notifications-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-service-unavailable-${environment}",
-        "arn:aws:lambda:${region}:${account_id}:function:tdr-sign-cookies-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-signed-cookies-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-yara-av-${environment}",
         "arn:aws:s3:::tdr-backend-code-mgmt/*"
