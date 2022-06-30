@@ -9,10 +9,6 @@
         "name": "KC_DB_URL_HOST"
       },
       {
-        "valueFrom": "${password_path}",
-        "name": "KC_DB_PASSWORD"
-      },
-      {
         "valueFrom": "${admin_user_path}",
         "name": "KEYCLOAK_ADMIN"
       },
@@ -69,10 +65,6 @@
       {
         "name" : "KEYCLOAK_IMPORT",
         "value": "/tmp/tdr-realm.json"
-      },
-      {
-        "name": "KC_DB_USERNAME",
-        "value": "${username}"
       },
       {
         "name": "SNS_TOPIC_ARN",
