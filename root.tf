@@ -542,6 +542,22 @@ module "signed_cookies_lambda" {
   environment_full       = local.environment_full_name
 }
 
+module "reporting_lambda" {
+  source                           = "./tdr-terraform-modules/lambda"
+  common_tags                      = local.common_tags
+  project                          = "tdr"
+  lambda_reporting                 = true
+  upload_domain                    = local.upload_domain
+  auth_url                         = local.keycloak_auth_url
+  api_url                          = module.consignment_api.api_url
+  keycloak_reporting_client_id     = local.keycloak_reporting_client_id
+  keycloak_reporting_client_secret = module.keycloak_ssm_parameters.params[local.keycloak_reporting_client_secret_name].value
+  timeout_seconds                  = 60
+  kms_key_arn                      = module.encryption_key.kms_key_arn
+  private_subnet_ids               = module.backend_checks_efs.private_subnets
+  vpc_id                           = module.shared_vpc.vpc_id
+}
+
 //create a new efs volume, ECS task attached to the volume and pass in the proper variables and create ECR repository in the backend project
 
 module "export_efs" {
@@ -601,6 +617,7 @@ module "notification_lambda" {
   common_tags                    = local.common_tags
   project                        = "tdr"
   lambda_ecr_scan_notifications  = true
+  kms_key_arn                    = module.encryption_key.kms_key_arn
   event_rule_arns                = []
   sns_topic_arns                 = [module.notifications_topic.sns_arn]
   kms_key_arn                    = module.encryption_key.kms_key_arn
