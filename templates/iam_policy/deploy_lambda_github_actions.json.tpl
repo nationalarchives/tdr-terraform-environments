@@ -30,6 +30,7 @@
         "arn:aws:lambda:${region}:${account_id}:function:tdr-service-unavailable-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-signed-cookies-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-yara-av-${environment}",
+        "arn:aws:lambda:${region}:${account_id}:function:tdr-reporting-${environment}",
         "arn:aws:s3:::tdr-backend-code-mgmt/*"
       ]
     }
