@@ -122,6 +122,44 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
    ```
    [location of project] $ terraform plan
    ```
+
+## Updating sub-module hashes
+
+The tdr-terraform-modules and tdr-configurations are sub-modules to the tdr-terraform-environment projects.
+
+To update the hashes for the sub-modules, following an update to them:
+
+1. On the command line go to the sub-module directory in the tdr-terraform-environment directory
+
+   ```
+   [location of project] $ cd tdr-terraform-modules
+   ```
+   Or
+   ```
+   [location  of project] $ cd tdr-configurations
+   ```
+2. Ensure you are on the Git main branch for the sub-module   
+3. Pull the latest main branch for the sub-module
+
+   ```
+   [location of sub-module] $ git pull
+   ```
+
+4. Go back to the main tdr-terraform-environments directory
+
+   ```
+   [location of sub-module] $ cd ..
+   ```
+   
+5. Check that the sub-module is now showing as a change
+
+   ```
+   [location of project] $ git status
+   ```
+
+6. Commit and merge the sub-module change as any other normal change to the code
+
+
 ## Further Information
 
 * Terraform website: https://www.terraform.io/
