@@ -552,6 +552,7 @@ module "reporting_lambda" {
   api_url                          = module.consignment_api.api_url
   keycloak_reporting_client_id     = local.keycloak_reporting_client_id
   keycloak_reporting_client_secret = module.keycloak_ssm_parameters.params[local.keycloak_reporting_client_secret_name].value
+  slack_bot_token                  = module.keycloak_ssm_parameters.params[local.slack_bot_token_name].value
   timeout_seconds                  = 60
   kms_key_arn                      = module.encryption_key.kms_key_arn
   private_subnet_ids               = module.backend_checks_efs.private_subnets
