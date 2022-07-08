@@ -65,6 +65,7 @@ locals {
   keycloak_govuk_notify_api_key_name      = "/${local.environment}/keycloak/govuk_notify/api_key"
   keycloak_govuk_notify_template_id_name  = "/${local.environment}/keycloak/govuk_notify/template_id"
   keycloak_reporting_client_secret_name   = "/${local.environment}/keycloak/reporting_client/secret"
+  slack_bot_token_name                    = "/${local.environment}/slack/bot"
 
   keycloak_reporting_client_id = "tdr-reporting"
 

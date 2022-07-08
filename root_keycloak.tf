@@ -49,7 +49,8 @@ module "keycloak_ssm_parameters" {
     { name = local.keycloak_configuration_properties_name, description = "The Keycloak configuration properties file ", value = "${local.environment}_properties.json", type = "SecureString" },
     { name = local.keycloak_user_admin_client_secret_name, description = "The Keycloak user admin secret", value = random_uuid.backend_checks_client_secret.result, type = "SecureString" },
     { name = local.keycloak_reporting_client_secret_name, description = "The Keycloak reporting client secret", value = random_uuid.reporting_client_secret.result, type = "SecureString" },
-    { name = local.keycloak_realm_admin_client_secret_name, description = "The Keycloak realm admin secret", value = random_uuid.backend_checks_client_secret.result, type = "SecureString" }
+    { name = local.keycloak_realm_admin_client_secret_name, description = "The Keycloak realm admin secret", value = random_uuid.backend_checks_client_secret.result, type = "SecureString" },
+    { name = local.slack_bot_token_name, description = "The Slack bot token", value = random_uuid.slack_bot_token.result, type = "SecureString" }
   ]
 }
 

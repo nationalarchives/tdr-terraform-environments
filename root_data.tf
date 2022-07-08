@@ -25,6 +25,7 @@ resource "random_password" "keycloak_password" {
 resource "random_uuid" "client_secret" {}
 resource "random_uuid" "backend_checks_client_secret" {}
 resource "random_uuid" "reporting_client_secret" {}
+resource "random_uuid" "slack_bot_token" {}
 
 data "aws_canonical_user_id" "canonical_user" {}
 
