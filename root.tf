@@ -414,6 +414,7 @@ module "api_update_lambda" {
   auth_url                              = local.keycloak_auth_url
   api_url                               = module.consignment_api.api_url
   keycloak_backend_checks_client_secret = module.keycloak_ssm_parameters.params[local.keycloak_backend_checks_secret_name].value
+  backend_checks_client_secret_path     = local.keycloak_backend_checks_secret_name
   kms_key_arn                           = module.encryption_key.kms_key_arn
   private_subnet_ids                    = module.backend_checks_efs.private_subnets
   vpc_id                                = module.shared_vpc.vpc_id
@@ -453,6 +454,7 @@ module "download_files_lambda" {
   backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
   private_subnet_ids                     = module.backend_checks_efs.private_subnets
   backend_checks_client_secret           = module.keycloak_ssm_parameters.params[local.keycloak_backend_checks_secret_name].value
+  backend_checks_client_secret_path      = local.keycloak_backend_checks_secret_name
   kms_key_arn                            = module.encryption_key.kms_key_arn
   efs_security_group_id                  = module.backend_checks_efs.security_group_id
   reserved_concurrency                   = 3
@@ -552,6 +554,7 @@ module "reporting_lambda" {
   api_url                          = module.consignment_api.api_url
   keycloak_reporting_client_id     = local.keycloak_reporting_client_id
   keycloak_reporting_client_secret = module.keycloak_ssm_parameters.params[local.keycloak_reporting_client_secret_name].value
+  reporting_client_secret_path     = local.keycloak_reporting_client_secret_name
   slack_bot_token                  = module.keycloak_ssm_parameters.params[local.slack_bot_token_name].value
   timeout_seconds                  = 60
   kms_key_arn                      = module.encryption_key.kms_key_arn
@@ -727,6 +730,7 @@ module "create_keycloak_users_api_lambda" {
   common_tags                      = local.common_tags
   project                          = var.project
   user_admin_client_secret         = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
+  user_admin_client_secret_path    = local.keycloak_user_admin_client_secret_name
   kms_key_arn                      = module.encryption_key.kms_key_arn
   auth_url                         = local.keycloak_auth_url
   vpc_id                           = module.shared_vpc.vpc_id
@@ -740,6 +744,7 @@ module "create_keycloak_users_s3_lambda" {
   common_tags                    = local.common_tags
   project                        = var.project
   user_admin_client_secret       = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
+  user_admin_client_secret_path  = local.keycloak_user_admin_client_secret_name
   kms_key_arn                    = module.encryption_key.kms_key_arn
   auth_url                       = local.keycloak_auth_url
   vpc_id                         = module.shared_vpc.vpc_id
