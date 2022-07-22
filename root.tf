@@ -769,3 +769,24 @@ module "create_bulk_users_bucket" {
   lambda_notification = true
   lambda_arn          = module.create_keycloak_users_s3_lambda.create_keycloak_users_s3_lambda_arn
 }
+
+module "rotate_keycloak_secrets_lambda" {
+  source                            = "./tdr-terraform-modules/lambda"
+  common_tags                       = local.common_tags
+  project                           = "tdr"
+  lambda_rotate_keycloak_secrets    = true
+  notifications_topic               = module.notifications_topic.sns_arn
+  private_subnet_ids                = module.backend_checks_efs.private_subnets
+  auth_url                          = local.keycloak_auth_url
+  rotate_secrets_client_path        = local.keycloak_rotate_secrets_client_secret_name
+  vpc_id                            = module.shared_vpc.vpc_id
+  kms_key_arn                       = module.encryption_key.kms_key_arn
+  rotate_keycloak_secrets_event_arn = module.periodic_rotate_keycloak_secrets_event.event_arn
+}
+
+module "periodic_rotate_keycloak_secrets_event" {
+  source                  = "./tdr-terraform-modules/cloudwatch_events"
+  schedule                = "rate(7 days)"
+  rule_name               = "rotate-keycloak-secrets"
+  lambda_event_target_arn = module.rotate_keycloak_secrets_lambda.rotate_keycloak_secrets_lambda_arn
+}

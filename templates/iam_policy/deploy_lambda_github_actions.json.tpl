@@ -27,6 +27,7 @@
         "arn:aws:lambda:${region}:${account_id}:function:tdr-file-format-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-log-data-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-notifications-${environment}",
+        "arn:aws:lambda:${region}:${account_id}:function:tdr-rotate-keycloak-secrets-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-service-unavailable-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-signed-cookies-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-yara-av-${environment}",
