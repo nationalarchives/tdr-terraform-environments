@@ -45,6 +45,10 @@
         "name": "GOVUK_NOTIFY_TEMPLATE_ID"
       },
       {
+        "valueFrom": "${rotate_client_secrets_client_path}",
+        "name": "ROTATE_CLIENT_SECRETS_CLIENT_SECRET"
+      },
+      {
         "valueFrom": "${reporting_client_secret_path}",
         "name": "REPORTING_CLIENT_SECRET"
       }
