@@ -29,3 +29,10 @@ output "nat_gateway_public_ips" {
 output "default_nacl_id" {
   value = aws_vpc.main.default_network_acl_id
 }
+
+output "elastic_ip_arns" {
+  value = [
+    "arn:aws:ec2:eu-west-2:${data.aws_caller_identity.current.account_id}:eip-allocation/${aws_eip.gw[0].id}",
+    "arn:aws:ec2:eu-west-2:${data.aws_caller_identity.current.account_id}:eip-allocation/${aws_eip.gw[1].id}",
+  ]
+}
