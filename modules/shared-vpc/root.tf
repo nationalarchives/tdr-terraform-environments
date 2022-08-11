@@ -21,7 +21,7 @@ resource "aws_default_security_group" "default" {
 # Create var.az_count private subnets, each in a different AZ
 resource "aws_subnet" "private" {
   count             = var.az_count
-  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 12, count.index)
+  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 11, count.index)
   availability_zone = data.aws_availability_zones.available.names[count.index]
   vpc_id            = aws_vpc.main.id
 
