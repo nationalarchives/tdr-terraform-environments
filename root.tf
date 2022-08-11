@@ -32,6 +32,7 @@ module "consignment_api" {
   environment                    = local.environment
   environment_full_name          = local.environment_full_name_map[local.environment]
   private_subnets                = module.shared_vpc.private_subnets
+  backend_checks_subnets         = module.backend_checks_efs.private_subnets
   public_subnets                 = module.shared_vpc.public_subnets
   vpc_id                         = module.shared_vpc.vpc_id
   region                         = local.region
