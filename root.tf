@@ -289,11 +289,11 @@ module "create_db_users_lambda" {
   vpc_id                      = module.shared_vpc.vpc_id
   private_subnet_ids          = module.backend_checks_efs.private_subnets
   consignment_database_sg_id  = module.consignment_api.consignment_db_security_group_id
-  db_admin_user               = module.consignment_api.database_username
-  db_admin_password           = module.consignment_api.database_password
-  db_url                      = module.consignment_api.database_url
+  db_admin_user               = module.consignment_api_database.database_user
+  db_admin_password           = module.consignment_api_database.database_password
+  db_url                      = module.consignment_api_database.database_url
   kms_key_arn                 = module.encryption_key.kms_key_arn
-  api_database_security_group = module.consignment_api.database_security_group
+  api_database_security_group = module.api_database_security_group.security_group_id
   lambda_name                 = "create-db-users"
   database_name               = "consignmentapi"
 }
@@ -306,11 +306,11 @@ module "create_bastion_user_lambda" {
   vpc_id                      = module.shared_vpc.vpc_id
   private_subnet_ids          = module.backend_checks_efs.private_subnets
   consignment_database_sg_id  = module.consignment_api.consignment_db_security_group_id
-  db_admin_user               = module.consignment_api.database_username
-  db_admin_password           = module.consignment_api.database_password
-  db_url                      = module.consignment_api.database_url
+  db_admin_user               = module.consignment_api_database.database_user
+  db_admin_password           = module.consignment_api_database.database_password
+  db_url                      = module.consignment_api_database.database_url
   kms_key_arn                 = module.encryption_key.kms_key_arn
-  api_database_security_group = module.consignment_api.database_security_group
+  api_database_security_group = module.api_database_security_group.security_group_id
   lambda_name                 = "create-bastion-user"
   database_name               = "bastion"
 }
@@ -832,7 +832,8 @@ module "shield_cloudwatch_rules" {
     keycloak_alb = module.keycloak_tdr_alb.alb_arn,
     api_alb      = module.consignment_api_alb.alb_arn,
     frontend_alb = module.frontend_alb.alb_arn,
-    elastic_ip_1 = module.shared_vpc.elastic_ip_arns[0],
+    elastic_ip_1 = module.shared_vpc.elastic_ip_arns[0
+    ],
     elastic_ip_2 = module.shared_vpc.elastic_ip_arns[1]
   }
   source              = "./tdr-terraform-modules/cloudwatch_alarms"
@@ -849,4 +850,33 @@ module "shield_cloudwatch_rules" {
   treat_missing_data  = "notBreaching"
   datapoints_to_alarm = 1
   evaluation_period   = 20
+}
+
+module "api_database_security_group" {
+  source      = "./tdr-terraform-modules/security_group"
+  common_tags = local.common_tags
+  description = "The security group for the API database"
+  name        = "tdr-consignment-api-database-instance-${local.environment}"
+  vpc_id      = module.shared_vpc.vpc_id
+  ingress_security_group_rules = [
+    { port = 5432, description = "Allow inbound access from ECS", security_group_id = module.consignment_api.ecs_task_security_group_id },
+    { port = 5432, description = "Allow inbound access from database migrations", security_group_id = module.database_migrations.db_migration_security_group },
+    { port = 5432, description = "Allow inbound access from create bastion users lambda", security_group_id = module.create_bastion_user_lambda.create_users_lambda_security_group_id[0] },
+    { port = 5432, description = "Allow inbound access from create users lambda", security_group_id = module.create_db_users_lambda.create_users_lambda_security_group_id[0] }
+  ]
+  egress_security_group_rules = [
+    { port = 5432, description = "Allow outbound access to the ECS tasks security group", security_group_id = module.consignment_api.ecs_task_security_group_id, protocol = "tcp" }
+  ]
+}
+
+module "consignment_api_database" {
+  source             = "./tdr-terraform-modules/rds_instance"
+  admin_username     = "api_admin"
+  availability_zone  = local.database_availability_zone
+  common_tags        = local.common_tags
+  database_name      = "consignmentapi"
+  environment        = local.environment
+  kms_key_id         = module.encryption_key.kms_key_arn
+  private_subnets    = module.shared_vpc.private_subnets
+  security_group_ids = [module.api_database_security_group.security_group_id]
 }
