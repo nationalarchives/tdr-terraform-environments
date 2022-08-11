@@ -790,3 +790,63 @@ module "periodic_rotate_keycloak_secrets_event" {
   rule_name               = "rotate-keycloak-secrets"
   lambda_event_target_arn = module.rotate_keycloak_secrets_lambda.rotate_keycloak_secrets_lambda_arn
 }
+
+module "advanced_shield" {
+  source  = "./tdr-terraform-modules/shield"
+  project = var.project
+  resource_arns = toset(
+    flatten(
+      [
+        data.aws_route53_zone.tdr_dns_zone.arn,
+        module.cloudfront_upload.cloudfront_arn,
+        module.keycloak_tdr_alb.alb_arn,
+        module.consignment_api_alb.alb_arn,
+        module.frontend_alb.alb_arn,
+        module.shared_vpc.elastic_ip_arns
+      ]
+    )
+  )
+}
+
+module "shield_response_team_role" {
+  source             = "./tdr-terraform-modules/iam_role"
+  assume_role_policy = templatefile("${path.module}/templates/iam_role/shield_response_assume_role.json.tpl", {})
+  common_tags        = local.common_tags
+  name               = "TDRShieldResponseTeamRole${title(local.environment)}"
+  policy_attachments = {
+    access_policy = "arn:aws:iam::aws:policy/service-role/AWSShieldDRTAccessPolicy"
+  }
+}
+
+module "shield_response_s3_bucket" {
+  source      = "./tdr-terraform-modules/s3"
+  common_tags = local.common_tags
+  function    = "shield-team-information"
+  project     = var.project
+}
+
+module "shield_cloudwatch_rules" {
+  for_each = {
+    route_53     = data.aws_route53_zone.tdr_dns_zone.arn,
+    cloudfront   = module.cloudfront_upload.cloudfront_arn,
+    keycloak_alb = module.keycloak_tdr_alb.alb_arn,
+    api_alb      = module.consignment_api_alb.alb_arn,
+    frontend_alb = module.frontend_alb.alb_arn,
+    elastic_ip_1 = module.shared_vpc.elastic_ip_arns[0],
+    elastic_ip_2 = module.shared_vpc.elastic_ip_arns[1]
+  }
+  source              = "./tdr-terraform-modules/cloudwatch_alarms"
+  environment         = local.environment
+  function            = "shield-metric-${each.key}"
+  metric_name         = "DDoSDetected"
+  project             = var.project
+  threshold           = 1
+  notification_topic  = module.notifications_topic.sns_arn
+  dimensions          = { "ResourceArn" = each.value }
+  statistic           = "Sum"
+  namespace           = "AWS/DDoSProtection"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  treat_missing_data  = "notBreaching"
+  datapoints_to_alarm = 1
+  evaluation_period   = 20
+}
