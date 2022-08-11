@@ -22,6 +22,8 @@ locals {
   )
   database_availability_zones = ["eu-west-2a", "eu-west-2b"]
 
+  database_availability_zone = "eu-west-2a"
+
   region = "eu-west-2"
 
   dns_zone_id = data.aws_route53_zone.tdr_dns_zone.zone_id
