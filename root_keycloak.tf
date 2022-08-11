@@ -13,7 +13,7 @@ module "keycloak_ecs_execution_policy" {
 module "keycloak_ecs_task_policy" {
   source        = "./tdr-terraform-modules/iam_policy"
   name          = "KeycloakECSTaskPolicy${title(local.environment)}"
-  policy_string = templatefile("./tdr-terraform-modules/iam_policy/templates/keycloak_ecs_task_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, environment = local.environment, kms_arn = module.encryption_key.kms_key_arn, cluster_resource_id = module.keycloak_database.cluster_resource_id })
+  policy_string = templatefile("./tdr-terraform-modules/iam_policy/templates/keycloak_ecs_task_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, environment = local.environment, kms_arn = module.encryption_key.kms_key_arn, cluster_resource_id = module.keycloak_database.cluster_resource_id, instance_resource_id = module.keycloak_database_instance.resource_id })
 }
 
 module "keycloak_execution_role" {
@@ -162,6 +162,18 @@ module "keycloak_database" {
   security_group_ids          = [module.keycloak_database_security_group.security_group_id]
 }
 
+module "keycloak_database_instance" {
+  source             = "./tdr-terraform-modules/rds_instance"
+  admin_username     = "keycloak_admin"
+  availability_zone  = local.database_availability_zone
+  common_tags        = local.common_tags
+  database_name      = "keycloak"
+  environment        = local.environment
+  kms_key_id         = module.encryption_key.kms_key_arn
+  private_subnets    = module.shared_vpc.private_subnets
+  security_group_ids = [module.keycloak_database_security_group.security_group_id]
+}
+
 module "create_keycloak_db_users_lambda_new" {
   source                              = "./tdr-terraform-modules/lambda"
   project                             = var.project
@@ -169,9 +181,9 @@ module "create_keycloak_db_users_lambda_new" {
   lambda_create_keycloak_db_users_new = true
   vpc_id                              = module.shared_vpc.vpc_id
   private_subnet_ids                  = module.shared_vpc.private_subnets
-  db_admin_user                       = module.keycloak_database.db_username
-  db_admin_password                   = module.keycloak_database.db_password
-  db_url                              = module.keycloak_database.db_url
+  db_admin_user                       = module.keycloak_database_instance.database_user
+  db_admin_password                   = module.keycloak_database_instance.database_password
+  db_url                              = module.keycloak_database_instance.database_url
   kms_key_arn                         = module.encryption_key.kms_key_arn
   keycloak_password                   = module.keycloak_ssm_parameters.params[local.keycloak_user_password_name].value
   keycloak_database_security_group    = module.keycloak_database_security_group.security_group_id

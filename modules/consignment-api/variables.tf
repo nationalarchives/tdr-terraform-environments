@@ -42,3 +42,5 @@ variable "ip_allowlist" {
 variable "create_users_security_group_id" {
   type = list(string)
 }
+
+variable "db_instance_resource_id" {}
