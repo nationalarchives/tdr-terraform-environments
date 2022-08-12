@@ -1,3 +1,4 @@
+//Delete this file once the DB move is complete
 resource "aws_ssm_parameter" "database_url" {
   name  = "/${var.environment}/consignmentapi/database/url"
   type  = "SecureString"

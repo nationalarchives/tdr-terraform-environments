@@ -22,9 +22,7 @@ data "template_file" "app" {
     app_port        = local.app_port
     app_environment = var.environment
     aws_region      = var.region
-    url_path        = aws_ssm_parameter.database_url.name
-    username_path   = aws_ssm_parameter.database_username.name
-    password_path   = aws_ssm_parameter.database_password.name
+    url_path        = "/${var.environment}/consignmentapi/instance/url"
     auth_url        = var.auth_url
     frontend_url    = var.frontend_url
   }
