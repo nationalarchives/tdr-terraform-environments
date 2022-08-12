@@ -26,6 +26,8 @@ variable "kms_key_id" {}
 
 variable "private_subnets" {}
 
+variable "backend_checks_subnets" {}
+
 variable "public_subnets" {}
 
 variable "region" {}
