@@ -172,6 +172,7 @@ module "keycloak_database_instance" {
   kms_key_id         = module.encryption_key.kms_key_arn
   private_subnets    = module.shared_vpc.private_subnets
   security_group_ids = [module.keycloak_database_security_group.security_group_id]
+  multi_az           = local.environment == "prod"
 }
 
 module "create_keycloak_db_users_lambda_new" {
@@ -199,4 +200,23 @@ module "keycloak_route53" {
   alb_zone_id           = module.keycloak_tdr_alb.alb_zone_id
   create_hosted_zone    = false
   hosted_zone_id        = data.aws_route53_zone.tdr_dns_zone.id
+}
+
+// These three can be deleted once the database move has been done
+resource "aws_ssm_parameter" "db_username_parameter" {
+  name  = "/${local.environment}/keycloak/database/username"
+  type  = "SecureString"
+  value = module.keycloak_database.db_username
+}
+
+resource "aws_ssm_parameter" "db_password_parameter" {
+  name  = "/${local.environment}/keycloak/database/password"
+  type  = "SecureString"
+  value = module.keycloak_database.db_password
+}
+
+resource "aws_ssm_parameter" "db_url_parameter" {
+  name  = "/${local.environment}/keycloak/database/url"
+  type  = "SecureString"
+  value = module.keycloak_database.db_url
 }
