@@ -58,7 +58,7 @@ resource "aws_ecs_service" "consignment_api_service" {
 
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]
-    subnets          = var.private_subnets
+    subnets          = var.backend_checks_subnets
     assign_public_ip = false
   }
 
