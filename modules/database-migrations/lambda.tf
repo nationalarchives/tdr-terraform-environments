@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "lambda_assume_role_document" {
 
 resource "aws_iam_policy" "lambda_migration_policy" {
   name   = "TDRDbMigrationLambdaPolicy${title(var.environment)}"
-  policy = templatefile("${path.module}/templates/migration_lambda.json.tpl", { account_id = data.aws_caller_identity.current.account_id, cluster_id = var.db_cluster_id, log_group_arn = "${aws_cloudwatch_log_group.db_migration_log_group.arn}:*" })
+  policy = templatefile("${path.module}/templates/migration_lambda.json.tpl", { account_id = data.aws_caller_identity.current.account_id, instance_id = var.db_instance_id, log_group_arn = "${aws_cloudwatch_log_group.db_migration_log_group.arn}:*" })
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_role_attach_migration_policy" {
