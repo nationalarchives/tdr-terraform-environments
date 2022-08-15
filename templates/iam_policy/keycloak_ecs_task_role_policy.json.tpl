@@ -4,10 +4,10 @@
     {
       "Effect": "Allow",
       "Action": [
-        "sns:Publish",
-        "rds-db:connect",
         "kms:Decrypt",
-        "kms:GenerateDataKey"
+        "kms:GenerateDataKey",
+        "rds-db:connect",
+        "sns:Publish"
       ],
       "Resource": [
         "${kms_arn}",
