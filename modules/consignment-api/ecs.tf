@@ -90,7 +90,7 @@ resource "aws_iam_role_policy_attachment" "assume_iam_auth" {
 
 resource "aws_iam_policy" "consignment_api_ecs_task_allow_iam_auth" {
   name   = "TDRConsignmentApiAllowIAMAuthPolicy${title(var.environment)}"
-  policy = templatefile("${path.module}/templates/allow_iam_db_auth.json.tpl", { cluster_id = aws_rds_cluster.consignment_api_database.cluster_resource_id, account_id = data.aws_caller_identity.current.account_id })
+  policy = templatefile("${path.module}/templates/allow_iam_db_auth.json.tpl", { cluster_id = aws_rds_cluster.consignment_api_database.cluster_resource_id, account_id = data.aws_caller_identity.current.account_id, resource_id = var.db_instance_resource_id })
 }
 
 resource "aws_iam_role" "consignment_api_ecs_task" {
