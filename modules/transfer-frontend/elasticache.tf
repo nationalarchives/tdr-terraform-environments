@@ -10,6 +10,7 @@ resource "aws_elasticache_replication_group" "redis_replication_group" {
   port                          = 6379
   security_group_ids            = aws_security_group.redis.*.id
   subnet_group_name             = aws_elasticache_subnet_group.redis_subnet_group.name
+  apply_immediately             = true
 }
 
 resource "aws_elasticache_subnet_group" "redis_subnet_group" {
