@@ -101,7 +101,7 @@ module "tdr_keycloak_ecs" {
     app_port                          = 8080
     app_environment                   = local.environment
     aws_region                        = local.region
-    url_path                          = module.keycloak_database.db_url_parameter_name
+    url_path                          = local.keycloak_db_url
     admin_user_path                   = local.keycloak_admin_user_name
     admin_password_path               = local.keycloak_admin_password_name
     client_secret_path                = local.keycloak_tdr_client_secret_name
