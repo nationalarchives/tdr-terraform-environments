@@ -16,8 +16,8 @@ module "database_migrations" {
   vpc_id          = module.shared_vpc.vpc_id
   private_subnets = module.shared_vpc.private_subnets
   common_tags     = local.common_tags
-  db_url          = module.consignment_api.database_url
-  db_cluster_id   = module.consignment_api.database_cluster_id
+  db_url          = module.consignment_api_database.database_url
+  db_instance_id  = module.consignment_api_database.resource_id
 }
 
 module "consignment_api" {
