@@ -5,7 +5,7 @@
       "Effect": "Allow",
       "Action": "rds-db:connect",
       "Resource": [
-        "arn:aws:rds-db:eu-west-2:${account_id}:dbuser:${cluster_id}/migrations_user"
+        "arn:aws:rds-db:eu-west-2:${account_id}:dbuser:${instance_id}/migrations_user"
       ]
     },
     {
