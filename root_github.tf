@@ -440,6 +440,6 @@ module "github_rotate_secrets_environment" {
   repository_name = "nationalarchives/tdr-rotate-keycloak-secrets"
   team_slug       = "transfer-digital-records-admins"
   secrets = {
-    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
+    "${upper(local.environment)}_ACCOUNT_NUMBER" = data.aws_caller_identity.current.account_id
   }
 }
