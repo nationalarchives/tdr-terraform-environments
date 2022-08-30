@@ -7,18 +7,18 @@ module "keycloak_cloudwatch" {
 module "keycloak_ecs_execution_policy" {
   source        = "./tdr-terraform-modules/iam_policy"
   name          = "KeycloakECSExecutionPolicy${title(local.environment)}"
-  policy_string = templatefile("./tdr-terraform-modules/iam_policy/templates/keycloak_ecs_execution_policy.json.tpl", { cloudwatch_log_group = module.keycloak_cloudwatch.log_group_arn, ecr_account_number = local.ecr_account_number })
+  policy_string = templatefile("${path.module}/templates/iam_policy/keycloak_ecs_execution_policy.json.tpl", { cloudwatch_log_group = module.keycloak_cloudwatch.log_group_arn, ecr_account_number = local.ecr_account_number })
 }
 
 module "keycloak_ecs_task_policy" {
   source        = "./tdr-terraform-modules/iam_policy"
   name          = "KeycloakECSTaskPolicy${title(local.environment)}"
-  policy_string = templatefile("./tdr-terraform-modules/iam_policy/templates/keycloak_ecs_task_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, environment = local.environment, kms_arn = module.encryption_key.kms_key_arn, cluster_resource_id = module.keycloak_database.cluster_resource_id, instance_resource_id = module.keycloak_database_instance.resource_id })
+  policy_string = templatefile("${path.module}/templates/iam_policy/keycloak_ecs_task_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, environment = local.environment, kms_arn = module.encryption_key.kms_key_arn, instance_resource_id = module.keycloak_database_instance.resource_id })
 }
 
 module "keycloak_execution_role" {
   source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./tdr-terraform-modules/ecs/templates/ecs_assume_role_policy.json.tpl", {})
+  assume_role_policy = templatefile("${path.module}/templates/iam_policy/ecs_assume_role_policy.json.tpl", {})
   common_tags        = local.common_tags
   name               = "KeycloakECSExecutionRole${title(local.environment)}"
   policy_attachments = {
@@ -29,7 +29,7 @@ module "keycloak_execution_role" {
 
 module "keycloak_task_role" {
   source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./tdr-terraform-modules/ecs/templates/ecs_assume_role_policy.json.tpl", {})
+  assume_role_policy = templatefile("${path.module}/templates/iam_policy/ecs_assume_role_policy.json.tpl", {})
   common_tags        = local.common_tags
   name               = "KeycloakECSTaskRole${title(local.environment)}"
   policy_attachments = { task_policy = module.keycloak_ecs_task_policy.policy_arn }
@@ -101,7 +101,7 @@ module "tdr_keycloak_ecs" {
     app_port                          = 8080
     app_environment                   = local.environment
     aws_region                        = local.region
-    url_path                          = module.keycloak_database.db_url_parameter_name
+    url_path                          = local.keycloak_db_url
     admin_user_path                   = local.keycloak_admin_user_name
     admin_password_path               = local.keycloak_admin_password_name
     client_secret_path                = local.keycloak_tdr_client_secret_name
@@ -150,18 +150,6 @@ module "keycloak_tdr_alb" {
   host                  = "auth.${local.environment_domain}"
 }
 
-module "keycloak_database" {
-  source                      = "./tdr-terraform-modules/rds"
-  admin_username              = "keycloak_admin"
-  common_tags                 = local.common_tags
-  database_availability_zones = local.database_availability_zones
-  database_name               = "keycloak"
-  environment                 = local.environment
-  kms_key_id                  = module.encryption_key.kms_key_arn
-  private_subnets             = module.shared_vpc.private_subnets
-  security_group_ids          = [module.keycloak_database_security_group.security_group_id]
-}
-
 module "keycloak_database_instance" {
   source             = "./tdr-terraform-modules/rds_instance"
   admin_username     = "keycloak_admin"
@@ -200,23 +188,4 @@ module "keycloak_route53" {
   alb_zone_id           = module.keycloak_tdr_alb.alb_zone_id
   create_hosted_zone    = false
   hosted_zone_id        = data.aws_route53_zone.tdr_dns_zone.id
-}
-
-// These three can be deleted once the database move has been done
-resource "aws_ssm_parameter" "db_username_parameter" {
-  name  = "/${local.environment}/keycloak/database/username"
-  type  = "SecureString"
-  value = module.keycloak_database.db_username
-}
-
-resource "aws_ssm_parameter" "db_password_parameter" {
-  name  = "/${local.environment}/keycloak/database/password"
-  type  = "SecureString"
-  value = module.keycloak_database.db_password
-}
-
-resource "aws_ssm_parameter" "db_url_parameter" {
-  name  = "/${local.environment}/keycloak/database/url"
-  type  = "SecureString"
-  value = module.keycloak_database.db_url
 }
