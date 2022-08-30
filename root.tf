@@ -438,6 +438,7 @@ module "file_format_lambda" {
   mount_target_one                       = module.backend_checks_efs.mount_target_one
   kms_key_arn                            = module.encryption_key.kms_key_arn
   efs_security_group_id                  = module.backend_checks_efs.security_group_id
+  upload_bucket                          = module.upload_file_cloudfront_dirty_s3.s3_bucket_name
 }
 
 module "download_files_lambda" {
