@@ -25,14 +25,6 @@
       {
         "valueFrom": "${url_path}",
         "name": "DB_ADDR"
-      },
-      {
-        "valueFrom": "${username_path}",
-        "name": "DB_USER"
-      },
-      {
-        "valueFrom": "${password_path}",
-        "name": "DB_PASSWORD"
       }
     ],
     "networkMode": "awsvpc",
