@@ -22,9 +22,7 @@ data "template_file" "app" {
     app_port        = local.app_port
     app_environment = var.environment
     aws_region      = var.region
-    url_path        = aws_ssm_parameter.database_url.name
-    username_path   = aws_ssm_parameter.database_username.name
-    password_path   = aws_ssm_parameter.database_password.name
+    url_path        = "/${var.environment}/consignmentapi/instance/url"
     auth_url        = var.auth_url
     frontend_url    = var.frontend_url
   }
@@ -90,7 +88,7 @@ resource "aws_iam_role_policy_attachment" "assume_iam_auth" {
 
 resource "aws_iam_policy" "consignment_api_ecs_task_allow_iam_auth" {
   name   = "TDRConsignmentApiAllowIAMAuthPolicy${title(var.environment)}"
-  policy = templatefile("${path.module}/templates/allow_iam_db_auth.json.tpl", { cluster_id = aws_rds_cluster.consignment_api_database.cluster_resource_id, account_id = data.aws_caller_identity.current.account_id, resource_id = var.db_instance_resource_id })
+  policy = templatefile("${path.module}/templates/allow_iam_db_auth.json.tpl", { account_id = data.aws_caller_identity.current.account_id, resource_id = var.db_instance_resource_id })
 }
 
 resource "aws_iam_role" "consignment_api_ecs_task" {

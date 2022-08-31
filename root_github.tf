@@ -294,7 +294,7 @@ module "github_api_update_environment" {
   }
 }
 
-module "github_export_status_update_environment" {
+module "github_export_failure_status_update_environment" {
   source          = "./tdr-terraform-modules/github_environments"
   environment     = local.environment
   repository_name = "nationalarchives/tdr-export-status-update"
@@ -440,6 +440,6 @@ module "github_rotate_secrets_environment" {
   repository_name = "nationalarchives/tdr-rotate-keycloak-secrets"
   team_slug       = "transfer-digital-records-admins"
   secrets = {
-    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
+    "${upper(local.environment)}_ACCOUNT_NUMBER" = data.aws_caller_identity.current.account_id
   }
 }
