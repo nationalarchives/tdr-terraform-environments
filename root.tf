@@ -546,6 +546,21 @@ module "signed_cookies_lambda" {
   environment_full       = local.environment_full_name
 }
 
+module "export_failure_status_lambda" {
+  source                 = "./tdr-terraform-modules/lambda"
+  common_tags            = local.common_tags
+  project                = "tdr"
+  lambda_export_failure  = true
+  upload_domain          = local.upload_domain
+  auth_url               = local.keycloak_auth_url
+  timeout_seconds        = 60
+  api_gateway_arn        = module.signed_cookies_api.api_arn
+  kms_key_arn            = module.encryption_key.kms_key_arn
+  private_subnet_ids     = module.backend_checks_efs.private_subnets
+  vpc_id                 = module.shared_vpc.vpc_id
+  environment_full       = local.environment_full_name
+}
+
 module "reporting_lambda" {
   source                           = "./tdr-terraform-modules/lambda"
   common_tags                      = local.common_tags
