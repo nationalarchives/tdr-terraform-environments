@@ -16,8 +16,8 @@ module "database_migrations" {
   vpc_id          = module.shared_vpc.vpc_id
   private_subnets = module.shared_vpc.private_subnets
   common_tags     = local.common_tags
-  db_url          = module.consignment_api.database_url
-  db_cluster_id   = module.consignment_api.database_cluster_id
+  db_url          = module.consignment_api_database.database_url
+  db_instance_id  = module.consignment_api_database.resource_id
 }
 
 module "consignment_api" {
@@ -438,6 +438,7 @@ module "file_format_lambda" {
   mount_target_one                       = module.backend_checks_efs.mount_target_one
   kms_key_arn                            = module.encryption_key.kms_key_arn
   efs_security_group_id                  = module.backend_checks_efs.security_group_id
+  upload_bucket                          = module.upload_file_cloudfront_dirty_s3.s3_bucket_name
 }
 
 module "download_files_lambda" {
@@ -551,14 +552,13 @@ module "export_failure_status_lambda" {
   common_tags            = local.common_tags
   project                = "tdr"
   lambda_export_failure  = true
-  upload_domain          = local.upload_domain
   auth_url               = local.keycloak_auth_url
   timeout_seconds        = 60
-  api_gateway_arn        = module.signed_cookies_api.api_arn
-  kms_key_arn            = module.encryption_key.kms_key_arn
   private_subnet_ids     = module.backend_checks_efs.private_subnets
   vpc_id                 = module.shared_vpc.vpc_id
   environment_full       = local.environment_full_name
+  api_url                          = module.consignment_api.api_url
+  backend_checks_client_secret_path = local.keycloak_backend_checks_secret_name
 }
 
 module "reporting_lambda" {
