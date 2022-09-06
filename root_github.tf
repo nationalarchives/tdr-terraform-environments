@@ -20,9 +20,7 @@ module "github_e2e_tests_environment" {
   source          = "./tdr-terraform-modules/github_repositories"
   repository_name = "nationalarchives/tdr-e2e-tests"
   secrets = {
-    "${upper(local.environment)}_ACCOUNT_NUMBER"        = data.aws_caller_identity.current.account_id
-    "${upper(local.environment)}_USER_ADMIN_SECRET"     = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
-    "${upper(local.environment)}_BACKEND_CHECKS_SECRET" = module.keycloak_ssm_parameters.params[local.keycloak_backend_checks_secret_name].value
+    "${upper(local.environment)}_ACCOUNT_NUMBER" = data.aws_caller_identity.current.account_id
   }
 }
 
@@ -144,6 +142,12 @@ module "github_run_keycloak_update_policy" {
   policy_string = templatefile("${path.module}/templates/iam_policy/github_run_ecs_policy.json.tpl", { task_definition_arn = module.run_keycloak_update_ecs.task_definition_arn, cluster_arn = module.run_keycloak_update_ecs.cluster_arn, role_arns = "\"${module.run_update_keycloak_execution_role.role.arn}\"" })
 }
 
+module "github_get_e2e_secrets_policy" {
+  source        = "./tdr-terraform-modules/iam_policy"
+  name          = "TDRGithubActionsE2ESecretsPolicy${title(local.environment)}"
+  policy_string = templatefile("${path.module}/templates/iam_policy/github_e2e_test_secrets_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, environment = local.environment })
+}
+
 module "github_run_keycloak_update_role" {
   source             = "./tdr-terraform-modules/iam_role"
   assume_role_policy = templatefile("${path.module}/templates/iam_role/github_assume_role.json.tpl", { account_id = data.aws_caller_identity.current.account_id, repo_name = "tdr-" })
@@ -151,6 +155,16 @@ module "github_run_keycloak_update_role" {
   name               = "TDRGitHubRunKeycloakUpdateRole${title(local.environment)}"
   policy_attachments = {
     update_ecs_policy = module.github_run_keycloak_update_policy.policy_arn
+  }
+}
+
+module "github_get_e2e_tests_secrets" {
+  source             = "./tdr-terraform-modules/iam_role"
+  assume_role_policy = templatefile("${path.module}/templates/iam_role/github_assume_role.json.tpl", { account_id = data.aws_caller_identity.current.account_id, repo_name = "tdr-" })
+  common_tags        = local.common_tags
+  name               = "TDRGithubActionsGetE2ESecretsRole${title(local.environment)}"
+  policy_attachments = {
+    get_ssm_policy = module.github_get_e2e_secrets_policy.policy_arn
   }
 }
 
