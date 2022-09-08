@@ -116,12 +116,17 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
    ```
    [location of project] $ terraform init   
    ```
-
-11. Run Terraform to make changes to the TDR environment AWS resources
+11. Run Terraform to view changes that will be made to the TDR environment AWS resources
 
    ```
    [location of project] $ terraform plan
    ```
+
+12. Once you've pushed and merged your changes to this repo:
+
+Go the the Actions tab -> Click ["Terraform Apply"] -> Click "Run workflow" -> select the branch with the workflow file you want to use -> Click the green "Run worklfow" button
+
+["Terraform Apply"]: https://github.com/nationalarchives/tdr-terraform-environments/actions/workflows/apply.yml
 
 ## Updating sub-module hashes
 
