@@ -24,6 +24,7 @@
         "arn:aws:lambda:${region}:${account_id}:function:tdr-database-migrations-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-download-files-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-export-api-authoriser-${environment}",
+        "arn:aws:lambda:${region}:${account_id}:function:tdr-export-status-update-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-file-format-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-log-data-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-notifications-${environment}",
