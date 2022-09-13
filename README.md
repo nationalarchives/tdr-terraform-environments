@@ -123,7 +123,10 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
    ```
 12. Optional (but recommended) run `terraform fmt --recursive` to properly format your Terraform changes
 
-13. Once you've pushed and merged your changes to this repo:
+13. If you've made changes to a sub-module (`tdr-terraform-modules` or `tdr-configurations`), push and get those changes
+merged (`cd {sub-module name}`) before you push the changes made in terraform-environments directory.
+
+14. Once you've pushed and merged the changes made in the terraform-environments your changes to it's GitHub repo (on the GitHub repo):
 
 Go the Actions tab -> Click ["Terraform Apply"] -> Click "Run workflow" -> select the branch with the workflow file you want to use -> Click the green "Run worklfow" button
 
