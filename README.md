@@ -121,10 +121,11 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
    ```
    [location of project] $ terraform plan
    ```
+12. Optional (but recommended) run `terraform fmt --recursive` to properly format your Terraform changes
 
-12. Once you've pushed and merged your changes to this repo:
+13. Once you've pushed and merged your changes to this repo:
 
-Go the the Actions tab -> Click ["Terraform Apply"] -> Click "Run workflow" -> select the branch with the workflow file you want to use -> Click the green "Run worklfow" button
+Go the Actions tab -> Click ["Terraform Apply"] -> Click "Run workflow" -> select the branch with the workflow file you want to use -> Click the green "Run worklfow" button
 
 ["Terraform Apply"]: https://github.com/nationalarchives/tdr-terraform-environments/actions/workflows/apply.yml
 
