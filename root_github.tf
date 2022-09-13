@@ -308,7 +308,7 @@ module "github_api_update_environment" {
   }
 }
 
-module "github_export_failure_status_update_environment" {
+module "github_export_status_update_update_environment" {
   source          = "./tdr-terraform-modules/github_environments"
   environment     = local.environment
   repository_name = "nationalarchives/tdr-export-status-update"
