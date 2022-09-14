@@ -547,11 +547,11 @@ module "signed_cookies_lambda" {
   environment_full       = local.environment_full_name
 }
 
-module "export_failure_status_lambda" {
+module "export_status_update_lambda" {
   source                            = "./tdr-terraform-modules/lambda"
   common_tags                       = local.common_tags
   project                           = "tdr"
-  lambda_export_failure             = true
+  lambda_export_status_update       = true
   auth_url                          = local.keycloak_auth_url
   timeout_seconds                   = 60
   private_subnet_ids                = module.backend_checks_efs.private_subnets
