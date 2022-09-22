@@ -557,7 +557,7 @@ module "export_status_update_lambda" {
   private_subnet_ids                = module.backend_checks_efs.private_subnets
   vpc_id                            = module.shared_vpc.vpc_id
   environment_full                  = local.environment_full_name
-  api_url                           = module.consignment_api.api_url
+  api_url                           = "${module.consignment_api.api_url}/graphql"
   backend_checks_client_secret_path = local.keycloak_backend_checks_secret_name
 }
 
