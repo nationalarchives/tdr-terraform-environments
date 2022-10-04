@@ -81,6 +81,14 @@
       {
         "name": "KEYCLOAK_HOST",
         "value": "${keycloak_host}"
+      },
+      {
+        "name": "GOVUK_NOTIFY_API_KEY_PATH",
+        "value": "${govuk_notify_api_key_path}"
+      },
+      {
+        "name": "GOVUK_NOTIFY_TEMPLATE_ID_PATH",
+        "value": "${govuk_notify_template_id_path}"
       }
     ],
     "networkMode": "awsvpc",

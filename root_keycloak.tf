@@ -13,7 +13,7 @@ module "keycloak_ecs_execution_policy" {
 module "keycloak_ecs_task_policy" {
   source        = "./tdr-terraform-modules/iam_policy"
   name          = "KeycloakECSTaskPolicy${title(local.environment)}"
-  policy_string = templatefile("${path.module}/templates/iam_policy/keycloak_ecs_task_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, environment = local.environment, kms_arn = module.encryption_key.kms_key_arn, instance_resource_id = module.keycloak_database_instance.resource_id })
+  policy_string = templatefile("${path.module}/templates/iam_policy/keycloak_ecs_task_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, environment = local.environment, kms_arn = module.encryption_key.kms_key_arn, instance_resource_id = module.keycloak_database_instance.resource_id, govuk_notify_api_key_path = local.keycloak_govuk_notify_api_key_name, govuk_notify_template_id_path = local.keycloak_govuk_notify_template_id_name })
 }
 
 module "keycloak_execution_role" {
