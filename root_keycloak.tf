@@ -43,7 +43,7 @@ module "keycloak_ssm_parameters" {
     { name = local.keycloak_tdr_client_secret_name, description = "The Keycloak tdr client secret", value = random_uuid.client_secret.result, type = "SecureString" },
     { name = local.keycloak_user_password_name, description = "The Keycloak user password", value = random_password.keycloak_password.result, type = "SecureString" },
     { name = local.keycloak_admin_password_name, description = "The Keycloak admin password", value = random_password.password.result, type = "SecureString" },
-    { name = local.keycloak_govuk_notify_api_key_name, description = "The GovUK Notify API key", value = "to_be_manually_added", type = "SecureString" },
+    { name = local.keycloak_govuk_notify_api_key_name, description = "The GovUK Notify API key", value = "to_be_manually_added", type = "SecureString", tier = "Advanced" },
     { name = local.keycloak_govuk_notify_template_id_name, description = "The GovUK Notify Template ID", value = "to_be_manually_added", type = "SecureString" },
     { name = local.keycloak_admin_user_name, description = "The Keycloak admin user", value = "tdr-keycloak-admin-${local.environment}", type = "SecureString" },
     { name = local.keycloak_configuration_properties_name, description = "The Keycloak configuration properties file ", value = "${local.environment}_properties.json", type = "SecureString" },
@@ -188,4 +188,13 @@ module "keycloak_route53" {
   alb_zone_id           = module.keycloak_tdr_alb.alb_zone_id
   create_hosted_zone    = false
   hosted_zone_id        = data.aws_route53_zone.tdr_dns_zone.id
+}
+
+module "keycloak_rotate_notify_api_key_event" {
+  source                     = "./tdr-terraform-modules/cloudwatch_events"
+  event_pattern              = "ssm_parameter_policy_action"
+  sns_topic_event_target_arn = toset([module.notifications_topic.sns_arn])
+  rule_name                  = "keycloak-rotate-notify-api-key"
+  rule_description           = "Notify to rotate API Key"
+  event_variables            = { parameter_name = local.keycloak_govuk_notify_api_key_name, policy_type = "NoChangeNotification" }
 }
