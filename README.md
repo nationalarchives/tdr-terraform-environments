@@ -1,6 +1,6 @@
 # TDR Terraform Environments
 
-**Important Note**: tdr-terraform-environments uses v1.1.3 of Terraform. Ensure that Terraform v1.1.3 is installed before proceeding.
+**Important Note**: tdr-terraform-environments uses v1.3.2 of Terraform. Ensure that Terraform v1.3.2 is installed before proceeding.
 
 This repository contains the Terraform code to create the AWS resources needed to support the TDR application
 
