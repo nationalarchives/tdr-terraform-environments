@@ -643,6 +643,7 @@ module "notification_lambda" {
   sns_topic_arns                 = [module.notifications_topic.sns_arn]
   muted_scan_alerts              = module.global_parameters.muted_ecr_scan_alerts
   judgment_export_s3_bucket_name = module.export_bucket_judgment.s3_bucket_name
+  standard_export_s3_bucket_name = module.export_bucket.s3_bucket_name
 }
 
 module "tdr_public_nacl" {
