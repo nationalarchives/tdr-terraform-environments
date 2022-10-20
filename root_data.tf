@@ -54,3 +54,7 @@ data "github_ip_ranges" "actions_ranges" {}
 data "aws_ssm_parameter" "transform_engine_retry_role_arn" {
   name = "/${local.environment}/transform_engine/retry_role_arn"
 }
+
+data "aws_ssm_parameter" "transform_engine_v2_retry_role_arn" {
+  name = "/${local.environment}/transform_engine_v2/tre-out/arn"
+}
