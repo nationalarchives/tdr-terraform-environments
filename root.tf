@@ -415,6 +415,7 @@ module "transform_engine_v2_retry_queue" {
   sqs_policy         = "transform_engine_v2_retry"
   visibility_timeout = 180 * 3
   kms_key_id         = module.encryption_key.kms_key_arn
+  sns_topic_arns     = toset([nonsensitive(data.aws_ssm_parameter.transform_engine_v2_tre_out_topic_arn.value)])
 }
 
 module "api_update_lambda" {
