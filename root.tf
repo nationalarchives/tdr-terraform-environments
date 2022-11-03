@@ -652,6 +652,7 @@ module "notification_lambda" {
   kms_key_arn                    = module.encryption_key.kms_key_arn
   event_rule_arns                = []
   sns_topic_arns                 = [module.notifications_topic.sns_arn]
+  sqs_queue_arns                 = [module.transform_engine_v2_retry_queue.sqs_arn, module.transform_engine_retry_queue.sqs_arn]
   muted_scan_alerts              = module.global_parameters.muted_ecr_scan_alerts
   judgment_export_s3_bucket_name = module.export_bucket_judgment.s3_bucket_name
   standard_export_s3_bucket_name = module.export_bucket.s3_bucket_name
