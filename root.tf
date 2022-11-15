@@ -228,7 +228,6 @@ module "encryption_key" {
 
 module "waf" {
   # a single WAF web acl and rules are used for all services to minimise AWS costs
-  # uses AWS classic WAF - should upgrade to WAFv2 once supported by Terraform
   source            = "./tdr-terraform-modules/waf"
   project           = var.project
   function          = "apps"
@@ -238,6 +237,7 @@ module "waf" {
   trusted_ips       = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
   geo_match         = split(",", var.geo_match)
   restricted_uri    = "admin"
+  log_destinations  = [module.waf_cloudwatch.log_group_arn]
 }
 
 module "backend_lambda_function_bucket" {
@@ -910,4 +910,10 @@ module "consignment_api_database" {
   private_subnets    = module.shared_vpc.private_subnets
   security_group_ids = [module.api_database_security_group.security_group_id]
   multi_az           = local.environment == "prod"
+}
+
+module "waf_cloudwatch" {
+  source      = "./tdr-terraform-modules/cloudwatch_logs"
+  common_tags = local.common_tags
+  name        = "aws-waf-logs-${local.environment}"
 }
