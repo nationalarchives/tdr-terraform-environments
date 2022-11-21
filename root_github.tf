@@ -457,3 +457,13 @@ module "github_rotate_secrets_environment" {
     "${upper(local.environment)}_ACCOUNT_NUMBER" = data.aws_caller_identity.current.account_id
   }
 }
+
+module "github_file_upload_data_environment" {
+  source          = "./tdr-terraform-modules/github_environments"
+  environment     = local.environment
+  repository_name = "nationalarchives/tdr-file-upload-data"
+  team_slug       = "transfer-digital-records-admins"
+  secrets = {
+    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
+  }
+}
