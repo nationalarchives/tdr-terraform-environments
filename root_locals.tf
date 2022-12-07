@@ -79,4 +79,9 @@ locals {
   //Only add subscription for intg as TRE SNS topics for other environments not configured whilst testing. Therefore cannot subscribe to non-existent SNS topics
   //This should be removed once rest of TRE environments are configured
   transform_engine_v2_sqs_topic_subscriptions = local.environment == "intg" ? [nonsensitive(data.aws_ssm_parameter.transform_engine_v2_tre_out_topic_arn.value)] : []
+
+  //Feature access blocks
+  block_feature_custom_metadata = local.environment == "prod" ? true : false
+  block_feature_view_history    = local.environment == "prod" ? true : false
+
 }
