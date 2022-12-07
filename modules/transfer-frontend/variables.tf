@@ -40,3 +40,13 @@ variable "alb_id" {}
 variable "public_subnet_ranges" {
   type = list(string)
 }
+
+variable "block_feature_custom_metadata" {
+  description = "Feature access block for custom metadata"
+  default     = true
+}
+
+variable "block_feature_view_history" {
+  description = "Feature access block for view history"
+  default     = true
+}
