@@ -39,11 +39,11 @@
         "value": "${auth_url}"
       },
       {
-        "name": "BLOCK_FEATURE_CUSTOM_METADATA"
+        "name": "BLOCK_FEATURE_CUSTOM_METADATA",
         "value": "${block_feature_custom_metadata}"
       },
       {
-        "name": "BLOCK_FEATURE_VIEW_HISTORY"
+        "name": "BLOCK_FEATURE_VIEW_HISTORY",
         "value": "${block_feature_view_history}"
       }
     ],
