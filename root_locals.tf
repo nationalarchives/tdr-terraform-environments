@@ -80,6 +80,9 @@ locals {
   //This should be removed once rest of TRE environments are configured
   transform_engine_v2_sqs_topic_subscriptions = local.environment == "intg" ? [nonsensitive(data.aws_ssm_parameter.transform_engine_v2_tre_out_topic_arn.value)] : []
 
+  //Don't run testing on prod
+  security_audit = local.environment == "prod" ? false : true
+
   //Feature access blocks
   block_feature_custom_metadata = local.environment == "prod" ? true : false
   block_feature_view_history    = local.environment == "prod" ? true : false

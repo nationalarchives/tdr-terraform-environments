@@ -919,3 +919,8 @@ module "waf_cloudwatch" {
   common_tags = local.common_tags
   name        = "aws-waf-logs-${local.environment}"
 }
+
+module "iam_security_audit_user_group" {
+  source         = "./tdr-terraform-modules/iam"
+  security_audit = local.security_audit
+}
