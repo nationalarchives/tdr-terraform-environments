@@ -84,7 +84,6 @@ locals {
   security_audit = local.environment == "prod" ? false : true
 
   //Feature access blocks
-  block_feature_custom_metadata = local.environment == "prod" ? true : false
-  block_feature_view_history    = local.environment == "prod" ? true : false
-
+  block_feature_custom_metadata = true
+  block_feature_view_history    = true
 }
