@@ -46,28 +46,28 @@ module "consignment_api" {
 }
 
 module "frontend" {
-  app_name                      = "frontend"
-  source                        = "./modules/transfer-frontend"
-  alb_dns_name                  = module.frontend_alb.alb_dns_name
-  alb_target_group_arn          = module.frontend_alb.alb_target_group_arn
-  alb_zone_id                   = module.frontend_alb.alb_zone_id
-  dns_zone_id                   = local.dns_zone_id
-  environment                   = local.environment
-  environment_full_name         = local.environment_full_name_map[local.environment]
-  common_tags                   = local.common_tags
-  ip_allowlist                  = local.environment == "intg" ? local.ip_allowlist : ["0.0.0.0/0"]
-  region                        = local.region
-  vpc_id                        = module.shared_vpc.vpc_id
-  public_subnets                = module.shared_vpc.public_subnets
-  private_subnets               = module.shared_vpc.private_subnets
-  dns_zone_name_trimmed         = local.dns_zone_name_trimmed
-  auth_url                      = local.keycloak_auth_url
-  client_secret_path            = module.keycloak_ssm_parameters.params[local.keycloak_tdr_client_secret_name].name
-  export_api_url                = module.export_api.api_url
-  alb_id                        = module.frontend_alb.alb_id
-  public_subnet_ranges          = module.shared_vpc.public_subnet_ranges
-  block_feature_custom_metadata = local.block_feature_custom_metadata
-  block_feature_view_history    = local.block_feature_view_history
+  app_name                           = "frontend"
+  source                             = "./modules/transfer-frontend"
+  alb_dns_name                       = module.frontend_alb.alb_dns_name
+  alb_target_group_arn               = module.frontend_alb.alb_target_group_arn
+  alb_zone_id                        = module.frontend_alb.alb_zone_id
+  dns_zone_id                        = local.dns_zone_id
+  environment                        = local.environment
+  environment_full_name              = local.environment_full_name_map[local.environment]
+  common_tags                        = local.common_tags
+  ip_allowlist                       = local.environment == "intg" ? local.ip_allowlist : ["0.0.0.0/0"]
+  region                             = local.region
+  vpc_id                             = module.shared_vpc.vpc_id
+  public_subnets                     = module.shared_vpc.public_subnets
+  private_subnets                    = module.shared_vpc.private_subnets
+  dns_zone_name_trimmed              = local.dns_zone_name_trimmed
+  auth_url                           = local.keycloak_auth_url
+  client_secret_path                 = module.keycloak_ssm_parameters.params[local.keycloak_tdr_client_secret_name].name
+  export_api_url                     = module.export_api.api_url
+  alb_id                             = module.frontend_alb.alb_id
+  public_subnet_ranges               = module.shared_vpc.public_subnet_ranges
+  block_feature_custom_metadata      = local.block_feature_custom_metadata
+  block_feature_descriptive_metadata = local.block_feature_descriptive_metadata
 }
 
 module "alb_logs_s3" {
