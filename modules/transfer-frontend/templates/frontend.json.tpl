@@ -43,8 +43,8 @@
         "value": "${block_feature_custom_metadata}"
       },
       {
-        "name": "BLOCK_FEATURE_VIEW_HISTORY",
-        "value": "${block_feature_view_history}"
+        "name": "BLOCK_FEATURE_DESCRIPTIVE_METADATA",
+        "value": "${block_feature_descriptive_metadata}"
       }
     ],
     "networkMode": "awsvpc",

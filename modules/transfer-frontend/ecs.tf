@@ -18,17 +18,17 @@ data "template_file" "app" {
   template = file("modules/transfer-frontend/templates/frontend.json.tpl")
 
   vars = {
-    app_image                     = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/transfer-frontend:${var.environment}"
-    app_port                      = local.app_port
-    app_environment               = var.environment
-    aws_region                    = var.region
-    client_secret_path            = var.client_secret_path
-    export_api_url                = var.export_api_url
-    alb_ip_a                      = var.public_subnet_ranges[0]
-    alb_ip_b                      = var.public_subnet_ranges[1]
-    auth_url                      = var.auth_url
-    block_feature_custom_metadata = var.block_feature_custom_metadata
-    block_feature_view_history    = var.block_feature_view_history
+    app_image                          = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/transfer-frontend:${var.environment}"
+    app_port                           = local.app_port
+    app_environment                    = var.environment
+    aws_region                         = var.region
+    client_secret_path                 = var.client_secret_path
+    export_api_url                     = var.export_api_url
+    alb_ip_a                           = var.public_subnet_ranges[0]
+    alb_ip_b                           = var.public_subnet_ranges[1]
+    auth_url                           = var.auth_url
+    block_feature_custom_metadata      = var.block_feature_custom_metadata
+    block_feature_descriptive_metadata = var.block_feature_descriptive_metadata
   }
 }
 
