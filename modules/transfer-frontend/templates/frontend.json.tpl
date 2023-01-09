@@ -37,6 +37,14 @@
       {
         "name": "AUTH_URL",
         "value": "${auth_url}"
+      },
+      {
+        "name": "BLOCK_FEATURE_CUSTOM_METADATA",
+        "value": "${block_feature_custom_metadata}"
+      },
+      {
+        "name": "BLOCK_FEATURE_DESCRIPTIVE_METADATA",
+        "value": "${block_feature_descriptive_metadata}"
       }
     ],
     "networkMode": "awsvpc",
