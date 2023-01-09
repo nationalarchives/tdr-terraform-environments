@@ -923,4 +923,5 @@ module "waf_cloudwatch" {
 module "iam_security_audit_user_group" {
   source         = "./tdr-terraform-modules/iam"
   security_audit = local.security_audit
+  environment    = local.environment
 }
