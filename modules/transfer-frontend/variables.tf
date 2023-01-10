@@ -41,8 +41,8 @@ variable "public_subnet_ranges" {
   type = list(string)
 }
 
-variable "block_feature_custom_metadata" {
-  description = "Feature access block for custom metadata"
+variable "block_feature_closure_metadata" {
+  description = "Feature access block for closure metadata"
   default     = true
 }
 
