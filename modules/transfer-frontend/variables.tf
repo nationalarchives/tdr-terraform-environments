@@ -51,7 +51,7 @@ variable "block_feature_descriptive_metadata" {
   default     = true
 }
 
-variable "block_feature_view_history" {
-  description = "Feature access block for view history"
+variable "block_feature_view_transfers" {
+  description = "Feature access block for view transfers"
   default     = true
 }

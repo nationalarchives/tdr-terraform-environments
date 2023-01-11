@@ -68,7 +68,7 @@ module "frontend" {
   public_subnet_ranges               = module.shared_vpc.public_subnet_ranges
   block_feature_closure_metadata     = local.block_feature_closure_metadata
   block_feature_descriptive_metadata = local.block_feature_descriptive_metadata
-  block_feature_view_history         = local.block_feature_view_history
+  block_feature_view_transfers       = local.block_feature_view_transfers
 }
 
 module "alb_logs_s3" {
