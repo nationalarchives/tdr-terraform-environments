@@ -86,4 +86,5 @@ locals {
   //Feature access blocks
   block_feature_closure_metadata     = true
   block_feature_descriptive_metadata = true
+  block_feature_view_history         = true
 }
