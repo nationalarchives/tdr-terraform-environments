@@ -511,22 +511,54 @@ module "file_format_build_task" {
   vpc_id            = module.shared_vpc.vpc_id
 }
 
+module "api_gateway_account" {
+  source      = "./tdr-terraform-modules/api_gateway_account"
+  environment = local.environment
+}
+
+module "export_api_policy" {
+  source        = "./tdr-terraform-modules/iam_policy"
+  name          = "TDRExportAPIPolicy${title(local.environment)}"
+  policy_string = templatefile("./templates/iam_policy/export_api_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, state_machine_arn = module.export_step_function.state_machine_arn })
+}
+
+module "export_api_role" {
+  source             = "./tdr-terraform-modules/iam_role"
+  assume_role_policy = templatefile("./templates/iam_policy/assume_role_policy.json.tpl", { service = "apigateway.amazonaws.com" })
+  common_tags        = local.common_tags
+  name               = "TDRExportAPIRole${title(local.environment)}"
+  policy_attachments = {
+    export_policy = module.export_api_policy.policy_arn
+  }
+}
+
 module "export_api" {
-  source          = "./tdr-terraform-modules/apigateway"
-  api_name        = "ExportAPI"
-  api_template    = "export_api"
-  template_params = { lambda_arn = module.export_authoriser_lambda.export_api_authoriser_arn, state_machine_arn = module.export_step_function.state_machine_arn }
-  environment     = local.environment
-  common_tags     = local.common_tags
+  source      = "./tdr-terraform-modules/apigateway"
+  api_name    = "ExportAPI"
+  environment = local.environment
+  common_tags = local.common_tags
+  api_definition = templatefile("./templates/api_gateway/export_api.json.tpl", {
+    environment       = local.environment,
+    title             = "Export API",
+    role_arn          = module.export_api_role.role.arn,
+    region            = local.region
+    state_machine_arn = module.export_step_function.state_machine_arn
+    lambda_arn        = module.export_authoriser_lambda.export_api_authoriser_arn
+  })
 }
 
 module "signed_cookies_api" {
-  source          = "./tdr-terraform-modules/apigateway"
-  api_name        = "SignedCookiesAPI"
-  api_template    = "sign_cookies_api"
-  template_params = { lambda_arn = module.signed_cookies_lambda.signed_cookies_arn, upload_cors_urls = module.frontend.frontend_url }
-  environment     = local.environment
-  common_tags     = local.common_tags
+  source   = "./tdr-terraform-modules/apigateway"
+  api_name = "SignedCookiesAPI"
+  api_definition = templatefile("./templates/api_gateway/sign_cookies_api.json.tpl", {
+    lambda_arn       = module.signed_cookies_lambda.signed_cookies_arn,
+    upload_cors_urls = module.frontend.frontend_url
+    environment      = local.environment,
+    title            = "Sign Cookies API",
+    region           = local.region
+  })
+  environment = local.environment
+  common_tags = local.common_tags
 }
 
 module "export_authoriser_lambda" {
