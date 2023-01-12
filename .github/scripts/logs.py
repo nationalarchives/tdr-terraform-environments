@@ -8,7 +8,6 @@ timestamp = int(time.time()) * 1000
 log_group_name = f"terraform-plan-outputs-{sys.argv[3]}"
 log_stream_name = sys.argv[2]
 
-
 with open(sys.argv[1]) as file:
     message = file.read()
     if len(message.encode("utf-8")) > 262144:
