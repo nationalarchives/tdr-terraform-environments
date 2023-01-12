@@ -45,6 +45,10 @@
       {
         "name": "BLOCK_FEATURE_DESCRIPTIVE_METADATA",
         "value": "${block_feature_descriptive_metadata}"
+      },
+      {
+        "name": "BLOCK_FEATURE_VIEW_TRANSFERS",
+        "value": "${block_feature_view_transfers}"
       }
     ],
     "networkMode": "awsvpc",
