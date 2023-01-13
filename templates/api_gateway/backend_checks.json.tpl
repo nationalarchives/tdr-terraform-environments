@@ -1,31 +1,35 @@
 {
-  "openapi": "3.0.1",
+  "swagger": "2.0",
   "info": {
-    "title": "${title}",
-    "version": "1"
+    "version": "1",
+    "title": "${title}"
   },
+  "basePath": "/${environment}",
+  "schemes": [
+    "https"
+  ],
   "paths": {
-    "/": {
+    "/backend-checks/{consignmentId+}": {
       "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
         "parameters": [
           {
             "name": "consignmentId",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "200 response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Empty"
-                }
-              }
+            "schema": {
+              "$ref": "#/definitions/Empty"
             }
           }
         },
@@ -36,7 +40,6 @@
         ],
         "x-amazon-apigateway-integration": {
           "credentials": "${role_arn}",
-          "httpMethod": "POST",
           "uri": "arn:aws:apigateway:${region}:states:action/StartExecution",
           "responses": {
             "default": {
@@ -51,23 +54,22 @@
             "application/json": "{\"input\": \"{\\\"consignmentId\\\": \\\"$input.params('consignmentId')\\\"}\",\"stateMachineArn\": \"${state_machine_arn}\"}"
           },
           "passthroughBehavior": "when_no_templates",
+          "httpMethod": "POST",
           "type": "aws"
         }
       }
     }
   },
-  "components": {
-    "securitySchemes": {
-      "lambda": {
-        "type": "apiKey",
-        "name": "Authorization",
-        "in": "header",
-        "x-amazon-apigateway-authtype": "custom",
-        "x-amazon-apigateway-authorizer": {
-          "authorizerUri": "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${lambda_arn}/invocations",
-          "authorizerResultTtlInSeconds": 0,
-          "type": "token"
-        }
+  "securityDefinitions": {
+    "lambda": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "x-amazon-apigateway-authtype": "custom",
+      "x-amazon-apigateway-authorizer": {
+        "authorizerUri": "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${lambda_arn}/invocations",
+        "authorizerResultTtlInSeconds": 0,
+        "type": "token"
       }
     }
   }
