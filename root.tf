@@ -569,6 +569,7 @@ module "export_authoriser_lambda" {
   timeout_seconds          = 10
   api_url                  = module.consignment_api.api_url
   api_gateway_arn          = module.export_api.api_arn
+  backend_checks_api_arn   = module.backend_checks_api.api_arn
   kms_key_arn              = module.encryption_key.kms_key_arn
   private_subnet_ids       = module.backend_checks_efs.private_subnets
   vpc_id                   = module.shared_vpc.vpc_id
