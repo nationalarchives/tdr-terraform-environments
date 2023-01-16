@@ -71,7 +71,8 @@ locals {
   keycloak_db_url                            = "/${local.environment}/keycloak/instance/url"
   slack_bot_token_name                       = "/${local.environment}/slack/bot"
 
-  keycloak_reporting_client_id = "tdr-reporting"
+  keycloak_reporting_client_id      = "tdr-reporting"
+  keycloak_backend-checks_client_id = "tdr-backend-checks"
 
   //Used for allowing full access for Cloudfront logging. More information at https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html#AccessLogsBucketAndFileOwnership
   logs_delivery_canonical_user_id = "c4c1ede66af53448b93c283ce9448c4ba468c9432aa01d700d3878632f77d2d0"
@@ -87,4 +88,20 @@ locals {
   block_feature_closure_metadata     = local.environment == "prod"
   block_feature_descriptive_metadata = local.environment == "prod"
   block_feature_view_transfers       = local.environment == "prod"
+
+  file_upload_data_function_name = "${var.project}-file-upload-data-${local.environment}"
+  api_update_v2_function_name    = "${var.project}-api-update-v2-${local.environment}"
+  yara_av_v2_function_name       = "${var.project}-yara-av-v2-${local.environment}"
+  file_format_v2_function_name   = "${var.project}-file-format-v2-${local.environment}"
+  checksum_v2_function_name      = "${var.project}-checksum-v2-${local.environment}"
+  redacted_files_function_name   = "${var.project}-redacted-files-${local.environment}"
+  statuses_function_name         = "${var.project}-statuses-${local.environment}"
+
+
+  upload_files_cloudfront_dirty_bucket_name = "${var.project}-upload-files-cloudfront-dirty-${local.environment}"
+
+  url_path              = "/${local.environment}/consignmentapi/instance/url"
+  tmp_directory         = "/tmp"
+  consignment_user_name = "consignment_api_user"
+
 }
