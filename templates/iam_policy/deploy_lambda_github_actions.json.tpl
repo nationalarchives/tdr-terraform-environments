@@ -33,6 +33,13 @@
         "arn:aws:lambda:${region}:${account_id}:function:tdr-signed-cookies-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-yara-av-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-reporting-${environment}",
+        "arn:aws:lambda:${region}:${account_id}:function:tdr-file-upload-data-${environment}",
+        "arn:aws:lambda:${region}:${account_id}:function:tdr-api-update-v2-${environment}",
+        "arn:aws:lambda:${region}:${account_id}:function:tdr-yara-av-v2-${environment}",
+        "arn:aws:lambda:${region}:${account_id}:function:tdr-file-format-v2-${environment}",
+        "arn:aws:lambda:${region}:${account_id}:function:tdr-checksum-${environment}",
+        "arn:aws:lambda:${region}:${account_id}:function:tdr-redacted-files-${environment}",
+        "arn:aws:lambda:${region}:${account_id}:function:tdr-statuses-${environment}",
         "arn:aws:s3:::tdr-backend-code-mgmt/*"
       ]
     }
