@@ -1,7 +1,7 @@
 module "backend_checks_api_policy" {
   source        = "./tdr-terraform-modules/iam_policy"
   name          = "TDRBackendChecksAPIPolicy${title(local.environment)}"
-  policy_string = templatefile("./templates/iam_policy/api_gateway_state_machine_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, state_machine_arn = module.back.state_machine_arn })
+  policy_string = templatefile("./templates/iam_policy/api_gateway_state_machine_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, state_machine_arn = "arn:aws:states:${local.region}:${data.aws_caller_identity.current.account_id}:stateMachine:${upper(var.project)}BackendChecks${title(local.environment)}" })
 }
 
 module "backend_checks_api_role" {
