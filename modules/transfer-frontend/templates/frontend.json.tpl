@@ -27,6 +27,10 @@
         "value": "${export_api_url}"
       },
       {
+        "name": "BACKEND_CHECKS_BASE_URL",
+        "value": "${backend_checks_api_url}"
+      },
+      {
         "name": "ALB_IP_A",
         "value": "${alb_ip_a}"
       },
