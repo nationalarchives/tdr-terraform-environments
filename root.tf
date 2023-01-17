@@ -64,6 +64,7 @@ module "frontend" {
   auth_url                           = local.keycloak_auth_url
   client_secret_path                 = module.keycloak_ssm_parameters.params[local.keycloak_tdr_client_secret_name].name
   export_api_url                     = module.export_api.api_url
+  backend_checks_api_url             = module.backend_checks_api.api_url
   alb_id                             = module.frontend_alb.alb_id
   public_subnet_ranges               = module.shared_vpc.public_subnet_ranges
   block_feature_closure_metadata     = local.block_feature_closure_metadata
