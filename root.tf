@@ -519,7 +519,7 @@ module "api_gateway_account" {
 module "export_api_policy" {
   source        = "./tdr-terraform-modules/iam_policy"
   name          = "TDRExportAPIPolicy${title(local.environment)}"
-  policy_string = templatefile("./templates/iam_policy/export_api_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, state_machine_arn = module.export_step_function.state_machine_arn })
+  policy_string = templatefile("./templates/iam_policy/api_gateway_state_machine_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, state_machine_arn = module.export_step_function.state_machine_arn })
 }
 
 module "export_api_role" {
