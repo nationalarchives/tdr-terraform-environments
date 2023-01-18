@@ -13,7 +13,7 @@
             "States.HeartbeatTimeout",
             "States.Timeout"
           ],
-          "MaxAttempts": 3
+          "MaxAttempts": ${max_attempts}
         }
       ],
       "Catch": [
@@ -30,7 +30,7 @@
         "LaunchType": "FARGATE",
         "Cluster": "${cluster_arn}",
         "TaskDefinition": "${task_arn}",
-        "PlatformVersion": "1.4.0",
+        "PlatformVersion": "${platform_version}",
         "NetworkConfiguration": {
           "AwsvpcConfiguration": {
             "AssignPublicIp": "DISABLED",
