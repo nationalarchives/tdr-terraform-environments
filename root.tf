@@ -648,14 +648,16 @@ module "export_step_function" {
   source = "./tdr-terraform-modules/stepfunctions"
   tags   = local.common_tags
   definition = templatefile("./templates/step_function/consignment_export_definition.json.tpl", {
-    account_id      = data.aws_caller_identity.current.account_id
-    environment     = local.environment
-    security_groups = jsonencode([module.consignment_export_ecs_security_group.security_group_id]),
-    subnet_ids      = jsonencode(module.export_efs.private_subnets),
-    cluster_arn     = module.consignment_export_ecs_task.cluster_arn,
-    task_arn        = module.consignment_export_ecs_task.task_definition_arn,
-    task_name       = "consignment-export",
-    sns_topic       = module.notifications_topic.sns_arn
+    account_id       = data.aws_caller_identity.current.account_id
+    environment      = local.environment
+    security_groups  = jsonencode([module.consignment_export_ecs_security_group.security_group_id]),
+    subnet_ids       = jsonencode(module.export_efs.private_subnets),
+    cluster_arn      = module.consignment_export_ecs_task.cluster_arn,
+    task_arn         = module.consignment_export_ecs_task.task_definition_arn,
+    task_name        = "consignment-export",
+    sns_topic        = module.notifications_topic.sns_arn,
+    platform_version = "1.4.0"
+    max_attempts     = 3
   })
   step_function_name = "ConsignmentExport"
   environment        = local.environment
