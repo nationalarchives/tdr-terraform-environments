@@ -8,7 +8,7 @@
       "OutputPath": "$.Payload",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "${file_upload_data_arn}"
+        "FunctionName": "${file_upload_data_lambda_arn}"
       },
       "Retry": [
         {
@@ -28,7 +28,7 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
-        "FunctionName": "${api_update_v2_arn}",
+        "FunctionName": "${api_update_lambda_arn}",
         "Payload": {
           "results": [],
           "statuses.$": "$.statuses",
@@ -70,7 +70,7 @@
                     "Resource": "arn:aws:states:::lambda:invoke",
                     "OutputPath": "$.Payload",
                     "Parameters": {
-                      "FunctionName": "${yara_av_v2_arn}",
+                      "FunctionName": "${antivirus_lambda_arn}",
                       "Payload.$": "$"
                     },
                     "Retry": [
@@ -97,7 +97,7 @@
                     "Resource": "arn:aws:states:::lambda:invoke",
                     "OutputPath": "$.Payload",
                     "Parameters": {
-                      "FunctionName": "${file_format_v2_arn}",
+                      "FunctionName": "${ffid_lambda_arn}",
                       "Payload.$": "$"
                     },
                     "Retry": [
@@ -124,7 +124,7 @@
                     "Resource": "arn:aws:states:::lambda:invoke",
                     "OutputPath": "$.Payload",
                     "Parameters": {
-                      "FunctionName": "${checksum_v2_arn}",
+                      "FunctionName": "${checksum_lambda_arn}",
                       "Payload.$": "$"
                     },
                     "Retry": [
@@ -174,7 +174,7 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "${redacted_files_arn}"
+        "FunctionName": "${redacted_files_lambda_arn}"
       },
       "Retry": [
         {
@@ -201,7 +201,7 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "${statuses_arn}"
+        "FunctionName": "${statuses_lambda_arn}"
       },
       "Retry": [
         {
@@ -228,7 +228,7 @@
       "OutputPath": "$.Payload",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "${api_update_v2_arn}"
+        "FunctionName": "${api_update_lambda_arn}"
       },
       "Retry": [
         {
@@ -249,12 +249,12 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "OutputPath": "$.Payload",
       "Parameters": {
-        "FunctionName": "${notification_arn}",
+        "FunctionName": "${notifications_lambda_arn}",
         "Payload": {
           "consignmentId.$": "$$.Execution.Input.consignmentId",
           "error.$": "$.Error",
           "cause.$": "$.Cause",
-          "environment": "intg"
+          "environment": "${environment}"
         }
       },
       "Retry": [
