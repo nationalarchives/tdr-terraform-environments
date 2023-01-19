@@ -519,7 +519,7 @@ module "api_gateway_account" {
 module "export_api_policy" {
   source        = "./tdr-terraform-modules/iam_policy"
   name          = "TDRExportAPIPolicy${title(local.environment)}"
-  policy_string = templatefile("./templates/iam_policy/export_api_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, state_machine_arn = module.export_step_function.state_machine_arn })
+  policy_string = templatefile("./templates/iam_policy/api_gateway_state_machine_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, state_machine_arn = module.export_step_function.state_machine_arn })
 }
 
 module "export_api_role" {
@@ -645,16 +645,32 @@ module "export_efs" {
 }
 
 module "export_step_function" {
-  source                 = "./tdr-terraform-modules/stepfunctions"
-  project                = var.project
-  common_tags            = local.common_tags
-  definition             = "consignment_export"
-  environment            = local.environment
-  step_function_name     = "ConsignmentExport"
-  definition_variables   = { security_groups = jsonencode([module.consignment_export_ecs_security_group.security_group_id]), subnet_ids = jsonencode(module.export_efs.private_subnets), cluster_arn = module.consignment_export_ecs_task.cluster_arn, task_arn = module.consignment_export_ecs_task.task_definition_arn, task_name = "consignment-export", sns_topic = module.notifications_topic.sns_arn }
-  policy                 = "consignment_export"
-  policy_variables       = { task_arn = module.consignment_export_ecs_task.task_definition_arn, execution_role = module.consignment_export_execution_role.role.arn, task_role = module.consignment_export_task_role.role.arn, kms_key_arn = module.encryption_key.kms_key_arn }
-  notification_sns_topic = module.notifications_topic.sns_arn
+  source = "./tdr-terraform-modules/stepfunctions"
+  tags   = local.common_tags
+  definition = templatefile("./templates/step_function/consignment_export_definition.json.tpl", {
+    account_id       = data.aws_caller_identity.current.account_id
+    environment      = local.environment
+    security_groups  = jsonencode([module.consignment_export_ecs_security_group.security_group_id]),
+    subnet_ids       = jsonencode(module.export_efs.private_subnets),
+    cluster_arn      = module.consignment_export_ecs_task.cluster_arn,
+    task_arn         = module.consignment_export_ecs_task.task_definition_arn,
+    task_name        = "consignment-export",
+    sns_topic        = module.notifications_topic.sns_arn,
+    platform_version = "1.4.0"
+    max_attempts     = 3
+  })
+  step_function_name = "ConsignmentExport"
+  environment        = local.environment
+  project            = var.project
+  policy = templatefile("./templates/iam_policy/consignment_export_policy.json.tpl", {
+    task_arn       = module.consignment_export_ecs_task.task_definition_arn,
+    execution_role = module.consignment_export_execution_role.role.arn,
+    task_role      = module.consignment_export_task_role.role.arn,
+    kms_key_arn    = module.encryption_key.kms_key_arn
+    account_id     = data.aws_caller_identity.current.account_id
+    sns_topic      = module.notifications_topic.sns_arn
+    environment    = local.environment
+  })
 }
 
 module "export_bucket" {
