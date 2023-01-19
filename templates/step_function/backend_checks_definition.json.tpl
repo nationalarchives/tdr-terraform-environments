@@ -1,5 +1,5 @@
 {
-  "Comment": "A description of my state machine",
+  "Comment": "A state machine to run all backend checks",
   "StartAt": "Get Files",
   "States": {
     "Get Files": {
@@ -13,9 +13,9 @@
       "Retry": [
         {
           "ErrorEquals": [
-            "Lambda.ServiceException",
             "Lambda.AWSLambdaException",
-            "Lambda.SdkClientException"
+            "Lambda.SdkClientException",
+            "Lambda.ServiceException"
           ],
           "IntervalSeconds": 2,
           "MaxAttempts": 6,
@@ -28,7 +28,7 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
-        "FunctionName": "${api_update_lambda_arn}",
+        "FunctionName": "${api_update_v2_lambda_arn}",
         "Payload": {
           "results": [],
           "statuses.$": "$.statuses",
@@ -41,9 +41,9 @@
       "Retry": [
         {
           "ErrorEquals": [
-            "Lambda.ServiceException",
             "Lambda.AWSLambdaException",
             "Lambda.SdkClientException",
+            "Lambda.ServiceException",
             "Lambda.TooManyRequestsException"
           ],
           "IntervalSeconds": 2,
@@ -70,15 +70,15 @@
                     "Resource": "arn:aws:states:::lambda:invoke",
                     "OutputPath": "$.Payload",
                     "Parameters": {
-                      "FunctionName": "${antivirus_lambda_arn}",
+                      "FunctionName": "${yara_av_v2_lambda_arn}",
                       "Payload.$": "$"
                     },
                     "Retry": [
                       {
                         "ErrorEquals": [
-                          "Lambda.ServiceException",
                           "Lambda.AWSLambdaException",
-                          "Lambda.SdkClientException"
+                          "Lambda.SdkClientException",
+                          "Lambda.ServiceException"
                         ],
                         "IntervalSeconds": 2,
                         "MaxAttempts": 6,
@@ -97,15 +97,15 @@
                     "Resource": "arn:aws:states:::lambda:invoke",
                     "OutputPath": "$.Payload",
                     "Parameters": {
-                      "FunctionName": "${ffid_lambda_arn}",
+                      "FunctionName": "${file_format_v2_lambda_arn}",
                       "Payload.$": "$"
                     },
                     "Retry": [
                       {
                         "ErrorEquals": [
-                          "Lambda.ServiceException",
                           "Lambda.AWSLambdaException",
-                          "Lambda.SdkClientException"
+                          "Lambda.SdkClientException",
+                          "Lambda.ServiceException"
                         ],
                         "IntervalSeconds": 2,
                         "MaxAttempts": 6,
@@ -124,15 +124,15 @@
                     "Resource": "arn:aws:states:::lambda:invoke",
                     "OutputPath": "$.Payload",
                     "Parameters": {
-                      "FunctionName": "${checksum_lambda_arn}",
+                      "FunctionName": "${checksum_v2_lambda_arn}",
                       "Payload.$": "$"
                     },
                     "Retry": [
                       {
                         "ErrorEquals": [
-                          "Lambda.ServiceException",
                           "Lambda.AWSLambdaException",
-                          "Lambda.SdkClientException"
+                          "Lambda.SdkClientException",
+                          "Lambda.ServiceException"
                         ],
                         "IntervalSeconds": 2,
                         "MaxAttempts": 6,
@@ -179,9 +179,9 @@
       "Retry": [
         {
           "ErrorEquals": [
-            "Lambda.ServiceException",
             "Lambda.AWSLambdaException",
             "Lambda.SdkClientException",
+            "Lambda.ServiceException",
             "Lambda.TooManyRequestsException"
           ],
           "IntervalSeconds": 2,
@@ -206,9 +206,9 @@
       "Retry": [
         {
           "ErrorEquals": [
-            "Lambda.ServiceException",
             "Lambda.AWSLambdaException",
             "Lambda.SdkClientException",
+            "Lambda.ServiceException",
             "Lambda.TooManyRequestsException"
           ],
           "IntervalSeconds": 2,
@@ -228,14 +228,14 @@
       "OutputPath": "$.Payload",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "${api_update_lambda_arn}"
+        "FunctionName": "${api_update_v2_lambda_arn}"
       },
       "Retry": [
         {
           "ErrorEquals": [
-            "Lambda.ServiceException",
             "Lambda.AWSLambdaException",
-            "Lambda.SdkClientException"
+            "Lambda.SdkClientException",
+            "Lambda.ServiceException"
           ],
           "IntervalSeconds": 2,
           "MaxAttempts": 6,
@@ -260,9 +260,9 @@
       "Retry": [
         {
           "ErrorEquals": [
-            "Lambda.ServiceException",
             "Lambda.AWSLambdaException",
             "Lambda.SdkClientException",
+            "Lambda.ServiceException",
             "Lambda.TooManyRequestsException"
           ],
           "IntervalSeconds": 2,
