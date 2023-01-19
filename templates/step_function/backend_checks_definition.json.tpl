@@ -249,7 +249,7 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "OutputPath": "$.Payload",
       "Parameters": {
-        "FunctionName": "${notifications_lambda_arn}",
+        "FunctionName": "${notification_lambda_arn}",
         "Payload": {
           "consignmentId.$": "$$.Execution.Input.consignmentId",
           "error.$": "$.Error",
