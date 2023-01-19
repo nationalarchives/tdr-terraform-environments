@@ -30,3 +30,247 @@ module "backend_checks_api" {
   common_tags = local.common_tags
   environment = local.environment
 }
+
+module "outbound_with_db_security_group" {
+  source      = "./tdr-terraform-modules/security_group"
+  description = ""
+  name        = "outbound_with_db_security_group"
+  vpc_id      = module.shared_vpc.vpc_id
+  common_tags = local.common_tags
+  egress_cidr_rules = [
+    { port = 443, cidr_blocks = ["0.0.0.0/0"], description = "Allow outbound access on port 443", protocol = "-1" }
+  ]
+  egress_security_group_rules = [
+    {
+      port        = 5432, security_group_id = module.api_database_security_group.security_group_id,
+      description = "Allow Postgres port from the backend checks", protocol = "-1"
+    }
+  ]
+}
+
+module "outbound_only_security_group" {
+  source      = "./tdr-terraform-modules/security_group"
+  description = ""
+  name        = "outbound_only_security_group"
+  vpc_id      = module.shared_vpc.vpc_id
+  common_tags = local.common_tags
+  egress_cidr_rules = [
+    { port = 443, cidr_blocks = ["0.0.0.0/0"], description = "Allow outbound access on port 443", protocol = "-1" }
+  ]
+}
+
+module "no_access_security_group" {
+  source      = "./tdr-terraform-modules/security_group"
+  description = ""
+  name        = "no_access"
+  vpc_id      = module.shared_vpc.vpc_id
+  common_tags = local.common_tags
+}
+
+module "file_upload_data" {
+  source        = "./tdr-terraform-modules/generic_lambda"
+  tags          = local.common_tags
+  function_name = local.file_upload_data_function_name
+  handler       = "lambda_handler.handler"
+  policies = {
+    "TDRFileUploadDataLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_policy.json.tpl", {
+      function_name  = local.file_upload_data_function_name,
+      bucket_name    = local.upload_files_cloudfront_dirty_bucket_name
+      account_id     = data.aws_caller_identity.current.account_id,
+      parameter_name = local.keycloak_backend_checks_secret_name
+    })
+  }
+  role_name = "TDRFileUploadDataLambdaRole${title(local.environment)}"
+  runtime   = "python3.9"
+  plaintext_env_vars = {
+    API_URL            = module.consignment_api.api_url
+    AUTH_URL           = local.keycloak_auth_url
+    CLIENT_ID          = local.keycloak_backend-checks_client_id
+    CLIENT_SECRET_PATH = local.keycloak_backend_checks_secret_name
+    BUCKET_NAME        = local.upload_files_cloudfront_dirty_bucket_name
+  }
+  vpc_config = [
+    {
+      subnet_ids         = module.shared_vpc.private_subnets
+      security_group_ids = [module.outbound_only_security_group.security_group_id]
+    }
+  ]
+}
+
+module "api_update_v2" {
+  source        = "./tdr-terraform-modules/generic_lambda"
+  tags          = local.common_tags
+  function_name = local.api_update_v2_function_name
+  handler       = "uk.gov.nationalarchives.api.update.Lambda::update"
+  policies = {
+    "TDRAPIUpdateV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_policy.json.tpl", {
+      function_name  = local.api_update_v2_function_name,
+      account_id     = data.aws_caller_identity.current.account_id,
+      parameter_name = local.keycloak_backend_checks_secret_name
+    })
+  }
+  role_name = "TDRAPIUpdateV2LambdaRole${title(local.environment)}"
+  runtime   = "java11"
+  plaintext_env_vars = {
+    API_URL            = module.consignment_api.api_url
+    AUTH_URL           = local.keycloak_auth_url
+    CLIENT_ID          = local.keycloak_backend-checks_client_id
+    CLIENT_SECRET_PATH = local.keycloak_backend_checks_secret_name
+  }
+  vpc_config = [
+    {
+      subnet_ids         = module.shared_vpc.private_subnets
+      security_group_ids = [module.outbound_only_security_group.security_group_id]
+    }
+  ]
+}
+
+module "file_format_v2" {
+  source        = "./tdr-terraform-modules/generic_lambda"
+  tags          = local.common_tags
+  function_name = local.file_format_v2_function_name
+  handler       = "uk.gov.nationalarchives.fileformat.Lambda::process"
+  policies = {
+    "TDRFileFormatV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_only_policy.json.tpl", {
+      function_name = local.file_format_v2_function_name,
+      account_id    = data.aws_caller_identity.current.account_id,
+      bucket_name   = local.upload_files_cloudfront_dirty_bucket_name
+    })
+  }
+  role_name = "TDRFileFormatV2LambdaRole${title(local.environment)}"
+  runtime   = "java11"
+  plaintext_env_vars = {
+    S3_BUCKET = local.upload_files_cloudfront_dirty_bucket_name
+  }
+  vpc_config = [
+    {
+      subnet_ids         = module.shared_vpc.private_subnets
+      security_group_ids = [module.outbound_only_security_group.security_group_id]
+    }
+  ]
+}
+
+module "checksum_v2" {
+  source        = "./tdr-terraform-modules/generic_lambda"
+  tags          = local.common_tags
+  function_name = local.checksum_v2_function_name
+  handler       = "uk.gov.nationalarchives.checksum.Lambda::process"
+  policies = {
+    "TDRChecksumV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_only_policy.json.tpl", {
+      function_name = local.checksum_v2_function_name,
+      account_id    = data.aws_caller_identity.current.account_id,
+      bucket_name   = local.upload_files_cloudfront_dirty_bucket_name
+    })
+  }
+  role_name = "TDRChecksumV2LambdaRole${title(local.environment)}"
+  runtime   = "java11"
+  plaintext_env_vars = {
+    CHUNK_SIZE_IN_MB = 50
+    S3_BUCKET        = local.upload_files_cloudfront_dirty_bucket_name
+  }
+  vpc_config = [
+    {
+      subnet_ids         = module.shared_vpc.private_subnets
+      security_group_ids = [module.outbound_only_security_group.security_group_id]
+    }
+  ]
+}
+
+module "redacted_files" {
+  source        = "./tdr-terraform-modules/generic_lambda"
+  tags          = local.common_tags
+  function_name = local.redacted_files_function_name
+  handler       = "uk.gov.nationalarchives.Lambda::run"
+  policies      = {}
+  role_name     = "TDRRedactedFilesLambdaRole${title(local.environment)}"
+  runtime       = "java11"
+  vpc_config = [
+    {
+      subnet_ids         = module.shared_vpc.private_subnets
+      security_group_ids = [module.no_access_security_group.security_group_id]
+    }
+  ]
+}
+
+module "statuses" {
+  source        = "./tdr-terraform-modules/generic_lambda"
+  tags          = local.common_tags
+  function_name = local.statuses_function_name
+  handler       = "uk.gov.nationalarchives.Lambda::run"
+  policies = {
+    "TDRStatusesLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/allow_iam_db_auth.json.tpl", {
+      function_name = local.statuses_function_name,
+      account_id    = data.aws_caller_identity.current.account_id,
+      resource_id   = module.consignment_api_database.resource_id
+      user_name     = local.consignment_user_name
+    })
+  }
+  role_name = "TDRStatusesLambdaRole${title(local.environment)}"
+  runtime   = "java11"
+  plaintext_env_vars = {
+    USER_NAME    = local.consignment_user_name
+    URL_PATH     = local.url_path
+    USE_IAM_AUTH = true
+  }
+  vpc_config = [
+    {
+      subnet_ids         = module.shared_vpc.private_subnets
+      security_group_ids = [module.outbound_with_db_security_group.security_group_id]
+    }
+  ]
+}
+
+module "yara_av_v2" {
+  source        = "./tdr-terraform-modules/generic_lambda"
+  tags          = local.common_tags
+  function_name = local.yara_av_v2_function_name
+  handler       = "matcher.matcher_lambda_handler"
+  policies = {
+    "TDRYaraAVV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_only_policy.json.tpl", {
+      function_name = local.yara_av_v2_function_name,
+      account_id    = data.aws_caller_identity.current.account_id,
+      bucket_name   = local.upload_files_cloudfront_dirty_bucket_name
+    })
+  }
+  role_name = "TDRYaraAVV2LambdaRole${title(local.environment)}"
+  runtime   = "python3.9"
+  plaintext_env_vars = {
+    ENVIRONMENT    = var.project
+    ROOT_DIRECTORY = local.tmp_directory
+  }
+  vpc_config = [
+    {
+      subnet_ids         = module.shared_vpc.private_subnets
+      security_group_ids = [module.outbound_only_security_group.security_group_id]
+    }
+  ]
+}
+
+module "backend_checks_step_function" {
+  source             = "./tdr-terraform-modules/stepfunctions"
+  tags               = local.common_tags
+  project            = var.project
+  step_function_name = "TDRBackendChecks${title(local.environment)}"
+  definition = templatefile("./templates/step_function/backend_checks_definition.json.tpl", {
+    environment                 = local.environment
+    file_upload_data_lambda_arn = module.file_upload_data.lambda_arn
+    api_update_v2_lambda_arn    = module.api_update_v2.lambda_arn
+    yara_av_v2_lambda_arn       = module.yara_av_v2.lambda_arn
+    statuses_lambda_arn         = module.statuses.lambda_arn
+    file_format_v2_lambda_arn   = module.file_format_v2.lambda_arn
+    checksum_v2_lambda_arn      = module.checksum_v2.lambda_arn
+    redacted_files_lambda_arn   = module.redacted_files.lambda_arn
+    notification_lambda_arn     = module.notification_lambda.ecr_scan_notification_lambda_arn[0]
+  })
+  environment = local.environment
+  policy = templatefile("./templates/iam_policy/backend_check_policy.json.tpl", {
+    file_upload_data_lambda_arn = module.file_upload_data.lambda_arn
+    statuses_lambda_arn         = module.statuses.lambda_arn
+    yara_av_v2_lambda_arn       = module.yara_av_v2.lambda_arn
+    file_format_v2_lambda_arn   = module.file_format_v2.lambda_arn
+    checksum_v2_lambda_arn      = module.checksum_v2.lambda_arn
+    redacted_files_lambda_arn   = module.redacted_files.lambda_arn
+    api_update_v2_lambda_arn    = module.api_update_v2.lambda_arn
+    notification_lambda_arn     = module.notification_lambda.ecr_scan_notification_lambda_arn[0]
+  })
+}
