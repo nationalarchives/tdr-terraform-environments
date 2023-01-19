@@ -945,7 +945,8 @@ module "api_database_security_group" {
     { port = 5432, description = "Allow inbound access from ECS", security_group_id = module.consignment_api.ecs_task_security_group_id },
     { port = 5432, description = "Allow inbound access from database migrations", security_group_id = module.database_migrations.db_migration_security_group },
     { port = 5432, description = "Allow inbound access from create bastion users lambda", security_group_id = module.create_bastion_user_lambda.create_users_lambda_security_group_id[0] },
-    { port = 5432, description = "Allow inbound access from create users lambda", security_group_id = module.create_db_users_lambda.create_users_lambda_security_group_id[0] }
+    { port = 5432, description = "Allow inbound access from create users lambda", security_group_id = module.create_db_users_lambda.create_users_lambda_security_group_id[0] },
+    { port = 5432, description = "Allow inbound access from backend checks", security_group_id = module.outbound_with_db_security_group.security_group_id }
   ]
   egress_security_group_rules = [
     { port = 5432, description = "Allow outbound access to the ECS tasks security group", security_group_id = module.consignment_api.ecs_task_security_group_id, protocol = "tcp" }
