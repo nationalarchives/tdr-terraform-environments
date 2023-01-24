@@ -8,6 +8,7 @@
       ],
       "Resource": [
         "${api_update_v2_lambda_arn}",
+        "${backend_checks_results_arn}",
         "${checksum_v2_lambda_arn}",
         "${file_format_v2_lambda_arn}",
         "${file_upload_data_lambda_arn}",
@@ -15,6 +16,20 @@
         "${redacted_files_lambda_arn}",
         "${statuses_lambda_arn}",
         "${yara_av_v2_lambda_arn}"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:PutObject",
+        "states:StartExecution"
+      ],
+      "Resource": [
+        "${backend_checks_bucket_arn}/*",
+        "${backend_checks_bucket_arn}",
+        "${state_machine_arn}"
       ]
     }
   ]

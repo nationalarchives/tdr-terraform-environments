@@ -24,9 +24,13 @@
     {
       "Effect": "Allow",
       "Action": [
-        "ssm:GetParameter"
+        "s3:GetObject",
+        "s3:ListBucket"
       ],
-      "Resource": "arn:aws:ssm:eu-west-2:${account_id}:parameter${parameter_name}"
+      "Resource": [
+        "arn:aws:s3:::${dirty_bucket}",
+        "arn:aws:s3:::${dirty_bucket}/*"
+      ]
     },
     {
       "Effect": "Allow",
@@ -36,8 +40,10 @@
         "s3:PutObject"
       ],
       "Resource": [
-        "arn:aws:s3:::${bucket_name}",
-        "arn:aws:s3:::${bucket_name}/*"
+        "arn:aws:s3:::${clean_bucket}",
+        "arn:aws:s3:::${clean_bucket}/*",
+        "arn:aws:s3:::${quarantine_bucket}",
+        "arn:aws:s3:::${quarantine_bucket}/*"
       ]
     }
   ]

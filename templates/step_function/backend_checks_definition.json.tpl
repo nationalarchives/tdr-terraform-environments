@@ -29,14 +29,7 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "FunctionName": "${api_update_v2_lambda_arn}",
-        "Payload": {
-          "results": [],
-          "statuses.$": "$.statuses",
-          "redactedResults": {
-            "redactedFiles": [],
-            "errors": []
-          }
-        }
+        "Payload.$": "$"
       },
       "Retry": [
         {
@@ -152,14 +145,17 @@
               "checksum.$": "$.[?(@.checksum)].checksum"
             }
           }
+        },
+        "ProcessorConfig": {
+          "Mode": "DISTRIBUTED",
+          "ExecutionType": "EXPRESS"
         }
       },
       "MaxConcurrency": 40,
       "ResultSelector": {
         "results.$": "$"
       },
-      "ItemsPath": "$.results",
-      "Next": "Redacted files",
+      "Next": "Process Map Results",
       "Catch": [
         {
           "ErrorEquals": [
@@ -167,7 +163,48 @@
           ],
           "Next": "Notify"
         }
-      ]
+      ],
+      "Label": "Map",
+      "ItemReader": {
+        "Resource": "arn:aws:states:::s3:getObject",
+        "ReaderConfig": {
+          "InputType": "JSON"
+        },
+        "Parameters": {
+          "Bucket.$": "$.bucket",
+          "Key.$": "$.key"
+        }
+      },
+      "ResultWriter": {
+        "Resource": "arn:aws:states:::s3:putObject",
+        "Parameters": {
+          "Bucket.$": "$.bucket",
+          "Prefix.$": "$.key"
+        }
+      }
+    },
+    "Process Map Results": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${backend_checks_results_arn}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Redacted files"
     },
     "Redacted files": {
       "Type": "Task",
@@ -190,11 +227,7 @@
         }
       ],
       "Next": "Generate Statuses",
-      "ResultPath": "$.redactedResults",
-      "ResultSelector": {
-        "redactedFiles.$": "$.Payload.redactedFiles",
-        "errors.$": "$.Payload.errors"
-      }
+      "ResultPath": null
     },
     "Generate Statuses": {
       "Type": "Task",
@@ -217,10 +250,7 @@
         }
       ],
       "Next": "Update API",
-      "ResultPath": "$.statuses",
-      "ResultSelector": {
-        "statuses.$": "$.Payload.statuses"
-      }
+      "ResultPath": null
     },
     "Update API": {
       "Type": "Task",
