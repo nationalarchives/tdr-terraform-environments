@@ -32,6 +32,8 @@ locals {
 
   environment_domain = local.environment == "prod" ? "${var.project}.${var.domain}" : "${var.project}-${local.environment_full_name}.${var.domain}"
 
+  s3_endpoint = "https://s3.eu-west-2.amazonaws.com"
+
   upload_domain = "upload.${local.environment_domain}"
 
   local_dev_frontend_url = "http://localhost:9000"
@@ -89,13 +91,14 @@ locals {
   block_feature_descriptive_metadata = local.environment == "prod"
   block_feature_view_transfers       = local.environment == "prod"
 
-  file_upload_data_function_name = "${var.project}-file-upload-data-${local.environment}"
-  api_update_v2_function_name    = "${var.project}-api-update-v2-${local.environment}"
-  yara_av_v2_function_name       = "${var.project}-yara-av-v2-${local.environment}"
-  file_format_v2_function_name   = "${var.project}-file-format-v2-${local.environment}"
-  checksum_v2_function_name      = "${var.project}-checksum-v2-${local.environment}"
-  redacted_files_function_name   = "${var.project}-redacted-files-${local.environment}"
-  statuses_function_name         = "${var.project}-statuses-${local.environment}"
+  file_upload_data_function_name       = "${var.project}-file-upload-data-${local.environment}"
+  api_update_v2_function_name          = "${var.project}-api-update-v2-${local.environment}"
+  backend_checks_results_function_name = "${var.project}-backend-checks-results-${local.environment}"
+  yara_av_v2_function_name             = "${var.project}-yara-av-v2-${local.environment}"
+  file_format_v2_function_name         = "${var.project}-file-format-v2-${local.environment}"
+  checksum_v2_function_name            = "${var.project}-checksum-v2-${local.environment}"
+  redacted_files_function_name         = "${var.project}-redacted-files-${local.environment}"
+  statuses_function_name               = "${var.project}-statuses-${local.environment}"
 
 
   upload_files_cloudfront_dirty_bucket_name = "${var.project}-upload-files-cloudfront-dirty-${local.environment}"
