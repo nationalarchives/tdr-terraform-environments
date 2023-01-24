@@ -194,7 +194,7 @@ module "redacted_files" {
   vpc_config = [
     {
       subnet_ids         = module.shared_vpc.private_subnets
-      security_group_ids = [module.outbound_only_security_group]
+      security_group_ids = [module.outbound_only_security_group.security_group_id]
     }
   ]
   plaintext_env_vars = {
