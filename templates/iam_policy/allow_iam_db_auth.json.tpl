@@ -27,6 +27,25 @@
       "Resource": [
         "arn:aws:rds-db:eu-west-2:${account_id}:dbuser:${resource_id}/${user_name}"
       ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${bucket_name}",
+        "arn:aws:s3:::${bucket_name}/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameter"
+      ],
+      "Resource": "arn:aws:ssm:eu-west-2:${account_id}:parameter${parameter_name}"
     }
   ]
 }

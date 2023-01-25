@@ -17,8 +17,7 @@
       "Action": [
         "ec2:CreateNetworkInterface",
         "ec2:DeleteNetworkInterface",
-        "ec2:DescribeNetworkInterfaces",
-        "elasticfilesystem:ClientWrite"
+        "ec2:DescribeNetworkInterfaces"
       ],
       "Resource": "*"
     },
@@ -31,6 +30,18 @@
       "Resource": [
         "arn:aws:s3:::${bucket_name}",
         "arn:aws:s3:::${bucket_name}/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${backend_checks_bucket_name}",
+        "arn:aws:s3:::${backend_checks_bucket_name}/*"
       ]
     },
     {
