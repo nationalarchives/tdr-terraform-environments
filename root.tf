@@ -32,7 +32,7 @@ module "consignment_api" {
   environment                    = local.environment
   environment_full_name          = local.environment_full_name_map[local.environment]
   private_subnets                = module.shared_vpc.private_subnets
-  backend_checks_subnets         = module.backend_checks_efs.private_subnets
+  backend_checks_subnets         = module.shared_vpc.private_backend_checks_subnets
   public_subnets                 = module.shared_vpc.public_subnets
   vpc_id                         = module.shared_vpc.vpc_id
   region                         = local.region
@@ -251,49 +251,13 @@ module "backend_lambda_function_bucket" {
   project     = var.project
 }
 
-module "antivirus_lambda" {
-  source                                 = "./tdr-terraform-modules/lambda"
-  backend_checks_efs_access_point        = module.backend_checks_efs.access_point
-  backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
-  common_tags                            = local.common_tags
-  file_system_id                         = module.backend_checks_efs.file_system_id
-  lambda_yara_av                         = true
-  timeout_seconds                        = local.file_check_lambda_timeouts_in_seconds["antivirus"]
-  project                                = var.project
-  use_efs                                = true
-  vpc_id                                 = module.shared_vpc.vpc_id
-  private_subnet_ids                     = module.backend_checks_efs.private_subnets
-  mount_target_zero                      = module.backend_checks_efs.mount_target_zero
-  mount_target_one                       = module.backend_checks_efs.mount_target_one
-  kms_key_arn                            = module.encryption_key.kms_key_arn
-  efs_security_group_id                  = module.backend_checks_efs.security_group_id
-}
-
-module "checksum_lambda" {
-  source                                 = "./tdr-terraform-modules/lambda"
-  project                                = var.project
-  common_tags                            = local.common_tags
-  lambda_checksum                        = true
-  timeout_seconds                        = local.file_check_lambda_timeouts_in_seconds["checksum"]
-  file_system_id                         = module.backend_checks_efs.file_system_id
-  backend_checks_efs_access_point        = module.backend_checks_efs.access_point
-  vpc_id                                 = module.shared_vpc.vpc_id
-  use_efs                                = true
-  backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
-  private_subnet_ids                     = module.backend_checks_efs.private_subnets
-  mount_target_zero                      = module.backend_checks_efs.mount_target_zero
-  mount_target_one                       = module.backend_checks_efs.mount_target_one
-  kms_key_arn                            = module.encryption_key.kms_key_arn
-  efs_security_group_id                  = module.backend_checks_efs.security_group_id
-}
-
 module "create_db_users_lambda" {
   source                      = "./tdr-terraform-modules/lambda"
   project                     = var.project
   common_tags                 = local.common_tags
   lambda_create_db_users      = true
   vpc_id                      = module.shared_vpc.vpc_id
-  private_subnet_ids          = module.backend_checks_efs.private_subnets
+  private_subnet_ids          = module.shared_vpc.private_backend_checks_subnets
   consignment_database_sg_id  = module.consignment_api.consignment_db_security_group_id
   db_admin_user               = module.consignment_api_database.database_user
   db_admin_password           = module.consignment_api_database.database_password
@@ -310,7 +274,7 @@ module "create_bastion_user_lambda" {
   common_tags                 = local.common_tags
   lambda_create_db_users      = true
   vpc_id                      = module.shared_vpc.vpc_id
-  private_subnet_ids          = module.backend_checks_efs.private_subnets
+  private_subnet_ids          = module.shared_vpc.private_backend_checks_subnets
   consignment_database_sg_id  = module.consignment_api.consignment_db_security_group_id
   db_admin_user               = module.consignment_api_database.database_user
   db_admin_password           = module.consignment_api_database.database_password
@@ -422,94 +386,13 @@ module "transform_engine_v2_retry_queue" {
   sns_topic_arns     = toset(local.transform_engine_v2_sqs_topic_subscriptions)
 }
 
-module "api_update_lambda" {
-  source                                = "./tdr-terraform-modules/lambda"
-  project                               = var.project
-  common_tags                           = local.common_tags
-  lambda_api_update                     = true
-  timeout_seconds                       = local.file_check_lambda_timeouts_in_seconds["api_update"]
-  auth_url                              = local.keycloak_auth_url
-  api_url                               = module.consignment_api.api_url
-  keycloak_backend_checks_client_secret = module.keycloak_ssm_parameters.params[local.keycloak_backend_checks_secret_name].value
-  backend_checks_client_secret_path     = local.keycloak_backend_checks_secret_name
-  kms_key_arn                           = module.encryption_key.kms_key_arn
-  private_subnet_ids                    = module.backend_checks_efs.private_subnets
-  vpc_id                                = module.shared_vpc.vpc_id
-}
-
-module "file_format_lambda" {
-  source                                 = "./tdr-terraform-modules/lambda"
-  project                                = var.project
-  common_tags                            = local.common_tags
-  lambda_file_format                     = true
-  timeout_seconds                        = local.file_check_lambda_timeouts_in_seconds["file_format"]
-  file_system_id                         = module.backend_checks_efs.file_system_id
-  backend_checks_efs_access_point        = module.backend_checks_efs.access_point
-  vpc_id                                 = module.shared_vpc.vpc_id
-  use_efs                                = true
-  backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
-  private_subnet_ids                     = module.backend_checks_efs.private_subnets
-  mount_target_zero                      = module.backend_checks_efs.mount_target_zero
-  mount_target_one                       = module.backend_checks_efs.mount_target_one
-  kms_key_arn                            = module.encryption_key.kms_key_arn
-  efs_security_group_id                  = module.backend_checks_efs.security_group_id
-  upload_bucket                          = module.upload_file_cloudfront_dirty_s3.s3_bucket_name
-}
-
-module "download_files_lambda" {
-  source                                 = "./tdr-terraform-modules/lambda"
-  common_tags                            = local.common_tags
-  project                                = var.project
-  lambda_download_files                  = true
-  timeout_seconds                        = local.file_check_lambda_timeouts_in_seconds["download_files"]
-  s3_sns_topic                           = module.dirty_upload_sns_topic.sns_arn
-  file_system_id                         = module.backend_checks_efs.file_system_id
-  backend_checks_efs_access_point        = module.backend_checks_efs.access_point
-  vpc_id                                 = module.shared_vpc.vpc_id
-  use_efs                                = true
-  auth_url                               = local.keycloak_auth_url
-  api_url                                = module.consignment_api.api_url
-  backend_checks_efs_root_directory_path = module.backend_checks_efs.root_directory_path
-  private_subnet_ids                     = module.backend_checks_efs.private_subnets
-  backend_checks_client_secret           = module.keycloak_ssm_parameters.params[local.keycloak_backend_checks_secret_name].value
-  backend_checks_client_secret_path      = local.keycloak_backend_checks_secret_name
-  kms_key_arn                            = module.encryption_key.kms_key_arn
-  efs_security_group_id                  = module.backend_checks_efs.security_group_id
-  reserved_concurrency                   = 3
-}
-
 module "service_unavailable_lambda" {
   source                     = "./tdr-terraform-modules/lambda"
   project                    = var.project
   common_tags                = local.common_tags
   lambda_service_unavailable = true
   vpc_id                     = module.shared_vpc.vpc_id
-  private_subnet_ids         = module.backend_checks_efs.private_subnets
-}
-
-module "backend_checks_efs" {
-  source                       = "./tdr-terraform-modules/efs"
-  common_tags                  = local.common_tags
-  function                     = "backend-checks-efs"
-  project                      = var.project
-  access_point_path            = "/backend-checks"
-  policy                       = "efs_access_policy"
-  policy_roles                 = jsonencode(flatten([module.file_format_build_task.file_format_build_role, module.checksum_lambda.checksum_lambda_role, module.antivirus_lambda.antivirus_lambda_role, module.download_files_lambda.download_files_lambda_role, module.file_format_lambda.file_format_lambda_role]))
-  bastion_role                 = module.bastion_role.role.arn
-  mount_target_security_groups = flatten([module.file_format_lambda.file_format_lambda_sg_id, module.download_files_lambda.download_files_lambda_sg_id, module.file_format_build_task.file_format_build_sg_id, module.antivirus_lambda.antivirus_lambda_sg_id, module.checksum_lambda.checksum_lambda_sg_id])
-  nat_gateway_ids              = module.shared_vpc.nat_gateway_ids
-  vpc_cidr_block               = module.shared_vpc.vpc_cidr_block
-  vpc_id                       = module.shared_vpc.vpc_id
-}
-
-module "file_format_build_task" {
-  source            = "./tdr-terraform-modules/ecs"
-  common_tags       = local.common_tags
-  file_system_id    = module.backend_checks_efs.file_system_id
-  access_point      = module.backend_checks_efs.access_point
-  file_format_build = true
-  project           = var.project
-  vpc_id            = module.shared_vpc.vpc_id
+  private_subnet_ids         = module.shared_vpc.private_backend_checks_subnets
 }
 
 module "api_gateway_account" {
@@ -572,9 +455,9 @@ module "export_authoriser_lambda" {
   api_gateway_arn          = module.export_api.api_arn
   backend_checks_api_arn   = module.backend_checks_api.api_arn
   kms_key_arn              = module.encryption_key.kms_key_arn
-  private_subnet_ids       = module.backend_checks_efs.private_subnets
+  private_subnet_ids       = module.shared_vpc.private_backend_checks_subnets
   vpc_id                   = module.shared_vpc.vpc_id
-  efs_security_group_id    = module.backend_checks_efs.security_group_id
+  efs_security_group_id    = module.export_efs.security_group_id
 
 }
 
@@ -590,7 +473,7 @@ module "signed_cookies_lambda" {
   timeout_seconds        = 60
   api_gateway_arn        = module.signed_cookies_api.api_arn
   kms_key_arn            = module.encryption_key.kms_key_arn
-  private_subnet_ids     = module.backend_checks_efs.private_subnets
+  private_subnet_ids     = module.shared_vpc.private_backend_checks_subnets
   vpc_id                 = module.shared_vpc.vpc_id
   environment_full       = local.environment_full_name
 }
@@ -602,7 +485,7 @@ module "export_status_update_lambda" {
   lambda_export_status_update       = true
   auth_url                          = local.keycloak_auth_url
   timeout_seconds                   = 60
-  private_subnet_ids                = module.backend_checks_efs.private_subnets
+  private_subnet_ids                = module.shared_vpc.private_backend_checks_subnets
   vpc_id                            = module.shared_vpc.vpc_id
   environment_full                  = local.environment_full_name
   api_url                           = "${module.consignment_api.api_url}/graphql"
@@ -623,7 +506,7 @@ module "reporting_lambda" {
   slack_bot_token                  = module.keycloak_ssm_parameters.params[local.slack_bot_token_name].value
   timeout_seconds                  = 60
   kms_key_arn                      = module.encryption_key.kms_key_arn
-  private_subnet_ids               = module.backend_checks_efs.private_subnets
+  private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
   vpc_id                           = module.shared_vpc.vpc_id
 }
 
@@ -736,7 +619,7 @@ module "tdr_private_nacl" {
     { rule_no = 100, cidr_block = "0.0.0.0/0", action = "allow", from_port = 443, to_port = 443, egress = true },
     { rule_no = 200, cidr_block = module.shared_vpc.vpc_cidr_block, action = "allow", from_port = 1024, to_port = 65535, egress = true }
   ]
-  subnet_ids  = flatten([module.backend_checks_efs.private_subnets, module.export_efs.private_subnets, module.shared_vpc.private_subnets])
+  subnet_ids  = flatten([module.shared_vpc.private_backend_checks_subnets, module.export_efs.private_subnets, module.shared_vpc.private_subnets])
   common_tags = local.common_tags
 }
 
@@ -800,7 +683,7 @@ module "s3_vpc_endpoint" {
       environment            = local.environment
       upload_bucket_name     = module.upload_bucket.s3_bucket_name,
       quarantine_bucket_name = module.upload_bucket_quarantine.s3_bucket_name,
-      antivirus_role         = module.antivirus_lambda.antivirus_lambda_role[0],
+      antivirus_role         = module.yara_av_v2.lambda_role_arn,
       export_task_role       = module.consignment_export_task_role.role.arn,
       export_bucket_name     = module.export_bucket.s3_bucket_name,
       account_id             = data.aws_caller_identity.current.account_id
@@ -818,7 +701,7 @@ module "create_keycloak_users_api_lambda" {
   auth_url                         = local.keycloak_auth_url
   vpc_id                           = module.shared_vpc.vpc_id
   lambda_create_keycloak_user_api  = true
-  private_subnet_ids               = module.backend_checks_efs.private_subnets
+  private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
   keycloak_user_management_api_arn = module.create_keycloak_users_api.api_arn
 }
 
@@ -832,7 +715,7 @@ module "create_keycloak_users_s3_lambda" {
   auth_url                       = local.keycloak_auth_url
   vpc_id                         = module.shared_vpc.vpc_id
   lambda_create_keycloak_user_s3 = true
-  private_subnet_ids             = module.backend_checks_efs.private_subnets
+  private_subnet_ids             = module.shared_vpc.private_backend_checks_subnets
   s3_bucket_arn                  = module.create_bulk_users_bucket.s3_bucket_arn
 }
 
@@ -859,7 +742,7 @@ module "rotate_keycloak_secrets_lambda" {
   project                           = "tdr"
   lambda_rotate_keycloak_secrets    = true
   notifications_topic               = module.notifications_topic.sns_arn
-  private_subnet_ids                = module.backend_checks_efs.private_subnets
+  private_subnet_ids                = module.shared_vpc.private_backend_checks_subnets
   auth_url                          = local.keycloak_auth_url
   rotate_secrets_client_path        = local.keycloak_rotate_secrets_client_secret_name
   vpc_id                            = module.shared_vpc.vpc_id
