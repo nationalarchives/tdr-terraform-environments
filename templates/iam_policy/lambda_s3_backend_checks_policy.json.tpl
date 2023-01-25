@@ -24,13 +24,6 @@
     {
       "Effect": "Allow",
       "Action": [
-        "ssm:GetParameter"
-      ],
-      "Resource": "arn:aws:ssm:eu-west-2:${account_id}:parameter${parameter_name}"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
         "s3:GetObject",
         "s3:ListBucket",
         "s3:PutObject"
