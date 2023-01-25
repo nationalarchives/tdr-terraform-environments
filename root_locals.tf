@@ -100,6 +100,9 @@ locals {
   redacted_files_function_name         = "${var.project}-redacted-files-${local.environment}"
   statuses_function_name               = "${var.project}-statuses-${local.environment}"
 
+  runtime_python_3_9 = "python3.9"
+  runtime_python_3_7 = "python3.7"
+  runtime_java_11    = "java11"
 
   upload_files_cloudfront_dirty_bucket_name = "${var.project}-upload-files-cloudfront-dirty-${local.environment}"
 

@@ -74,7 +74,7 @@ module "file_upload_data" {
     })
   }
   role_name = "TDRFileUploadDataLambdaRole${title(local.environment)}"
-  runtime   = "python3.9"
+  runtime   = local.runtime_python_3_9
   plaintext_env_vars = {
     API_URL                    = "${module.consignment_api.api_url}/graphql"
     AUTH_URL                   = local.keycloak_auth_url
@@ -106,7 +106,7 @@ module "api_update_v2" {
     })
   }
   role_name = "TDRAPIUpdateV2LambdaRole${title(local.environment)}"
-  runtime   = "java11"
+  runtime   = local.runtime_java_11
   plaintext_env_vars = {
     API_URL            = "${module.consignment_api.api_url}/graphql"
     AUTH_URL           = local.keycloak_auth_url
@@ -137,7 +137,7 @@ module "file_format_v2" {
     })
   }
   role_name = "TDRFileFormatV2LambdaRole${title(local.environment)}"
-  runtime   = "java11"
+  runtime   = local.runtime_java_11
   plaintext_env_vars = {
     S3_BUCKET = local.upload_files_cloudfront_dirty_bucket_name
   }
@@ -163,7 +163,7 @@ module "checksum_v2" {
     })
   }
   role_name = "TDRChecksumV2LambdaRole${title(local.environment)}"
-  runtime   = "java11"
+  runtime   = local.runtime_java_11
   plaintext_env_vars = {
     CHUNK_SIZE_IN_MB = 50
     S3_BUCKET        = local.upload_files_cloudfront_dirty_bucket_name
@@ -190,7 +190,7 @@ module "redacted_files" {
     })
   }
   role_name = "TDRRedactedFilesLambdaRole${title(local.environment)}"
-  runtime   = "java11"
+  runtime   = local.runtime_java_11
   vpc_config = [
     {
       subnet_ids         = module.shared_vpc.private_subnets
@@ -219,7 +219,7 @@ module "statuses" {
     })
   }
   role_name = "TDRStatusesLambdaRole${title(local.environment)}"
-  runtime   = "java11"
+  runtime   = local.runtime_java_11
   plaintext_env_vars = {
     USER_NAME    = local.consignment_user_name
     URL_PATH     = local.url_path
@@ -250,7 +250,7 @@ module "yara_av_v2" {
     })
   }
   role_name = "TDRYaraAVV2LambdaRole${title(local.environment)}"
-  runtime   = "python3.7"
+  runtime   = local.runtime_python_3_7
   plaintext_env_vars = {
     ENVIRONMENT    = local.environment
     ROOT_DIRECTORY = local.tmp_directory
@@ -277,7 +277,7 @@ module "backend_checks_results" {
     })
   }
   role_name = "TDRBackendChecksResultsLambdaRole${title(local.environment)}"
-  runtime   = "python3.9"
+  runtime   = local.runtime_python_3_9
   plaintext_env_vars = {
     ENVIRONMENT    = local.environment
     ROOT_DIRECTORY = local.tmp_directory

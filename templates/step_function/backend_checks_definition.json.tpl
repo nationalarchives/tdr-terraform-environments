@@ -194,9 +194,9 @@
       "Retry": [
         {
           "ErrorEquals": [
-            "Lambda.ServiceException",
             "Lambda.AWSLambdaException",
             "Lambda.SdkClientException",
+            "Lambda.ServiceException",
             "Lambda.TooManyRequestsException"
           ],
           "IntervalSeconds": 2,
