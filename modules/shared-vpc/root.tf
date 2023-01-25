@@ -116,7 +116,7 @@ resource "aws_subnet" "private_backend_checks" {
   tags = merge(
     var.common_tags,
     tomap(
-      { "Name" = "tdr-backend-checks-private-subnet--${count.index}-${var.environment}" }
+      { "Name" = "tdr-backend-checks-private-subnet-${count.index}-${var.environment}" }
     )
   )
 }
