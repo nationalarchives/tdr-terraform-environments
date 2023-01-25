@@ -102,9 +102,7 @@ module "upload_file_cloudfront_dirty_s3" {
   function                 = "upload-files-cloudfront-dirty"
   common_tags              = local.common_tags
   cors_urls                = local.upload_cors_urls
-  sns_topic_arn            = module.dirty_upload_sns_topic.sns_arn
   bucket_policy            = "cloudfront_oai"
-  sns_notification         = true
   abort_incomplete_uploads = true
   cloudfront_oai           = module.cloudfront_upload.cloudfront_oai_iam_arn
 }
