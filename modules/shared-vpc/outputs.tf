@@ -14,6 +14,10 @@ output "private_subnets" {
   value = aws_subnet.private.*.id
 }
 
+output "private_backend_checks_subnets" {
+  value = aws_subnet.private_backend_checks.*.id
+}
+
 output "nat_gateway_ids" {
   value = aws_nat_gateway.gw.*.id
 }
