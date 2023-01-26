@@ -108,6 +108,25 @@ resource "aws_route_table" "private" {
   )
 }
 
+resource "aws_subnet" "private_backend_checks" {
+  count             = 2
+  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 6, count.index + 4)
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+  vpc_id            = aws_vpc.main.id
+  tags = merge(
+    var.common_tags,
+    tomap(
+      { "Name" = "tdr-backend-checks-private-subnet-${count.index}-${var.environment}" }
+    )
+  )
+}
+
+resource "aws_route_table_association" "private_backend_checks_association" {
+  count          = 2
+  subnet_id      = aws_subnet.private_backend_checks.*.id[count.index]
+  route_table_id = aws_route_table.private.*.id[count.index]
+}
+
 # Explicitly associate the newly created route tables to the private subnets (so they don't default to the main route table)
 resource "aws_route_table_association" "private" {
   count          = var.az_count
