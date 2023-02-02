@@ -60,10 +60,11 @@ module "outbound_only_security_group" {
 }
 
 module "file_upload_data" {
-  source        = "./tdr-terraform-modules/generic_lambda"
-  tags          = local.common_tags
-  function_name = local.file_upload_data_function_name
-  handler       = "lambda_handler.handler"
+  source               = "./tdr-terraform-modules/generic_lambda"
+  tags                 = local.common_tags
+  function_name        = local.file_upload_data_function_name
+  handler              = "lambda_handler.handler"
+  reserved_concurrency = -1
   policies = {
     "TDRFileUploadDataLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_policy.json.tpl", {
       function_name              = local.file_upload_data_function_name,
