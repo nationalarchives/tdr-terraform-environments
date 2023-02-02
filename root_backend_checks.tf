@@ -155,6 +155,7 @@ module "checksum_v2" {
   function_name        = local.checksum_v2_function_name
   handler              = "uk.gov.nationalarchives.checksum.Lambda::process"
   reserved_concurrency = -1
+  timeout_seconds      = 60
   policies = {
     "TDRChecksumV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_only_policy.json.tpl", {
       function_name = local.checksum_v2_function_name,
@@ -240,6 +241,7 @@ module "yara_av_v2" {
   function_name        = local.yara_av_v2_function_name
   handler              = "matcher.matcher_lambda_handler"
   reserved_concurrency = -1
+  timeout_seconds      = 60
   policies = {
     "TDRYaraAVV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_av_policy.json.tpl", {
       function_name     = local.yara_av_v2_function_name,
