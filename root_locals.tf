@@ -84,7 +84,7 @@ locals {
   transform_engine_v2_sqs_topic_subscriptions = local.environment == "intg" ? [nonsensitive(data.aws_ssm_parameter.transform_engine_v2_tre_out_topic_arn.value)] : []
 
   //Set to true to create security audit IAM user group
-  security_audit = local.environment == false
+  security_audit = false
 
   //Feature access blocks
   block_feature_closure_metadata     = local.environment == "prod"
