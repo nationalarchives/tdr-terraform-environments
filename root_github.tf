@@ -120,6 +120,22 @@ module "github_update_waf_and_security_groups_role" {
   }
 }
 
+module "github_run_e2e_tests_policy" {
+  source        = "./tdr-terraform-modules/iam_policy"
+  name          = "TDRGithubActionsRunE2ETestsPolicy${title(local.environment)}"
+  policy_string = templatefile("${path.module}/templates/iam_policy/github_run_e2e_tests_policy.json.tpl", { environment = local.environment })
+}
+
+module "github_run_e2e_tests_role" {
+  source             = "./tdr-terraform-modules/iam_role"
+  assume_role_policy = templatefile("${path.module}/templates/iam_role/github_assume_role.json.tpl", { account_id = data.aws_caller_identity.current.account_id })
+  common_tags        = local.common_tags
+  name               = "TDRGithubActionsRunE2ETestsRole${title(local.environment)}"
+  policy_attachments = {
+    run_tests_policy = module.github_run_e2e_tests_policy.policy_arn
+  }
+}
+
 module "github_update_ecs_policy" {
   source        = "./tdr-terraform-modules/iam_policy"
   name          = "TDRGitHubECSUpdatePolicy${title(local.environment)}"
