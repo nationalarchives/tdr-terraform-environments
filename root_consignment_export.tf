@@ -15,7 +15,7 @@ module "consignment_export_cloudwatch" {
 
 module "consignment_export_execution_role" {
   source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./tdr-terraform-modules/ecs/templates/ecs_assume_role_policy.json.tpl", {})
+  assume_role_policy = templatefile("./templates/iam_policy/ecs_assume_role_policy.json.tpl", {})
   common_tags        = local.common_tags
   name               = "TDRConsignmentExportECSExecutionRole${title(local.environment)}"
   policy_attachments = {
@@ -26,7 +26,7 @@ module "consignment_export_execution_role" {
 
 module "consignment_export_task_role" {
   source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./tdr-terraform-modules/ecs/templates/ecs_assume_role_policy.json.tpl", {})
+  assume_role_policy = templatefile("./templates/iam_policy/ecs_assume_role_policy.json.tpl", {})
   common_tags        = local.common_tags
   name               = "TDRConsignmentExportEcsTaskRole${title(local.environment)}"
   policy_attachments = {
