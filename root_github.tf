@@ -198,7 +198,7 @@ module "run_update_keycloak_execution_policy" {
 
 module "run_update_keycloak_execution_role" {
   source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./tdr-terraform-modules/ecs/templates/ecs_assume_role_policy.json.tpl", {})
+  assume_role_policy = templatefile("./templates/iam_policy/ecs_assume_role_policy.json.tpl", {})
   common_tags        = local.common_tags
   name               = "TDRKeycloakUpdateECSExecutionRole${title(local.environment)}"
   policy_attachments = {
