@@ -256,7 +256,6 @@ module "create_db_users_lambda" {
   lambda_create_db_users      = true
   vpc_id                      = module.shared_vpc.vpc_id
   private_subnet_ids          = module.shared_vpc.private_backend_checks_subnets
-  consignment_database_sg_id  = module.consignment_api.consignment_db_security_group_id
   db_admin_user               = module.consignment_api_database.database_user
   db_admin_password           = module.consignment_api_database.database_password
   db_url                      = module.consignment_api_database.database_url
@@ -273,7 +272,6 @@ module "create_bastion_user_lambda" {
   lambda_create_db_users      = true
   vpc_id                      = module.shared_vpc.vpc_id
   private_subnet_ids          = module.shared_vpc.private_backend_checks_subnets
-  consignment_database_sg_id  = module.consignment_api.consignment_db_security_group_id
   db_admin_user               = module.consignment_api_database.database_user
   db_admin_password           = module.consignment_api_database.database_password
   db_url                      = module.consignment_api_database.database_url
