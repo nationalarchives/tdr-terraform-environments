@@ -151,16 +151,17 @@ module "keycloak_tdr_alb" {
 }
 
 module "keycloak_database_instance" {
-  source             = "./tdr-terraform-modules/rds_instance"
-  admin_username     = "keycloak_admin"
-  availability_zone  = local.database_availability_zone
-  common_tags        = local.common_tags
-  database_name      = "keycloak"
-  environment        = local.environment
-  kms_key_id         = module.encryption_key.kms_key_arn
-  private_subnets    = module.shared_vpc.private_subnets
-  security_group_ids = [module.keycloak_database_security_group.security_group_id]
-  multi_az           = local.environment == "prod"
+  source                  = "./tdr-terraform-modules/rds_instance"
+  admin_username          = "keycloak_admin"
+  availability_zone       = local.database_availability_zone
+  common_tags             = local.common_tags
+  database_name           = "keycloak"
+  environment             = local.environment
+  kms_key_id              = module.encryption_key.kms_key_arn
+  private_subnets         = module.shared_vpc.private_subnets
+  security_group_ids      = [module.keycloak_database_security_group.security_group_id]
+  multi_az                = local.environment == "prod"
+  backup_retention_period = 30
 }
 
 module "create_keycloak_db_users_lambda_new" {
