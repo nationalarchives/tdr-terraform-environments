@@ -216,6 +216,7 @@ module "frontend_alb" {
   public_subnets       = module.shared_vpc.public_subnets
   vpc_id               = module.shared_vpc.vpc_id
   common_tags          = local.common_tags
+  http_listener        = false
 }
 
 module "encryption_key" {
