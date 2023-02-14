@@ -83,7 +83,7 @@
                       "FunctionName": "${notification_lambda_arn}",
                       "Payload": {
                         "consignmentId.$": "$$.Execution.Input.consignmentId",
-                        "error.$": "The antivirus lambda has failed for consignment $$.Execution.Input.consignmentId",
+                        "error": "The antivirus lambda has failed",
                         "cause.$": "$.Cause",
                         "environment": "${environment}"
                       }
@@ -141,7 +141,7 @@
                       "FunctionName": "${notification_lambda_arn}",
                       "Payload": {
                         "consignmentId.$": "$$.Execution.Input.consignmentId",
-                        "error.$": "The file format lambda has failed for consignment $$.Execution.Input.consignmentId",
+                        "error": "The file format lambda has failed",
                         "cause.$": "$.Cause",
                         "environment": "${environment}"
                       }
@@ -199,7 +199,7 @@
                       "FunctionName": "${notification_lambda_arn}",
                       "Payload": {
                         "consignmentId.$": "$$.Execution.Input.consignmentId",
-                        "error.$": "The checksum lambda has failed for consignment $$.Execution.Input.consignmentId",
+                        "error": "The checksum lambda has failed",
                         "cause.$": "$.Cause",
                         "environment": "${environment}"
                       }
