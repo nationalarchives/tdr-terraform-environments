@@ -88,16 +88,8 @@
                         "environment": "${environment}"
                       }
                     },
-                    "Next": "Antivirus Add Error",
-                    "ResultPath": null
-                  },
-                  "Antivirus Add Error": {
-                    "Type": "Pass",
                     "End": true,
-                    "Result": {
-                      "failure": "Antivirus"
-                    },
-                    "ResultPath": "$.Cause"
+                    "ResultPath": null
                   }
                 }
               },
@@ -146,16 +138,8 @@
                         "environment": "${environment}"
                       }
                     },
-                    "Next": "File Format Add Error",
-                    "ResultPath": null
-                  },
-                  "File Format Add Error": {
-                    "Type": "Pass",
                     "End": true,
-                    "Result": {
-                      "failure": "FileFormat"
-                    },
-                    "ResultPath": "$.Cause"
+                    "ResultPath": null
                   }
                 }
               },
@@ -204,16 +188,8 @@
                         "environment": "${environment}"
                       }
                     },
-                    "Next": "Checksum Add Error",
-                    "ResultPath": null
-                  },
-                  "Checksum Add Error": {
-                    "Type": "Pass",
                     "End": true,
-                    "Result": {
-                      "failure": "Checksum"
-                    },
-                    "ResultPath": "$.Cause"
+                    "ResultPath": null
                   }
                 }
               }
@@ -223,8 +199,7 @@
             "ResultSelector": {
               "antivirus.$": "$.[?(@.antivirus)].antivirus",
               "fileFormat.$": "$.[?(@.fileFormat)].fileFormat",
-              "checksum.$": "$.[?(@.checksum)].checksum",
-              "failures.$": "$.[?(@.Error)].Cause.failure"
+              "checksum.$": "$.[?(@.checksum)].checksum"
             }
           }
         },
