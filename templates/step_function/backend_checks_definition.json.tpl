@@ -66,19 +66,30 @@
                       "FunctionName": "${yara_av_v2_lambda_arn}",
                       "Payload.$": "$"
                     },
-                    "Retry": [
+                    "End": true,
+                    "Catch": [
                       {
                         "ErrorEquals": [
-                          "Lambda.AWSLambdaException",
-                          "Lambda.SdkClientException",
-                          "Lambda.ServiceException"
+                          "States.ALL"
                         ],
-                        "IntervalSeconds": 2,
-                        "MaxAttempts": 6,
-                        "BackoffRate": 2
+                        "Next": "AV Notify"
                       }
-                    ],
-                    "End": true
+                    ]
+                  },
+                  "AV Notify": {
+                    "Type": "Task",
+                    "Resource": "arn:aws:states:::lambda:invoke",
+                    "Parameters": {
+                      "FunctionName": "${notification_lambda_arn}",
+                      "Payload": {
+                        "consignmentId.$": "$$.Execution.Input.consignmentId",
+                        "error": "The antivirus lambda has failed",
+                        "cause.$": "$.Cause",
+                        "environment": "${environment}"
+                      }
+                    },
+                    "End": true,
+                    "ResultPath": null
                   }
                 }
               },
@@ -105,7 +116,30 @@
                         "BackoffRate": 2
                       }
                     ],
-                    "End": true
+                    "End": true,
+                    "Catch": [
+                      {
+                        "ErrorEquals": [
+                          "States.ALL"
+                        ],
+                        "Next": "File Format Notify"
+                      }
+                    ]
+                  },
+                  "File Format Notify": {
+                    "Type": "Task",
+                    "Resource": "arn:aws:states:::lambda:invoke",
+                    "Parameters": {
+                      "FunctionName": "${notification_lambda_arn}",
+                      "Payload": {
+                        "consignmentId.$": "$$.Execution.Input.consignmentId",
+                        "error": "The file format lambda has failed",
+                        "cause.$": "$.Cause",
+                        "environment": "${environment}"
+                      }
+                    },
+                    "End": true,
+                    "ResultPath": null
                   }
                 }
               },
@@ -132,7 +166,30 @@
                         "BackoffRate": 2
                       }
                     ],
-                    "End": true
+                    "End": true,
+                    "Catch": [
+                      {
+                        "ErrorEquals": [
+                          "States.ALL"
+                        ],
+                        "Next": "Checksum Notify"
+                      }
+                    ]
+                  },
+                  "Checksum Notify": {
+                    "Type": "Task",
+                    "Resource": "arn:aws:states:::lambda:invoke",
+                    "Parameters": {
+                      "FunctionName": "${notification_lambda_arn}",
+                      "Payload": {
+                        "consignmentId.$": "$$.Execution.Input.consignmentId",
+                        "error": "The checksum lambda has failed",
+                        "cause.$": "$.Cause",
+                        "environment": "${environment}"
+                      }
+                    },
+                    "End": true,
+                    "ResultPath": null
                   }
                 }
               }
@@ -156,14 +213,6 @@
         "results.$": "$"
       },
       "Next": "Process Map Results",
-      "Catch": [
-        {
-          "ErrorEquals": [
-            "States.ALL"
-          ],
-          "Next": "Notify"
-        }
-      ],
       "Label": "Map",
       "ItemReader": {
         "Resource": "arn:aws:states:::s3:getObject",
@@ -273,37 +322,6 @@
         }
       ],
       "End": true
-    },
-    "Notify": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::lambda:invoke",
-      "OutputPath": "$.Payload",
-      "Parameters": {
-        "FunctionName": "${notification_lambda_arn}",
-        "Payload": {
-          "consignmentId.$": "$$.Execution.Input.consignmentId",
-          "error.$": "$.Error",
-          "cause.$": "$.Cause",
-          "environment": "${environment}"
-        }
-      },
-      "Retry": [
-        {
-          "ErrorEquals": [
-            "Lambda.AWSLambdaException",
-            "Lambda.SdkClientException",
-            "Lambda.ServiceException",
-            "Lambda.TooManyRequestsException"
-          ],
-          "IntervalSeconds": 2,
-          "MaxAttempts": 6,
-          "BackoffRate": 2
-        }
-      ],
-      "Next": "Fail"
-    },
-    "Fail": {
-      "Type": "Fail"
     }
   }
 }
