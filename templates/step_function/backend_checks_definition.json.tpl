@@ -13,9 +13,7 @@
       "Retry": [
         {
           "ErrorEquals": [
-            "Lambda.AWSLambdaException",
-            "Lambda.SdkClientException",
-            "Lambda.ServiceException"
+            "States.ALL"
           ],
           "IntervalSeconds": 2,
           "MaxAttempts": 6,
@@ -34,10 +32,7 @@
       "Retry": [
         {
           "ErrorEquals": [
-            "Lambda.AWSLambdaException",
-            "Lambda.SdkClientException",
-            "Lambda.ServiceException",
-            "Lambda.TooManyRequestsException"
+            "States.ALL"
           ],
           "IntervalSeconds": 2,
           "MaxAttempts": 6,
@@ -107,9 +102,7 @@
                     "Retry": [
                       {
                         "ErrorEquals": [
-                          "Lambda.AWSLambdaException",
-                          "Lambda.SdkClientException",
-                          "Lambda.ServiceException"
+                          "States.ALL"
                         ],
                         "IntervalSeconds": 2,
                         "MaxAttempts": 6,
@@ -157,9 +150,7 @@
                     "Retry": [
                       {
                         "ErrorEquals": [
-                          "Lambda.AWSLambdaException",
-                          "Lambda.SdkClientException",
-                          "Lambda.ServiceException"
+                          "States.ALL"
                         ],
                         "IntervalSeconds": 2,
                         "MaxAttempts": 6,
@@ -243,10 +234,7 @@
       "Retry": [
         {
           "ErrorEquals": [
-            "Lambda.AWSLambdaException",
-            "Lambda.SdkClientException",
-            "Lambda.ServiceException",
-            "Lambda.TooManyRequestsException"
+            "States.ALL"
           ],
           "IntervalSeconds": 2,
           "MaxAttempts": 6,
@@ -265,10 +253,7 @@
       "Retry": [
         {
           "ErrorEquals": [
-            "Lambda.AWSLambdaException",
-            "Lambda.SdkClientException",
-            "Lambda.ServiceException",
-            "Lambda.TooManyRequestsException"
+            "States.ALL"
           ],
           "IntervalSeconds": 2,
           "MaxAttempts": 6,
@@ -288,10 +273,7 @@
       "Retry": [
         {
           "ErrorEquals": [
-            "Lambda.AWSLambdaException",
-            "Lambda.SdkClientException",
-            "Lambda.ServiceException",
-            "Lambda.TooManyRequestsException"
+            "States.ALL"
           ],
           "IntervalSeconds": 2,
           "MaxAttempts": 6,
@@ -312,9 +294,7 @@
       "Retry": [
         {
           "ErrorEquals": [
-            "Lambda.AWSLambdaException",
-            "Lambda.SdkClientException",
-            "Lambda.ServiceException"
+            "States.ALL"
           ],
           "IntervalSeconds": 2,
           "MaxAttempts": 6,
