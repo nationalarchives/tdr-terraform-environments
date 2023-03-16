@@ -2,6 +2,7 @@ import boto3
 import time
 import sys
 from urllib.parse import quote_plus
+import os
 
 client = boto3.client("logs")
 timestamp = int(time.time()) * 1000
@@ -29,4 +30,6 @@ encoded_stream_name = quote_plus(quote_plus(log_stream_name))
 fragment = f"logsV2:log-groups/log-group/{log_group_name}/log-events/{encoded_stream_name}"
 url = f"{base_url}?region=eu-west-2#{fragment}"
 
-print(f"::set-output name=log-url::{url}")
+
+with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
+    print(f"log-url={url}", file=fh)
