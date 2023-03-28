@@ -87,9 +87,9 @@ locals {
   security_audit = false
 
   //Feature access blocks
-  block_feature_closure_metadata     = local.environment == "prod"
-  block_feature_descriptive_metadata = local.environment == "prod"
-  block_feature_view_transfers       = local.environment == "prod"
+  block_feature_closure_metadata     = false
+  block_feature_descriptive_metadata = false
+  block_feature_view_transfers       = false
 
   file_upload_data_function_name       = "${var.project}-file-upload-data-${local.environment}"
   api_update_v2_function_name          = "${var.project}-api-update-v2-${local.environment}"
