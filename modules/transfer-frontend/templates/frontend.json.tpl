@@ -1,7 +1,7 @@
 [
   {
     "name": "aws-otel-collector",
-    "image": "229554778675.dkr.ecr.eu-west-2.amazonaws.com/collector",
+    "image": "${collector_image}",
     "cpu": 256,
     "memory": 512,
     "portMappings": [],
@@ -16,8 +16,8 @@
       "logDriver": "awslogs",
       "options": {
         "awslogs-create-group": "True",
-        "awslogs-group": "/ecs/ecs-aws-otel-sidecar-collector",
-        "awslogs-region": "eu-west-2",
+        "awslogs-group": "/ecs/ecs-aws-otel-sidecar-collector-${app_environment}",
+        "awslogs-region": "${aws_region}",
         "awslogs-stream-prefix": "ecs"
       }
     }
