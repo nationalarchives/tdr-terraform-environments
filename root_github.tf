@@ -34,6 +34,16 @@ module "github_transfer_frontend_environment" {
   }
 }
 
+module "github_tdr_xray_logging_environment" {
+  source          = "./tdr-terraform-modules/github_environments"
+  environment     = local.environment
+  repository_name = "nationalarchives/tdr-xray-logging"
+  team_slug       = "transfer-digital-records-admins"
+  secrets = {
+    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
+  }
+}
+
 module "github_terraform_environment" {
   source                = "./tdr-terraform-modules/github_environments"
   environment           = local.environment
