@@ -110,7 +110,6 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
    [location of project] $ export GITHUB_TOKEN=[valid token with access to TDR GitHub repos. Can use token from SSM parameter store: /mgmt/github/jenkins-api-key]
    [location of project] $ export GITHUB_OWNER=nationalarchives
    ```
-   
 10. Initialize Terraform (if not done so previously):
 
    ```
