@@ -86,11 +86,6 @@ locals {
   //Set to true to create security audit IAM user group
   security_audit = false
 
-  //Feature access blocks
-  block_feature_closure_metadata     = false
-  block_feature_descriptive_metadata = false
-  block_feature_view_transfers       = false
-
   file_upload_data_function_name       = "${var.project}-file-upload-data-${local.environment}"
   api_update_v2_function_name          = "${var.project}-api-update-v2-${local.environment}"
   backend_checks_results_function_name = "${var.project}-backend-checks-results-${local.environment}"
