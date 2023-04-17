@@ -42,18 +42,3 @@ variable "alb_id" {}
 variable "public_subnet_ranges" {
   type = list(string)
 }
-
-variable "block_feature_closure_metadata" {
-  description = "Feature access block for closure metadata"
-  default     = true
-}
-
-variable "block_feature_descriptive_metadata" {
-  description = "Feature access block for descriptive metadata"
-  default     = true
-}
-
-variable "block_feature_view_transfers" {
-  description = "Feature access block for view transfers"
-  default     = true
-}
