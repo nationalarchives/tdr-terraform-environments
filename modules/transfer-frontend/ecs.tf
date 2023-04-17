@@ -29,9 +29,6 @@ data "template_file" "app" {
     alb_ip_a                           = var.public_subnet_ranges[0]
     alb_ip_b                           = var.public_subnet_ranges[1]
     auth_url                           = var.auth_url
-    block_feature_closure_metadata     = var.block_feature_closure_metadata
-    block_feature_descriptive_metadata = var.block_feature_descriptive_metadata
-    block_feature_view_transfers       = var.block_feature_view_transfers
   }
 }
 
