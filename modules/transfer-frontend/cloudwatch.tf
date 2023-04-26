@@ -8,3 +8,8 @@ resource "aws_cloudwatch_log_stream" "tdr_application_log_stream" {
   name           = "tdr-frontend-log-stream-${var.environment}"
   log_group_name = aws_cloudwatch_log_group.frontend_log_group.name
 }
+
+resource "aws_cloudwatch_log_group" "aws-otel-collector" {
+  name              = "/ecs/aws-otel-collector-${var.environment}"
+  retention_in_days = 30
+}

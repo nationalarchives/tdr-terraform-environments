@@ -18,6 +18,7 @@ data "template_file" "app" {
   template = file("modules/transfer-frontend/templates/frontend.json.tpl")
 
   vars = {
+    collector_image        = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/aws-otel-collector:${var.environment}"
     app_image              = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/transfer-frontend:${var.environment}"
     app_port               = local.app_port
     app_environment        = var.environment
@@ -142,7 +143,9 @@ data "aws_iam_policy_document" "frontend_ecs_execution" {
     ]
     resources = [
       "${aws_cloudwatch_log_group.frontend_log_group.arn}:*",
-      "arn:aws:ecr:eu-west-2:${data.aws_ssm_parameter.mgmt_account_number.value}:repository/transfer-frontend"
+      "arn:aws:ecr:eu-west-2:${data.aws_ssm_parameter.mgmt_account_number.value}:repository/transfer-frontend",
+      "${aws_cloudwatch_log_group.aws-otel-collector.arn}:*",
+      "arn:aws:ecr:eu-west-2:${data.aws_ssm_parameter.mgmt_account_number.value}:repository/aws-otel-collector"
     ]
   }
   statement {
