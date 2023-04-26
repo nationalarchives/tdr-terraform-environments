@@ -15,7 +15,7 @@
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-        "awslogs-group": "/ecs/ecs-aws-otel-sidecar-collector-${app_environment}",
+        "awslogs-group": "/ecs/aws-otel-collector-${app_environment}",
         "awslogs-region": "${aws_region}",
         "awslogs-stream-prefix": "ecs"
       }
