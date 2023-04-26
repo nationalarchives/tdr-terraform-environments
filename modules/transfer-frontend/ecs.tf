@@ -145,7 +145,8 @@ data "aws_iam_policy_document" "frontend_ecs_execution" {
       "${aws_cloudwatch_log_group.frontend_log_group.arn}:*",
       "arn:aws:ecr:eu-west-2:${data.aws_ssm_parameter.mgmt_account_number.value}:repository/transfer-frontend",
       "${aws_cloudwatch_log_group.aws-otel-collector.arn}:*",
-      "arn:aws:ecr:eu-west-2:${data.aws_ssm_parameter.mgmt_account_number.value}:repository/aws-otel-collector"
+      "arn:aws:ecr:eu-west-2:${data.aws_ssm_parameter.mgmt_account_number.value}:repository/aws-otel-collector",
+      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/ecs/application/metrics:log-stream:otel-stream-*"
     ]
   }
   statement {
