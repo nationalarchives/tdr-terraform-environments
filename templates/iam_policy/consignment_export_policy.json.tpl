@@ -49,7 +49,11 @@
         "logs:GetLogDelivery",
         "logs:ListLogDeliveries",
         "logs:PutResourcePolicy",
-        "logs:UpdateLogDelivery"
+        "logs:UpdateLogDelivery",
+        "xray:PutTraceSegments",
+        "xray:PutTelemetryRecords",
+        "xray:GetSamplingRules",
+        "xray:GetSamplingTargets"
       ],
       "Resource": "*"
     },
