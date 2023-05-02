@@ -117,6 +117,11 @@ resource "aws_iam_role_policy_attachment" "frontend_ecs_task_xray" {
   policy_arn = "arn:aws:iam::aws:policy/AWSXrayFullAccess"
 }
 
+resource "aws_iam_role_policy_attachment" "frontend_ecs_task_ecs_execution" {
+  role       = aws_iam_role.frontend_ecs_task.name
+  policy_arn = aws_iam_policy.frontend_ecs_execution.arn
+}
+
 resource "aws_iam_role_policy_attachment" "frontend_ecs_execution_ssm" {
   role       = aws_iam_role.frontend_ecs_execution.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
