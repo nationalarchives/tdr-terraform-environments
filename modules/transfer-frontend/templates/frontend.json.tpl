@@ -63,6 +63,10 @@
       {
         "name": "AUTH_URL",
         "value": "${auth_url}"
+      },
+      {
+        "name": "OTEL_SERVICE_NAME",
+        "value": "${otel_service_name}"
       }
     ],
     "networkMode": "awsvpc",
