@@ -31,6 +31,16 @@
         "${backend_checks_bucket_arn}",
         "${state_machine_arn}"
       ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "xray:PutTraceSegments",
+        "xray:PutTelemetryRecords",
+        "xray:GetSamplingRules",
+        "xray:GetSamplingTargets"
+      ],
+      "Resource": "*"
     }
   ]
 }
