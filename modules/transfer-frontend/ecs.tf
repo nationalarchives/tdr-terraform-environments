@@ -29,6 +29,7 @@ data "template_file" "app" {
     alb_ip_a               = var.public_subnet_ranges[0]
     alb_ip_b               = var.public_subnet_ranges[1]
     auth_url               = var.auth_url
+    otel_service_name      = var.otel_service_name
   }
 }
 

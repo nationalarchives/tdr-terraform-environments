@@ -37,6 +37,8 @@ variable "export_api_url" {}
 
 variable "backend_checks_api_url" {}
 
+variable "otel_service_name" {}
+
 variable "alb_id" {}
 
 variable "public_subnet_ranges" {

@@ -67,6 +67,7 @@ module "frontend" {
   backend_checks_api_url = module.backend_checks_api.api_url
   alb_id                 = module.frontend_alb.alb_id
   public_subnet_ranges   = module.shared_vpc.public_subnet_ranges
+  otel_service_name      = "frontend-${local.environment}"
 }
 
 module "alb_logs_s3" {
