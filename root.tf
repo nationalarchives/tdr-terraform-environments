@@ -419,7 +419,7 @@ module "reporting_lambda" {
   keycloak_reporting_client_secret = module.keycloak_ssm_parameters.params[local.keycloak_reporting_client_secret_name].value
   reporting_client_secret_path     = local.keycloak_reporting_client_secret_name
   slack_bot_token                  = module.keycloak_ssm_parameters.params[local.slack_bot_token_name].value
-  timeout_seconds                  = 60
+  timeout_seconds                  = 120
   kms_key_arn                      = module.encryption_key.kms_key_arn
   private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
   vpc_id                           = module.shared_vpc.vpc_id
