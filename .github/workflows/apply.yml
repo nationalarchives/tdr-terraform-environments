@@ -3,10 +3,14 @@ on:
   workflow_dispatch:
     inputs:
       environment:
+        type: choice
+        description: 'The environment to deploy against.'
         required: true
-        description: The environment to deploy against.
-        type: string
-        default: intg
+        options:
+          - intg
+          - staging
+          - prod
+        default: 'intg'
 permissions:
   id-token: write
   contents: write
