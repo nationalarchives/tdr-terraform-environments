@@ -274,17 +274,6 @@ module "github_aws_accounts_environment" {
   repository_name       = "nationalarchives/tdr-aws-accounts"
   team_slug             = "transfer-digital-records-admins"
   integration_team_slug = ["transfer-digital-records"]
-  secrets = {
-    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
-  }
-}
-
-module "github_aws_accounts_repository" {
-  source          = "./tdr-terraform-modules/github_repositories"
-  repository_name = "nationalarchives/tdr-aws-accounts"
-  secrets = {
-    "${upper(local.environment)}_ACCOUNT_NUMBER" = data.aws_caller_identity.current.account_id
-  }
 }
 
 module "github_create_db_user_policy" {
@@ -362,21 +351,10 @@ module "github_create_db_users_environment" {
 
 module "github_custodian_environment" {
   source                = "./tdr-terraform-modules/github_environments"
-  environment           = local.environment
+  environment           = "tdr-${local.environment}"
   repository_name       = "nationalarchives/tna-custodian"
   team_slug             = "transfer-digital-records-admins"
   integration_team_slug = ["transfer-digital-records"]
-  secrets = {
-    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
-  }
-}
-
-module "github_custodian_repository" {
-  source          = "./tdr-terraform-modules/github_repositories"
-  repository_name = "nationalarchives/tna-custodian"
-  secrets = {
-    "${upper(local.environment)}_ACCOUNT_NUMBER" = data.aws_caller_identity.current.account_id
-  }
 }
 
 module "github_download_files_environment" {
