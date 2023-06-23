@@ -775,3 +775,10 @@ module "iam_security_audit_user_group" {
   security_audit = local.security_audit
   environment    = local.environment
 }
+
+module "ecs_task_events_log_group" {
+  source            = "./tdr-terraform-modules/cloudwatch_logs"
+  name              = "/aws/events/ecs-task-events-${local.environment}"
+  retention_in_days = 30
+  common_tags       = local.common_tags
+}
