@@ -782,3 +782,11 @@ module "ecs_task_events_log_group" {
   retention_in_days = 30
   common_tags       = local.common_tags
 }
+
+module "ecs_task_stopped_event" {
+  source                               = "./tdr-terraform-modules/cloudwatch_events"
+  event_pattern                        = "ecs_task_stopped"
+  log_group_ecs_task_events_target_arn = module.ecs_task_events_log_group.log_group_arn
+  rule_name                            = "ecs-task-state-stopped"
+  rule_description                     = "Log to cloudwatch when ECS task state is STOPPED"
+}
