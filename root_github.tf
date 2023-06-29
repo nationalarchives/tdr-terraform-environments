@@ -83,17 +83,6 @@ module "github_db_migrations_environment" {
   }
 }
 
-module "github_keycloak_user_management_environment" {
-  source          = "./tdr-terraform-modules/github_environments"
-  environment     = local.environment
-  repository_name = "nationalarchives/tdr-keycloak-user-management"
-  team_slug       = "transfer-digital-records-admins"
-  secrets = {
-    TITLE_STAGE    = title(local.environment)
-    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
-  }
-}
-
 module "github_actions_deploy_lambda_policy" {
   source        = "./tdr-terraform-modules/iam_policy"
   name          = "TDRGithubActionsDeployLambda${title(local.environment)}"
@@ -432,16 +421,6 @@ module "github_signed_cookies_environment" {
   source          = "./tdr-terraform-modules/github_environments"
   environment     = local.environment
   repository_name = "nationalarchives/tdr-signed-cookies"
-  team_slug       = "transfer-digital-records-admins"
-  secrets = {
-    ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
-  }
-}
-
-module "github_reporting_environment" {
-  source          = "./tdr-terraform-modules/github_environments"
-  environment     = local.environment
-  repository_name = "nationalarchives/tdr-reporting"
   team_slug       = "transfer-digital-records-admins"
   secrets = {
     ACCOUNT_NUMBER = data.aws_caller_identity.current.account_id
