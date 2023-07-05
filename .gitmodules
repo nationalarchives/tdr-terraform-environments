@@ -5,5 +5,5 @@
 	path = tdr-terraform-modules
 	url = https://github.com/nationalarchives/tdr-terraform-modules.git
 [submodule "da-terraform-configurations"]
-    path = da-terraform-configurations
-    url = https://github.com/nationalarchives/da-terraform-configurations.git
+	path = da-terraform-configurations
+	url = https://github.com/nationalarchives/da-terraform-configurations.git
