@@ -1,4 +1,4 @@
-module "s3-external-kms-key" {
+module "s3_external_kms_key" {
   source   = "./da-terraform-modules/kms"
   key_name = "tdr-s3-data-external-${local.environment}"
   tags     = local.common_tags

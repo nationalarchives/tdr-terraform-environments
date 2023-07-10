@@ -501,6 +501,7 @@ module "notification_lambda" {
   project                        = "tdr"
   lambda_ecr_scan_notifications  = true
   kms_key_arn                    = module.encryption_key.kms_key_arn
+  kms_export_bucket_key_arn      = module.s3_external_kms_key.kms_key_arn
   event_rule_arns                = []
   sns_topic_arns                 = [module.notifications_topic.sns_arn]
   sqs_queue_arns                 = [module.transform_engine_v2_retry_queue.sqs_arn, module.transform_engine_retry_queue.sqs_arn]
