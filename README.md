@@ -85,7 +85,13 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
    [location of project] $ git clone https://github.com/nationalarchives/da-terraform-configurations.git
    ```
 
-6. Create Terraform workspaces corresponding to the TDR environments:
+6. Clone DA Terraform Modules repository
+
+   ```
+   [location of project] $ git clone https://github.com/nationalarchives/da-terraform-modules.git
+   ```
+
+7. Create Terraform workspaces corresponding to the TDR environments:
 
    ```
    [location of project] $ terraform workspace new intg
@@ -94,45 +100,45 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
 
    [location of project] $ terraform workspace new prod
    ```
-7. Switch to the Terraform workspace corresponding to the TDR environment to be worked on:
+8. Switch to the Terraform workspace corresponding to the TDR environment to be worked on:
 
    ```
    [location of project] $ terraform workspace select intg
    ```
 
-8. Run the following command to ensure Terraform uses the correct credentials:
+9. Run the following command to ensure Terraform uses the correct credentials:
 
    ```
    [location of project] $ export AWS_PROFILE=terraform
    ```
 
-9. Set the following Terraform environment variables on the local environment:
+10. Set the following Terraform environment variables on the local environment:
 
     * TF_VAR_tdr_account_number=*[account number of the environment to update]*
     
-10. Set the following environmental variables:
+11. Set the following environmental variables:
 
    ```
    [location of project] $ export GITHUB_TOKEN=[valid token with access to TDR GitHub repos. Can use token from SSM parameter store: /mgmt/github/jenkins-api-key]
    [location of project] $ export GITHUB_OWNER=nationalarchives
    ```
    
-11. Initialize Terraform (if not done so previously):
+12. Initialize Terraform (if not done so previously):
 
    ```
    [location of project] $ terraform init   
    ```
-12. Run Terraform to view changes that will be made to the TDR environment AWS resources
+13. Run Terraform to view changes that will be made to the TDR environment AWS resources
 
    ```
    [location of project] $ terraform plan
    ```
-13. Run `terraform fmt --recursive` to properly format your Terraform changes
+14. Run `terraform fmt --recursive` to properly format your Terraform changes
 
-14. Before you push the changes made in terraform-environments directory, if you've made changes to a sub-module (`tdr-terraform-modules` or `tdr-configurations`), push and get those changes
+15. Before you push the changes made in terraform-environments directory, if you've made changes to a sub-module (`tdr-terraform-modules` or `tdr-configurations`), push and get those changes
 merged (`cd {sub-module name}`) and then update the sub-module hashes (instructions on how to do this are below) before moving onto the next step.
 
-15. Commit and push all the changes made in the terraform-environments directory to its GitHub repo, then (in the GitHub repo):
+16. Commit and push all the changes made in the terraform-environments directory to its GitHub repo, then (in the GitHub repo):
 
 Go the Actions tab -> Click ["Terraform Apply"] -> Click "Run workflow" -> select the branch with the workflow file you want to use -> Click the green "Run worklfow" button
 
