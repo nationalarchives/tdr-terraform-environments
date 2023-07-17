@@ -41,9 +41,16 @@ module "consignment_export_execution_policy" {
 }
 
 module "consignment_export_task_policy" {
-  source        = "./tdr-terraform-modules/iam_policy"
-  name          = "TDRConsignmentExportECSTaskPolicy${title(local.environment)}"
-  policy_string = templatefile("./tdr-terraform-modules/iam_policy/templates/consignment_export_task_policy.json.tpl", { environment = local.environment, titleEnvironment = title(local.environment), aws_region = local.region, account = data.aws_caller_identity.current.account_id })
+  source = "./tdr-terraform-modules/iam_policy"
+  name   = "TDRConsignmentExportECSTaskPolicy${title(local.environment)}"
+  policy_string = templatefile(
+    "./tdr-terraform-modules/iam_policy/templates/consignment_export_task_policy.json.tpl", {
+      environment               = local.environment,
+      titleEnvironment          = title(local.environment),
+      aws_region                = local.region,
+      account                   = data.aws_caller_identity.current.account_id,
+      kms_export_bucket_key_arn = module.s3_external_kms_key.kms_key_arn
+  })
 }
 
 module "consignment_export_ecs_task" {

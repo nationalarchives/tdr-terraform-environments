@@ -116,29 +116,22 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
 
     * TF_VAR_tdr_account_number=*[account number of the environment to update]*
     
-11. Set the following environmental variables:
-
-   ```
-   [location of project] $ export GITHUB_TOKEN=[valid token with access to TDR GitHub repos. Can use token from SSM parameter store: /mgmt/github/jenkins-api-key]
-   [location of project] $ export GITHUB_OWNER=nationalarchives
-   ```
-   
-12. Initialize Terraform (if not done so previously):
+11. Initialize Terraform (if not done so previously):
 
    ```
    [location of project] $ terraform init   
    ```
-13. Run Terraform to view changes that will be made to the TDR environment AWS resources
+12. Run Terraform to view changes that will be made to the TDR environment AWS resources
 
    ```
    [location of project] $ terraform plan
    ```
-14. Run `terraform fmt --recursive` to properly format your Terraform changes
+13. Run `terraform fmt --recursive` to properly format your Terraform changes
 
-15. Before you push the changes made in terraform-environments directory, if you've made changes to a sub-module (`tdr-terraform-modules` or `tdr-configurations`), push and get those changes
+14. Before you push the changes made in terraform-environments directory, if you've made changes to a sub-module (`tdr-terraform-modules` or `tdr-configurations`), push and get those changes
 merged (`cd {sub-module name}`) and then update the sub-module hashes (instructions on how to do this are below) before moving onto the next step.
 
-16. Commit and push all the changes made in the terraform-environments directory to its GitHub repo, then (in the GitHub repo):
+15. Commit and push all the changes made in the terraform-environments directory to its GitHub repo, then (in the GitHub repo):
 
 Go the Actions tab -> Click ["Terraform Apply"] -> Click "Run workflow" -> select the branch with the workflow file you want to use -> Click the green "Run worklfow" button
 
