@@ -19,6 +19,10 @@
       {
         "name" : "DB_PORT",
         "value" : "5432"
+      },
+      {
+        "name": "BLOCK_HTTP4S",
+        "value": "${block_http4s}"
       }
     ],
     "secrets": [

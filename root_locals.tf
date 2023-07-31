@@ -105,4 +105,6 @@ locals {
   tmp_directory         = "/tmp"
   consignment_user_name = "consignment_api_user"
 
+  //feature access blocks
+  block_http4s = local.environment == "prod" ? true : false
 }

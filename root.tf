@@ -43,6 +43,7 @@ module "consignment_api" {
   dns_zone_name_trimmed          = local.dns_zone_name_trimmed
   db_instance_resource_id        = module.consignment_api_database.resource_id
   create_users_security_group_id = flatten([module.create_db_users_lambda.create_users_lambda_security_group_id, module.create_bastion_user_lambda.create_users_lambda_security_group_id])
+  block_http4s           = local.block_http4s
 }
 
 module "frontend" {
