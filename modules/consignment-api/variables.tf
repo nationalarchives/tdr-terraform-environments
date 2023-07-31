@@ -8,6 +8,8 @@ variable "app_name" {}
 
 variable "auth_url" {}
 
+variable "frontend_url" {}
+
 variable "block_http4s" {}
 
 variable "common_tags" {}
@@ -35,8 +37,6 @@ variable "region" {}
 variable "vpc_id" {}
 
 variable "dns_zone_name_trimmed" {}
-
-variable "frontend_url" {}
 
 variable "ip_allowlist" {
   description = "IP addresses allowed to access"
