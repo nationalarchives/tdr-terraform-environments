@@ -10,6 +10,8 @@ variable "auth_url" {}
 
 variable "frontend_url" {}
 
+variable "block_http4s" {}
+
 variable "common_tags" {}
 
 variable "database_availability_zones" {}
