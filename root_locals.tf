@@ -106,5 +106,5 @@ locals {
   consignment_user_name = "consignment_api_user"
 
   //feature access blocks
-  block_http4s = local.environment == "prod" ? true : false
+  block_http4s = local.environment == "prod" || local.environment == "staging" ? true : false
 }
