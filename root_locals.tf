@@ -107,5 +107,5 @@ locals {
 
   //feature access blocks
   block_http4s                 = local.environment == "prod" ? true : false
-  block_assign_file_references = local.environment == "intg" ? true : false
+  block_assign_file_references = local.environment == "intg" ? false : true
 }
