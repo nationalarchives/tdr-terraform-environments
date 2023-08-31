@@ -18,14 +18,15 @@ data "template_file" "app" {
   template = file("${path.module}/templates/consignment-api.json.tpl")
 
   vars = {
-    app_image       = "${local.ecr_account_number}.dkr.ecr.eu-west-2.amazonaws.com/consignment-api:${var.environment}"
-    app_port        = local.app_port
-    app_environment = var.environment
-    aws_region      = var.region
-    url_path        = "/${var.environment}/consignmentapi/instance/url"
-    auth_url        = var.auth_url
-    frontend_url    = var.frontend_url
-    block_http4s    = var.block_http4s
+    app_image                    = "${local.ecr_account_number}.dkr.ecr.eu-west-2.amazonaws.com/consignment-api:${var.environment}"
+    app_port                     = local.app_port
+    app_environment              = var.environment
+    aws_region                   = var.region
+    url_path                     = "/${var.environment}/consignmentapi/instance/url"
+    auth_url                     = var.auth_url
+    frontend_url                 = var.frontend_url
+    block_http4s                 = var.block_http4s
+    block_assign_file_references = var.block_assign_file_references
   }
 }
 
