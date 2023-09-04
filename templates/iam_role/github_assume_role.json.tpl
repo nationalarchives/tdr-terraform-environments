@@ -27,7 +27,7 @@
           "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
         },
         "StringLike": {
-          "token.actions.githubusercontent.com:sub": "repo:nationalarchives/da-reference-counter"
+          "token.actions.githubusercontent.com:sub": "repo:nationalarchives/da-*"
         }
       }
     }
