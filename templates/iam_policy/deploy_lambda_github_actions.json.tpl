@@ -14,6 +14,7 @@
       ],
       "Resource": [
         "arn:aws:lambda:${region}:${account_id}:event-source-mapping:*",
+        "arn:aws:lambda:${region}:${account_id}:function:da-reference-generator-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-api-update-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-api-update-v2-${environment}",
         "arn:aws:lambda:${region}:${account_id}:function:tdr-backend-checks-results-${environment}",
