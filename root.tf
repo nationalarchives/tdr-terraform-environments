@@ -545,41 +545,6 @@ module "tdr_default_nacl" {
   default_network_acl_id = module.shared_vpc.default_nacl_id
 }
 
-module "athena_s3" {
-  source      = "./tdr-terraform-modules/s3"
-  project     = var.project
-  common_tags = local.common_tags
-  function    = "athena"
-  access_logs = false
-}
-
-module "athena" {
-  source      = "./tdr-terraform-modules/athena"
-  project     = var.project
-  common_tags = local.common_tags
-  function    = "security_logs"
-  bucket      = module.athena_s3.s3_bucket_id
-  environment = local.environment
-  queries = [
-    "create_table_keycloak_alb_logs",
-    "create_table_frontend_alb_logs",
-    "create_table_consignmentapi_alb_logs",
-    "create_table_tdr_cloudtrail_logs",
-    "create_table_tdr_s3_upload_logs",
-    "tdr_alb_client_ip_count",
-    "tdr_alb_error_counts",
-    "tdr_cloudtrail_action_for_iam_user",
-    "tdr_cloudtrail_action_for_principal",
-    "tdr_cloudtrail_action_for_role_name",
-    "tdr_cloudtrail_action_on_date",
-    "tdr_cloudtrail_ip_for_access_key",
-    "tdr_cloudtrail_update_resource",
-    "tdr_cloudtrail_user_for_access_key",
-    "tdr_s3_deleted_objects",
-    "tdr_s3_object_operations",
-    "tdr_s3_request_errors"
-  ]
-}
 // Create bastion role here so we can attach it to the EFS file system policy as you can't add roles that don't exist
 // We'll attach policies to the role when the bastion is created.
 module "bastion_role" {
