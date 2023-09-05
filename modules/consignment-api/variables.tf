@@ -48,3 +48,5 @@ variable "create_users_security_group_id" {
 }
 
 variable "db_instance_resource_id" {}
+
+variable "block_assign_file_references" {}
