@@ -105,7 +105,7 @@ locals {
   tmp_directory         = "/tmp"
   consignment_user_name = "consignment_api_user"
   //tre has used different naming conventions for its environment names
-  tre_environment       = local.environment == "intg" ? "int" : local.environment
+  tre_environment = local.environment == "intg" ? "int" : local.environment
 
   //feature access blocks
   block_http4s                 = local.environment == "prod" ? true : false
