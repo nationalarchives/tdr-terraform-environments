@@ -107,6 +107,10 @@ locals {
   //tre has used different naming conventions for its environment names
   tre_environment = local.environment == "intg" ? "int" : local.environment
 
+  // event bus hosted on tre environments
+  da_event_bus_arn     = module.tre_configuration.terraform_config[local.tre_environment]["da_eventbus"]
+  da_event_bus_kms_key = module.tre_configuration.terraform_config[local.tre_environment]["da_eventbus_kms_key_alias_arn"]
+
   //feature access blocks
   block_http4s                 = local.environment == "prod" ? true : false
   block_assign_file_references = local.environment == "intg" ? false : true
