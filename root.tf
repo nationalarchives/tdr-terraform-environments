@@ -2,6 +2,16 @@ module "global_parameters" {
   source = "./tdr-configurations/terraform"
 }
 
+module "tre_configuration" {
+  source  = "./da-terraform-configurations"
+  project = "tre"
+}
+
+module "tdr_configuration" {
+  source  = "./da-terraform-configurations"
+  project = "tdr"
+}
+
 module "shared_vpc" {
   source                      = "./modules/shared-vpc"
   az_count                    = 2
