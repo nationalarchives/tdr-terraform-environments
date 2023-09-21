@@ -111,6 +111,8 @@ locals {
   da_event_bus_arn     = module.tre_configuration.terraform_config[local.tre_environment]["da_eventbus"]
   da_event_bus_kms_key = module.tre_configuration.terraform_config[local.tre_environment]["da_eventbus_kms_key_alias_arn"]
 
+  reference_generator_url = module.tdr_configuration.terraform_config["reference_generator_${local.environment}_url"]
+
   //feature access blocks
   block_http4s                 = local.environment == "prod" ? true : false
   block_assign_file_references = local.environment == "intg" ? false : true
