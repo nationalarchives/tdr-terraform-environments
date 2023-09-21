@@ -12,6 +12,8 @@ variable "frontend_url" {}
 
 variable "block_http4s" {}
 
+variable "da_reference_generator_url" {}
+
 variable "common_tags" {}
 
 variable "database_availability_zones" {}
