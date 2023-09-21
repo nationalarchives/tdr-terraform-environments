@@ -27,7 +27,7 @@ data "template_file" "app" {
     frontend_url                 = var.frontend_url
     block_http4s                 = var.block_http4s
     block_assign_file_references = var.block_assign_file_references
-    reference_generator_url      = var.reference_generator_url
+    da_reference_generator_url   = var.da_reference_generator_url
   }
 }
 

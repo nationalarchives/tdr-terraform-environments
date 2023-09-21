@@ -55,7 +55,7 @@ module "consignment_api" {
   create_users_security_group_id = flatten([module.create_db_users_lambda.create_users_lambda_security_group_id, module.create_bastion_user_lambda.create_users_lambda_security_group_id])
   block_http4s                   = local.block_http4s
   block_assign_file_references   = local.block_assign_file_references
-  reference_generator_url        = local.reference_generator_url
+  da_reference_generator_url     = local.da_reference_generator_url
 }
 
 module "frontend" {

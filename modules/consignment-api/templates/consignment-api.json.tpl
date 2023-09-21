@@ -30,7 +30,7 @@
       },
       {
         "name": "REFERENCE_GENERATOR_URL",
-        "value": "${reference_generator_url}"
+        "value": "${da_reference_generator_url}"
       }
     ],
     "secrets": [
