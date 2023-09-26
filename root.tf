@@ -522,6 +522,7 @@ module "notification_lambda" {
   judgment_export_s3_bucket_name = module.export_bucket_judgment.s3_bucket_name
   standard_export_s3_bucket_name = module.export_bucket.s3_bucket_name
   da_event_bus_arn               = local.da_event_bus_arn
+  da_event_bus_kms_key_arn       = local.da_event_bus_kms_key
 }
 
 module "tdr_public_nacl" {
