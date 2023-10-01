@@ -490,6 +490,7 @@ module "export_bucket" {
   project     = var.project
   function    = "consignment-export"
   common_tags = local.common_tags
+  kms_key_id  = module.s3_external_kms_key.kms_key_arn
 }
 
 module "export_bucket_judgment" {
@@ -497,6 +498,7 @@ module "export_bucket_judgment" {
   project     = var.project
   function    = "consignment-export-judgment"
   common_tags = local.common_tags
+  kms_key_id  = module.s3_external_kms_key.kms_key_arn
 }
 
 module "notifications_topic" {
