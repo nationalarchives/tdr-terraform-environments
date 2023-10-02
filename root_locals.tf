@@ -112,10 +112,9 @@ locals {
 
   da_reference_generator_url = module.tdr_configuration.terraform_config["reference_generator_${local.environment}_url"]
 
-  export_bucket_admins_emails = module.global_parameters.export_bucket_admins
-  export_bucket_admins = merge({for email in local.export_bucket_admins_emails : email => {
-
-  })
+  //Give all federated users access to intg export buckets. Restrict users in higher environments
+  export_bucket_admins_emails = local.environment == "intg" ? ["*"] : module.global_parameters.export_bucket_admins
+  export_bucket_admins        = [for email in local.export_bucket_admins_emails : "arn:aws:sts::${data.aws_caller_identity.current.account_id}:federated-user/${email}"]
 
   //feature access blocks
   block_http4s                 = local.environment == "prod" ? true : false

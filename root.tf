@@ -808,9 +808,16 @@ module "ecs_task_stopped_event" {
   rule_description                     = "Log to cloudwatch when ECS task state is STOPPED"
 }
 
-module "x" {
-  source = "./da-terraform-modules"
-  name = "TDRAdminExportBucketAccess${title(local.environment)}"
-  assume_role_policy = templatefile("${path.module}/templates/iam_policy/export_bucket_admin_assume_permission.json.tpl", { account = data.aws_caller_identity, roles = local.export_bucket_admins })
-  policy_attachments = []
+module "export_bucket_admin_access" {
+  source = "./da-terraform-modules/iam_role"
+  name   = "TDRAdminExportBucketAccess${title(local.environment)}"
+  assume_role_policy = templatefile("${path.module}/templates/iam_policy/export_bucket_admin_assume_permission.json.tpl", {
+    account = data.aws_caller_identity.current.account_id,
+  roles = local.export_bucket_admins })
+  policy_attachments = tomap({
+    "s3ExportBucketAccess" : templatefile("${path.module}/templates/iam_policy/export_bucket_admin_access_permission.json.tpl", {
+      export_bucket_kms_key_arn = module.s3_external_kms_key.kms_key_arn
+    })
+  })
+  tags = local.common_tags
 }
