@@ -112,6 +112,11 @@ locals {
 
   da_reference_generator_url = module.tdr_configuration.terraform_config["reference_generator_${local.environment}_url"]
 
+  export_bucket_admins_emails = module.global_parameters.export_bucket_admins
+  export_bucket_admins = merge({for email in local.export_bucket_admins_emails : email => {
+
+  })
+
   //feature access blocks
   block_http4s                 = local.environment == "prod" ? true : false
   block_assign_file_references = local.environment == "intg" ? false : true

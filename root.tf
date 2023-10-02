@@ -807,3 +807,10 @@ module "ecs_task_stopped_event" {
   rule_name                            = "ecs-task-state-stopped"
   rule_description                     = "Log to cloudwatch when ECS task state is STOPPED"
 }
+
+module "x" {
+  source = "./da-terraform-modules"
+  name = "TDRAdminExportBucketAccess${title(local.environment)}"
+  assume_role_policy = templatefile("${path.module}/templates/iam_policy/export_bucket_admin_assume_permission.json.tpl", { account = data.aws_caller_identity, roles = local.export_bucket_admins })
+  policy_attachments = []
+}
