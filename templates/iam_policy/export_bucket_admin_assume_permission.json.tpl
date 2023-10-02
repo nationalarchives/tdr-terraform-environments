@@ -4,7 +4,7 @@
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": ${roles}
+        "AWS": ${jsonencode(roles)}
       },
       "Action": "sts:AssumeRole"
     }
