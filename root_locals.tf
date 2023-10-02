@@ -106,6 +106,9 @@ locals {
   //tre has used different naming conventions for its environment names
   tre_environment = local.environment == "intg" ? "int" : local.environment
 
+  // apply s3 bucket encryption in intg only for now
+  s3_encryption_key_arn = local.environment == "intg" ? module.s3_external_kms_key.kms_key_arn : ""
+
   // event bus hosted on tre environments
   da_event_bus_arn     = module.tre_configuration.terraform_config[local.tre_environment]["da_eventbus"]
   da_event_bus_kms_key = module.tre_configuration.terraform_config[local.tre_environment]["da_eventbus_kms_key_alias_arn"]
