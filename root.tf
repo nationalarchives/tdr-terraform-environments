@@ -497,6 +497,7 @@ module "export_bucket_judgment" {
   project     = var.project
   function    = "consignment-export-judgment"
   common_tags = local.common_tags
+  kms_key_id  = local.s3_encryption_key_arn
 }
 
 module "notifications_topic" {
