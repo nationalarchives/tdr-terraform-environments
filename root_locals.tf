@@ -108,6 +108,7 @@ locals {
 
   // apply s3 bucket encryption in intg only for now
   s3_encryption_key_arn = local.environment == "intg" ? module.s3_external_kms_key.kms_key_arn : ""
+  bucket_key_enabled    = local.environment == "intg" ? true : false
 
   // event bus hosted on tre environments
   da_event_bus_arn     = module.tre_configuration.terraform_config[local.tre_environment]["da_eventbus"]
