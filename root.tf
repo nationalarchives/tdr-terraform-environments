@@ -498,7 +498,7 @@ module "export_bucket_judgment" {
   function           = "consignment-export-judgment"
   common_tags        = local.common_tags
   kms_key_id         = local.s3_encryption_key_arn
-  bucket_key_enabled = true
+  bucket_key_enabled = local.bucket_key_enabled
 }
 
 module "notifications_topic" {
