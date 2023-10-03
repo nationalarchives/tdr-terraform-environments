@@ -500,6 +500,7 @@ module "export_bucket_judgment" {
   kms_key_id         = local.s3_encryption_key_arn
   bucket_key_enabled = local.bucket_key_enabled
   tre_role_arn       = local.tre_export_role_arn
+  bucket_policy      = "export_bucket"
 }
 
 module "notifications_topic" {
