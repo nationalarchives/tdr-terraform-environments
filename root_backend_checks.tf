@@ -254,7 +254,7 @@ module "yara_av_v2" {
     })
   }
   role_name = "TDRYaraAVV2LambdaRole${title(local.environment)}"
-  runtime   = local.runtime_python_3_7
+  runtime   = local.runtime_python_3_9
   plaintext_env_vars = {
     ENVIRONMENT    = local.environment
     ROOT_DIRECTORY = local.tmp_directory
