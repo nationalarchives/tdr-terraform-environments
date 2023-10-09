@@ -31,6 +31,10 @@
       {
         "name": "REFERENCE_GENERATOR_URL",
         "value": "${da_reference_generator_url}"
+      },
+      {
+        "name": "REFERENCE_GENERATOR_LIMIT",
+        "value": "${da_reference_generator_limit}"
       }
     ],
     "secrets": [
