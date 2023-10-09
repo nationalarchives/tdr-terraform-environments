@@ -1,5 +1,5 @@
 
-module "aws_sso_roles" {
+module "aws_sso_roles_ssm_parameters" {
   source = "./da-terraform-modules/ssm_parameter"
   parameters = [
     {
