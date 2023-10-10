@@ -117,8 +117,6 @@ locals {
     data.aws_ssm_parameter.aws_sso_developer_role.value] : [data.aws_ssm_parameter.aws_sso_admin_role.value,
   data.aws_ssm_parameter.aws_sso_export_role.value]
 
-  #  aws_sso_export_bucket_access_roles = [""]
-
   // event bus hosted on tre environments
   da_event_bus_arn     = module.tre_configuration.terraform_config[local.tre_environment]["da_eventbus"]
   da_event_bus_kms_key = module.tre_configuration.terraform_config["${local.tre_environment}_da_eventbus_kms_arn"]
