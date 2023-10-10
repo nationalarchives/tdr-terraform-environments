@@ -1,3 +1,22 @@
+# AWS SSO groups that require access to encrypted s3 export buckets need updating with relevant decrypt permissions for KMS s3 Key
+
+locals {
+  aws_sso_export_bucket_access_roles = local.environment == "intg" ? [
+    data.aws_ssm_parameter.aws_sso_admin_role.value, data.aws_ssm_parameter.aws_sso_developer_role.value, data.aws_ssm_parameter.aws_sso_export_role.value] : [
+  data.aws_ssm_parameter.aws_sso_admin_role.value, data.aws_ssm_parameter.aws_sso_export_role.value]
+}
+
+data "aws_ssm_parameter" "aws_sso_admin_role" {
+  name = "/${local.environment}/admin_role"
+}
+
+data "aws_ssm_parameter" "aws_sso_export_role" {
+  name = "/${local.environment}/export_role"
+}
+
+data "aws_ssm_parameter" "aws_sso_developer_role" {
+  name = "/${local.environment}/developer_role"
+}
 
 module "aws_sso_export_roles_ssm_parameters" {
   source = "./da-terraform-modules/ssm_parameter"
@@ -21,27 +40,5 @@ module "aws_sso_export_roles_ssm_parameters" {
       value       = "placeholder"
     }
   ]
-  tags = local.common_tags
-}
-
-module "export_bucket_access_policy" {
-  source = "./da-terraform-modules/iam_policy"
-  name   = "TDRExportBucketAccessPolicy${title(local.environment)}"
-  policy_string = templatefile("./templates/iam_policy/export_bucket_access_policy.json.tpl", {
-    account_id                = data.aws_caller_identity.current.account_id,
-    kms_export_bucket_key_arn = module.s3_external_kms_key.kms_key_arn
-    environment               = local.environment
-  })
-}
-
-module "export_bucket_access_role" {
-  source = "./da-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./templates/iam_policy/assume_role_principal_policy.json.tpl", {
-    export_access_principals = local.aws_sso_export_bucket_access_roles
-  })
-  name = "TDRExportBucketAccessRole${title(local.environment)}"
-  policy_attachments = {
-    ExportBucketAccess = module.export_bucket_access_policy.policy_arn
-  }
   tags = local.common_tags
 }

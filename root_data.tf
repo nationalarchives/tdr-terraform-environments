@@ -58,15 +58,3 @@ data "aws_ssm_parameter" "transform_engine_retry_role_arn" {
 data "aws_ssm_parameter" "transform_engine_v2_tre_out_topic_arn" {
   name = "/${local.environment}/transform_engine_v2/tre-out/arn"
 }
-
-data "aws_ssm_parameter" "aws_sso_admin_role" {
-  name = "/${local.environment}/admin_role"
-}
-
-data "aws_ssm_parameter" "aws_sso_export_role" {
-  name = "/${local.environment}/export_role"
-}
-
-data "aws_ssm_parameter" "aws_sso_developer_role" {
-  name = "/${local.environment}/developer_role"
-}
