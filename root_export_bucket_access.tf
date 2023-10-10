@@ -1,24 +1,24 @@
 
-module "admin_role_ssm_parameter" {
+module "aws_sso_export_roles_ssm_parameters" {
   source = "./da-terraform-modules/ssm_parameter"
   parameters = [
     {
-      name        = "/${local.environment}/admin_role"
+      name        = "/${local.environment}/admin_role",
+      description = "AWS SSO admin role. Value to be added manually"
       type        = "SecureString"
       value       = "placeholder"
-      description = "AWS SSO role for admins. Requires manually adding to parameter store"
     },
     {
-      name        = "/${local.environment}/export_role"
+      name        = "/${local.environment}/developer_role",
+      description = "AWS SSO developer role. Value to be added manually"
       type        = "SecureString"
       value       = "placeholder"
-      description = "AWS SSO role for accessing the export buckets. Requires manually adding to parameter store"
     },
     {
-      name        = "/${local.environment}/developer_role"
+      name        = "/${local.environment}/export_role",
+      description = "AWS SSO export role. Value to be added manually"
       type        = "SecureString"
       value       = "placeholder"
-      description = "AWS SSO role for developers. Requires manually adding to parameter store"
     }
   ]
   tags = local.common_tags
