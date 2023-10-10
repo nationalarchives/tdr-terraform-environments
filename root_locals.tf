@@ -111,12 +111,6 @@ locals {
   bucket_key_enabled    = local.environment == "intg" ? true : false
   tre_export_role_arn   = module.tre_configuration.terraform_config[local.tre_environment]["s3_export_bucket_reader_arn"]
 
-  aws_sso_export_bucket_access_roles = local.environment == "intg" ? [
-    data.aws_ssm_parameter.aws_sso_admin_role.value,
-    data.aws_ssm_parameter.aws_sso_export_role.value,
-    data.aws_ssm_parameter.aws_sso_developer_role.value] : [data.aws_ssm_parameter.aws_sso_admin_role.value,
-  data.aws_ssm_parameter.aws_sso_export_role.value]
-
   // event bus hosted on tre environments
   da_event_bus_arn     = module.tre_configuration.terraform_config[local.tre_environment]["da_eventbus"]
   da_event_bus_kms_key = module.tre_configuration.terraform_config["${local.tre_environment}_da_eventbus_kms_arn"]
