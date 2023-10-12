@@ -1,9 +1,7 @@
 # AWS SSO groups that require access to encrypted s3 export buckets need updating with relevant decrypt permissions for KMS s3 Key
 
 locals {
-  aws_sso_export_bucket_access_roles = local.environment == "intg" ? [
-    data.aws_ssm_parameter.aws_sso_admin_role.value, data.aws_ssm_parameter.aws_sso_developer_role.value, data.aws_ssm_parameter.aws_sso_export_role.value] : [
-  data.aws_ssm_parameter.aws_sso_admin_role.value, data.aws_ssm_parameter.aws_sso_export_role.value]
+  aws_sso_export_bucket_access_roles = [data.aws_ssm_parameter.aws_sso_admin_role.value, data.aws_ssm_parameter.aws_sso_export_role.value]
 }
 
 data "aws_ssm_parameter" "aws_sso_admin_role" {
@@ -12,10 +10,6 @@ data "aws_ssm_parameter" "aws_sso_admin_role" {
 
 data "aws_ssm_parameter" "aws_sso_export_role" {
   name = "/${local.environment}/export_role"
-}
-
-data "aws_ssm_parameter" "aws_sso_developer_role" {
-  name = "/${local.environment}/developer_role"
 }
 
 module "aws_sso_export_roles_ssm_parameters" {
