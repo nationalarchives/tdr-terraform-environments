@@ -56,6 +56,7 @@ module "consignment_api" {
   block_http4s                   = local.block_http4s
   block_assign_file_references   = local.block_assign_file_references
   da_reference_generator_url     = local.da_reference_generator_url
+  da_reference_generator_limit   = local.da_reference_generator_limit
 }
 
 module "frontend" {
@@ -486,10 +487,14 @@ module "export_step_function" {
 }
 
 module "export_bucket" {
-  source      = "./tdr-terraform-modules/s3"
-  project     = var.project
-  function    = "consignment-export"
-  common_tags = local.common_tags
+  source             = "./tdr-terraform-modules/s3"
+  project            = var.project
+  function           = "consignment-export"
+  common_tags        = local.common_tags
+  kms_key_id         = local.s3_encryption_key_arn
+  bucket_key_enabled = local.bucket_key_enabled
+  tre_role_arn       = local.tre_export_role_arn
+  bucket_policy      = "export_bucket"
 }
 
 module "export_bucket_judgment" {
