@@ -487,12 +487,14 @@ module "export_step_function" {
 }
 
 module "export_bucket" {
-  source        = "./tdr-terraform-modules/s3"
-  project       = var.project
-  function      = "consignment-export"
-  common_tags   = local.common_tags
-  tre_role_arn  = local.tre_export_role_arn
-  bucket_policy = "export_bucket"
+  source             = "./tdr-terraform-modules/s3"
+  project            = var.project
+  function           = "consignment-export"
+  common_tags        = local.common_tags
+  kms_key_id         = local.s3_encryption_key_arn
+  bucket_key_enabled = local.bucket_key_enabled
+  tre_role_arn       = local.tre_export_role_arn
+  bucket_policy      = "export_bucket"
 }
 
 module "export_bucket_judgment" {
