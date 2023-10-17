@@ -67,6 +67,10 @@
       {
         "name": "OTEL_SERVICE_NAME",
         "value": "${otel_service_name}"
+      },
+      {
+        "name": "BLOCK_VALIDATION_LIBRARY",
+        "value": "${block_validation_library}"
       }
     ],
     "networkMode": "awsvpc",
