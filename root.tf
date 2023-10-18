@@ -492,8 +492,8 @@ module "export_bucket" {
   project            = var.project
   function           = "consignment-export"
   common_tags        = local.common_tags
-  kms_key_id         = local.s3_encryption_key_arn
-  bucket_key_enabled = local.bucket_key_enabled
+  kms_key_id         = module.s3_external_kms_key.kms_key_arn
+  bucket_key_enabled = true
   tre_role_arn       = local.tre_export_role_arn
   bucket_policy      = "export_bucket"
 }
@@ -503,8 +503,8 @@ module "export_bucket_judgment" {
   project            = var.project
   function           = "consignment-export-judgment"
   common_tags        = local.common_tags
-  kms_key_id         = local.s3_encryption_key_arn
-  bucket_key_enabled = local.bucket_key_enabled
+  kms_key_id         = module.s3_external_kms_key.kms_key_arn
+  bucket_key_enabled = true
   tre_role_arn       = local.tre_export_role_arn
   bucket_policy      = "export_bucket"
 }
