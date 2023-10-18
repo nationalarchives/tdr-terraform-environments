@@ -106,7 +106,7 @@ locals {
   //tre has used different naming conventions for its environment names
   tre_environment = local.environment == "intg" ? "int" : local.environment
 
-  // apply s3 bucket encryption in intg only for now
+  // apply s3 bucket encryption in intg / staging only for now
   s3_encryption_key_arn = local.environment == "prod" ? "" : module.s3_external_kms_key.kms_key_arn
   bucket_key_enabled    = local.environment == "prod" ? false : true
   tre_export_role_arn   = module.tre_configuration.terraform_config[local.tre_environment]["s3_export_bucket_reader_arn"]
