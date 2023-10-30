@@ -211,6 +211,7 @@ module "statuses" {
   function_name        = local.statuses_function_name
   handler              = "uk.gov.nationalarchives.Lambda::run"
   reserved_concurrency = -1
+  timeout_seconds      = 30
   policies = {
     "TDRStatusesLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/allow_iam_db_auth.json.tpl", {
       function_name  = local.statuses_function_name,
