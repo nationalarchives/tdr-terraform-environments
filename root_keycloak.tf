@@ -162,6 +162,7 @@ module "keycloak_database_instance" {
   private_subnets         = module.shared_vpc.private_subnets
   security_group_ids      = [module.keycloak_database_security_group.security_group_id]
   multi_az                = local.environment == "prod"
+  ca_cert_identifier      = local.database_ca_cert_identifier
   backup_retention_period = 30
 }
 

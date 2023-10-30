@@ -789,6 +789,7 @@ module "consignment_api_database" {
   private_subnets    = module.shared_vpc.private_subnets
   security_group_ids = [module.api_database_security_group.security_group_id]
   multi_az           = local.environment == "prod"
+  ca_cert_identifier = local.database_ca_cert_identifier
 }
 
 module "waf_cloudwatch" {
