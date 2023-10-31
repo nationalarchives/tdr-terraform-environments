@@ -57,6 +57,7 @@ module "consignment_api" {
   block_assign_file_references   = local.block_assign_file_references
   da_reference_generator_url     = local.da_reference_generator_url
   da_reference_generator_limit   = local.da_reference_generator_limit
+  block_validation_library       = local.block_validation_library
 }
 
 module "frontend" {
