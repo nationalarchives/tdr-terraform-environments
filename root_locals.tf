@@ -24,6 +24,8 @@ locals {
 
   database_availability_zone = "eu-west-2a"
 
+  database_ca_cert_identifier = "rds-ca-rsa2048-g1"
+
   region = "eu-west-2"
 
   dns_zone_id = data.aws_route53_zone.tdr_dns_zone.zone_id
