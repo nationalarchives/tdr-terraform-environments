@@ -98,7 +98,7 @@ module "api_update_v2" {
   function_name        = local.api_update_v2_function_name
   handler              = "uk.gov.nationalarchives.api.update.Lambda::update"
   reserved_concurrency = -1
-  timeout_seconds      = 60
+  timeout_seconds      = 90
   policies = {
     "TDRAPIUpdateV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_policy.json.tpl", {
       function_name  = local.api_update_v2_function_name,
@@ -211,6 +211,7 @@ module "statuses" {
   function_name        = local.statuses_function_name
   handler              = "uk.gov.nationalarchives.Lambda::run"
   reserved_concurrency = -1
+  timeout_seconds      = 30
   policies = {
     "TDRStatusesLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/allow_iam_db_auth.json.tpl", {
       function_name  = local.statuses_function_name,
