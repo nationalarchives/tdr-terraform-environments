@@ -21,10 +21,6 @@
         "value" : "5432"
       },
       {
-        "name": "BLOCK_HTTP4S",
-        "value": "${block_http4s}"
-      },
-      {
         "name": "BLOCK_ASSIGN_FILE_REFERENCES",
         "value": "${block_assign_file_references}"
       },

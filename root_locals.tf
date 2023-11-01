@@ -121,7 +121,6 @@ locals {
   da_reference_generator_limit = module.tdr_configuration.terraform_config["reference_generator_limit"]
 
   //feature access blocks
-  block_http4s                 = true
   block_assign_file_references = local.environment == "intg" ? false : true
   block_validation_library     = local.environment == "intg" ? false : true
 }

@@ -25,7 +25,6 @@ data "template_file" "app" {
     url_path                     = "/${var.environment}/consignmentapi/instance/url"
     auth_url                     = var.auth_url
     frontend_url                 = var.frontend_url
-    block_http4s                 = var.block_http4s
     block_assign_file_references = var.block_assign_file_references
     da_reference_generator_url   = var.da_reference_generator_url
     da_reference_generator_limit = var.da_reference_generator_limit

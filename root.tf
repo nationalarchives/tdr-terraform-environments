@@ -53,7 +53,6 @@ module "consignment_api" {
   dns_zone_name_trimmed          = local.dns_zone_name_trimmed
   db_instance_resource_id        = module.consignment_api_database.resource_id
   create_users_security_group_id = flatten([module.create_db_users_lambda.create_users_lambda_security_group_id, module.create_bastion_user_lambda.create_users_lambda_security_group_id])
-  block_http4s                   = local.block_http4s
   block_assign_file_references   = local.block_assign_file_references
   da_reference_generator_url     = local.da_reference_generator_url
   da_reference_generator_limit   = local.da_reference_generator_limit
