@@ -113,6 +113,9 @@ locals {
   bucket_key_enabled    = local.environment == "prod" ? false : true
   tre_export_role_arn   = module.tre_configuration.terraform_config[local.tre_environment]["s3_export_bucket_reader_arn"]
 
+  standard_export_bucket_read_access_roles = [local.tre_export_role_arn]
+  judgment_export_bucket_read_access_role  = [local.tre_export_role_arn]
+
   // event bus hosted on tre environments
   da_event_bus_arn     = module.tre_configuration.terraform_config[local.tre_environment]["da_eventbus"]
   da_event_bus_kms_key = module.tre_configuration.terraform_config["${local.tre_environment}_da_eventbus_kms_arn"]

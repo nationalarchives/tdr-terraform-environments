@@ -489,25 +489,25 @@ module "export_step_function" {
 }
 
 module "export_bucket" {
-  source             = "./tdr-terraform-modules/s3"
-  project            = var.project
-  function           = "consignment-export"
-  common_tags        = local.common_tags
-  kms_key_id         = local.s3_encryption_key_arn
-  bucket_key_enabled = local.bucket_key_enabled
-  tre_role_arn       = local.tre_export_role_arn
-  bucket_policy      = "export_bucket"
+  source                = "./tdr-terraform-modules/s3"
+  project               = var.project
+  function              = "consignment-export"
+  common_tags           = local.common_tags
+  kms_key_id            = local.s3_encryption_key_arn
+  bucket_key_enabled    = local.bucket_key_enabled
+  read_access_role_arns = local.standard_export_bucket_read_access_roles
+  bucket_policy         = "export_bucket"
 }
 
 module "export_bucket_judgment" {
-  source             = "./tdr-terraform-modules/s3"
-  project            = var.project
-  function           = "consignment-export-judgment"
-  common_tags        = local.common_tags
-  kms_key_id         = local.s3_encryption_key_arn
-  bucket_key_enabled = local.bucket_key_enabled
-  tre_role_arn       = local.tre_export_role_arn
-  bucket_policy      = "export_bucket"
+  source                = "./tdr-terraform-modules/s3"
+  project               = var.project
+  function              = "consignment-export-judgment"
+  common_tags           = local.common_tags
+  kms_key_id            = local.s3_encryption_key_arn
+  bucket_key_enabled    = local.bucket_key_enabled
+  read_access_role_arns = local.judgment_export_bucket_read_access_role
+  bucket_policy         = "export_bucket"
 }
 
 module "notifications_topic" {
