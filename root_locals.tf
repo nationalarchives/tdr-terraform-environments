@@ -112,9 +112,12 @@ locals {
   s3_encryption_key_arn = local.environment == "prod" ? "" : module.s3_external_kms_key.kms_key_arn
   bucket_key_enabled    = local.environment == "prod" ? false : true
   tre_export_role_arn   = module.tre_configuration.terraform_config[local.tre_environment]["s3_export_bucket_reader_arn"]
+  // talend only has a role set for intg this will change in the future
+  talend_export_role_arn = local.environment == "intg" ? module.talend_configuration.terraform_config[local.environment]["remote_engine_instance_profile_role"] : ""
 
-  standard_export_bucket_read_access_roles = [local.tre_export_role_arn]
-  judgment_export_bucket_read_access_role  = [local.tre_export_role_arn]
+  // talend only has a role set for intg this will change in the future
+  standard_export_bucket_read_access_roles = local.environment == "intg" ? [local.tre_export_role_arn, local.talend_export_role_arn] : [local.tre_export_role_arn]
+  judgment_export_bucket_read_access_roles = [local.tre_export_role_arn]
 
   // event bus hosted on tre environments
   da_event_bus_arn     = module.tre_configuration.terraform_config[local.tre_environment]["da_eventbus"]
