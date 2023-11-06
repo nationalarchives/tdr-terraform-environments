@@ -29,6 +29,7 @@ data "template_file" "app" {
     block_assign_file_references = var.block_assign_file_references
     da_reference_generator_url   = var.da_reference_generator_url
     da_reference_generator_limit = var.da_reference_generator_limit
+    block_validation_library     = var.block_validation_library
   }
 }
 
