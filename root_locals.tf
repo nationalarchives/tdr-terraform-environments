@@ -24,6 +24,8 @@ locals {
 
   database_availability_zone = "eu-west-2a"
 
+  database_ca_cert_identifier = "rds-ca-rsa2048-g1"
+
   region = "eu-west-2"
 
   dns_zone_id = data.aws_route53_zone.tdr_dns_zone.zone_id
@@ -107,6 +109,9 @@ locals {
   //tre has used different naming conventions for its environment names
   tre_environment     = local.environment == "intg" ? "int" : local.environment
   tre_export_role_arn = module.tre_configuration.terraform_config[local.tre_environment]["s3_export_bucket_reader_arn"]
+
+  standard_export_bucket_read_access_roles = [local.tre_export_role_arn]
+  judgment_export_bucket_read_access_role  = [local.tre_export_role_arn]
 
   // event bus hosted on tre environments
   da_event_bus_arn     = module.tre_configuration.terraform_config[local.tre_environment]["da_eventbus"]

@@ -57,6 +57,7 @@ module "consignment_api" {
   block_assign_file_references   = local.block_assign_file_references
   da_reference_generator_url     = local.da_reference_generator_url
   da_reference_generator_limit   = local.da_reference_generator_limit
+  block_validation_library       = local.block_validation_library
 }
 
 module "frontend" {
@@ -488,25 +489,25 @@ module "export_step_function" {
 }
 
 module "export_bucket" {
-  source             = "./tdr-terraform-modules/s3"
-  project            = var.project
-  function           = "consignment-export"
-  common_tags        = local.common_tags
-  kms_key_id         = module.s3_external_kms_key.kms_key_arn
-  bucket_key_enabled = true
-  tre_role_arn       = local.tre_export_role_arn
-  bucket_policy      = "export_bucket"
+  source                = "./tdr-terraform-modules/s3"
+  project               = var.project
+  function              = "consignment-export"
+  common_tags           = local.common_tags
+  kms_key_id            = local.s3_encryption_key_arn
+  bucket_key_enabled    = local.bucket_key_enabled
+  read_access_role_arns = local.standard_export_bucket_read_access_roles
+  bucket_policy         = "export_bucket"
 }
 
 module "export_bucket_judgment" {
-  source             = "./tdr-terraform-modules/s3"
-  project            = var.project
-  function           = "consignment-export-judgment"
-  common_tags        = local.common_tags
-  kms_key_id         = module.s3_external_kms_key.kms_key_arn
-  bucket_key_enabled = true
-  tre_role_arn       = local.tre_export_role_arn
-  bucket_policy      = "export_bucket"
+  source                = "./tdr-terraform-modules/s3"
+  project               = var.project
+  function              = "consignment-export-judgment"
+  common_tags           = local.common_tags
+  kms_key_id            = local.s3_encryption_key_arn
+  bucket_key_enabled    = local.bucket_key_enabled
+  read_access_role_arns = local.judgment_export_bucket_read_access_role
+  bucket_policy         = "export_bucket"
 }
 
 module "notifications_topic" {
@@ -789,6 +790,8 @@ module "consignment_api_database" {
   private_subnets    = module.shared_vpc.private_subnets
   security_group_ids = [module.api_database_security_group.security_group_id]
   multi_az           = local.environment == "prod"
+  ca_cert_identifier = local.database_ca_cert_identifier
+  apply_immediately  = true
 }
 
 module "waf_cloudwatch" {
