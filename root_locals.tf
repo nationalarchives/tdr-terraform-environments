@@ -105,15 +105,10 @@ locals {
   url_path              = "/${local.environment}/consignmentapi/instance/url"
   tmp_directory         = "/tmp"
   consignment_user_name = "consignment_api_user"
-  //tre has used different naming conventions for its environment names
-  tre_environment = local.environment == "intg" ? "int" : local.environment
 
-  // apply s3 bucket encryption in intg / staging only for now
-  s3_encryption_key_arn = local.environment == "prod" ? "" : module.s3_external_kms_key.kms_key_arn
-  bucket_key_enabled    = local.environment == "prod" ? false : true
-  tre_export_role_arn   = module.tre_configuration.terraform_config[local.tre_environment]["s3_export_bucket_reader_arn"]
-  // talend only has a role set for intg this will change in the future
-  talend_export_role_arn = local.environment == "intg" ? module.talend_configuration.terraform_config[local.environment]["remote_engine_instance_profile_role"] : ""
+  //tre has used different naming conventions for its environment names
+  tre_environment     = local.environment == "intg" ? "int" : local.environment
+  tre_export_role_arn = module.tre_configuration.terraform_config[local.tre_environment]["s3_export_bucket_reader_arn"]
 
   // talend only has a role set for intg this will change in the future
   standard_export_bucket_read_access_roles = local.environment == "intg" ? [local.tre_export_role_arn, local.talend_export_role_arn] : [local.tre_export_role_arn]
