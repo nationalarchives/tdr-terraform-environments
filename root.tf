@@ -7,6 +7,11 @@ module "tre_configuration" {
   project = "tre"
 }
 
+module "talend_configuration" {
+  source  = "./da-terraform-configurations"
+  project = "talend"
+}
+
 module "tdr_configuration" {
   source  = "./da-terraform-configurations"
   project = "tdr"
@@ -506,7 +511,7 @@ module "export_bucket_judgment" {
   common_tags           = local.common_tags
   kms_key_id            = module.s3_external_kms_key.kms_key_arn
   bucket_key_enabled    = true
-  read_access_role_arns = local.judgment_export_bucket_read_access_role
+  read_access_role_arns = local.judgment_export_bucket_read_access_roles
   bucket_policy         = "export_bucket"
 }
 
