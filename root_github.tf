@@ -96,9 +96,3 @@ module "run_keycloak_update_ecs" {
   task_family_name = "keycloak-update-${local.environment}"
   task_role        = null
 }
-
-module "keycloak_update_cloudwatch" {
-  source      = "./tdr-terraform-modules/cloudwatch_logs"
-  common_tags = local.common_tags
-  name        = "/ecs/keycloak-update-${local.environment}"
-}
