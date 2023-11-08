@@ -1,6 +1,6 @@
 module "github_update_waf_and_security_groups_policy" {
-  source        = "./tdr-terraform-modules/iam_policy"
-  name          = "TDRUpdateWAFAndSecurityGroupsPolicy${title(local.environment)}"
+  source = "./tdr-terraform-modules/iam_policy"
+  name   = "TDRUpdateWAFAndSecurityGroupsPolicy${title(local.environment)}"
   policy_string = templatefile("${path.module}/templates/iam_policy/update_waf_and_security_groups_policy.json.tpl", {
     rule_group_arn    = module.waf.rule_group_arn, ip_set_arn = module.waf.ip_set_arn,
     account_id        = data.aws_caller_identity.current.account_id,
@@ -9,20 +9,20 @@ module "github_update_waf_and_security_groups_policy" {
 }
 
 module "github_update_waf_and_security_groups_role" {
-  source             = "./tdr-terraform-modules/iam_role"
+  source = "./tdr-terraform-modules/iam_role"
   assume_role_policy = templatefile("${path.module}/templates/iam_role/github_assume_role.json.tpl", {
     account_id = data.aws_caller_identity.current.account_id, repo_name = "tdr-e2e-tests"
   })
-  common_tags        = local.common_tags
-  name               = "TDRUpdateWAFAndSecurityGroupsRole${title(local.environment)}"
+  common_tags = local.common_tags
+  name        = "TDRUpdateWAFAndSecurityGroupsRole${title(local.environment)}"
   policy_attachments = {
     update_policy = module.github_update_waf_and_security_groups_policy.policy_arn
   }
 }
 
 module "github_run_keycloak_update_policy" {
-  source        = "./tdr-terraform-modules/iam_policy"
-  name          = "TDRGitHubRunKeycloakUpdatePolicy${title(local.environment)}"
+  source = "./tdr-terraform-modules/iam_policy"
+  name   = "TDRGitHubRunKeycloakUpdatePolicy${title(local.environment)}"
   policy_string = templatefile("${path.module}/templates/iam_policy/github_run_ecs_policy.json.tpl", {
     task_definition_arn = module.run_keycloak_update_ecs.task_definition_arn,
     cluster_arn         = module.run_keycloak_update_ecs.cluster_arn,
@@ -32,12 +32,12 @@ module "github_run_keycloak_update_policy" {
 
 
 module "github_run_keycloak_update_role" {
-  source             = "./tdr-terraform-modules/iam_role"
+  source = "./tdr-terraform-modules/iam_role"
   assume_role_policy = templatefile("${path.module}/templates/iam_role/github_assume_role.json.tpl", {
     account_id = data.aws_caller_identity.current.account_id, repo_name = "tdr-"
   })
-  common_tags        = local.common_tags
-  name               = "TDRGitHubRunKeycloakUpdateRole${title(local.environment)}"
+  common_tags = local.common_tags
+  name        = "TDRGitHubRunKeycloakUpdateRole${title(local.environment)}"
   policy_attachments = {
     update_ecs_policy = module.github_run_keycloak_update_policy.policy_arn
   }
@@ -50,8 +50,8 @@ module "keycloak_update_cloudwatch" {
 }
 
 module "run_update_keycloak_execution_policy" {
-  source        = "./tdr-terraform-modules/iam_policy"
-  name          = "TDRKeycloakUpdateECSExecutionPolicy${title(local.environment)}"
+  source = "./tdr-terraform-modules/iam_policy"
+  name   = "TDRKeycloakUpdateECSExecutionPolicy${title(local.environment)}"
   policy_string = templatefile("${path.module}/templates/iam_policy/keycloak_update_execution_policy.json.tpl", {
     log_group_arn             = module.keycloak_update_cloudwatch.log_group_arn,
     management_account_number = data.aws_ssm_parameter.mgmt_account_number.value
@@ -70,9 +70,9 @@ module "run_update_keycloak_execution_role" {
 }
 
 module "run_keycloak_update_ecs" {
-  source               = "./tdr-terraform-modules/generic_ecs"
-  cluster_name         = "keycloak_update_${local.environment}"
-  common_tags          = local.common_tags
+  source       = "./tdr-terraform-modules/generic_ecs"
+  cluster_name = "keycloak_update_${local.environment}"
+  common_tags  = local.common_tags
   container_definition = templatefile("${path.module}/templates/ecs_tasks/keycloak_update.json.tpl", {
     project                    = var.project
     log_group_name             = "/ecs/keycloak-update-${local.environment}",
