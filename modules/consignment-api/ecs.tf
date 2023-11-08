@@ -1,6 +1,9 @@
 locals {
   app_port           = 8080
   ecr_account_number = var.environment == "sbox" ? data.aws_caller_identity.current.account_id : data.aws_ssm_parameter.mgmt_account_number.value
+  cpu                = var.environment == "intg" ? "512" : "1024"
+  memory             = var.environment == "intg" ? "1024" : "2048"
+
 }
 
 resource "aws_ecs_cluster" "consignment_api_ecs" {
@@ -38,8 +41,8 @@ resource "aws_ecs_task_definition" "consignment_api_task" {
   execution_role_arn       = aws_iam_role.consignment_api_ecs_execution.arn
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = 512
-  memory                   = 1024
+  cpu                      = local.cpu
+  memory                   = local.memory
   container_definitions    = data.template_file.app.rendered
   task_role_arn            = aws_iam_role.consignment_api_ecs_task.arn
 
