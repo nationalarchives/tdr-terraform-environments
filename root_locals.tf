@@ -58,7 +58,8 @@ locals {
 
   ecr_account_number = local.environment == "sbox" ? data.aws_caller_identity.current.account_id : data.aws_ssm_parameter.mgmt_account_number.value
 
-  user_session_timeout_mins = 60
+  // temporarily increase prod user session timeout for Welsh Government transfer
+  user_session_timeout_mins = local.environment == "prod" ? 300 : 60
 
   keycloak_auth_url = "https://auth.${local.dns_zone_name_trimmed}"
 
