@@ -7,6 +7,11 @@ module "tre_configuration" {
   project = "tre"
 }
 
+module "talend_configuration" {
+  source  = "./da-terraform-configurations"
+  project = "talend"
+}
+
 module "tdr_configuration" {
   source  = "./da-terraform-configurations"
   project = "tdr"
@@ -392,20 +397,21 @@ module "export_authoriser_lambda" {
 }
 
 module "signed_cookies_lambda" {
-  source                 = "./tdr-terraform-modules/lambda"
-  common_tags            = local.common_tags
-  project                = "tdr"
-  lambda_signed_cookies  = true
-  upload_domain          = local.upload_domain
-  auth_url               = local.keycloak_auth_url
-  frontend_url           = module.frontend.frontend_url
-  cloudfront_key_pair_id = module.cloudfront_upload.cloudfront_key_pair_id
-  timeout_seconds        = 60
-  api_gateway_arn        = module.signed_cookies_api.api_arn
-  kms_key_arn            = module.encryption_key.kms_key_arn
-  private_subnet_ids     = module.shared_vpc.private_backend_checks_subnets
-  vpc_id                 = module.shared_vpc.vpc_id
-  environment_full       = local.environment_full_name
+  source                    = "./tdr-terraform-modules/lambda"
+  common_tags               = local.common_tags
+  project                   = "tdr"
+  lambda_signed_cookies     = true
+  upload_domain             = local.upload_domain
+  auth_url                  = local.keycloak_auth_url
+  frontend_url              = module.frontend.frontend_url
+  cloudfront_key_pair_id    = module.cloudfront_upload.cloudfront_key_pair_id
+  timeout_seconds           = 60
+  api_gateway_arn           = module.signed_cookies_api.api_arn
+  kms_key_arn               = module.encryption_key.kms_key_arn
+  private_subnet_ids        = module.shared_vpc.private_backend_checks_subnets
+  vpc_id                    = module.shared_vpc.vpc_id
+  environment_full          = local.environment_full_name
+  user_session_timeout_mins = local.user_session_timeout_mins
 }
 
 module "export_status_update_lambda" {
@@ -488,25 +494,25 @@ module "export_step_function" {
 }
 
 module "export_bucket" {
-  source             = "./tdr-terraform-modules/s3"
-  project            = var.project
-  function           = "consignment-export"
-  common_tags        = local.common_tags
-  kms_key_id         = local.s3_encryption_key_arn
-  bucket_key_enabled = local.bucket_key_enabled
-  tre_role_arn       = local.tre_export_role_arn
-  bucket_policy      = "export_bucket"
+  source                = "./tdr-terraform-modules/s3"
+  project               = var.project
+  function              = "consignment-export"
+  common_tags           = local.common_tags
+  kms_key_id            = module.s3_external_kms_key.kms_key_arn
+  bucket_key_enabled    = true
+  read_access_role_arns = local.standard_export_bucket_read_access_roles
+  bucket_policy         = "export_bucket"
 }
 
 module "export_bucket_judgment" {
-  source             = "./tdr-terraform-modules/s3"
-  project            = var.project
-  function           = "consignment-export-judgment"
-  common_tags        = local.common_tags
-  kms_key_id         = local.s3_encryption_key_arn
-  bucket_key_enabled = local.bucket_key_enabled
-  tre_role_arn       = local.tre_export_role_arn
-  bucket_policy      = "export_bucket"
+  source                = "./tdr-terraform-modules/s3"
+  project               = var.project
+  function              = "consignment-export-judgment"
+  common_tags           = local.common_tags
+  kms_key_id            = module.s3_external_kms_key.kms_key_arn
+  bucket_key_enabled    = true
+  read_access_role_arns = local.judgment_export_bucket_read_access_roles
+  bucket_policy         = "export_bucket"
 }
 
 module "notifications_topic" {

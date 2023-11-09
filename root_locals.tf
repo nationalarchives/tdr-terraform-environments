@@ -58,6 +58,8 @@ locals {
 
   ecr_account_number = local.environment == "sbox" ? data.aws_caller_identity.current.account_id : data.aws_ssm_parameter.mgmt_account_number.value
 
+  user_session_timeout_mins = 60
+
   keycloak_auth_url = "https://auth.${local.dns_zone_name_trimmed}"
 
   keycloak_backend_checks_secret_name        = "/${local.environment}/keycloak/backend_checks_client/secret"
@@ -105,13 +107,16 @@ locals {
   url_path              = "/${local.environment}/consignmentapi/instance/url"
   tmp_directory         = "/tmp"
   consignment_user_name = "consignment_api_user"
-  //tre has used different naming conventions for its environment names
-  tre_environment = local.environment == "intg" ? "int" : local.environment
 
-  // apply s3 bucket encryption in intg / staging only for now
-  s3_encryption_key_arn = local.environment == "prod" ? "" : module.s3_external_kms_key.kms_key_arn
-  bucket_key_enabled    = local.environment == "prod" ? false : true
-  tre_export_role_arn   = module.tre_configuration.terraform_config[local.tre_environment]["s3_export_bucket_reader_arn"]
+  //tre has used different naming conventions for its environment names
+  tre_environment     = local.environment == "intg" ? "int" : local.environment
+  tre_export_role_arn = module.tre_configuration.terraform_config[local.tre_environment]["s3_export_bucket_reader_arn"]
+
+  // talend only has a role set for intg this will change in the future
+  talend_export_role_arn = local.environment == "intg" ? module.talend_configuration.terraform_config[local.environment]["remote_engine_instance_profile_role"] : ""
+
+  standard_export_bucket_read_access_roles = local.environment == "intg" ? [local.tre_export_role_arn, local.talend_export_role_arn] : [local.tre_export_role_arn]
+  judgment_export_bucket_read_access_roles = [local.tre_export_role_arn]
 
   // event bus hosted on tre environments
   da_event_bus_arn     = module.tre_configuration.terraform_config[local.tre_environment]["da_eventbus"]
