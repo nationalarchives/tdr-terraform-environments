@@ -58,6 +58,8 @@ locals {
 
   ecr_account_number = local.environment == "sbox" ? data.aws_caller_identity.current.account_id : data.aws_ssm_parameter.mgmt_account_number.value
 
+  user_session_timeout_mins = 60
+
   keycloak_auth_url = "https://auth.${local.dns_zone_name_trimmed}"
 
   keycloak_backend_checks_secret_name        = "/${local.environment}/keycloak/backend_checks_client/secret"
@@ -124,7 +126,6 @@ locals {
   da_reference_generator_limit = module.tdr_configuration.terraform_config["reference_generator_limit"]
 
   //feature access blocks
-  block_http4s                 = true
   block_assign_file_references = local.environment == "intg" ? false : true
   block_validation_library     = local.environment == "intg" ? false : true
 }

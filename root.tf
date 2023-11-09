@@ -58,7 +58,6 @@ module "consignment_api" {
   dns_zone_name_trimmed          = local.dns_zone_name_trimmed
   db_instance_resource_id        = module.consignment_api_database.resource_id
   create_users_security_group_id = flatten([module.create_db_users_lambda.create_users_lambda_security_group_id, module.create_bastion_user_lambda.create_users_lambda_security_group_id])
-  block_http4s                   = local.block_http4s
   block_assign_file_references   = local.block_assign_file_references
   da_reference_generator_url     = local.da_reference_generator_url
   da_reference_generator_limit   = local.da_reference_generator_limit
@@ -398,20 +397,21 @@ module "export_authoriser_lambda" {
 }
 
 module "signed_cookies_lambda" {
-  source                 = "./tdr-terraform-modules/lambda"
-  common_tags            = local.common_tags
-  project                = "tdr"
-  lambda_signed_cookies  = true
-  upload_domain          = local.upload_domain
-  auth_url               = local.keycloak_auth_url
-  frontend_url           = module.frontend.frontend_url
-  cloudfront_key_pair_id = module.cloudfront_upload.cloudfront_key_pair_id
-  timeout_seconds        = 60
-  api_gateway_arn        = module.signed_cookies_api.api_arn
-  kms_key_arn            = module.encryption_key.kms_key_arn
-  private_subnet_ids     = module.shared_vpc.private_backend_checks_subnets
-  vpc_id                 = module.shared_vpc.vpc_id
-  environment_full       = local.environment_full_name
+  source                    = "./tdr-terraform-modules/lambda"
+  common_tags               = local.common_tags
+  project                   = "tdr"
+  lambda_signed_cookies     = true
+  upload_domain             = local.upload_domain
+  auth_url                  = local.keycloak_auth_url
+  frontend_url              = module.frontend.frontend_url
+  cloudfront_key_pair_id    = module.cloudfront_upload.cloudfront_key_pair_id
+  timeout_seconds           = 60
+  api_gateway_arn           = module.signed_cookies_api.api_arn
+  kms_key_arn               = module.encryption_key.kms_key_arn
+  private_subnet_ids        = module.shared_vpc.private_backend_checks_subnets
+  vpc_id                    = module.shared_vpc.vpc_id
+  environment_full          = local.environment_full_name
+  user_session_timeout_mins = local.user_session_timeout_mins
 }
 
 module "export_status_update_lambda" {
