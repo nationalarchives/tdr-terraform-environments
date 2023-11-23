@@ -83,9 +83,6 @@ locals {
   //Used for allowing full access for Cloudfront logging. More information at https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html#AccessLogsBucketAndFileOwnership
   logs_delivery_canonical_user_id = "c4c1ede66af53448b93c283ce9448c4ba468c9432aa01d700d3878632f77d2d0"
 
-  //TRE SQS v2 to be retired. Issues on TRE side mean will no longer subscribe to TRE topics
-  transform_engine_v2_sqs_topic_subscriptions = []
-
   //Set to true to create security audit IAM user group
   security_audit = false
 

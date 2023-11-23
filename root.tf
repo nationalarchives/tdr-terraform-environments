@@ -238,13 +238,12 @@ module "frontend_alb" {
 }
 
 module "encryption_key" {
-  source           = "./tdr-terraform-modules/kms"
-  project          = var.project
-  function         = "encryption"
-  key_policy       = "message_system_access"
-  environment      = local.environment
-  common_tags      = local.common_tags
-  policy_variables = { transform_engine_retry_role = data.aws_ssm_parameter.transform_engine_retry_role_arn.value }
+  source      = "./tdr-terraform-modules/kms"
+  project     = var.project
+  function    = "encryption"
+  key_policy  = "message_system_access"
+  environment = local.environment
+  common_tags = local.common_tags
 }
 
 module "waf" {
@@ -298,27 +297,6 @@ module "create_bastion_user_lambda" {
   api_database_security_group = module.api_database_security_group.security_group_id
   lambda_name                 = "create-bastion-user"
   database_name               = "bastion"
-}
-
-module "transform_engine_retry_queue" {
-  source             = "./tdr-terraform-modules/sqs"
-  common_tags        = local.common_tags
-  project            = var.project
-  function           = "transform-engine-retry"
-  sqs_policy         = "transform_engine_retry"
-  visibility_timeout = 180 * 3
-  kms_key_id         = module.encryption_key.kms_key_arn
-}
-
-module "transform_engine_v2_retry_queue" {
-  source             = "./tdr-terraform-modules/sqs"
-  common_tags        = local.common_tags
-  project            = var.project
-  function           = "transform-engine-v2-retry"
-  sqs_policy         = "transform_engine_v2_retry"
-  visibility_timeout = 180 * 3
-  kms_key_id         = module.encryption_key.kms_key_arn
-  sns_topic_arns     = toset(local.transform_engine_v2_sqs_topic_subscriptions)
 }
 
 module "service_unavailable_lambda" {
@@ -533,7 +511,6 @@ module "notification_lambda" {
   kms_export_bucket_key_arn      = module.s3_external_kms_key.kms_key_arn
   event_rule_arns                = []
   sns_topic_arns                 = [module.notifications_topic.sns_arn]
-  sqs_queue_arns                 = [module.transform_engine_v2_retry_queue.sqs_arn, module.transform_engine_retry_queue.sqs_arn]
   muted_scan_alerts              = module.global_parameters.muted_ecr_scan_alerts
   judgment_export_s3_bucket_name = module.export_bucket_judgment.s3_bucket_name
   standard_export_s3_bucket_name = module.export_bucket.s3_bucket_name
