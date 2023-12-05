@@ -89,6 +89,10 @@
       {
         "name": "GOVUK_NOTIFY_TEMPLATE_ID_PATH",
         "value": "${govuk_notify_template_id_path}"
+      },
+      {
+        "name": "BLOCK_SHARED_PAGES",
+        "value": "${block_shared_pages}"
       }
     ],
     "networkMode": "awsvpc",
