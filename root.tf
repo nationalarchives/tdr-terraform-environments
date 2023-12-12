@@ -260,6 +260,21 @@ module "waf" {
   log_destinations  = [module.waf_cloudwatch.log_group_arn]
 }
 
+module "waf_aws_managed_rules" {
+  source           = "./da-terraform-modules/wafv2_aws_managed_rules"
+  tags             = local.common_tags
+  log_destinations = [module.waf_cloudwatch.log_group_arn]
+  arn_associations = [module.waf.web_acl_arn]
+  aws_managed_rules = [
+    { name = "AWS-AWSManagedRulesAmazonIpReputationList", priority = 2, managed_rule_group_statement_name = "AWS-AWSManagedRulesAmazonIpReputationList", managed_rule_group_statement_vendor_name = "AWS", metric_name = "AWS-AWSManagedRulesAmazonIpReputationList" },
+    { name = "AWS-AWSManagedRulesCommonRuleSet", priority = 3, managed_rule_group_statement_name = "AWS-AWSManagedRulesCommonRuleSet", managed_rule_group_statement_vendor_name = "AWS", metric_name = "AWS-AWSManagedRulesCommonRuleSet" },
+    { name = "AWS-AWSManagedRulesKnownBadInputsRuleSet", priority = 4, managed_rule_group_statement_name = "AWS-AWSManagedRulesKnownBadInputsRuleSet", managed_rule_group_statement_vendor_name = "AWS", metric_name = "AWS-AWSManagedRulesKnownBadInputsRuleSet" },
+    { name = "AWS-AWSManagedRulesLinuxRuleSet", priority = 5, managed_rule_group_statement_name = "AWS-AWSManagedRulesLinuxRuleSet", managed_rule_group_statement_vendor_name = "AWS", metric_name = "AWS-AWSManagedRulesLinuxRuleSet" },
+    { name = "AWS-AWSManagedRulesUnixRuleSet", priority = 6, managed_rule_group_statement_name = "AWS-AWSManagedRulesUnixRuleSet", managed_rule_group_statement_vendor_name = "AWS", metric_name = "AWS-AWSManagedRulesUnixRuleSet" },
+    { name = "AWS-AWSManagedRulesSQLiRuleSet", priority = 7, managed_rule_group_statement_name = "AWS-AWSManagedRulesSQLiRuleSet", managed_rule_group_statement_vendor_name = "AWS", metric_name = "AWS-AWSManagedRulesSQLiRuleSet" }
+  ]
+}
+
 module "backend_lambda_function_bucket" {
   source      = "./tdr-terraform-modules/s3"
   common_tags = local.common_tags
