@@ -116,6 +116,7 @@ module "tdr_keycloak_ecs" {
     rotate_client_secrets_client_path = local.keycloak_rotate_secrets_client_secret_name
     sns_topic_arn                     = module.notifications_topic.sns_arn
     keycloak_host                     = "auth.${local.environment_domain}"
+    block_shared_pages                = local.block_shared_keycloak_pages
   })
   container_name               = "keycloak"
   cpu                          = 1024
