@@ -125,4 +125,5 @@ locals {
   //feature access blocks
   block_assign_file_references = local.environment == "intg" ? false : true
   block_validation_library     = local.environment == "intg" ? false : true
+  block_shared_keycloak_pages  = local.environment == "intg" ? false : true
 }
