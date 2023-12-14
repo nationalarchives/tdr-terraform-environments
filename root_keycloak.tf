@@ -120,6 +120,7 @@ module "tdr_keycloak_ecs" {
   })
   container_name               = "keycloak"
   cpu                          = 1024
+  desired_count                = local.ecs_service_tasks_desired_count
   environment                  = local.environment
   execution_role               = module.keycloak_execution_role.role.arn
   load_balancer_container_port = 8080

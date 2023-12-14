@@ -45,3 +45,9 @@ variable "public_subnet_ranges" {
   type = list(string)
 }
 variable "block_validation_library" {}
+
+variable "service_tasks_desired_count" {
+  description = "Number of desired running tasks for the service"
+  type        = number
+  default     = 1
+}

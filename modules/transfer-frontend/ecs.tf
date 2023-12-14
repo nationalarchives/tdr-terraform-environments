@@ -56,7 +56,7 @@ resource "aws_ecs_service" "frontend_service" {
   name                              = "${var.app_name}_service_${var.environment}"
   cluster                           = aws_ecs_cluster.frontend_ecs.id
   task_definition                   = aws_ecs_task_definition.frontend_task.arn
-  desired_count                     = 1
+  desired_count                     = var.service_tasks_desired_count
   launch_type                       = "FARGATE"
   health_check_grace_period_seconds = "360"
 

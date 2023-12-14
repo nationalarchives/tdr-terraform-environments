@@ -105,6 +105,8 @@ locals {
   tmp_directory         = "/tmp"
   consignment_user_name = "consignment_api_user"
 
+  ecs_service_tasks_desired_count = local.environment == "intg" ? 1 : 0
+
   //tre has used different naming conventions for its environment names
   tre_environment     = local.environment == "intg" ? "int" : local.environment
   tre_export_role_arn = module.tre_configuration.terraform_config[local.tre_environment]["s3_export_bucket_reader_arn"]

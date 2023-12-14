@@ -54,3 +54,9 @@ variable "db_instance_resource_id" {}
 variable "block_assign_file_references" {}
 
 variable "block_validation_library" {}
+
+variable "service_tasks_desired_count" {
+  description = "Number of desired running tasks for the service"
+  type        = number
+  default     = 1
+}
