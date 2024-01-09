@@ -11,3 +11,14 @@ module "s3_external_kms_key" {
     service_names = ["cloudwatch"]
   }
 }
+
+module "s3_internal_kms_key" {
+  source   = "./da-terraform-modules/kms"
+  key_name = "tdr-s3-internal-kms-${local.environment}"
+  tags     = local.common_tags
+  default_policy_variables = {
+    user_roles    = concat(local.aws_sso_internal_bucket_access_roles)
+    ci_roles      = [local.assume_role]
+    service_names = ["cloudwatch"]
+  }
+}
