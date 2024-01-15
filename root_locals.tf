@@ -115,6 +115,14 @@ locals {
   standard_export_bucket_read_access_roles = local.environment == "intg" ? [local.tre_export_role_arn, local.talend_export_role_arn] : [local.tre_export_role_arn]
   judgment_export_bucket_read_access_roles = [local.tre_export_role_arn]
 
+  // s3 internal bucket encryption
+  internal_s3_encryption_key_arn = ""
+  internal_bucket_key_enabled    = false
+
+  // s3 upload bucket encryption
+  upload_dirty_s3_encryption_key_arn = ""
+  upload_dirty_bucket_key_enabled    = false
+
   // event bus hosted on tre environments
   da_event_bus_arn     = module.tre_configuration.terraform_config[local.tre_environment]["da_eventbus"]
   da_event_bus_kms_key = module.tre_configuration.terraform_config["${local.tre_environment}_da_eventbus_kms_arn"]
