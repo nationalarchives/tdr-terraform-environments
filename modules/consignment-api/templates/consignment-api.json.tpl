@@ -21,10 +21,6 @@
         "value" : "5432"
       },
       {
-        "name": "BLOCK_ASSIGN_FILE_REFERENCES",
-        "value": "${block_assign_file_references}"
-      },
-      {
         "name": "REFERENCE_GENERATOR_URL",
         "value": "${da_reference_generator_url}"
       },
