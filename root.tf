@@ -122,8 +122,8 @@ module "upload_file_cloudfront_dirty_s3" {
   source                   = "./tdr-terraform-modules/s3"
   project                  = var.project
   function                 = "upload-files-cloudfront-dirty"
-  bucket_key_enabled       = local.internal_bucket_key_enabled
-  kms_key_id               = local.internal_s3_encryption_key_arn
+  bucket_key_enabled       = local.upload_dirty_bucket_key_enabled
+  kms_key_id               = local.upload_dirty_s3_encryption_key_arn
   common_tags              = local.common_tags
   cors_urls                = local.upload_cors_urls
   bucket_policy            = "cloudfront_oai"
