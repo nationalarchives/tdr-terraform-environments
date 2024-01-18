@@ -6,7 +6,7 @@ locals {
     }
   )
 
-  tdr_reporting_slack_channel_id = "/${local.environment}/slack/tdr_reporting/channelid"
+  tdr_reporting_slack_channel_id = "/${local.environment}/slack/tdr_reporting/channel_id"
 
 }
 
@@ -17,7 +17,7 @@ module "reporting_lambda_ssm_parameters" {
       name        = local.tdr_reporting_slack_channel_id,
       description = "Slack channel id where reports will be sent. Value to be added manually"
       type        = "SecureString"
-      value       = "CXXXXXXXXXX"
+      value       = "To be manually added"
     }
   ]
   tags = merge(local.common_tags, local.manual_input_tag)
