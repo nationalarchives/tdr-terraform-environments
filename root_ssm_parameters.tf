@@ -22,3 +22,4 @@ module "reporting_lambda_ssm_parameters" {
   ]
   tags = merge(local.common_tags, local.manual_input_tag)
 }
+
