@@ -50,6 +50,16 @@
         "ssm:GetParameter"
       ],
       "Resource": "arn:aws:ssm:eu-west-2:${account_id}:parameter${parameter_name}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "kms:Decrypt",
+      "Resource": ${decryption_keys}
+    },
+    {
+      "Effect": "Allow",
+      "Action": "kms:Encrypt",
+      "Resource": ${encryption_keys}
     }
   ]
 }
