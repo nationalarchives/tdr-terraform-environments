@@ -423,11 +423,13 @@ module "reporting_lambda" {
   keycloak_reporting_client_secret = module.keycloak_ssm_parameters.params[local.keycloak_reporting_client_secret_name].value
   reporting_client_secret_path     = local.keycloak_reporting_client_secret_name
   slack_bot_token                  = module.keycloak_ssm_parameters.params[local.slack_bot_token_name].value
+  tdr_reporting_slack_channel_id   = module.reporting_lambda_ssm_parameters.params[local.tdr_reporting_slack_channel_id].value
   timeout_seconds                  = 120
   kms_key_arn                      = module.encryption_key.kms_key_arn
   private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
   vpc_id                           = module.shared_vpc.vpc_id
 }
+
 
 //create a new efs volume, ECS task attached to the volume and pass in the proper variables and create ECR repository in the backend project
 
