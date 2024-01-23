@@ -52,3 +52,7 @@ variable "create_users_security_group_id" {
 variable "db_instance_resource_id" {}
 
 variable "block_validation_library" {}
+
+variable "cloudwatch_log_retention_days" {
+  description = "Number of days to retain cloudwatch logs"
+}

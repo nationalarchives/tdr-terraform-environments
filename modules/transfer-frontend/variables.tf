@@ -45,3 +45,7 @@ variable "public_subnet_ranges" {
   type = list(string)
 }
 variable "block_validation_library" {}
+
+variable "cloudwatch_log_retention_days" {
+  description = "Number of days to retain cloudwatch logs"
+}

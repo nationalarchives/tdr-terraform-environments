@@ -8,9 +8,10 @@ module "consignment_export_ecs_security_group" {
 }
 
 module "consignment_export_cloudwatch" {
-  source      = "./tdr-terraform-modules/cloudwatch_logs"
-  common_tags = local.common_tags
-  name        = "/ecs/consignment-export-${local.environment}"
+  source            = "./tdr-terraform-modules/cloudwatch_logs"
+  common_tags       = local.common_tags
+  name              = "/ecs/consignment-export-${local.environment}"
+  retention_in_days = local.environment_default_cloudwatch_retention_days
 }
 
 module "consignment_export_execution_role" {
