@@ -130,6 +130,9 @@ locals {
   da_reference_generator_url   = module.tdr_configuration.terraform_config["reference_generator_${local.environment}_url"]
   da_reference_generator_limit = module.tdr_configuration.terraform_config["reference_generator_limit"]
 
+  // setting of '0' means indefinite retention: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group#retention_in_days
+  environment_default_cloudwatch_retention_days = local.environment == "prod" ? 0 : 30
+
   //feature access blocks
   block_validation_library    = local.environment == "prod" ? true : false
   block_shared_keycloak_pages = local.environment == "intg" ? false : true
