@@ -27,10 +27,6 @@
       {
         "name": "REFERENCE_GENERATOR_LIMIT",
         "value": "${da_reference_generator_limit}"
-      },
-      {
-        "name": "BLOCK_VALIDATION_LIBRARY",
-        "value": "${block_validation_library}"
       }
     ],
     "secrets": [
