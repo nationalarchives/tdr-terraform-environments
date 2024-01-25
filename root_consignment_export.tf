@@ -45,12 +45,14 @@ module "consignment_export_task_policy" {
   name   = "TDRConsignmentExportECSTaskPolicy${title(local.environment)}"
   policy_string = templatefile(
     "./tdr-terraform-modules/iam_policy/templates/consignment_export_task_policy.json.tpl", {
-      environment               = local.environment,
-      titleEnvironment          = title(local.environment),
-      aws_region                = local.region,
-      account                   = data.aws_caller_identity.current.account_id,
-      //TODO: change this argument in tdr-terraform-modules to accept decryption keys array (or upgrade to a component from da-terraform-modules) and pass through internal bucket key in addition
-      kms_export_bucket_key_arn = module.s3_external_kms_key.kms_key_arn
+      environment      = local.environment,
+      titleEnvironment = title(local.environment),
+      aws_region       = local.region,
+      account          = data.aws_caller_identity.current.account_id,
+      kms_export_bucket_key_arns = jsonencode([
+        module.s3_external_kms_key.kms_key_arn,
+        module.s3_internal_kms_key.kms_key_arn
+      ])
   })
 }
 
