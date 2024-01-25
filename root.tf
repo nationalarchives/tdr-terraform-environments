@@ -58,7 +58,6 @@ module "consignment_api" {
   dns_zone_name_trimmed          = local.dns_zone_name_trimmed
   db_instance_resource_id        = module.consignment_api_database.resource_id
   create_users_security_group_id = flatten([module.create_db_users_lambda.create_users_lambda_security_group_id, module.create_bastion_user_lambda.create_users_lambda_security_group_id])
-  block_assign_file_references   = local.block_assign_file_references
   da_reference_generator_url     = local.da_reference_generator_url
   da_reference_generator_limit   = local.da_reference_generator_limit
   block_validation_library       = local.block_validation_library
@@ -424,11 +423,13 @@ module "reporting_lambda" {
   keycloak_reporting_client_secret = module.keycloak_ssm_parameters.params[local.keycloak_reporting_client_secret_name].value
   reporting_client_secret_path     = local.keycloak_reporting_client_secret_name
   slack_bot_token                  = module.keycloak_ssm_parameters.params[local.slack_bot_token_name].value
+  tdr_reporting_slack_channel_id   = module.reporting_lambda_ssm_parameters.params[local.tdr_reporting_slack_channel_id].value
   timeout_seconds                  = 120
   kms_key_arn                      = module.encryption_key.kms_key_arn
   private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
   vpc_id                           = module.shared_vpc.vpc_id
 }
+
 
 //create a new efs volume, ECS task attached to the volume and pass in the proper variables and create ECR repository in the backend project
 
