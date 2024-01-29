@@ -49,7 +49,7 @@ module "consignment_export_task_policy" {
       titleEnvironment = title(local.environment),
       aws_region       = local.region,
       account          = data.aws_caller_identity.current.account_id,
-      kms_key_arns = jsonencode([
+      kms_bucket_key_arns = jsonencode([
         module.s3_external_kms_key.kms_key_arn,
         module.s3_internal_kms_key.kms_key_arn
       ])
