@@ -45,6 +45,4 @@ variable "public_subnet_ranges" {
   type = list(string)
 }
 
-variable "block_validation_library" {}
-
 variable "block_draft_metadata_upload" {}
