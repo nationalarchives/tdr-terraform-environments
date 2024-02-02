@@ -28,7 +28,7 @@ module "draft_metadata_api_gateway" {
 
 module "draft_metadata_bucket" {
   source      = "./da-terraform-modules/s3"
-  bucket_name = "${var.project}-draft-metadata-${local.environment_domain}"
+  bucket_name = "${var.project}-draft-metadata-${local.environment}"
   common_tags = local.common_tags
   kms_key_arn = module.s3_internal_kms_key.kms_key_arn
 }
