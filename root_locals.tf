@@ -131,6 +131,5 @@ locals {
   da_reference_generator_limit = module.tdr_configuration.terraform_config["reference_generator_limit"]
 
   //feature access blocks
-  block_validation_library    = local.environment == "prod" ? true : false
   block_shared_keycloak_pages = local.environment == "intg" ? false : true
 }

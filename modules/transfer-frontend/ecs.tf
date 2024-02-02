@@ -18,19 +18,18 @@ data "template_file" "app" {
   template = file("modules/transfer-frontend/templates/frontend.json.tpl")
 
   vars = {
-    collector_image          = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/aws-otel-collector:${var.environment}"
-    app_image                = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/transfer-frontend:${var.environment}"
-    app_port                 = local.app_port
-    app_environment          = var.environment
-    aws_region               = var.region
-    client_secret_path       = var.client_secret_path
-    export_api_url           = var.export_api_url
-    backend_checks_api_url   = var.backend_checks_api_url
-    alb_ip_a                 = var.public_subnet_ranges[0]
-    alb_ip_b                 = var.public_subnet_ranges[1]
-    auth_url                 = var.auth_url
-    otel_service_name        = var.otel_service_name
-    block_validation_library = var.block_validation_library
+    collector_image        = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/aws-otel-collector:${var.environment}"
+    app_image              = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/transfer-frontend:${var.environment}"
+    app_port               = local.app_port
+    app_environment        = var.environment
+    aws_region             = var.region
+    client_secret_path     = var.client_secret_path
+    export_api_url         = var.export_api_url
+    backend_checks_api_url = var.backend_checks_api_url
+    alb_ip_a               = var.public_subnet_ranges[0]
+    alb_ip_b               = var.public_subnet_ranges[1]
+    auth_url               = var.auth_url
+    otel_service_name      = var.otel_service_name
   }
 }
 
