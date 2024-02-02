@@ -67,6 +67,10 @@
       {
         "name": "OTEL_SERVICE_NAME",
         "value": "${otel_service_name}"
+      },
+      {
+        "name": "BLOCK_DRAFT_METADATA_UPLOAD",
+        "value": "${block_draft_metadata_upload}"
       }
     ],
     "networkMode": "awsvpc",

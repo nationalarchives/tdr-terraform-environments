@@ -132,4 +132,5 @@ locals {
 
   //feature access blocks
   block_shared_keycloak_pages = local.environment == "intg" ? false : true
+  block_draft_metadata_upload = local.environment == "intg" ? false : true
 }

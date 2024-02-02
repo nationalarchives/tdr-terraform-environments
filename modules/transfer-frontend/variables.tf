@@ -44,3 +44,5 @@ variable "alb_id" {}
 variable "public_subnet_ranges" {
   type = list(string)
 }
+
+variable "block_draft_metadata_upload" {}
