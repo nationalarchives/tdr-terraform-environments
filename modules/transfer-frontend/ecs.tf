@@ -30,7 +30,6 @@ data "template_file" "app" {
     alb_ip_b                    = var.public_subnet_ranges[1]
     auth_url                    = var.auth_url
     otel_service_name           = var.otel_service_name
-    block_validation_library    = var.block_validation_library
     block_draft_metadata_upload = var.block_draft_metadata_upload
   }
 }

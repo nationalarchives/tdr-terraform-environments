@@ -60,7 +60,6 @@ module "consignment_api" {
   create_users_security_group_id = flatten([module.create_db_users_lambda.create_users_lambda_security_group_id, module.create_bastion_user_lambda.create_users_lambda_security_group_id])
   da_reference_generator_url     = local.da_reference_generator_url
   da_reference_generator_limit   = local.da_reference_generator_limit
-  block_validation_library       = local.block_validation_library
 }
 
 module "frontend" {
@@ -86,7 +85,6 @@ module "frontend" {
   alb_id                      = module.frontend_alb.alb_id
   public_subnet_ranges        = module.shared_vpc.public_subnet_ranges
   otel_service_name           = "frontend-${local.environment}"
-  block_validation_library    = local.block_validation_library
   block_draft_metadata_upload = local.block_draft_metadata_upload
 }
 

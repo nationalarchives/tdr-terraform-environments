@@ -69,10 +69,6 @@
         "value": "${otel_service_name}"
       },
       {
-        "name": "BLOCK_VALIDATION_LIBRARY",
-        "value": "${block_validation_library}"
-      },
-      {
         "name": "BLOCK_DRAFT_METADATA_UPLOAD",
         "value": "${block_draft_metadata_upload}"
       }
