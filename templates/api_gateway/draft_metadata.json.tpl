@@ -39,7 +39,7 @@
         ],
         "x-amazon-apigateway-request-validator" : "Validate query string parameters and headers",
         "x-amazon-apigateway-integration": {
-          "uri": "arn:aws:apigateway:{region}:lambda:path/2015-03-31/functions/${lambda_arn}/invocations",
+          "uri": "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${lambda_arn}/invocations",
           "responses": {
             "default": {
               "statusCode": "200"
