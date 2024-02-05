@@ -72,6 +72,8 @@ module "file_upload_data" {
       account_id                 = data.aws_caller_identity.current.account_id,
       parameter_name             = local.keycloak_backend_checks_secret_name
       backend_checks_bucket_name = module.backend_lambda_function_bucket.s3_bucket_name
+      decryption_keys            = jsonencode([module.s3_upload_kms_key.kms_key_arn])
+      encryption_keys            = jsonencode([module.s3_internal_kms_key.kms_key_arn])
     })
   }
   role_name = "TDRFileUploadDataLambdaRole${title(local.environment)}"
@@ -133,9 +135,10 @@ module "file_format_v2" {
   timeout_seconds      = 60
   policies = {
     "TDRFileFormatV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_only_policy.json.tpl", {
-      function_name = local.file_format_v2_function_name,
-      account_id    = data.aws_caller_identity.current.account_id,
-      bucket_name   = local.upload_files_cloudfront_dirty_bucket_name
+      function_name   = local.file_format_v2_function_name,
+      account_id      = data.aws_caller_identity.current.account_id,
+      bucket_name     = local.upload_files_cloudfront_dirty_bucket_name
+      decryption_keys = jsonencode([module.s3_upload_kms_key.kms_key_arn])
     })
   }
   role_name = "TDRFileFormatV2LambdaRole${title(local.environment)}"
@@ -160,9 +163,10 @@ module "checksum_v2" {
   timeout_seconds      = 60
   policies = {
     "TDRChecksumV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_only_policy.json.tpl", {
-      function_name = local.checksum_v2_function_name,
-      account_id    = data.aws_caller_identity.current.account_id,
-      bucket_name   = local.upload_files_cloudfront_dirty_bucket_name
+      function_name   = local.checksum_v2_function_name,
+      account_id      = data.aws_caller_identity.current.account_id,
+      bucket_name     = local.upload_files_cloudfront_dirty_bucket_name
+      decryption_keys = jsonencode([module.s3_upload_kms_key.kms_key_arn])
     })
   }
   role_name = "TDRChecksumV2LambdaRole${title(local.environment)}"
@@ -252,6 +256,8 @@ module "yara_av_v2" {
       dirty_bucket      = local.upload_files_cloudfront_dirty_bucket_name
       clean_bucket      = module.upload_bucket.s3_bucket_name
       quarantine_bucket = module.upload_bucket_quarantine.s3_bucket_name
+      decryption_keys   = jsonencode([module.s3_upload_kms_key.kms_key_arn])
+      encryption_keys   = jsonencode([module.s3_internal_kms_key.kms_key_arn])
     })
   }
   role_name = "TDRYaraAVV2LambdaRole${title(local.environment)}"
