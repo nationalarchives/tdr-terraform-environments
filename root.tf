@@ -60,33 +60,32 @@ module "consignment_api" {
   create_users_security_group_id = flatten([module.create_db_users_lambda.create_users_lambda_security_group_id, module.create_bastion_user_lambda.create_users_lambda_security_group_id])
   da_reference_generator_url     = local.da_reference_generator_url
   da_reference_generator_limit   = local.da_reference_generator_limit
-  block_validation_library       = local.block_validation_library
 }
 
 module "frontend" {
-  app_name                 = "frontend"
-  source                   = "./modules/transfer-frontend"
-  alb_dns_name             = module.frontend_alb.alb_dns_name
-  alb_target_group_arn     = module.frontend_alb.alb_target_group_arn
-  alb_zone_id              = module.frontend_alb.alb_zone_id
-  dns_zone_id              = local.dns_zone_id
-  environment              = local.environment
-  environment_full_name    = local.environment_full_name_map[local.environment]
-  common_tags              = local.common_tags
-  ip_allowlist             = local.environment == "intg" ? local.ip_allowlist : ["0.0.0.0/0"]
-  region                   = local.region
-  vpc_id                   = module.shared_vpc.vpc_id
-  public_subnets           = module.shared_vpc.public_subnets
-  private_subnets          = module.shared_vpc.private_subnets
-  dns_zone_name_trimmed    = local.dns_zone_name_trimmed
-  auth_url                 = local.keycloak_auth_url
-  client_secret_path       = module.keycloak_ssm_parameters.params[local.keycloak_tdr_client_secret_name].name
-  export_api_url           = module.export_api.api_url
-  backend_checks_api_url   = module.backend_checks_api.api_url
-  alb_id                   = module.frontend_alb.alb_id
-  public_subnet_ranges     = module.shared_vpc.public_subnet_ranges
-  otel_service_name        = "frontend-${local.environment}"
-  block_validation_library = local.block_validation_library
+  app_name                    = "frontend"
+  source                      = "./modules/transfer-frontend"
+  alb_dns_name                = module.frontend_alb.alb_dns_name
+  alb_target_group_arn        = module.frontend_alb.alb_target_group_arn
+  alb_zone_id                 = module.frontend_alb.alb_zone_id
+  dns_zone_id                 = local.dns_zone_id
+  environment                 = local.environment
+  environment_full_name       = local.environment_full_name_map[local.environment]
+  common_tags                 = local.common_tags
+  ip_allowlist                = local.environment == "intg" ? local.ip_allowlist : ["0.0.0.0/0"]
+  region                      = local.region
+  vpc_id                      = module.shared_vpc.vpc_id
+  public_subnets              = module.shared_vpc.public_subnets
+  private_subnets             = module.shared_vpc.private_subnets
+  dns_zone_name_trimmed       = local.dns_zone_name_trimmed
+  auth_url                    = local.keycloak_auth_url
+  client_secret_path          = module.keycloak_ssm_parameters.params[local.keycloak_tdr_client_secret_name].name
+  export_api_url              = module.export_api.api_url
+  backend_checks_api_url      = module.backend_checks_api.api_url
+  alb_id                      = module.frontend_alb.alb_id
+  public_subnet_ranges        = module.shared_vpc.public_subnet_ranges
+  otel_service_name           = "frontend-${local.environment}"
+  block_draft_metadata_upload = local.block_draft_metadata_upload
 }
 
 module "alb_logs_s3" {
@@ -773,7 +772,7 @@ module "consignment_api_database" {
   availability_zone  = local.database_availability_zone
   common_tags        = local.common_tags
   database_name      = "consignmentapi"
-  database_version   = "14.7"
+  database_version   = "14.10"
   environment        = local.environment
   kms_key_id         = module.encryption_key.kms_key_arn
   private_subnets    = module.shared_vpc.private_subnets
