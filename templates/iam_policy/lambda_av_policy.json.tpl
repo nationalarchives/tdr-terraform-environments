@@ -45,6 +45,16 @@
         "arn:aws:s3:::${quarantine_bucket}",
         "arn:aws:s3:::${quarantine_bucket}/*"
       ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": "kms:Decrypt",
+      "Resource": ${decryption_keys}
+    },
+    {
+      "Effect": "Allow",
+      "Action": "kms:Encrypt",
+      "Resource": ${encryption_keys}
     }
   ]
 }
