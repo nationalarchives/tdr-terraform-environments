@@ -37,7 +37,6 @@ If you are adding an environment variable for a lambda that needs to be populate
 2. Manually enter unencrypted value in SSM parameter store
 3. Apply changes a second time to push encrypted value from SSM parameter into the environment variable
 
-
 [tf-backend]: https://github.com/nationalarchives/tdr-dev-documentation/tree/master/manual/tdr-create-aws-instructure-setup.md
 [github-actions-job]: https://github.com/nationalarchives/tdr-terraform-environments/actions/workflows/apply.yml
 [end-to-end tests]: https://github.com/nationalarchives/tdr-e2e-tests/actions/workflows/ci.yml
