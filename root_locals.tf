@@ -116,8 +116,8 @@ locals {
   judgment_export_bucket_read_access_roles = [local.tre_export_role_arn]
 
   // s3 internal bucket encryption
-  internal_s3_encryption_key_arn = ""
-  internal_bucket_key_enabled    = false
+  internal_s3_encryption_key_arn = local.environment == "intg" ? module.s3_internal_kms_key.kms_key_arn : ""
+  internal_bucket_key_enabled    = local.environment == "intg"
 
   // s3 upload bucket encryption
   upload_dirty_s3_encryption_key_arn = ""
