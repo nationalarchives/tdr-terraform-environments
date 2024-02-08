@@ -21,6 +21,7 @@ module "s3_internal_kms_key" {
       module.yara_av_v2.lambda_role_arn,
       module.file_upload_data.lambda_role_arn,
       module.consignment_export_task_role.role.arn,
+      module.draft_metadata_validator_lambda.lambda_role_arn
     ], local.aws_sso_internal_bucket_access_roles)
     ci_roles      = [local.assume_role]
     service_names = ["cloudwatch"]
