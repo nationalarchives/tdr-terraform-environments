@@ -13,7 +13,6 @@ module "draft_metadata_validator_lambda" {
       kms_key_arn    = module.s3_internal_kms_key.kms_key_arn
     })
   }
-  role_name = "TDRDraftMetadataValidatorLambdaRole${title(local.environment)}"
 }
 
 module "draft_metadata_api_gateway" {
