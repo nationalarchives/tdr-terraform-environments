@@ -100,6 +100,7 @@ locals {
   runtime_java_11    = "java11"
 
   upload_files_cloudfront_dirty_bucket_name = "${var.project}-upload-files-cloudfront-dirty-${local.environment}"
+  draft_metadata_bucket_name                = "${var.project}-draft-metadata-${local.environment}"
 
   url_path              = "/${local.environment}/consignmentapi/instance/url"
   tmp_directory         = "/tmp"
