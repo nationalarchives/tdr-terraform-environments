@@ -1,7 +1,7 @@
 module "draft_metadata_validator_lambda" {
   source        = "./da-terraform-modules/lambda"
   function_name = "tdr-draft-metadata-validator-${local.environment}"
-  handler       = "draft_metadata_validator.handler"
+  handler       = "uk.gov.nationalarchives.Lambda::handleRequest"
   runtime       = local.runtime_java_11
   tags          = local.common_tags
   policies = {
@@ -12,6 +12,12 @@ module "draft_metadata_validator_lambda" {
       bucket_name    = local.draft_metadata_bucket_name
       kms_key_arn    = module.s3_internal_kms_key.kms_key_arn
     })
+  }
+  plaintext_env_vars = {
+    API_URL            = module.consignment_api.api_url
+    AUTH_URL           = local.keycloak_auth_url
+    CLIENT_SECRET_PATH = local.keycloak_backend_checks_secret_name
+    BUCKET_NAME        = local.draft_metadata_bucket_name
   }
 }
 
