@@ -10,6 +10,9 @@ module "draft_metadata_validator_lambda" {
       environment = local.environment
     })
   }
+  lambda_invoke_permissions = {
+    "apigateway.amazonaws.com" = "${module.draft_metadata_api_gateway.api_execution_arn}/*/POST/draft-metadata/validate"
+  }
 }
 
 module "draft_metadata_api_gateway" {
