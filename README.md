@@ -30,6 +30,13 @@ Integration deployments can be approved by anyone in the `transfer-digital-recor
 
 Integration and staging deployments will automatically start the [end-to-end tests]. Wait for these to succeed before deploying the Terraform to the next environment, as well as doing any manual checks you need to make sure the deployment made the change you expected.
 
+### Adding/Updating Lambda Environment Variables
+
+If you are adding an environment variable for a lambda that needs to be populated with an encrypted, manually added value from the SSM Parameter store, you will need to apply the changes twice. 
+1. Apply changes in order to set up SSM parameter and Lambda environment variable
+2. Manually enter unencrypted value in SSM parameter store
+3. Apply changes a second time to push encrypted value from SSM parameter into the environment variable
+
 [tf-backend]: https://github.com/nationalarchives/tdr-dev-documentation/tree/master/manual/tdr-create-aws-instructure-setup.md
 [github-actions-job]: https://github.com/nationalarchives/tdr-terraform-environments/actions/workflows/apply.yml
 [end-to-end tests]: https://github.com/nationalarchives/tdr-e2e-tests/actions/workflows/ci.yml
