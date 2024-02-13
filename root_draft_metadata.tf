@@ -18,7 +18,7 @@ module "draft_metadata_validator_lambda" {
     })
   }
   plaintext_env_vars = {
-    API_URL            = module.consignment_api.api_url
+    API_URL            = "${module.consignment_api.api_url}/graphql"
     AUTH_URL           = local.keycloak_auth_url
     CLIENT_SECRET_PATH = local.keycloak_backend_checks_secret_name
     BUCKET_NAME        = local.draft_metadata_bucket_name
