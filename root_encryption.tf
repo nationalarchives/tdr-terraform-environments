@@ -1,3 +1,7 @@
+locals {
+  e2e_testing_role_arns = local.environment == "prod" ? [] : [module.tdr_configuration.terraform_config[local.environment]["e2e_testing_role_arn"]]
+}
+
 module "s3_external_kms_key" {
   source   = "./da-terraform-modules/kms"
   key_name = "tdr-s3-external-kms-${local.environment}"
@@ -21,7 +25,7 @@ module "s3_internal_kms_key" {
       module.yara_av_v2.lambda_role_arn,
       module.file_upload_data.lambda_role_arn,
       module.consignment_export_task_role.role.arn,
-    ], local.aws_sso_internal_bucket_access_roles)
+    ], local.aws_sso_internal_bucket_access_roles, local.e2e_testing_role_arns)
     ci_roles      = [local.assume_role]
     service_names = ["cloudwatch"]
   }
