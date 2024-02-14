@@ -1,14 +1,29 @@
+locals {
+  draft_metadata_bucket_name = "${var.project}-draft-metadata-${local.environment}"
+}
+
 module "draft_metadata_validator_lambda" {
-  source        = "./da-terraform-modules/lambda"
-  function_name = "tdr-draft-metadata-validator-${local.environment}"
-  handler       = "draft_metadata_validator.handler"
-  runtime       = local.runtime_java_11
-  tags          = local.common_tags
+  source          = "./da-terraform-modules/lambda"
+  function_name   = "tdr-draft-metadata-validator-${local.environment}"
+  handler         = "uk.gov.nationalarchives.draftmetadatavalidator.Lambda::handleRequest"
+  runtime         = local.runtime_java_11
+  tags            = local.common_tags
+  timeout_seconds = 120
+  memory_size     = 1024
   policies = {
     "TDRDraftMetadataValidatorLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_validator_lambda.json.tpl", {
-      account_id  = var.tdr_account_number
-      environment = local.environment
+      account_id     = var.tdr_account_number
+      environment    = local.environment
+      parameter_name = local.keycloak_backend_checks_secret_name
+      bucket_name    = local.draft_metadata_bucket_name
+      kms_key_arn    = module.s3_internal_kms_key.kms_key_arn
     })
+  }
+  plaintext_env_vars = {
+    API_URL            = "${module.consignment_api.api_url}/graphql"
+    AUTH_URL           = local.keycloak_auth_url
+    CLIENT_SECRET_PATH = local.keycloak_backend_checks_secret_name
+    BUCKET_NAME        = local.draft_metadata_bucket_name
   }
   lambda_invoke_permissions = {
     "apigateway.amazonaws.com" = "${module.draft_metadata_api_gateway.api_execution_arn}/*/POST/draft-metadata/validate/{consignmentId+}"
@@ -31,7 +46,7 @@ module "draft_metadata_api_gateway" {
 
 module "draft_metadata_bucket" {
   source      = "./da-terraform-modules/s3"
-  bucket_name = "${var.project}-draft-metadata-${local.environment}"
+  bucket_name = local.draft_metadata_bucket_name
   common_tags = local.common_tags
   kms_key_arn = module.s3_internal_kms_key.kms_key_arn
 }
