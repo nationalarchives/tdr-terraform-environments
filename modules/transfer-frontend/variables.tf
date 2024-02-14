@@ -46,3 +46,5 @@ variable "public_subnet_ranges" {
 }
 
 variable "block_draft_metadata_upload" {}
+
+variable "validate_draft_metadata_api_url" {}
