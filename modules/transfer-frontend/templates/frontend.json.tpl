@@ -71,6 +71,10 @@
       {
         "name": "BLOCK_DRAFT_METADATA_UPLOAD",
         "value": "${block_draft_metadata_upload}"
+      },
+      {
+        "name": "DRAFT_METADATA_VALIDATOR_API_URL",
+        "value": "${draft_metadata_validator_api_url}"
       }
     ],
     "networkMode": "awsvpc",
