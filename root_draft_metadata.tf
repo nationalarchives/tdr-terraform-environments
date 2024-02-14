@@ -11,7 +11,7 @@ module "draft_metadata_validator_lambda" {
     })
   }
   lambda_invoke_permissions = {
-    "apigateway.amazonaws.com" = "${module.draft_metadata_api_gateway.api_execution_arn}/*/POST/draft-metadata/validate"
+    "apigateway.amazonaws.com" = "${module.draft_metadata_api_gateway.api_execution_arn}/*/POST/draft-metadata/validate/{consignmentId+}"
   }
 }
 
