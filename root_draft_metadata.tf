@@ -3,13 +3,13 @@ locals {
 }
 
 module "draft_metadata_validator_lambda" {
-  source        = "./da-terraform-modules/lambda"
-  function_name = "tdr-draft-metadata-validator-${local.environment}"
-  handler       = "uk.gov.nationalarchives.draftmetadatavalidator.Lambda::handleRequest"
-  runtime       = local.runtime_java_11
-  tags          = local.common_tags
-  timeout       = 120
-  memory_size   = 1024
+  source          = "./da-terraform-modules/lambda"
+  function_name   = "tdr-draft-metadata-validator-${local.environment}"
+  handler         = "uk.gov.nationalarchives.draftmetadatavalidator.Lambda::handleRequest"
+  runtime         = local.runtime_java_11
+  tags            = local.common_tags
+  timeout_seconds = 120
+  memory_size     = 1024
   policies = {
     "TDRDraftMetadataValidatorLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_validator_lambda.json.tpl", {
       account_id     = var.tdr_account_number
