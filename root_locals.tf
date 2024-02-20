@@ -121,7 +121,7 @@ locals {
 
   // s3 upload bucket encryption
   upload_dirty_s3_encryption_key_arn = local.environment == "intg" ? module.s3_upload_kms_key.kms_key_arn : ""
-  upload_dirty_bucket_key_enabled    = true
+  upload_dirty_bucket_key_enabled    = local.environment == "intg"
 
   // event bus hosted on tre environments
   da_event_bus_arn     = module.tre_configuration.terraform_config[local.tre_environment]["da_eventbus"]
