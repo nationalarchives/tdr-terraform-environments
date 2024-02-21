@@ -29,7 +29,6 @@ module "s3_internal_kms_key" {
     ], local.aws_sso_internal_bucket_access_roles, local.e2e_testing_role_arns)
     ci_roles                 = [local.assume_role]
     service_names            = ["cloudwatch"]
-    cloudfront_distributions = [module.cloudfront_upload.cloudfront_arn]
   }
 }
 
@@ -46,5 +45,6 @@ module "s3_upload_kms_key" {
     ], local.aws_sso_internal_bucket_access_roles)
     ci_roles      = [local.assume_role]
     service_names = ["cloudwatch"]
+    cloudfront_distributions = [module.cloudfront_upload.cloudfront_arn]
   }
 }
