@@ -118,16 +118,16 @@ module "upload_bucket_quarantine" {
 }
 
 module "upload_file_cloudfront_dirty_s3" {
-  source                   = "./tdr-terraform-modules/s3"
-  project                  = var.project
-  function                 = "upload-files-cloudfront-dirty"
-  bucket_key_enabled       = local.upload_dirty_bucket_key_enabled
-  kms_key_id               = local.upload_dirty_s3_encryption_key_arn
-  common_tags              = local.common_tags
-  cors_urls                = local.upload_cors_urls
-  bucket_policy            = "cloudfront_oai"
-  abort_incomplete_uploads = true
-  cloudfront_oai           = module.cloudfront_upload.cloudfront_oai_iam_arn
+  source                       = "./tdr-terraform-modules/s3"
+  project                      = var.project
+  function                     = "upload-files-cloudfront-dirty"
+  bucket_key_enabled           = local.upload_dirty_bucket_key_enabled
+  kms_key_id                   = local.upload_dirty_s3_encryption_key_arn
+  common_tags                  = local.common_tags
+  cors_urls                    = local.upload_cors_urls
+  bucket_policy                = "cloudfront_oai"
+  abort_incomplete_uploads     = true
+  cloudfront_oai               = module.cloudfront_upload.cloudfront_oai_iam_arn
   cloudfront_distribution_arns = [module.cloudfront_upload.cloudfront_arn]
 }
 
