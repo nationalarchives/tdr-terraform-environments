@@ -128,6 +128,7 @@ module "upload_file_cloudfront_dirty_s3" {
   bucket_policy            = "cloudfront_oai"
   abort_incomplete_uploads = true
   cloudfront_oai           = module.cloudfront_upload.cloudfront_oai_iam_arn
+  cloudfront_distribution_arns = [module.cloudfront_upload.cloudfront_arn]
 }
 
 module "upload_file_cloudfront_logs" {
