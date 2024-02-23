@@ -120,7 +120,7 @@ locals {
   internal_bucket_key_enabled    = local.environment == "intg"
 
   // s3 upload bucket encryption
-  upload_dirty_s3_encryption_key_arn = "" // local.environment == "intg" ? module.s3_upload_kms_key.kms_key_arn : ""
+  upload_dirty_s3_encryption_key_arn = ""    // local.environment == "intg" ? module.s3_upload_kms_key.kms_key_arn : ""
   upload_dirty_bucket_key_enabled    = false // local.environment == "intg"
 
   // event bus hosted on tre environments
