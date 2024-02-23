@@ -151,6 +151,7 @@ module "cloudfront_upload" {
   alias_domain_name                   = local.upload_domain
   certificate_arn                     = module.cloudfront_certificate.certificate_arn
   api_gateway_url                     = module.signed_cookies_api.api_url
+  sse_kms_enabled                     = local.upload_dirty_bucket_key_enabled
 }
 
 module "cloudfront_upload_dns" {
