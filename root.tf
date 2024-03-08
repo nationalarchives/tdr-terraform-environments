@@ -87,6 +87,7 @@ module "frontend" {
   otel_service_name                = "frontend-${local.environment}"
   block_draft_metadata_upload      = local.block_draft_metadata_upload
   draft_metadata_validator_api_url = module.draft_metadata_api_gateway.api_url
+  draft_metadata_s3_bucket         = module.draft_metadata_bucket.s3_bucket_name
 }
 
 module "alb_logs_s3" {
