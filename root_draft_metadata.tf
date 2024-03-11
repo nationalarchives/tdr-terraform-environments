@@ -1,7 +1,3 @@
-#locals {
-#  draft_metadata_bucket_name = "${var.project}-draft-metadata-${local.environment}"
-#}
-
 module "draft_metadata_validator_lambda" {
   source          = "./da-terraform-modules/lambda"
   function_name   = "tdr-draft-metadata-validator-${local.environment}"
