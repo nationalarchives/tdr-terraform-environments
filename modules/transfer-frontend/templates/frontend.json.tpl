@@ -77,8 +77,8 @@
         "value": "${draft_metadata_validator_api_url}"
       },
       {
-        "name": "DRAFT_METADATA_S3_BUCKET",
-        "value": "${draft_metadata_s3_bucket}"
+        "name": "DRAFT_METADATA_S3_BUCKET_NAME",
+        "value": "${draft_metadata_s3_bucket_name}"
       }
     ],
     "networkMode": "awsvpc",

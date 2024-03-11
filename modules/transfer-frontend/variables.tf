@@ -49,4 +49,4 @@ variable "block_draft_metadata_upload" {}
 
 variable "draft_metadata_validator_api_url" {}
 
-variable "draft_metadata_s3_bucket" {}
+variable "draft_metadata_s3_bucket_name" {}

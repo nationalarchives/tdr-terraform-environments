@@ -32,7 +32,7 @@ data "template_file" "app" {
     otel_service_name                = var.otel_service_name
     block_draft_metadata_upload      = var.block_draft_metadata_upload
     draft_metadata_validator_api_url = var.draft_metadata_validator_api_url
-    draft_metadata_s3_bucket         = var.draft_metadata_s3_bucket
+    draft_metadata_s3_bucket         = var.draft_metadata_s3_bucket_name
   }
 }
 
