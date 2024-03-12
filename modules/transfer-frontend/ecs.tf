@@ -142,6 +142,22 @@ resource "aws_iam_policy" "frontend_ecs_execution" {
   policy = data.aws_iam_policy_document.frontend_ecs_execution.json
 }
 
+resource "aws_iam_policy" "frontend_draft_metadata" {
+  name = "TDRFrontendEcsDraftMetadata${title(var.environment)}"
+  policy = templatefile(
+    "modules/transfer-frontend/templates/draft_metadata_policy.json.tpl", {
+      environment         = var.environment,
+      titleEnvironment    = title(var.environment),
+      account             = data.aws_caller_identity.current.account_id,
+      kms_bucket_key_arns = var.draft_metadata_s3_kms_keys
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "frontend_draft_metadata" {
+  role       = aws_iam_role.frontend_ecs_task.name
+  policy_arn = aws_iam_policy.frontend_draft_metadata.arn
+}
+
 data "aws_ssm_parameter" "mgmt_account_number" {
   name = "/mgmt/management_account"
 }
