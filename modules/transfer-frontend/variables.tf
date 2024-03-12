@@ -48,3 +48,5 @@ variable "public_subnet_ranges" {
 variable "block_draft_metadata_upload" {}
 
 variable "draft_metadata_validator_api_url" {}
+
+variable "draft_metadata_s3_bucket_name" {}
