@@ -19,7 +19,7 @@ data "template_file" "app" {
 
   vars = {
     collector_image                  = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/aws-otel-collector:${var.environment}"
-    app_image                        = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/transfer-frontend:${var.environment}"
+    app_image                        = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/transfer-frontend:playV3"
     app_port                         = local.app_port
     app_environment                  = var.environment
     aws_region                       = var.region
