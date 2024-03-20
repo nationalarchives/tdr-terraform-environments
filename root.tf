@@ -376,6 +376,7 @@ module "export_authoriser_lambda" {
   api_url                  = module.consignment_api.api_url
   api_gateway_arn          = module.export_api.api_arn
   backend_checks_api_arn   = module.backend_checks_api.api_arn
+  draft_metadata_api_arn   = module.draft_metadata_api_gateway.api_execution_arn
   kms_key_arn              = module.encryption_key.kms_key_arn
   private_subnet_ids       = module.shared_vpc.private_backend_checks_subnets
   vpc_id                   = module.shared_vpc.vpc_id
