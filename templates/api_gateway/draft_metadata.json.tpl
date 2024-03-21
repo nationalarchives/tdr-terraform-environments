@@ -54,7 +54,7 @@
           },
           "passthroughBehavior": "when_no_match",
           "httpMethod": "POST",
-          "type": "aws"
+          "type": "aws_proxy"
         }
       }
     }
