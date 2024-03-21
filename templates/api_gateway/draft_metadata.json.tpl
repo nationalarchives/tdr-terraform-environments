@@ -52,7 +52,7 @@
           "requestTemplates": {
             "application/json": "{\"input\": \"{\\\"consignmentId\\\": \\\"$input.params('consignmentId')\\\"}\"}"
           },
-          "passthroughBehavior": "when_no_templates",
+          "passthroughBehavior": "when_no_match",
           "httpMethod": "POST",
           "type": "aws"
         }
