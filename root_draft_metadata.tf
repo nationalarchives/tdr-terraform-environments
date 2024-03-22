@@ -46,3 +46,102 @@ module "draft_metadata_bucket" {
   common_tags = local.common_tags
   kms_key_arn = module.s3_internal_kms_key.kms_key_arn
 }
+
+data "aws_ssm_parameter" "backend_checks_keycloak_secret" {
+  name = local.keycloak_backend_checks_secret_name
+}
+
+resource "aws_events_connection" "consignment_api_connection" {
+  name               = "TDRConsignmentAPIConnection${title(local.environment)}"
+  authorization_type = "OAUTH_CLIENT_CREDENTIALS"
+
+  auth_parameters {
+    oauth {
+      client_parameters {
+        client_id     = local.keycloak_backend-checks_client_id
+        client_secret = data.aws_ssm_parameter.backend_checks_keycloak_secret
+      }
+
+      authorization_endpoint = local.keycloak_auth_url
+      http_method            = "POST"
+
+      oauth_http_parameters {
+        body_parameters {
+          key   = "grant_type"
+          value = "client_credentials"
+        }
+      }
+    }
+  }
+}
+
+module "draft_metadata_checks" {
+  source = "./da-terraform-modules/sfn"
+  step_function_name = "TDRMetadataChecks${title(local.environment)}"
+  step_function_definition = jsonencode(
+    {
+      "Comment": "Run antivirus checks on metadata, update DB if positive, else trigger metadata validation",
+      "StartAt": "RunAntivirusLambda",
+      "States": {
+        "CallCheckLambda": {
+          "Type": "Task",
+          "Resource": module.yara_av_v2.lambda_arn
+          "Parameters": {
+            "consignmentId.$": "$.consignmentId",
+            "checkType.$": "metadata"
+          },
+          "Next": "CheckAntivirusResults"
+        },
+        "CheckAntivirusResults": {
+          "Type": "Choice",
+          "Choices": [
+            {
+              "Variable": "$.result",
+              "StringEquals": "",
+              "Next": "ValidateMetadataLambda"
+            },
+            {
+              "Not": {
+                "Variable": "$.result",
+                "StringEquals": ""
+              },
+              "Next": "PrepareVirusDetectedQueryParams"
+            }
+          ],
+          "Default": "CallValidateMetadataLambda"
+        },
+        "PrepareVirusDetectedQueryParams": {
+          "Type": "Pass",
+          "ResultPath": "$.statusUpdate",
+          "Parameters": {
+            "query.$": "States.Format('mutation { updateConsignmentStatus(consignmentId: \"{}\", statusType: \"DraftMetadata\" , statusValue: \"VirusDetected\") { consignmentId statusValue } }', $.consignmentId)"
+          },
+          "Next": "UpdateDraftMetadataStatus"
+        },
+        "UpdateDraftMetadataStatus": {
+          "Type": "Task",
+          "Resource": "arn:aws:states:::http:invoke",
+          "Parameters": {
+            "ApiEndpoint": "${module.consignment_api.api_url}/consignment",
+            "Method": "POST",
+            "Authentication": aws_events_connection.consignment_api_connection
+            "Headers": {
+              "Content-Type": "application/json"
+            },
+            "RequestBody.$": "$.statusUpdate.query"
+          },
+          "End": true
+        },
+        "CallValidateMetadataLambda": {
+          "Type": "Task",
+          "Resource": module.draft_metadata_validator_lambda,
+          "Parameters": {
+            "consignmentId.$": "$.consignmentId"
+          },
+          "End": true
+        }
+      }
+    }
+  )
+  step_function_role_policy_attachments = {}
+}
