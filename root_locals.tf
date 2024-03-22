@@ -131,7 +131,7 @@ locals {
 
   //feature access blocks
   block_shared_keycloak_pages = local.environment == "intg" ? false : true
-  block_draft_metadata_upload = local.environment == "intg" ? false : true
+  block_draft_metadata_upload = local.environment == "prod" ? true : false
 
   draft_metadata_s3_bucket_name = "${var.project}-draft-metadata-${local.environment}"
 }
