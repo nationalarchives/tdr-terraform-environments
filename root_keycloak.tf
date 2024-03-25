@@ -142,7 +142,7 @@ module "keycloak_tdr_alb" {
   alb_target_type       = "ip"
   certificate_arn       = module.keycloak_certificate.certificate_arn
   health_check_matcher  = "200,303"
-  health_check_path     = "/health"
+  health_check_path     = "health"
   http_listener         = false
   public_subnets        = module.shared_vpc.public_subnets
   vpc_id                = module.shared_vpc.vpc_id
