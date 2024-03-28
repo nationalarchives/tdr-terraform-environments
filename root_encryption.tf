@@ -11,8 +11,13 @@ module "s3_external_kms_key" {
       module.notification_lambda.notifications_lambda_role_arn[0],
       module.consignment_export_task_role.role.arn,
     ], local.aws_sso_export_bucket_access_roles, local.standard_export_bucket_read_access_roles, local.judgment_export_bucket_read_access_roles)
-    ci_roles      = [local.assume_role]
-    service_names = ["cloudwatch"]
+    ci_roles = [local.assume_role]
+    service_details = [
+      {
+        service_name : "cloudwatch"
+        service_source_account : data.aws_caller_identity.current.account_id
+      }
+    ]
   }
 }
 
@@ -28,8 +33,13 @@ module "s3_internal_kms_key" {
       module.draft_metadata_validator_lambda.lambda_role_arn,
       module.frontend.task_role_arn
     ], local.aws_sso_internal_bucket_access_roles, local.e2e_testing_role_arns)
-    ci_roles      = [local.assume_role]
-    service_names = ["cloudwatch"]
+    ci_roles = [local.assume_role]
+    service_details = [
+      {
+        service_name : "cloudwatch"
+        service_source_account : data.aws_caller_identity.current.account_id
+      }
+    ]
   }
 }
 
@@ -44,8 +54,13 @@ module "s3_upload_kms_key" {
       module.file_format_v2.lambda_role_arn,
       module.checksum_v2.lambda_role_arn
     ], local.aws_sso_internal_bucket_access_roles)
-    ci_roles                 = [local.assume_role]
-    service_names            = ["cloudwatch"]
+    ci_roles = [local.assume_role]
+    service_details = [
+      {
+        service_name : "cloudwatch"
+        service_source_account : data.aws_caller_identity.current.account_id
+      }
+    ]
     cloudfront_distributions = [module.cloudfront_upload.cloudfront_arn]
   }
 }
