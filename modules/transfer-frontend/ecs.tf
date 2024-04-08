@@ -1,5 +1,7 @@
 locals {
   app_port = 9000
+  cpu      = var.environment == "intg" ? "512" : "1024"
+  memory   = var.environment == "intg" ? "1024" : "2048"
 }
 resource "aws_ecs_cluster" "frontend_ecs" {
   name = "frontend_${var.environment}"
@@ -41,8 +43,8 @@ resource "aws_ecs_task_definition" "frontend_task" {
   execution_role_arn       = aws_iam_role.frontend_ecs_execution.arn
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = 512
-  memory                   = 1024
+  cpu                      = local.cpu
+  memory                   = local.memory
   container_definitions    = data.template_file.app.rendered
   task_role_arn            = aws_iam_role.frontend_ecs_task.arn
 
