@@ -1,5 +1,5 @@
 resource "random_password" "play_secret" {
-  length = 32
+  length = 64
 }
 
 resource "aws_ssm_parameter" "play_secret" {
