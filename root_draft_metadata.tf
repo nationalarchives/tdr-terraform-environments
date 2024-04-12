@@ -88,7 +88,8 @@ module "draft_metadata_checks" {
           "Resource": module.yara_av_v2.lambda_arn
           "Parameters": {
             "consignmentId.$": "$.consignmentId",
-            "checkType.$": "metadata"
+            "fileId.$": "draft-metadata.csv",
+            "scanType.$": "metadata"
           },
           "Next": "CheckAntivirusResults"
         },
