@@ -57,7 +57,7 @@ data "aws_ssm_parameter" "backend_checks_keycloak_secret" {
   name = local.keycloak_backend_checks_secret_name
 }
 
-resource "cloudwatch_event_connection" "consignment_api_connection" {
+resource "aws_cloudwatch_event_connection" "consignment_api_connection" {
   name               = "TDRConsignmentAPIConnection${title(local.environment)}"
   authorization_type = "OAUTH_CLIENT_CREDENTIALS"
 
@@ -131,7 +131,7 @@ module "draft_metadata_checks" {
           "Parameters" : {
             "ApiEndpoint" : "${module.consignment_api.api_url}/consignment",
             "Method" : "POST",
-            "Authentication" : aws_events_connection.consignment_api_connection
+            "Authentication" : aws_cloudwatch_event_connection.consignment_api_connection
             "Headers" : {
               "Content-Type" : "application/json"
             },
