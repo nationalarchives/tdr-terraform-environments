@@ -109,10 +109,9 @@ locals {
   tre_environment     = local.environment == "intg" ? "int" : local.environment
   tre_export_role_arn = module.tre_configuration.terraform_config[local.tre_environment]["s3_export_bucket_reader_arn"]
 
-  // talend only has a role set for intg this will change in the future
-  talend_export_role_arn = local.environment == "intg" ? module.talend_configuration.terraform_config[local.environment]["remote_engine_instance_profile_role"] : ""
+  talend_export_role_arn = module.talend_configuration.terraform_config[local.environment]["remote_engine_instance_profile_role"]
 
-  standard_export_bucket_read_access_roles = local.environment == "intg" ? [local.tre_export_role_arn, local.talend_export_role_arn] : [local.tre_export_role_arn]
+  standard_export_bucket_read_access_roles = [local.tre_export_role_arn, local.talend_export_role_arn]
   judgment_export_bucket_read_access_roles = [local.tre_export_role_arn]
 
   // s3 internal bucket encryption
@@ -130,8 +129,8 @@ locals {
   da_reference_generator_limit = module.tdr_configuration.terraform_config["reference_generator_limit"]
 
   //feature access blocks
-  block_shared_keycloak_pages = local.environment == "intg" ? false : true
-  block_draft_metadata_upload = local.environment == "prod" ? true : false
-
-  draft_metadata_s3_bucket_name = "${var.project}-draft-metadata-${local.environment}"
+  block_shared_keycloak_pages       = local.environment == "intg" ? false : true
+  block_draft_metadata_upload       = local.environment == "prod" ? true : false
+  block_automate_judgment_transfers = local.environment == "prod" ? true : false
+  draft_metadata_s3_bucket_name     = "${var.project}-draft-metadata-${local.environment}"
 }

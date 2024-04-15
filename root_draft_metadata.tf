@@ -38,6 +38,12 @@ module "draft_metadata_api_gateway" {
   api_name    = "DraftMetadata"
   environment = local.environment
   common_tags = local.common_tags
+  api_method_settings = [{
+    method_path        = "*/*"
+    logging_level      = "INFO",
+    metrics_enabled    = false,
+    data_trace_enabled = false
+  }]
 }
 
 module "draft_metadata_bucket" {

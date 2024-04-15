@@ -1,5 +1,7 @@
 locals {
   app_port = 9000
+  cpu      = var.environment == "intg" ? "512" : "1024"
+  memory   = var.environment == "intg" ? "1024" : "2048"
 }
 resource "aws_ecs_cluster" "frontend_ecs" {
   name = "frontend_${var.environment}"
@@ -18,21 +20,22 @@ data "template_file" "app" {
   template = file("modules/transfer-frontend/templates/frontend.json.tpl")
 
   vars = {
-    collector_image                  = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/aws-otel-collector:${var.environment}"
-    app_image                        = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/transfer-frontend:${var.environment}"
-    app_port                         = local.app_port
-    app_environment                  = var.environment
-    aws_region                       = var.region
-    client_secret_path               = var.client_secret_path
-    export_api_url                   = var.export_api_url
-    backend_checks_api_url           = var.backend_checks_api_url
-    alb_ip_a                         = var.public_subnet_ranges[0]
-    alb_ip_b                         = var.public_subnet_ranges[1]
-    auth_url                         = var.auth_url
-    otel_service_name                = var.otel_service_name
-    block_draft_metadata_upload      = var.block_draft_metadata_upload
-    draft_metadata_validator_api_url = var.draft_metadata_validator_api_url
-    draft_metadata_s3_bucket_name    = var.draft_metadata_s3_bucket_name
+    collector_image                   = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/aws-otel-collector:${var.environment}"
+    app_image                         = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/transfer-frontend:${var.environment}"
+    app_port                          = local.app_port
+    app_environment                   = var.environment
+    aws_region                        = var.region
+    client_secret_path                = var.client_secret_path
+    export_api_url                    = var.export_api_url
+    backend_checks_api_url            = var.backend_checks_api_url
+    alb_ip_a                          = var.public_subnet_ranges[0]
+    alb_ip_b                          = var.public_subnet_ranges[1]
+    auth_url                          = var.auth_url
+    otel_service_name                 = var.otel_service_name
+    block_draft_metadata_upload       = var.block_draft_metadata_upload
+    draft_metadata_validator_api_url  = var.draft_metadata_validator_api_url
+    draft_metadata_s3_bucket_name     = var.draft_metadata_s3_bucket_name
+    block_automate_judgment_transfers = var.block_automate_judgment_transfers
   }
 }
 
@@ -41,8 +44,8 @@ resource "aws_ecs_task_definition" "frontend_task" {
   execution_role_arn       = aws_iam_role.frontend_ecs_execution.arn
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = 512
-  memory                   = 1024
+  cpu                      = local.cpu
+  memory                   = local.memory
   container_definitions    = data.template_file.app.rendered
   task_role_arn            = aws_iam_role.frontend_ecs_task.arn
 
