@@ -57,7 +57,7 @@ data "aws_ssm_parameter" "backend_checks_keycloak_secret" {
   name = local.keycloak_backend_checks_secret_name
 }
 
-resource "aws_events_connection" "consignment_api_connection" {
+resource "cloudwatch_event_connection" "consignment_api_connection" {
   name               = "TDRConsignmentAPIConnection${title(local.environment)}"
   authorization_type = "OAUTH_CLIENT_CREDENTIALS"
 
