@@ -69,12 +69,13 @@ resource "aws_cloudwatch_event_connection" "consignment_api_connection" {
       }
 
       authorization_endpoint = local.keycloak_auth_url
-      http_method            = "POST"
+      http_method            = "GET"
 
       oauth_http_parameters {
-        body_parameters {
+        body {
           key   = "grant_type"
           value = "client_credentials"
+          is_value_secret = false
         }
       }
     }
