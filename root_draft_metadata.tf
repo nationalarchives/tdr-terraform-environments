@@ -73,8 +73,8 @@ resource "aws_cloudwatch_event_connection" "consignment_api_connection" {
 
       oauth_http_parameters {
         body {
-          key   = "grant_type"
-          value = "client_credentials"
+          key             = "grant_type"
+          value           = "client_credentials"
           is_value_secret = false
         }
       }
