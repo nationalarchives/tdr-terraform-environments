@@ -82,70 +82,70 @@ resource "aws_events_connection" "consignment_api_connection" {
 }
 
 module "draft_metadata_checks" {
-  source = "./da-terraform-modules/sfn"
+  source             = "./da-terraform-modules/sfn"
   step_function_name = "TDRMetadataChecks${title(local.environment)}"
   step_function_definition = jsonencode(
     {
-      "Comment": "Run antivirus checks on metadata, update DB if positive, else trigger metadata validation",
-      "StartAt": "RunAntivirusLambda",
-      "States": {
-        "CallCheckLambda": {
-          "Type": "Task",
-          "Resource": module.yara_av_v2.lambda_arn
-          "Parameters": {
-            "consignmentId.$": "$.consignmentId",
-            "fileId.$": "draft-metadata.csv",
-            "scanType.$": "metadata"
+      "Comment" : "Run antivirus checks on metadata, update DB if positive, else trigger metadata validation",
+      "StartAt" : "RunAntivirusLambda",
+      "States" : {
+        "CallCheckLambda" : {
+          "Type" : "Task",
+          "Resource" : module.yara_av_v2.lambda_arn
+          "Parameters" : {
+            "consignmentId.$" : "$.consignmentId",
+            "fileId.$" : "draft-metadata.csv",
+            "scanType.$" : "metadata"
           },
-          "Next": "CheckAntivirusResults"
+          "Next" : "CheckAntivirusResults"
         },
-        "CheckAntivirusResults": {
-          "Type": "Choice",
-          "Choices": [
+        "CheckAntivirusResults" : {
+          "Type" : "Choice",
+          "Choices" : [
             {
-              "Variable": "$.result",
-              "StringEquals": "",
-              "Next": "ValidateMetadataLambda"
+              "Variable" : "$.result",
+              "StringEquals" : "",
+              "Next" : "ValidateMetadataLambda"
             },
             {
-              "Not": {
-                "Variable": "$.result",
-                "StringEquals": ""
+              "Not" : {
+                "Variable" : "$.result",
+                "StringEquals" : ""
               },
-              "Next": "PrepareVirusDetectedQueryParams"
+              "Next" : "PrepareVirusDetectedQueryParams"
             }
           ],
-          "Default": "CallValidateMetadataLambda"
+          "Default" : "CallValidateMetadataLambda"
         },
-        "PrepareVirusDetectedQueryParams": {
-          "Type": "Pass",
-          "ResultPath": "$.statusUpdate",
-          "Parameters": {
-            "query.$": "States.Format('mutation { updateConsignmentStatus(consignmentId: \"{}\", statusType: \"DraftMetadata\" , statusValue: \"VirusDetected\") { consignmentId statusValue } }', $.consignmentId)"
+        "PrepareVirusDetectedQueryParams" : {
+          "Type" : "Pass",
+          "ResultPath" : "$.statusUpdate",
+          "Parameters" : {
+            "query.$" : "States.Format('mutation { updateConsignmentStatus(consignmentId: \"{}\", statusType: \"DraftMetadata\" , statusValue: \"VirusDetected\") { consignmentId statusValue } }', $.consignmentId)"
           },
-          "Next": "UpdateDraftMetadataStatus"
+          "Next" : "UpdateDraftMetadataStatus"
         },
-        "UpdateDraftMetadataStatus": {
-          "Type": "Task",
-          "Resource": "arn:aws:states:::http:invoke",
-          "Parameters": {
-            "ApiEndpoint": "${module.consignment_api.api_url}/consignment",
-            "Method": "POST",
-            "Authentication": aws_events_connection.consignment_api_connection
-            "Headers": {
-              "Content-Type": "application/json"
+        "UpdateDraftMetadataStatus" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::http:invoke",
+          "Parameters" : {
+            "ApiEndpoint" : "${module.consignment_api.api_url}/consignment",
+            "Method" : "POST",
+            "Authentication" : aws_events_connection.consignment_api_connection
+            "Headers" : {
+              "Content-Type" : "application/json"
             },
-            "RequestBody.$": "$.statusUpdate.query"
+            "RequestBody.$" : "$.statusUpdate.query"
           },
-          "End": true
+          "End" : true
         },
-        "CallValidateMetadataLambda": {
-          "Type": "Task",
-          "Resource": module.draft_metadata_validator_lambda,
-          "Parameters": {
-            "consignmentId.$": "$.consignmentId"
+        "CallValidateMetadataLambda" : {
+          "Type" : "Task",
+          "Resource" : module.draft_metadata_validator_lambda,
+          "Parameters" : {
+            "consignmentId.$" : "$.consignmentId"
           },
-          "End": true
+          "End" : true
         }
       }
     }
