@@ -54,7 +54,7 @@ module "draft_metadata_bucket" {
 }
 
 data "aws_ssm_parameter" "backend_checks_keycloak_secret" {
-  name = local.keycloak_backend_checks_secret_name
+  name            = local.keycloak_backend_checks_secret_name
   with_decryption = true
 }
 
@@ -134,7 +134,7 @@ module "draft_metadata_checks" {
             "ApiEndpoint" : "${module.consignment_api.api_url}/consignment",
             "Method" : "POST",
             "Authentication" : {
-              "ConnectionArn": aws_cloudwatch_event_connection.consignment_api_connection.arn
+              "ConnectionArn" : aws_cloudwatch_event_connection.consignment_api_connection.arn
             },
             "Headers" : {
               "Content-Type" : "application/json"
