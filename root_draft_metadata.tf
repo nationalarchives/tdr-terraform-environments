@@ -55,6 +55,7 @@ module "draft_metadata_bucket" {
 
 data "aws_ssm_parameter" "backend_checks_keycloak_secret" {
   name = local.keycloak_backend_checks_secret_name
+  with_decryption = true
 }
 
 resource "aws_cloudwatch_event_connection" "consignment_api_connection" {
@@ -65,7 +66,7 @@ resource "aws_cloudwatch_event_connection" "consignment_api_connection" {
     oauth {
       client_parameters {
         client_id     = local.keycloak_backend-checks_client_id
-        client_secret = data.aws_ssm_parameter.backend_checks_keycloak_secret
+        client_secret = data.aws_ssm_parameter.backend_checks_keycloak_secret.value
       }
 
       authorization_endpoint = local.keycloak_auth_url
@@ -90,13 +91,13 @@ module "draft_metadata_checks" {
       "Comment" : "Run antivirus checks on metadata, update DB if positive, else trigger metadata validation",
       "StartAt" : "RunAntivirusLambda",
       "States" : {
-        "CallCheckLambda" : {
+        "RunAntivirusLambda" : {
           "Type" : "Task",
           "Resource" : module.yara_av_v2.lambda_arn
           "Parameters" : {
             "consignmentId.$" : "$.consignmentId",
-            "fileId.$" : "draft-metadata.csv",
-            "scanType.$" : "metadata"
+            "fileId" : "draft-metadata.csv",
+            "scanType" : "metadata"
           },
           "Next" : "CheckAntivirusResults"
         },
@@ -106,7 +107,7 @@ module "draft_metadata_checks" {
             {
               "Variable" : "$.result",
               "StringEquals" : "",
-              "Next" : "ValidateMetadataLambda"
+              "Next" : "RunValidateMetadataLambda"
             },
             {
               "Not" : {
@@ -116,7 +117,7 @@ module "draft_metadata_checks" {
               "Next" : "PrepareVirusDetectedQueryParams"
             }
           ],
-          "Default" : "CallValidateMetadataLambda"
+          "Default" : "RunValidateMetadataLambda"
         },
         "PrepareVirusDetectedQueryParams" : {
           "Type" : "Pass",
@@ -132,7 +133,9 @@ module "draft_metadata_checks" {
           "Parameters" : {
             "ApiEndpoint" : "${module.consignment_api.api_url}/consignment",
             "Method" : "POST",
-            "Authentication" : aws_cloudwatch_event_connection.consignment_api_connection
+            "Authentication" : {
+              "ConnectionArn": aws_cloudwatch_event_connection.consignment_api_connection.arn
+            },
             "Headers" : {
               "Content-Type" : "application/json"
             },
@@ -140,9 +143,9 @@ module "draft_metadata_checks" {
           },
           "End" : true
         },
-        "CallValidateMetadataLambda" : {
+        "RunValidateMetadataLambda" : {
           "Type" : "Task",
-          "Resource" : module.draft_metadata_validator_lambda,
+          "Resource" : module.draft_metadata_validator_lambda.lambda_arn,
           "Parameters" : {
             "consignmentId.$" : "$.consignmentId"
           },
