@@ -121,19 +121,20 @@ module "draft_metadata_checks" {
             "fileId" : "draft-metadata.csv",
             "scanType" : "metadata"
           },
+          "ResultPath" : "$.output",
           "Next" : "CheckAntivirusResults"
         },
         "CheckAntivirusResults" : {
           "Type" : "Choice",
           "Choices" : [
             {
-              "Variable" : "$.result",
+              "Variable" : "$.output.antivirus.result",
               "StringEquals" : "",
               "Next" : "RunValidateMetadataLambda"
             },
             {
               "Not" : {
-                "Variable" : "$.result",
+                "Variable" : "$.output.antivirus.result",
                 "StringEquals" : ""
               },
               "Next" : "PrepareVirusDetectedQueryParams"
