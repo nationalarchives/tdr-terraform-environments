@@ -83,6 +83,28 @@ resource "aws_cloudwatch_event_connection" "consignment_api_connection" {
   }
 }
 
+resource "aws_iam_policy" "draft_metadata_checks_policy" {
+  name        = "TDRMetadataChecksPolicy${title(local.environment)}"
+  description = "Policy to allow necessary lambda executions from step function"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "lambda:InvokeFunction"
+        ]
+        Resource = [
+          module.yara_av_v2.lambda_arn,
+          module.draft_metadata_validator_lambda.lambda_arn
+        ]
+      }
+    ]
+  })
+}
+
+
 module "draft_metadata_checks" {
   source             = "./da-terraform-modules/sfn"
   step_function_name = "TDRMetadataChecks${title(local.environment)}"
@@ -154,5 +176,7 @@ module "draft_metadata_checks" {
       }
     }
   )
-  step_function_role_policy_attachments = {}
+  step_function_role_policy_attachments = {
+    "lambda-policy" : aws_iam_policy.draft_metadata_checks_policy.arn
+  }
 }
