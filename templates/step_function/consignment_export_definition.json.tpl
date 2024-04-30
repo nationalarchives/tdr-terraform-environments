@@ -11,7 +11,8 @@
         {
           "ErrorEquals": [
             "States.HeartbeatTimeout",
-            "States.Timeout"
+            "States.Timeout",
+            "ECS.AmazonECSException"
           ],
           "MaxAttempts": ${max_attempts}
         }
