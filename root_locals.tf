@@ -26,6 +26,8 @@ locals {
 
   database_ca_cert_identifier = "rds-ca-rsa2048-g1"
 
+  export_notifications_topic_name = "tdr-export-notifications-${local.environment}"
+
   region = "eu-west-2"
 
   dns_zone_id = data.aws_route53_zone.tdr_dns_zone.zone_id
