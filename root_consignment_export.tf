@@ -44,15 +44,19 @@ module "consignment_export_task_policy" {
   source = "./tdr-terraform-modules/iam_policy"
   name   = "TDRConsignmentExportECSTaskPolicy${title(local.environment)}"
   policy_string = templatefile(
-    "./tdr-terraform-modules/iam_policy/templates/consignment_export_task_policy.json.tpl", {
-      environment      = local.environment,
-      titleEnvironment = title(local.environment),
-      aws_region       = local.region,
-      account          = data.aws_caller_identity.current.account_id,
+    "${path.module}/templates/iam_policy/consignment_export_task_policy.json.tpl", {
+      environment          = local.environment,
+      titleEnvironment     = title(local.environment),
+      aws_region           = local.region,
+      account              = data.aws_caller_identity.current.account_id,
+      instance_resource_id = module.consignment_api_database.resource_id
       kms_bucket_key_arns = jsonencode([
         module.s3_external_kms_key.kms_key_arn,
         module.s3_internal_kms_key.kms_key_arn
       ])
+      export_bucket_name          = module.new_export_bucket.bucket_name
+      judgment_export_bucket_name = module.new_export_bucket_judgment.bucket_name
+      topic_name                  = local.export_notifications_topic_name
   })
 }
 
@@ -70,6 +74,7 @@ module "consignment_export_ecs_task" {
       output_bucket              = module.export_bucket.s3_bucket_name
       output_bucket_judgment     = module.export_bucket_judgment.s3_bucket_name
       api_url                    = "${module.consignment_api.api_url}/graphql"
+      output_topic_arn           = module.export_sns_notifications_topic.sns_arn
       auth_url                   = local.keycloak_auth_url
       region                     = local.region
       download_files_batch_size  = 40

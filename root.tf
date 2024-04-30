@@ -7,6 +7,11 @@ module "tre_configuration" {
   project = "tre"
 }
 
+module "dr2_configuration" {
+  source  = "./da-terraform-configurations"
+  project = "dr2"
+}
+
 module "talend_configuration" {
   source  = "./da-terraform-configurations"
   project = "talend"
@@ -459,16 +464,20 @@ module "export_step_function" {
   source = "./tdr-terraform-modules/stepfunctions"
   tags   = local.common_tags
   definition = templatefile("./templates/step_function/consignment_export_definition.json.tpl", {
-    account_id       = data.aws_caller_identity.current.account_id
-    environment      = local.environment
-    security_groups  = jsonencode([module.consignment_export_ecs_security_group.security_group_id]),
-    subnet_ids       = jsonencode(module.export_efs.private_subnets),
-    cluster_arn      = module.consignment_export_ecs_task.cluster_arn,
-    task_arn         = module.consignment_export_ecs_task.task_definition_arn,
-    task_name        = "consignment-export",
-    sns_topic        = module.notifications_topic.sns_arn,
-    platform_version = "1.4.0"
-    max_attempts     = 3
+    account_id                    = data.aws_caller_identity.current.account_id
+    environment                   = local.environment
+    security_groups               = jsonencode([module.consignment_export_ecs_security_group.security_group_id]),
+    subnet_ids                    = jsonencode(module.export_efs.private_subnets),
+    cluster_arn                   = module.consignment_export_ecs_task.cluster_arn,
+    task_arn                      = module.consignment_export_ecs_task.task_definition_arn,
+    task_name                     = "consignment-export",
+    sns_topic                     = module.notifications_topic.sns_arn,
+    platform_version              = "1.4.0"
+    max_attempts                  = 3,
+    export_output_bucket          = module.new_export_bucket.bucket_name
+    export_output_judgment_bucket = module.new_export_bucket_judgment.bucket_name
+    bagit_export_bucket           = module.export_bucket.s3_bucket_name
+    bagit_export_judgment_bucket  = module.export_bucket_judgment.s3_bucket_name
   })
   step_function_name = "ConsignmentExport"
   environment        = local.environment
@@ -483,6 +492,34 @@ module "export_step_function" {
     environment    = local.environment
   })
 }
+
+module "new_export_bucket" {
+  source      = "./da-terraform-modules/s3"
+  bucket_name = "tdr-export-${local.environment}"
+  kms_key_arn = module.s3_external_kms_key.kms_key_arn
+  common_tags = local.common_tags
+}
+
+module "new_export_bucket_judgment" {
+  source      = "./da-terraform-modules/s3"
+  bucket_name = "tdr-export-judgment-${local.environment}"
+  kms_key_arn = module.s3_external_kms_key.kms_key_arn
+  common_tags = local.common_tags
+}
+
+module "export_sns_notifications_topic" {
+  source     = "./da-terraform-modules/sns"
+  tags       = local.common_tags
+  topic_name = local.export_notifications_topic_name
+  sns_policy = templatefile("${path.module}/templates/sns/export_notifications_policy.json.tpl", {
+    export_role        = module.consignment_export_task_role.role.arn
+    dr2_account_number = module.dr2_configuration.account_numbers[local.environment]
+    region             = "eu-west-2"
+    account_id         = data.aws_caller_identity.current.account_id
+    topic_name         = local.export_notifications_topic_name
+  })
+}
+
 
 module "export_bucket" {
   source                = "./tdr-terraform-modules/s3"
@@ -766,7 +803,8 @@ module "api_database_security_group" {
     { port = 5432, description = "Allow inbound access from database migrations", security_group_id = module.database_migrations.db_migration_security_group },
     { port = 5432, description = "Allow inbound access from create bastion users lambda", security_group_id = module.create_bastion_user_lambda.create_users_lambda_security_group_id[0] },
     { port = 5432, description = "Allow inbound access from create users lambda", security_group_id = module.create_db_users_lambda.create_users_lambda_security_group_id[0] },
-    { port = 5432, description = "Allow inbound access from backend checks", security_group_id = module.outbound_with_db_security_group.security_group_id }
+    { port = 5432, description = "Allow inbound access from backend checks", security_group_id = module.outbound_with_db_security_group.security_group_id },
+    { port = 5432, description = "Allow inbound access from export", security_group_id = module.consignment_export_ecs_security_group.security_group_id }
   ]
   egress_security_group_rules = [
     { port = 5432, description = "Allow outbound access to the ECS tasks security group", security_group_id = module.consignment_api.ecs_task_security_group_id, protocol = "tcp" }

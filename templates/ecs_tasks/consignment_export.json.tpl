@@ -7,6 +7,10 @@
       {
         "name": "CLIENT_SECRET",
         "valueFrom": "${backend_client_secret_path}"
+      },
+      {
+        "name": "DB_HOST",
+        "valueFrom": "/${app_environment}/consignmentapi/instance/url"
       }
     ],
     "environment": [
@@ -15,20 +19,24 @@
         "value": "${clean_bucket}"
       },
       {
-        "name": "OUTPUT_BUCKET",
-        "value": "${output_bucket}"
-      },
-      {
-        "name": "OUTPUT_BUCKET_JUDGMENT",
-        "value": "${output_bucket_judgment}"
-      },
-      {
         "name": "API_URL",
         "value": "${api_url}"
       },
       {
+        "name": "USE_IAM_AUTH",
+        "value": "true"
+      },
+      {
+        "name": "DB_USER",
+        "value": "consignment_api_user"
+      },
+      {
         "name": "AUTH_URL",
         "value": "${auth_url}"
+      },
+      {
+        "name": "OUTPUT_TOPIC_ARN",
+        "value": "${output_topic_arn}"
       },
       {
         "name": "DOWNLOAD_FILES_BATCH_SIZE",
