@@ -494,17 +494,19 @@ module "export_step_function" {
 }
 
 module "new_export_bucket" {
-  source      = "./da-terraform-modules/s3"
-  bucket_name = "tdr-export-${local.environment}"
-  kms_key_arn = module.s3_external_kms_key.kms_key_arn
-  common_tags = local.common_tags
+  source            = "./da-terraform-modules/s3"
+  bucket_name       = "tdr-export-${local.environment}"
+  kms_key_arn       = module.s3_external_kms_key.kms_key_arn
+  common_tags       = local.common_tags
+  use_random_suffix = true
 }
 
 module "new_export_bucket_judgment" {
-  source      = "./da-terraform-modules/s3"
-  bucket_name = "tdr-export-judgment-${local.environment}"
-  kms_key_arn = module.s3_external_kms_key.kms_key_arn
-  common_tags = local.common_tags
+  source            = "./da-terraform-modules/s3"
+  bucket_name       = "tdr-export-judgment-${local.environment}"
+  kms_key_arn       = module.s3_external_kms_key.kms_key_arn
+  common_tags       = local.common_tags
+  use_random_suffix = true
 }
 
 module "export_sns_notifications_topic" {
