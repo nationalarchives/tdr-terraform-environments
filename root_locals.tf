@@ -26,7 +26,7 @@ locals {
 
   database_ca_cert_identifier = "rds-ca-rsa2048-g1"
 
-  export_notifications_topic_name = "tdr-export-notifications-${local.environment}"
+  export_notifications_topic_name = "tdr-external-notifications-${local.environment}"
 
   region = "eu-west-2"
 
