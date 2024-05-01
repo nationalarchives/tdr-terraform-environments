@@ -508,9 +508,10 @@ module "new_export_bucket_judgment" {
 }
 
 module "export_sns_notifications_topic" {
-  source     = "./da-terraform-modules/sns"
-  tags       = local.common_tags
-  topic_name = local.export_notifications_topic_name
+  source      = "./da-terraform-modules/sns"
+  tags        = local.common_tags
+  topic_name  = local.export_notifications_topic_name
+  kms_key_arn = module.sns_external_kms_key.kms_key_arn
   sns_policy = templatefile("${path.module}/templates/sns/export_notifications_policy.json.tpl", {
     export_role        = module.consignment_export_task_role.role.arn
     dr2_account_number = module.dr2_configuration.account_numbers[local.environment]
@@ -519,7 +520,6 @@ module "export_sns_notifications_topic" {
     topic_name         = local.export_notifications_topic_name
   })
 }
-
 
 module "export_bucket" {
   source                = "./tdr-terraform-modules/s3"
@@ -530,6 +530,7 @@ module "export_bucket" {
   bucket_key_enabled    = true
   read_access_role_arns = local.standard_export_bucket_read_access_roles
   bucket_policy         = "export_bucket"
+
 }
 
 module "export_bucket_judgment" {
