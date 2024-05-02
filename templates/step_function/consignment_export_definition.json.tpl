@@ -18,9 +18,10 @@
                 {
                   "ErrorEquals": [
                     "States.HeartbeatTimeout",
-                    "States.Timeout"
+                    "States.Timeout",
+                    "ECS.AmazonECSException"
                   ],
-                  "MaxAttempts": 3
+                  "MaxAttempts": ${max_attempts}
                 }
               ],
               "Parameters": {
@@ -81,11 +82,12 @@
                 {
                   "ErrorEquals": [
                     "States.HeartbeatTimeout",
-                    "States.Timeout"
+                    "States.Timeout",
+                    "ECS.AmazonECSException"
                   ],
-                  "MaxAttempts": 3
-                }
-              ],
+                  "MaxAttempts": ${max_attempts}
+              }
+              ]
               "Parameters": {
                 "LaunchType": "FARGATE",
                 "Cluster": "${cluster_arn}",
