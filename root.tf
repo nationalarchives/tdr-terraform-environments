@@ -473,7 +473,7 @@ module "export_step_function" {
     task_name                     = "consignment-export",
     sns_topic                     = module.notifications_topic.sns_arn,
     platform_version              = "1.4.0"
-    max_attempts                  = 3,
+    max_attempts                  = 2,
     export_output_bucket          = module.new_export_bucket.bucket_name
     export_output_judgment_bucket = module.new_export_bucket_judgment.bucket_name
     bagit_export_bucket           = module.export_bucket.s3_bucket_name
