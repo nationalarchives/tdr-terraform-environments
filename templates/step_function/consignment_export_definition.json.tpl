@@ -87,7 +87,7 @@
                   ],
                   "MaxAttempts": ${max_attempts}
               }
-              ]
+              ],
               "Parameters": {
                 "LaunchType": "FARGATE",
                 "Cluster": "${cluster_arn}",
