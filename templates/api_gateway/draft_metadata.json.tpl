@@ -1,9 +1,8 @@
 {
-  "swagger" : "2.0",
-  "info" : {
-    "description" : "API Gateway for Draft Metadata validation",
-    "version" : "0.0.1",
-    "title" : "${title}"
+  "swagger": "2.0",
+  "info": {
+    "version": "1",
+    "title": "${title}"
   },
   "basePath" : "/${environment}",
   "schemes" : [ "https" ],
@@ -37,9 +36,9 @@
             "lambda": []
           }
         ],
-        "x-amazon-apigateway-request-validator" : "Validate query string parameters and headers",
         "x-amazon-apigateway-integration": {
-          "uri": "arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${lambda_arn}/invocations",
+          "credentials": "${execution_role_arn}",
+          "uri": "arn:aws:apigateway:${region}:states:action/StartExecution",
           "responses": {
             "default": {
               "statusCode": "200"
@@ -50,11 +49,11 @@
             "integration.request.header.Content-Type": "'application/x-amz-json-1.1'"
           },
           "requestTemplates": {
-            "application/json": "{\"input\": \"{\\\"consignmentId\\\": \\\"$input.params('consignmentId')\\\"}\"}"
+            "application/json": "{\"input\": \"{\\\"consignmentId\\\": \\\"$input.params('consignmentId')\\\"}\",\"stateMachineArn\": \"${state_machine_arn}\"}"
           },
-          "passthroughBehavior": "when_no_match",
+          "passthroughBehavior": "when_no_templates",
           "httpMethod": "POST",
-          "type": "aws_proxy"
+          "type": "aws"
         }
       }
     }

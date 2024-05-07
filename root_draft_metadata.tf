@@ -31,7 +31,8 @@ module "draft_metadata_api_gateway" {
   api_definition = templatefile("./templates/api_gateway/draft_metadata.json.tpl", {
     environment           = local.environment
     title                 = "Draft Metadata"
-    lambda_arn            = module.draft_metadata_validator_lambda.lambda_arn,
+    state_machine_arn     = module.draft_metadata_checks.step_function_arn
+    execution_role_arn    = aws_iam_role.draft_metadata_api_gateway_execution_role.arn
     region                = local.region
     authoriser_lambda_arn = module.export_authoriser_lambda.export_api_authoriser_arn
   })
@@ -44,6 +45,37 @@ module "draft_metadata_api_gateway" {
     metrics_enabled    = false,
     data_trace_enabled = false
   }]
+}
+
+resource "aws_iam_role" "draft_metadata_api_gateway_execution_role" {
+  name = "TDRMetadataChecksAPIGatewayExecutionRole${title(local.environment)}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "apigateway.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+
+  inline_policy {
+    name = "TDRMetadataChecksAPIGatewayStepFunctionExecutionPolicy${title(local.environment)}"
+    policy = jsonencode({
+      Version = "2012-10-17",
+      Statement = [
+        {
+          Effect = "Allow",
+          Action = "states:StartExecution",
+          Resource = module.draft_metadata_checks.step_function_arn
+        }
+      ]
+    })
+  }
 }
 
 module "draft_metadata_bucket" {
