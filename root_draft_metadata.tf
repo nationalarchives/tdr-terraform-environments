@@ -69,8 +69,8 @@ resource "aws_iam_role" "draft_metadata_api_gateway_execution_role" {
       Version = "2012-10-17",
       Statement = [
         {
-          Effect = "Allow",
-          Action = "states:StartExecution",
+          Effect   = "Allow",
+          Action   = "states:StartExecution",
           Resource = module.draft_metadata_checks.step_function_arn
         }
       ]
@@ -137,40 +137,40 @@ resource "aws_iam_policy" "draft_metadata_checks_policy" {
 }
 
 resource "aws_iam_policy" "api_invoke_policy" {
-    name = "TDRAPIInvokePolicy${title(local.environment)}"
+  name = "TDRAPIInvokePolicy${title(local.environment)}"
 
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [
-        {
-          Effect    = "Allow"
-          Action    = "states:InvokeHTTPEndpoint"
-          Resource  = module.draft_metadata_checks.step_function_arn
-          Condition = {
-            StringEquals = {
-              "states:HTTPMethod" = "POST"
-            }
-            StringLike = {
-              "states:HTTPEndpoint" = "${module.consignment_api.api_url}/*"
-            }
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "states:InvokeHTTPEndpoint"
+        Resource = module.draft_metadata_checks.step_function_arn
+        Condition = {
+          StringEquals = {
+            "states:HTTPMethod" = "POST"
           }
-        },
-        {
-          Effect  = "Allow"
-          Action  = "events:RetrieveConnectionCredentials"
-          Resource = aws_cloudwatch_event_connection.consignment_api_connection.arn
-        },
-        {
-          Effect  = "Allow"
-          Action  = [
-            "secretsmanager:GetSecretValue",
-            "secretsmanager:DescribeSecret"
-          ]
-          Resource = "arn:aws:secretsmanager:*:*:secret:events!connection/*"
+          StringLike = {
+            "states:HTTPEndpoint" = "${module.consignment_api.api_url}/*"
+          }
         }
-      ]
-    })
-  }
+      },
+      {
+        Effect   = "Allow"
+        Action   = "events:RetrieveConnectionCredentials"
+        Resource = aws_cloudwatch_event_connection.consignment_api_connection.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ]
+        Resource = "arn:aws:secretsmanager:*:*:secret:events!connection/*"
+      }
+    ]
+  })
+}
 
 module "draft_metadata_checks" {
   source             = "./da-terraform-modules/sfn"
@@ -209,16 +209,16 @@ module "draft_metadata_checks" {
           ],
           "Default" : "RunValidateMetadataLambda"
         },
-        "PrepareVirusDetectedQueryParams": {
+        "PrepareVirusDetectedQueryParams" : {
           "Type" : "Pass",
           "ResultPath" : "$.statusUpdate",
           "Parameters" : {
-            "query": "mutation updateConsignmentStatus($updateConsignmentStatusInput: ConsignmentStatusInput!) { updateConsignmentStatus(updateConsignmentStatusInput: $updateConsignmentStatusInput) }",
-            "variables": {
-              "updateConsignmentStatusInput": {
-                "consignmentId.$": "$.consignmentId",
-                "statusType": "DraftMetadata",
-                "statusValue": "Failed"
+            "query" : "mutation updateConsignmentStatus($updateConsignmentStatusInput: ConsignmentStatusInput!) { updateConsignmentStatus(updateConsignmentStatusInput: $updateConsignmentStatusInput) }",
+            "variables" : {
+              "updateConsignmentStatusInput" : {
+                "consignmentId.$" : "$.consignmentId",
+                "statusType" : "DraftMetadata",
+                "statusValue" : "Failed"
               }
             }
           },
@@ -253,6 +253,6 @@ module "draft_metadata_checks" {
   )
   step_function_role_policy_attachments = {
     "lambda-policy" : aws_iam_policy.draft_metadata_checks_policy.arn,
-    "api-invoke-policy": aws_iam_policy.api_invoke_policy.arn
+    "api-invoke-policy" : aws_iam_policy.api_invoke_policy.arn
   }
 }
