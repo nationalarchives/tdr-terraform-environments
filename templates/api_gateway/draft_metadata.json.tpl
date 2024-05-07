@@ -1,8 +1,9 @@
 {
-  "swagger": "2.0",
-  "info": {
-    "version": "1",
-    "title": "${title}"
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "API Gateway for Draft Metadata validation",
+    "version" : "0.0.1",
+    "title" : "${title}"
   },
   "basePath" : "/${environment}",
   "schemes" : [ "https" ],

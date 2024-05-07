@@ -143,7 +143,6 @@ resource "aws_iam_policy" "api_invoke_policy" {
       Version = "2012-10-17"
       Statement = [
         {
-          Sid       = "Statement1"
           Effect    = "Allow"
           Action    = "states:InvokeHTTPEndpoint"
           Resource  = module.draft_metadata_checks.step_function_arn
@@ -157,13 +156,11 @@ resource "aws_iam_policy" "api_invoke_policy" {
           }
         },
         {
-          Sid     = "Statement2"
           Effect  = "Allow"
           Action  = "events:RetrieveConnectionCredentials"
           Resource = aws_cloudwatch_event_connection.consignment_api_connection.arn
         },
         {
-          Sid     = "Statement3"
           Effect  = "Allow"
           Action  = [
             "secretsmanager:GetSecretValue",
