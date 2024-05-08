@@ -474,8 +474,8 @@ module "export_step_function" {
     sns_topic                     = module.notifications_topic.sns_arn,
     platform_version              = "1.4.0"
     max_attempts                  = 2,
-    export_output_bucket          = module.new_export_bucket.bucket_name
-    export_output_judgment_bucket = module.new_export_bucket_judgment.bucket_name
+    export_output_bucket          = module.flat_format_export_bucket.bucket_name
+    export_output_judgment_bucket = module.flat_format_export_bucket_judgment.bucket_name
     bagit_export_bucket           = module.export_bucket.s3_bucket_name
     bagit_export_judgment_bucket  = module.export_bucket_judgment.s3_bucket_name
   })
@@ -493,7 +493,7 @@ module "export_step_function" {
   })
 }
 
-module "new_export_bucket" {
+module "flat_format_export_bucket" {
   source            = "./da-terraform-modules/s3"
   bucket_name       = "tdr-export-${local.environment}"
   kms_key_arn       = module.s3_external_kms_key.kms_key_arn
@@ -501,7 +501,7 @@ module "new_export_bucket" {
   use_random_suffix = true
 }
 
-module "new_export_bucket_judgment" {
+module "flat_format_export_bucket_judgment" {
   source            = "./da-terraform-modules/s3"
   bucket_name       = "tdr-export-judgment-${local.environment}"
   kms_key_arn       = module.s3_external_kms_key.kms_key_arn
@@ -509,17 +509,17 @@ module "new_export_bucket_judgment" {
   use_random_suffix = true
 }
 
-module "export_sns_notifications_topic" {
+module "external_sns_notifications_topic" {
   source      = "./da-terraform-modules/sns"
   tags        = local.common_tags
-  topic_name  = local.export_notifications_topic_name
+  topic_name  = local.external_notifications_topic
   kms_key_arn = module.sns_external_kms_key.kms_key_arn
-  sns_policy = templatefile("${path.module}/templates/sns/export_notifications_policy.json.tpl", {
+  sns_policy = templatefile("${path.module}/templates/sns/external_notifications_policy.json.tpl", {
     export_role        = module.consignment_export_task_role.role.arn
     dr2_account_number = module.dr2_configuration.account_numbers[local.environment]
     region             = "eu-west-2"
     account_id         = data.aws_caller_identity.current.account_id
-    topic_name         = local.export_notifications_topic_name
+    topic_name         = local.external_notifications_topic
   })
 }
 
@@ -532,7 +532,6 @@ module "export_bucket" {
   bucket_key_enabled    = true
   read_access_role_arns = local.standard_export_bucket_read_access_roles
   bucket_policy         = "export_bucket"
-
 }
 
 module "export_bucket_judgment" {
