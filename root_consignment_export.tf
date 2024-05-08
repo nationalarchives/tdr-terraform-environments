@@ -54,9 +54,9 @@ module "consignment_export_task_policy" {
         module.s3_external_kms_key.kms_key_arn,
         module.s3_internal_kms_key.kms_key_arn
       ])
-      export_bucket_name          = module.new_export_bucket.bucket_name
-      judgment_export_bucket_name = module.new_export_bucket_judgment.bucket_name
-      topic_name                  = local.export_notifications_topic_name
+      export_bucket_name          = module.flat_format_export_bucket.bucket_name
+      judgment_export_bucket_name = module.flat_format_export_bucket_judgment.bucket_name
+      topic_name                  = local.external_notifications_topic
   })
 }
 
@@ -74,7 +74,7 @@ module "consignment_export_ecs_task" {
       output_bucket              = module.export_bucket.s3_bucket_name
       output_bucket_judgment     = module.export_bucket_judgment.s3_bucket_name
       api_url                    = "${module.consignment_api.api_url}/graphql"
-      output_topic_arn           = module.export_sns_notifications_topic.sns_arn
+      output_topic_arn           = module.external_sns_notifications_topic.sns_arn
       auth_url                   = local.keycloak_auth_url
       region                     = local.region
       download_files_batch_size  = 40

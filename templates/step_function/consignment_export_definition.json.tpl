@@ -1,5 +1,5 @@
 {
-  "Comment": "A state machine to run the Fargate task to export the consignment",
+  "Comment": "A state machine to run two Fargate tasks. One to create a bagit export and one to create a flattened export",
   "StartAt": "Parallel",
   "States": {
     "Parallel": {

@@ -26,10 +26,8 @@ module "sns_external_kms_key" {
   key_name = "tdr-sns-external-kms-${local.environment}"
   tags     = local.common_tags
   default_policy_variables = {
-    user_roles = concat([
-      module.consignment_export_task_role.role.arn,
-    ], local.aws_sso_export_bucket_access_roles)
-    ci_roles = [local.assume_role]
+    user_roles = [module.consignment_export_task_role.role.arn]
+    ci_roles   = [local.assume_role]
     service_details = [
       {
         service_name : "sns"
