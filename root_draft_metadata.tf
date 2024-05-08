@@ -166,7 +166,7 @@ resource "aws_iam_policy" "api_invoke_policy" {
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ]
-        Resource = "arn:aws:secretsmanager:*:*:secret:events!connection/*"
+        Resource = "arn:aws:secretsmanager:${local.region}:${var.tdr_account_number}:secret:events!connection/*"
       }
     ]
   })
