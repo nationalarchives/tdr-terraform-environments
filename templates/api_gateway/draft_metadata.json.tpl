@@ -8,7 +8,7 @@
   "basePath" : "/${environment}",
   "schemes" : [ "https" ],
   "paths" : {
-    "/draft-metadata/validate/{consignmentId+}" : {
+    "/draft-metadata/validate/{consignmentId}/{fileName}" : {
       "post" : {
         "consumes": [
           "application/json"
@@ -19,6 +19,12 @@
         "parameters": [
           {
             "name": "consignmentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fileName",
             "in": "path",
             "required": true,
             "type": "string"
@@ -47,10 +53,12 @@
           },
           "requestParameters": {
             "integration.request.header.Accept-Encoding": "'identity'",
-            "integration.request.header.Content-Type": "'application/x-amz-json-1.1'"
+            "integration.request.header.Content-Type": "'application/x-amz-json-1.1'",
+            "integration.request.path.consignmentId": "method.request.path.consignmentId",
+            "integration.request.path.fileName": "method.request.path.fileName"
           },
           "requestTemplates": {
-            "application/json": "{\"input\": \"{\\\"consignmentId\\\": \\\"$input.params('consignmentId')\\\"}\",\"stateMachineArn\": \"${state_machine_arn}\"}"
+            "application/json": "{\"input\": \"{\\\"consignmentId\\\": \\\"$input.params('consignmentId')\\\", \\\"fileName\\\": \\\"$input.params('fileName')\\\"}\",\"stateMachineArn\": \"${state_machine_arn}\"}"
           },
           "passthroughBehavior": "when_no_templates",
           "httpMethod": "POST",

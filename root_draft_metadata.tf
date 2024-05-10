@@ -48,33 +48,12 @@ module "draft_metadata_api_gateway" {
 }
 
 resource "aws_iam_role" "draft_metadata_api_gateway_execution_role" {
-  name = "TDRMetadataChecksAPIGatewayExecutionRole${title(local.environment)}"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Principal = {
-          Service = "apigateway.amazonaws.com"
-        },
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
+  name               = "TDRMetadataChecksAPIGatewayExecutionRole${title(local.environment)}"
+  assume_role_policy = templatefile("./templates/iam_policy/assume_role_policy.json.tpl", { service = "apigateway.amazonaws.com" })
 
   inline_policy {
-    name = "TDRMetadataChecksAPIGatewayStepFunctionExecutionPolicy${title(local.environment)}"
-    policy = jsonencode({
-      Version = "2012-10-17",
-      Statement = [
-        {
-          Effect   = "Allow",
-          Action   = "states:StartExecution",
-          Resource = module.draft_metadata_checks.step_function_arn
-        }
-      ]
-    })
+    name   = "TDRMetadataChecksAPIGatewayStepFunctionExecutionPolicy${title(local.environment)}"
+    policy = templatefile("./templates/iam_policy/api_gateway_state_machine_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, state_machine_arn = module.draft_metadata_checks.step_function_arn })
   }
 }
 
@@ -119,56 +98,23 @@ resource "aws_iam_policy" "draft_metadata_checks_policy" {
   name        = "TDRMetadataChecksPolicy${title(local.environment)}"
   description = "Policy to allow necessary lambda executions from step function"
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "lambda:InvokeFunction"
-        ]
-        Resource = [
-          module.yara_av_v2.lambda_arn,
-          module.draft_metadata_validator_lambda.lambda_arn
-        ]
-      }
-    ]
+  policy = templatefile("./templates/iam_policy/invoke_lambda_policy.json.tpl", {
+    resources = jsonencode([
+      module.yara_av_v2.lambda_arn,
+      module.draft_metadata_validator_lambda.lambda_arn
+    ])
   })
 }
 
 resource "aws_iam_policy" "api_invoke_policy" {
   name = "TDRAPIInvokePolicy${title(local.environment)}"
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect   = "Allow"
-        Action   = "states:InvokeHTTPEndpoint"
-        Resource = module.draft_metadata_checks.step_function_arn
-        Condition = {
-          StringEquals = {
-            "states:HTTPMethod" = "POST"
-          }
-          StringLike = {
-            "states:HTTPEndpoint" = "${module.consignment_api.api_url}/*"
-          }
-        }
-      },
-      {
-        Effect   = "Allow"
-        Action   = "events:RetrieveConnectionCredentials"
-        Resource = aws_cloudwatch_event_connection.consignment_api_connection.arn
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret"
-        ]
-        Resource = "arn:aws:secretsmanager:${local.region}:${var.tdr_account_number}:secret:events!connection/*"
-      }
-    ]
+  policy = templatefile("./templates/iam_policy/third_party_api_invocation_template.json.tpl", {
+    region            = local.region
+    account_number    = var.tdr_account_number
+    connection_arn    = aws_cloudwatch_event_connection.consignment_api_connection.arn
+    api_url           = module.consignment_api.api_url
+    step_function_arn = module.draft_metadata_checks.step_function_arn
   })
 }
 
@@ -177,7 +123,7 @@ module "draft_metadata_checks" {
   step_function_name = "TDRMetadataChecks${title(local.environment)}"
   step_function_definition = jsonencode(
     {
-      "Comment" : "Run antivirus checks on metadata, update DB if positive, else trigger metadata validation",
+      "Comment" : "Run antivirus checks on metadata, update database if positive, else trigger metadata validation",
       "StartAt" : "RunAntivirusLambda",
       "States" : {
         "RunAntivirusLambda" : {
@@ -185,7 +131,7 @@ module "draft_metadata_checks" {
           "Resource" : module.yara_av_v2.lambda_arn
           "Parameters" : {
             "consignmentId.$" : "$.consignmentId",
-            "fileId" : "draft-metadata.csv",
+            "fileId.$" : "$.fileName",
             "scanType" : "metadata"
           },
           "ResultPath" : "$.output",
@@ -218,7 +164,7 @@ module "draft_metadata_checks" {
               "updateConsignmentStatusInput" : {
                 "consignmentId.$" : "$.consignmentId",
                 "statusType" : "DraftMetadata",
-                "statusValue" : "Failed"
+                "statusValue" : "CompletedWithIssues"
               }
             }
           },
