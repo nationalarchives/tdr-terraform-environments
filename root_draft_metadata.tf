@@ -121,82 +121,12 @@ resource "aws_iam_policy" "api_invoke_policy" {
 module "draft_metadata_checks" {
   source             = "./da-terraform-modules/sfn"
   step_function_name = "TDRMetadataChecks${title(local.environment)}"
-  step_function_definition = jsonencode(
-    {
-      "Comment" : "Run antivirus checks on metadata, update database if positive, else trigger metadata validation",
-      "StartAt" : "RunAntivirusLambda",
-      "States" : {
-        "RunAntivirusLambda" : {
-          "Type" : "Task",
-          "Resource" : module.yara_av_v2.lambda_arn
-          "Parameters" : {
-            "consignmentId.$" : "$.consignmentId",
-            "fileId.$" : "$.fileName",
-            "scanType" : "metadata"
-          },
-          "ResultPath" : "$.output",
-          "Next" : "CheckAntivirusResults"
-        },
-        "CheckAntivirusResults" : {
-          "Type" : "Choice",
-          "Choices" : [
-            {
-              "Variable" : "$.output.antivirus.result",
-              "StringEquals" : "",
-              "Next" : "RunValidateMetadataLambda"
-            },
-            {
-              "Not" : {
-                "Variable" : "$.output.antivirus.result",
-                "StringEquals" : ""
-              },
-              "Next" : "PrepareVirusDetectedQueryParams"
-            }
-          ],
-          "Default" : "RunValidateMetadataLambda"
-        },
-        "PrepareVirusDetectedQueryParams" : {
-          "Type" : "Pass",
-          "ResultPath" : "$.statusUpdate",
-          "Parameters" : {
-            "query" : "mutation updateConsignmentStatus($updateConsignmentStatusInput: ConsignmentStatusInput!) { updateConsignmentStatus(updateConsignmentStatusInput: $updateConsignmentStatusInput) }",
-            "variables" : {
-              "updateConsignmentStatusInput" : {
-                "consignmentId.$" : "$.consignmentId",
-                "statusType" : "DraftMetadata",
-                "statusValue" : "CompletedWithIssues"
-              }
-            }
-          },
-          "Next" : "UpdateDraftMetadataStatus"
-        },
-        "UpdateDraftMetadataStatus" : {
-          "Type" : "Task",
-          "Resource" : "arn:aws:states:::http:invoke",
-          "Parameters" : {
-            "ApiEndpoint" : "${module.consignment_api.api_url}/graphql",
-            "Method" : "POST",
-            "Authentication" : {
-              "ConnectionArn" : aws_cloudwatch_event_connection.consignment_api_connection.arn
-            },
-            "Headers" : {
-              "Content-Type" : "application/json"
-            },
-            "RequestBody.$" : "$.statusUpdate"
-          },
-          "End" : true
-        },
-        "RunValidateMetadataLambda" : {
-          "Type" : "Task",
-          "Resource" : module.draft_metadata_validator_lambda.lambda_arn,
-          "Parameters" : {
-            "consignmentId.$" : "$.consignmentId"
-          },
-          "End" : true
-        }
-      }
-    }
-  )
+  step_function_definition = templatefile("./templates/step_function/metadata_checks_definition.json.tpl", {
+    antivirus_lambda_arn           = module.yara_av_v2.lambda_arn,
+    consignment_api_url            = module.consignment_api.api_url,
+    consignment_api_connection_arn = aws_cloudwatch_event_connection.consignment_api_connection.arn,
+    validator_lambda_arn           = module.draft_metadata_validator_lambda.lambda_arn
+  })
   step_function_role_policy_attachments = {
     "lambda-policy" : aws_iam_policy.draft_metadata_checks_policy.arn,
     "api-invoke-policy" : aws_iam_policy.api_invoke_policy.arn
