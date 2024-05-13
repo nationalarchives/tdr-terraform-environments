@@ -256,6 +256,7 @@ module "yara_av_v2" {
       dirty_bucket      = local.upload_files_cloudfront_dirty_bucket_name
       clean_bucket      = module.upload_bucket.s3_bucket_name
       quarantine_bucket = module.upload_bucket_quarantine.s3_bucket_name
+      metadata_bucket   = local.draft_metadata_s3_bucket_name
       decryption_keys   = jsonencode([module.s3_upload_kms_key.kms_key_arn])
       encryption_keys   = jsonencode([module.s3_internal_kms_key.kms_key_arn])
     })
