@@ -54,8 +54,8 @@ module "consignment_export_task_policy" {
         module.s3_external_kms_key.kms_key_arn,
         module.s3_internal_kms_key.kms_key_arn
       ])
-      export_bucket_name          = module.flat_format_export_bucket.bucket_name
-      judgment_export_bucket_name = module.flat_format_export_bucket_judgment.bucket_name
+      export_bucket_name          = local.flat_format_bucket_name
+      judgment_export_bucket_name = local.flat_format_judgment_bucket_name
       topic_name                  = local.external_notifications_topic
   })
 }

@@ -474,8 +474,8 @@ module "export_step_function" {
     sns_topic                     = module.notifications_topic.sns_arn,
     platform_version              = "1.4.0"
     max_attempts                  = 2,
-    export_output_bucket          = module.flat_format_export_bucket.bucket_name
-    export_output_judgment_bucket = module.flat_format_export_bucket_judgment.bucket_name
+    export_output_bucket          = local.flat_format_bucket_name
+    export_output_judgment_bucket = local.flat_format_judgment_bucket_name
     bagit_export_bucket           = module.export_bucket.s3_bucket_name
     bagit_export_judgment_bucket  = module.export_bucket_judgment.s3_bucket_name
   })
@@ -494,19 +494,17 @@ module "export_step_function" {
 }
 
 module "flat_format_export_bucket" {
-  source            = "./da-terraform-modules/s3"
-  bucket_name       = "tdr-export-${local.environment}"
-  kms_key_arn       = module.s3_external_kms_key.kms_key_arn
-  common_tags       = local.common_tags
-  use_random_suffix = true
+  source      = "./da-terraform-modules/s3"
+  bucket_name = local.flat_format_bucket_name
+  kms_key_arn = module.s3_external_kms_key.kms_key_arn
+  common_tags = local.common_tags
 }
 
 module "flat_format_export_bucket_judgment" {
-  source            = "./da-terraform-modules/s3"
-  bucket_name       = "tdr-export-judgment-${local.environment}"
-  kms_key_arn       = module.s3_external_kms_key.kms_key_arn
-  common_tags       = local.common_tags
-  use_random_suffix = true
+  source      = "./da-terraform-modules/s3"
+  bucket_name = local.flat_format_judgment_bucket_name
+  kms_key_arn = module.s3_external_kms_key.kms_key_arn
+  common_tags = local.common_tags
 }
 
 module "external_sns_notifications_topic" {
