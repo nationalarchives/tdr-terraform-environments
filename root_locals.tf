@@ -135,4 +135,7 @@ locals {
   block_draft_metadata_upload       = local.environment == "prod" ? true : false
   block_automate_judgment_transfers = local.environment == false
   draft_metadata_s3_bucket_name     = "${var.project}-draft-metadata-${local.environment}"
+
+  flat_format_bucket_name          = "tdr-export-${local.environment}"
+  flat_format_judgment_bucket_name = "tdr-export-judgment-${local.environment}"
 }
