@@ -83,6 +83,10 @@
       {
         "name": "DRAFT_METADATA_S3_BUCKET_NAME",
         "value": "${draft_metadata_s3_bucket_name}"
+      },
+      {
+        "name": "NOTIFICATION_SNS_TOPIC_ARN",
+        "value": "${notification_sns_topic_arn}"
       }
     ],
     "networkMode": "awsvpc",
