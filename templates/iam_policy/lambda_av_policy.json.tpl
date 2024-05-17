@@ -43,7 +43,9 @@
         "arn:aws:s3:::${clean_bucket}",
         "arn:aws:s3:::${clean_bucket}/*",
         "arn:aws:s3:::${quarantine_bucket}",
-        "arn:aws:s3:::${quarantine_bucket}/*"
+        "arn:aws:s3:::${quarantine_bucket}/*",
+        "arn:aws:s3:::${metadata_bucket}",
+        "arn:aws:s3:::${metadata_bucket}/*"
       ]
     },
     {
