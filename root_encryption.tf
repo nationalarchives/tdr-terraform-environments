@@ -21,6 +21,22 @@ module "s3_external_kms_key" {
   }
 }
 
+module "sns_external_kms_key" {
+  source   = "./da-terraform-modules/kms"
+  key_name = "tdr-sns-external-kms-${local.environment}"
+  tags     = local.common_tags
+  default_policy_variables = {
+    user_roles = [module.consignment_export_task_role.role.arn]
+    ci_roles   = [local.assume_role]
+    service_details = [
+      {
+        service_name : "sns"
+        service_source_account : data.aws_caller_identity.current.account_id
+      }
+    ]
+  }
+}
+
 module "s3_internal_kms_key" {
   source   = "./da-terraform-modules/kms"
   key_name = "tdr-s3-internal-kms-${local.environment}"
