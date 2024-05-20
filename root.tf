@@ -854,3 +854,10 @@ module "ecs_task_stopped_event" {
   rule_name                            = "ecs-task-state-stopped"
   rule_description                     = "Log to cloudwatch when ECS task state is STOPPED"
 }
+
+module "metadata_schema_bucket" {
+  source      = "./da-terraform-modules/s3"
+  bucket_name = "${var.project}-metadata-schema-${local.environment}"
+  common_tags = local.common_tags
+  kms_key_arn = module.s3_internal_kms_key.kms_key_arn
+}
