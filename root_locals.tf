@@ -26,6 +26,8 @@ locals {
 
   database_ca_cert_identifier = "rds-ca-rsa2048-g1"
 
+  external_notifications_topic = "tdr-external-notifications-${local.environment}"
+
   region = "eu-west-2"
 
   dns_zone_id = data.aws_route53_zone.tdr_dns_zone.zone_id
@@ -133,4 +135,7 @@ locals {
   block_draft_metadata_upload       = local.environment == "prod" ? true : false
   block_automate_judgment_transfers = local.environment == false
   draft_metadata_s3_bucket_name     = "${var.project}-draft-metadata-${local.environment}"
+
+  flat_format_bucket_name          = "tdr-export-${local.environment}"
+  flat_format_judgment_bucket_name = "tdr-export-judgment-${local.environment}"
 }
