@@ -1,6 +1,6 @@
 [
   {
-    "name": "transfers-api",
+    "name": "transfer-service",
     "image": "${app_image}",
     "cpu": 0,
     "secrets": [],
@@ -9,7 +9,7 @@
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-        "awslogs-group": "/ecs/transfers-api-${app_environment}",
+        "awslogs-group": "${log_group_name}",
         "awslogs-region": "${aws_region}",
         "awslogs-stream-prefix": "ecs",
         "awslogs-datetime-format": "%Y-%m-%d %H:%M:%S%L"
