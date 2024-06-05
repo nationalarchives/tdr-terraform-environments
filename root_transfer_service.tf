@@ -1,3 +1,7 @@
+locals {
+  transfer_service_count = local.environment == "intg" ? 1 : 0
+}
+
 module "transfer_service_certificate" {
   source      = "./tdr-terraform-modules/certificatemanager"
   project     = var.project
@@ -5,6 +9,38 @@ module "transfer_service_certificate" {
   dns_zone    = local.environment_domain
   domain_name = "transfer-service.${local.environment_domain}"
   common_tags = local.common_tags
+}
+
+module "transfer_service_route53" {
+  source                = "./tdr-terraform-modules/route53"
+  common_tags           = local.common_tags
+  environment_full_name = local.environment_full_name
+  project               = "tdr"
+  a_record_name         = "transfer-service"
+  alb_dns_name          = module.transfer_service_tdr_alb.alb_dns_name
+  alb_zone_id           = module.transfer_service_tdr_alb.alb_zone_id
+  create_hosted_zone    = false
+  hosted_zone_id        = data.aws_route53_zone.tdr_dns_zone.id
+}
+
+module "transfer_service_tdr_alb" {
+  source                = "./tdr-terraform-modules/alb"
+  project               = var.project
+  function              = "transfer-service"
+  environment           = local.environment
+  alb_log_bucket        = module.alb_logs_s3.s3_bucket_id
+  alb_security_group_id = module.transfer_service_alb_security_group.security_group_id
+  alb_target_group_port = 8080
+  alb_target_type       = "ip"
+  certificate_arn       = module.transfer_service_certificate.certificate_arn
+  health_check_matcher  = "200,303"
+  health_check_path     = "health"
+  http_listener         = false
+  public_subnets        = module.shared_vpc.public_subnets
+  vpc_id                = module.shared_vpc.vpc_id
+  common_tags           = local.common_tags
+  own_host_header_only  = true
+  host                  = "transfer-service.${local.environment_domain}"
 }
 
 module "transfer_service_cloudwatch" {
@@ -44,7 +80,7 @@ module "transfer_service_task_policy" {
   source = "./da-terraform-modules/iam_policy"
   name   = "TDRTransferServiceECSTaskPolicy${title(local.environment)}"
   policy_string = templatefile(
-  "${path.module}/templates/iam_policy/transfer_service_ecs_task_policy.json.tpl", {})
+  "${path.module}/templates/iam_policy/transfer_service_ecs_task_policy.json.tpl", {account_id = data.aws_caller_identity.current.account_id, environment = local.environment })
 }
 
 module "transfer_service_ecs_security_group" {
@@ -73,12 +109,12 @@ module "transfer_service_alb_security_group" {
 
 module "transfer_service_ecs_task" {
   source               = "./tdr-terraform-modules/generic_ecs"
-  alb_target_group_arn = module.keycloak_tdr_alb.alb_target_group_arn
+  alb_target_group_arn = module.transfer_service_tdr_alb.alb_target_group_arn
   cluster_name         = "transfer_service_${local.environment}"
   common_tags          = local.common_tags
   container_definition = templatefile(
     "${path.module}/templates/ecs_tasks/transfer_service.json.tpl", {
-      app_image       = "${local.ecr_account_number}.dkr.ecr.eu-west-2.amazonaws.com/transfer-service:${local.environment}"
+      app_image       = "${local.ecr_account_number}.dkr.ecr.eu-west-2.amazonaws.com/transfer-service:tktest"
       log_group_name  = module.transfer_service_cloudwatch.log_group_name,
       app_environment = local.environment,
       aws_region      = local.region
