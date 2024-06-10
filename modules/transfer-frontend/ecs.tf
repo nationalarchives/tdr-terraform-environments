@@ -120,6 +120,23 @@ data "aws_iam_policy_document" "ecs_assume_role" {
   }
 }
 
+data "aws_iam_policy_document" "sns_notifications_publish" {
+  statement {
+    actions = ["sns:Publish"]
+    resources = [var.notification_sns_topic_arn]
+  }
+}
+
+resource "aws_iam_policy" "frontend_sns_notifications_publish" {
+  name   = "TDRFrontendSNSPublishPolicy${title(var.environment)}"
+  policy = data.aws_iam_policy_document.sns_notifications_publish.json
+}
+
+resource "aws_iam_role_policy_attachment" "frontend_ecs_task_sns_publish" {
+  role       = aws_iam_role.frontend_ecs_task.name
+  policy_arn = aws_iam_policy.frontend_sns_notifications_publish
+}
+
 resource "aws_iam_role_policy_attachment" "frontend_ecs_task_xray" {
   role       = aws_iam_role.frontend_ecs_task.name
   policy_arn = "arn:aws:iam::aws:policy/AWSXrayFullAccess"
