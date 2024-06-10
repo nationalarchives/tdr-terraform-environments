@@ -134,7 +134,7 @@ resource "aws_iam_policy" "frontend_sns_notifications_publish" {
 
 resource "aws_iam_role_policy_attachment" "frontend_ecs_task_sns_publish" {
   role       = aws_iam_role.frontend_ecs_task.name
-  policy_arn = aws_iam_policy.frontend_sns_notifications_publish
+  policy_arn = aws_iam_policy.frontend_sns_notifications_publish.arn
 }
 
 resource "aws_iam_role_policy_attachment" "frontend_ecs_task_xray" {
