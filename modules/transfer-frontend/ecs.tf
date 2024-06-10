@@ -122,7 +122,7 @@ data "aws_iam_policy_document" "ecs_assume_role" {
 
 data "aws_iam_policy_document" "sns_notifications_publish" {
   statement {
-    actions = ["sns:Publish"]
+    actions   = ["sns:Publish"]
     resources = [var.notification_sns_topic_arn]
   }
 }
