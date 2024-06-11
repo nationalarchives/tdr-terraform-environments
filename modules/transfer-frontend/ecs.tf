@@ -128,7 +128,7 @@ data "aws_iam_policy_document" "sns_notifications_publish" {
 }
 
 resource "aws_iam_policy" "frontend_kms_key_use" {
-  name   = "TDRFrontendKmsKeyUsePolicy${title(var.environment)}"
+  name   = "TDRFrontendKMSKeyUsePolicy${title(var.environment)}"
   policy = data.aws_iam_policy_document.frontend_kms_key_use.json
 }
 
