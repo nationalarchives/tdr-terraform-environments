@@ -127,6 +127,26 @@ data "aws_iam_policy_document" "sns_notifications_publish" {
   }
 }
 
+resource "aws_iam_policy" "frontend_kms_key_use" {
+  name   = "TDRFrontendKmsKeyUsePolicy${title(var.environment)}"
+  policy = data.aws_iam_policy_document.frontend_kms_key_use.json
+}
+
+resource "aws_iam_role_policy_attachment" "frontend_ecs_task_kms_key_use" {
+  role       = aws_iam_role.frontend_ecs_task.name
+  policy_arn = aws_iam_policy.frontend_kms_key_use.arn
+}
+
+data "aws_iam_policy_document" "frontend_kms_key_use" {
+  statement {
+    actions   = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = [var.notifications_topic_kms_key_arn]
+  }
+}
+
 resource "aws_iam_policy" "frontend_sns_notifications_publish" {
   name   = "TDRFrontendSNSPublishPolicy${title(var.environment)}"
   policy = data.aws_iam_policy_document.sns_notifications_publish.json
@@ -136,6 +156,7 @@ resource "aws_iam_role_policy_attachment" "frontend_ecs_task_sns_publish" {
   role       = aws_iam_role.frontend_ecs_task.name
   policy_arn = aws_iam_policy.frontend_sns_notifications_publish.arn
 }
+
 
 resource "aws_iam_role_policy_attachment" "frontend_ecs_task_xray" {
   role       = aws_iam_role.frontend_ecs_task.name
