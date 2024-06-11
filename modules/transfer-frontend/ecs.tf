@@ -139,7 +139,7 @@ resource "aws_iam_role_policy_attachment" "frontend_ecs_task_kms_key_use" {
 
 data "aws_iam_policy_document" "frontend_kms_key_use" {
   statement {
-    actions   = [
+    actions = [
       "kms:Decrypt",
       "kms:GenerateDataKey"
     ]
