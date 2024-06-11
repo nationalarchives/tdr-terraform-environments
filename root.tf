@@ -96,6 +96,7 @@ module "frontend" {
   draft_metadata_s3_kms_keys        = jsonencode([module.s3_internal_kms_key.kms_key_arn])
   draft_metadata_s3_bucket_name     = local.draft_metadata_s3_bucket_name
   notification_sns_topic_arn        = module.notifications_topic.sns_arn
+  notifications_topic_kms_key_arn   = module.encryption_key.kms_key_arn
 }
 
 module "alb_logs_s3" {
@@ -105,7 +106,6 @@ module "alb_logs_s3" {
   access_logs   = false
   bucket_policy = "alb_logging_euwest2"
   common_tags   = local.common_tags
-  kms_key_id    = 1
 }
 
 module "upload_bucket" {
