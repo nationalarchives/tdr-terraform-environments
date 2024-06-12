@@ -6,7 +6,7 @@
       "Action": [
         "sns:Publish"
       ],
-      "Resource": [        "
+      "Resource": [
         "arn:aws:sns:eu-west-2:${account_id}:tdr-notifications-${environment}"
       ]
     }
