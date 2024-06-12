@@ -96,6 +96,7 @@ module "frontend" {
   draft_metadata_s3_kms_keys        = jsonencode([module.s3_internal_kms_key.kms_key_arn])
   draft_metadata_s3_bucket_name     = local.draft_metadata_s3_bucket_name
   notification_sns_topic_arn        = module.notifications_topic.sns_arn
+  notifications_topic_kms_key_arn   = module.encryption_key.kms_key_arn
 }
 
 module "alb_logs_s3" {
@@ -566,6 +567,10 @@ module "notification_lambda" {
   standard_export_s3_bucket_name = module.export_bucket.s3_bucket_name
   da_event_bus_arn               = local.da_event_bus_arn
   da_event_bus_kms_key_arn       = local.da_event_bus_kms_key
+  notifications_vpc_config = {
+    subnet_ids         = module.shared_vpc.private_subnets
+    security_group_ids = [module.outbound_only_security_group.security_group_id]
+  }
 }
 
 module "tdr_public_nacl" {
