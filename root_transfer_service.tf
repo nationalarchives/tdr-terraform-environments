@@ -31,7 +31,7 @@ module "transfer_service_execution_policy" {
   source        = "./da-terraform-modules/iam_policy"
   name          = "TDRTransferServiceECSExecutionPolicy${title(local.environment)}"
   tags          = local.common_tags
-  policy_string = templatefile("./templates/iam_policy/transfer_service_ecs_execution_policy.json.tpl", { management_account_number = data.aws_ssm_parameter.mgmt_account_number.value })
+  policy_string = templatefile("./templates/iam_policy/transfer_service_ecs_execution_policy.json.tpl", { management_account_number = data.aws_ssm_parameter.mgmt_account_number.value, cloudwatch_log_group = module.transfer_service_cloudwatch[0].log_group_arn })
 }
 
 module "transfer_service_task_policy" {
@@ -45,12 +45,13 @@ module "transfer_service_task_policy" {
 
 module "transfer_service_certificate" {
   count       = local.transfer_service_count
-  source      = "./tdr-terraform-modules/certificatemanager"
+  source      = "./da-terraform-modules/certificatemanager"
   project     = var.project
   function    = "transfer-service"
   dns_zone    = local.environment_domain
   domain_name = "transfer-service.${local.environment_domain}"
   common_tags = local.common_tags
+  environment = local.environment
 }
 
 module "transfer_service_route53" {
@@ -59,6 +60,7 @@ module "transfer_service_route53" {
   common_tags           = local.common_tags
   environment_full_name = local.environment_full_name
   project               = "tdr"
+  cname_record_name     = "transfer-service"
   a_record_name         = "transfer-service"
   alb_dns_name          = module.transfer_service_tdr_alb[0].alb_dns_name
   alb_zone_id           = module.transfer_service_tdr_alb[0].alb_zone_id
@@ -78,7 +80,7 @@ module "transfer_service_tdr_alb" {
   alb_target_type       = "ip"
   certificate_arn       = module.transfer_service_certificate[0].certificate_arn
   health_check_matcher  = "200,303"
-  health_check_path     = "health"
+  health_check_path     = "healthcheck"
   http_listener         = false
   public_subnets        = module.shared_vpc.public_subnets
   vpc_id                = module.shared_vpc.vpc_id
