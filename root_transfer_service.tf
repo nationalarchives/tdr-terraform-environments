@@ -60,7 +60,6 @@ module "transfer_service_route53" {
   common_tags           = local.common_tags
   environment_full_name = local.environment_full_name
   project               = "tdr"
-  cname_record_name     = "transfer-service"
   a_record_name         = "transfer-service"
   alb_dns_name          = module.transfer_service_tdr_alb[0].alb_dns_name
   alb_zone_id           = module.transfer_service_tdr_alb[0].alb_zone_id
