@@ -133,7 +133,7 @@ module "transfer_service_ecs_task" {
       app_environment = local.environment,
       aws_region      = local.region
   })
-  container_name               = "transferservice"
+  container_name               = "transfer-service"
   cpu                          = 512
   environment                  = local.environment
   execution_role               = module.transfer_service_execution_role[0].role_arn
