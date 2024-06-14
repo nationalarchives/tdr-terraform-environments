@@ -1,6 +1,7 @@
 locals {
   // Apply to intg environment only initially
   transfer_service_count = local.environment == "intg" ? 1 : 0
+  ip_allow_list          = local.environment == "intg" ? local.ip_allowlist : ["0.0.0.0/0"]
 }
 
 module "transfer_service_execution_role" {
@@ -116,7 +117,7 @@ module "transfer_service_alb_security_group" {
   vpc_id      = module.shared_vpc.vpc_id
   common_tags = local.common_tags
   ingress_cidr_rules = [
-    { port = 443, cidr_blocks = ["0.0.0.0/0"], description = "Allow all IPs over HTTPS" }
+    { port = 443, cidr_blocks = local.ip_allow_list, description = "Restrict IPs over HTTPS" }
   ]
   egress_cidr_rules = [{ port = 0, cidr_blocks = ["0.0.0.0/0"], description = "Allow outbound access on all ports", protocol = "-1" }]
 }
