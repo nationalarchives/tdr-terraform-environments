@@ -143,6 +143,6 @@ module "transfer_service_ecs_task" {
   private_subnets              = module.shared_vpc.private_backend_checks_subnets
   security_groups              = [module.transfer_service_ecs_security_group[0].security_group_id]
   service_name                 = "transfer_service_${local.environment}"
-  task_family_name             = "transfer_service-${local.environment}"
+  task_family_name             = "transfer_service_${local.environment}"
   task_role                    = module.transfer_service_task_role[0].role_arn
 }
