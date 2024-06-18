@@ -46,13 +46,12 @@ module "transfer_service_task_policy" {
 
 module "transfer_service_certificate" {
   count       = local.transfer_service_count
-  source      = "./da-terraform-modules/certificatemanager"
+  source      = "./tdr-terraform-modules/certificatemanager"
   project     = var.project
   function    = "transfer-service"
   dns_zone    = local.environment_domain
   domain_name = "transfer-service.${local.environment_domain}"
   common_tags = local.common_tags
-  environment = local.environment
 }
 
 module "transfer_service_route53" {
