@@ -2,6 +2,8 @@ locals {
   // Apply to intg environment only initially
   transfer_service_count = local.environment == "intg" ? 1 : 0
   ip_allow_list          = local.environment == "intg" ? local.ip_allowlist : ["0.0.0.0/0"]
+  domain                 = "nationalarchives.gov.uk"
+  sub_domain             = "transfer-service"
 }
 
 module "transfer_service_execution_role" {
