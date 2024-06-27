@@ -66,7 +66,8 @@
       "Type": "Task",
       "Resource": "${validator_lambda_arn}",
       "Parameters": {
-        "consignmentId.$": "$.consignmentId"
+        "consignmentId.$": "$.consignmentId",
+        "fileName.$": "$.fileName"
       },
       "End": true
     }
