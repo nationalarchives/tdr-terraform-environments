@@ -65,6 +65,7 @@ module "file_upload_data" {
   function_name        = local.file_upload_data_function_name
   handler              = "lambda_handler.handler"
   reserved_concurrency = -1
+  timeout_seconds      = 60
   policies = {
     "TDRFileUploadDataLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_policy.json.tpl", {
       function_name              = local.file_upload_data_function_name,
@@ -100,7 +101,7 @@ module "api_update_v2" {
   function_name        = local.api_update_v2_function_name
   handler              = "uk.gov.nationalarchives.api.update.Lambda::update"
   reserved_concurrency = -1
-  timeout_seconds      = 90
+  timeout_seconds      = 600
   policies = {
     "TDRAPIUpdateV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_policy.json.tpl", {
       function_name  = local.api_update_v2_function_name,
