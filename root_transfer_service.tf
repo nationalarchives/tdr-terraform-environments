@@ -2,6 +2,8 @@ locals {
   // Apply to intg environment only initially
   transfer_service_count = local.environment == "intg" ? 1 : 0
   ip_allow_list          = local.environment == "intg" ? local.ip_allowlist : ["0.0.0.0/0"]
+  domain                 = "nationalarchives.gov.uk"
+  sub_domain             = "transfer-service"
 }
 
 module "transfer_service_execution_role" {
@@ -46,12 +48,13 @@ module "transfer_service_task_policy" {
 
 module "transfer_service_certificate" {
   count       = local.transfer_service_count
-  source      = "./tdr-terraform-modules/certificatemanager"
+  source      = "./da-terraform-modules/certificatemanager"
   project     = var.project
   function    = "transfer-service"
   dns_zone    = local.environment_domain
   domain_name = "transfer-service.${local.environment_domain}"
   common_tags = local.common_tags
+  environment = local.environment
 }
 
 module "transfer_service_route53" {
