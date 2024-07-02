@@ -77,7 +77,7 @@ HCL Language Support: https://plugins.jetbrains.com/plugin/7808-hashicorp-terraf
 
 3. Clone TDR Configurations repository
    ```
-   [location of project] $ git clone git@github.com/nationalarchives/tdr-configurations.git
+   [location of project] $ git clone git@github.com:nationalarchives/tdr-configurations.git
    ```
 
 4. Clone Terraform modules repository.
