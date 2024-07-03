@@ -132,10 +132,12 @@ module "transfer_service_ecs_task" {
   common_tags          = local.common_tags
   container_definition = templatefile(
     "${path.module}/templates/ecs_tasks/transfer_service.json.tpl", {
-      app_image       = "${local.ecr_account_number}.dkr.ecr.eu-west-2.amazonaws.com/transfer-service:${local.environment}"
-      log_group_name  = module.transfer_service_cloudwatch[0].log_group_name,
-      app_environment = local.environment,
-      aws_region      = local.region
+      app_image              = "${local.ecr_account_number}.dkr.ecr.eu-west-2.amazonaws.com/transfer-service:${local.environment}"
+      log_group_name         = module.transfer_service_cloudwatch[0].log_group_name,
+      app_environment        = local.environment,
+      aws_region             = local.region,
+      records_upload_bucket  = module.upload_file_cloudfront_dirty_s3.s3_bucket_arn
+      metadata_upload_bucket = module.draft_metadata_bucket.s3_bucket_arn
   })
   container_name               = "transfer-service"
   cpu                          = 512
