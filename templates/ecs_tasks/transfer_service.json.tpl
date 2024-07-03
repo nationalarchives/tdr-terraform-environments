@@ -4,7 +4,16 @@
     "image": "${app_image}",
     "networkMode": "awsvpc",
     "secrets": [],
-    "environment": [],
+    "environment": [
+       {
+         "name": "RECORDS_UPLOAD_BUCKET",
+         "value": "${records_upload_bucket}"
+       },
+       {
+         "name": "METADATA_UPLOAD_BUCKET",
+         "value": "${metadata_upload_bucket}"
+       }
+    ],
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
