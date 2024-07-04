@@ -32,7 +32,7 @@ module "draft_metadata_validator_lambda_2" {
   handler         = "uk.gov.nationalarchives.draftmetadatavalidator.Lambda::handleRequest"
   tags            = local.common_tags
   use_image       = true
-  image_url       = "arn:aws:ecr:eu-west-2:${management_account_number}:repository/draft-metadata-validator"
+  image_url       = "arn:aws:ecr:eu-west-2:${data.aws_ssm_parameter.mgmt_account_number.value}:repository/draft-metadata-validator"
   timeout_seconds = 120
   memory_size     = 1024
   policies = {
