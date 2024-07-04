@@ -12,6 +12,14 @@
        {
          "name": "METADATA_UPLOAD_BUCKET",
          "value": "${metadata_upload_bucket}"
+       },
+       {
+         "name": "CONSIGNMENT_API_URL",
+         "value": "${consignment_api_url}/graphql"
+       },
+       {
+         "name": "AUTH_URL",
+         "value": "${auth_url}"
        }
     ],
     "logConfiguration": {

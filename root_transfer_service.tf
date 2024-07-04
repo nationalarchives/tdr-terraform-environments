@@ -138,6 +138,8 @@ module "transfer_service_ecs_task" {
       aws_region             = local.region,
       records_upload_bucket  = module.upload_file_cloudfront_dirty_s3.s3_bucket_arn
       metadata_upload_bucket = module.draft_metadata_bucket.s3_bucket_arn
+      auth_url               = local.keycloak_auth_url
+      consignment_api_url    = module.consignment_api.api_url
   })
   container_name               = "transfer-service"
   cpu                          = 512
