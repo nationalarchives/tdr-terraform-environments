@@ -20,6 +20,10 @@
        {
          "name": "AUTH_URL",
          "value": "${auth_url}"
+       },
+       {
+         "name": "API_PORT",
+         "value": "${transfer_service_api_port}"
        }
     ],
     "logConfiguration": {
