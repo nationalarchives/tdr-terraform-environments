@@ -11,6 +11,7 @@ on:
           - staging
           - prod
         default: 'intg'
+run-name: Applying Terraform to ${{inputs.environment}}
 permissions:
   id-token: write
   contents: write
