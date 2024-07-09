@@ -1,5 +1,3 @@
-
-#
 module "draft_metadata_validator_lambda_ecr" {
   source          = "./da-terraform-modules/lambda"
   function_name   = "tdr-draft-metadata-validator-2-${local.environment}"
@@ -25,7 +23,3 @@ module "draft_metadata_validator_lambda_ecr" {
     BUCKET_NAME        = local.draft_metadata_s3_bucket_name
   }
 }
-
-
-
-
