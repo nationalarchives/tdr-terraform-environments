@@ -94,7 +94,7 @@
       },
       {
         "name": "FILE_CHECKS_TOTAL_TIMEOUT_IN_SECONDS",
-        "value": "${file_checks_total_timout}"
+        "value": "${file_checks_total_timeout_in_seconds}"
       }
     ],
     "networkMode": "awsvpc",
