@@ -83,6 +83,14 @@
       {
         "name": "NOTIFICATION_SNS_TOPIC_ARN",
         "value": "${notification_sns_topic_arn}"
+      },
+      {
+        "name": "BLOCK_METADATA_REVIEW",
+        "value": "${block_metadata_review}"
+      },
+      {
+        "name": "FILE_CHECKS_TOTAL_TIMEOUT_IN_SECONDS",
+        "value": "${file_checks_total_timeout_in_seconds}"
       }
     ],
     "networkMode": "awsvpc",
