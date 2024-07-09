@@ -91,6 +91,10 @@
       {
         "name": "BLOCK_METADATA_REVIEW",
         "value": "${block_metadata_review}"
+      },
+      {
+        "name": "FILE_CHECKS_TOTAL_TIMEOUT_IN_SECONDS",
+        "value": "${file_checks_total_timout}"
       }
     ],
     "networkMode": "awsvpc",
