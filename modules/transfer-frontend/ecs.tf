@@ -38,6 +38,7 @@ data "template_file" "app" {
     draft_metadata_s3_bucket_name     = var.draft_metadata_s3_bucket_name
     block_automate_judgment_transfers = var.block_automate_judgment_transfers
     notification_sns_topic_arn        = var.notification_sns_topic_arn
+    file_checks_total_timout          = 480
   }
 }
 
