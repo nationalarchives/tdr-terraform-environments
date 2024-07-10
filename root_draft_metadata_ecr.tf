@@ -14,6 +14,7 @@ module "draft_metadata_validator_lambda_ecr" {
       parameter_name = local.keycloak_backend_checks_secret_name
       bucket_name    = local.draft_metadata_s3_bucket_name
       kms_key_arn    = module.s3_internal_kms_key.kms_key_arn
+      management_account_id = local.ecr_account_number
     })
   }
   plaintext_env_vars = {
