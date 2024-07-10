@@ -47,4 +47,5 @@
      ],
      "Resource": "arn:aws:ecr:eu-west-2:${data.aws_ssm_parameter.mgmt_account_number.value}:repository/draft-metadata-validator"
     }
+  ]
 }
