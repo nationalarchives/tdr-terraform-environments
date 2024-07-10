@@ -1,6 +1,6 @@
 module "draft_metadata_validator_lambda_ecr" {
   source          = "./da-terraform-modules/lambda"
-  function_name   = "tdr-draft-metadata-validator-2-${local.environment}"
+  function_name   = "tdr-draft-metadata-validator-v2-${local.environment}"
   handler         = "uk.gov.nationalarchives.draftmetadatavalidator.Lambda::handleRequest"
   tags            = local.common_tags
   use_image       = true
@@ -17,7 +17,7 @@ module "draft_metadata_validator_lambda_ecr" {
     })
   }
   plaintext_env_vars = {
-    API_URL            = "graphql"
+    API_URL            = "${module.consignment_api.api_url}/graphql"
     AUTH_URL           = local.keycloak_auth_url
     CLIENT_SECRET_PATH = local.keycloak_backend_checks_secret_name
     BUCKET_NAME        = local.draft_metadata_s3_bucket_name
