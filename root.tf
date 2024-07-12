@@ -1,7 +1,7 @@
 module "global_parameters" {
   source = "./tdr-configurations/terraform"
 }
-//temp
+
 module "tre_configuration" {
   source  = "./da-terraform-configurations"
   project = "tre"
