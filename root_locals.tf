@@ -77,6 +77,7 @@ locals {
   keycloak_reporting_client_secret_name      = "/${local.environment}/keycloak/reporting_client/secret"
   keycloak_rotate_secrets_client_secret_name = "/${local.environment}/keycloak/rotate_secrets_client/secret"
   keycloak_db_url                            = "/${local.environment}/keycloak/instance/url"
+  keycloak_transfer_service_secret_name      = "/${local.environment}/keycloak/transfer_service_client/secret"
   slack_bot_token_name                       = "/${local.environment}/slack/bot"
 
   keycloak_reporting_client_id      = "tdr-reporting"

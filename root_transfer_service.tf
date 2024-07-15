@@ -4,6 +4,20 @@ locals {
   ip_allow_list          = local.environment == "intg" ? local.ip_allowlist : ["0.0.0.0/0"]
   domain                 = "nationalarchives.gov.uk"
   sub_domain             = "transfer-service"
+  hosted_zone_name       = local.environment_full_name == "production" ? "${local.sub_domain}.tdr.${local.domain}" : "${local.sub_domain}.tdr-${local.environment_full_name}.${local.domain}"
+}
+
+module "transfer_service_ssm_parameters" {
+  source = "./da-terraform-modules/ssm_parameter"
+  tags   = local.common_tags
+  parameters = [
+    {
+      name        = local.keycloak_transfer_service_secret_name,
+      description = "Secret for the transfer service client"
+      type        = "SecureString"
+      value       = "To be manually added"
+    }
+  ]
 }
 
 module "transfer_service_execution_role" {
@@ -63,7 +77,7 @@ module "transfer_service_route53" {
   common_tags           = local.common_tags
   environment_full_name = local.environment_full_name
   project               = "tdr"
-  a_record_name         = "transfer-service"
+  a_record_name         = local.sub_domain
   alb_dns_name          = module.transfer_service_tdr_alb[0].alb_dns_name
   alb_zone_id           = module.transfer_service_tdr_alb[0].alb_zone_id
   create_hosted_zone    = false
@@ -153,4 +167,69 @@ module "transfer_service_ecs_task" {
   service_name                 = "transfer_service_${local.environment}"
   task_family_name             = "transfer_service_${local.environment}"
   task_role                    = module.transfer_service_task_role[0].role_arn
+}
+
+data "aws_ssm_parameter" "transfer_service_keycloak_secret" {
+  name            = local.keycloak_transfer_service_secret_name
+  with_decryption = true
+}
+
+resource "aws_cloudwatch_event_connection" "transfer_service_api_connection" {
+  name               = "TDRTransferServiceAPIConnection${title(local.environment)}"
+  authorization_type = "OAUTH_CLIENT_CREDENTIALS"
+
+  auth_parameters {
+    oauth {
+      client_parameters {
+        client_id     = local.keycloak_transfer_service_secret_name
+        client_secret = data.aws_ssm_parameter.transfer_service_keycloak_secret.value
+      }
+
+      authorization_endpoint = "${local.keycloak_auth_url}/realms/tdr/protocol/openid-connect/token"
+      http_method            = "POST"
+
+      oauth_http_parameters {
+        body {
+          key             = "grant_type"
+          value           = "client_credentials"
+          is_value_secret = false
+        }
+      }
+    }
+  }
+}
+
+resource "aws_iam_policy" "transfer_service_api_invoke_policy" {
+  name = "TDRTransferServiceAPIInvokePolicy${title(local.environment)}"
+
+  policy = templatefile("./templates/iam_policy/third_party_api_invocation_template.json.tpl", {
+    region            = local.region
+    account_number    = var.tdr_account_number
+    connection_arn    = aws_cloudwatch_event_connection.transfer_service_api_connection.arn
+    api_url           = "https://${local.hosted_zone_name}"
+    step_function_arn = module.transfer_service_data_load.step_function_arn
+  })
+}
+
+module "transfer_service_data_load" {
+  source             = "./da-terraform-modules/sfn"
+  step_function_name = "TDRDataLoad${title(local.environment)}"
+  step_function_definition = templatefile("./templates/step_function/data_load_definition.json.tpl", {
+    antivirus_lambda_arn = module.yara_av_v2.lambda_arn
+  })
+  step_function_role_policy_attachments = {
+    "lambda-policy" : aws_iam_policy.transfer_service_api_invoke_policy.arn,
+    "api-invoke-policy" : aws_iam_policy.transfer_service_api_invoke_policy.arn
+  }
+}
+
+resource "aws_iam_policy" "transfer_service_data_load_policy" {
+  name        = "TDRTransferServiceDataLoadPolicy${title(local.environment)}"
+  description = "Policy to allow necessary lambda executions from step function"
+
+  policy = templatefile("./templates/iam_policy/invoke_lambda_policy.json.tpl", {
+    resources = jsonencode([
+      module.yara_av_v2.lambda_arn
+    ])
+  })
 }
