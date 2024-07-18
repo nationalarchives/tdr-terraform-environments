@@ -73,10 +73,6 @@
         "value": "${block_draft_metadata_upload}"
       },
       {
-        "name": "BLOCK_AUTOMATE_JUDGMENT_TRANSFERS",
-        "value": "${block_automate_judgment_transfers}"
-      },
-      {
         "name": "DRAFT_METADATA_VALIDATOR_API_URL",
         "value": "${draft_metadata_validator_api_url}"
       },

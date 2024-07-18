@@ -68,36 +68,35 @@ module "consignment_api" {
 }
 
 module "frontend" {
-  app_name                          = "frontend"
-  source                            = "./modules/transfer-frontend"
-  alb_dns_name                      = module.frontend_alb.alb_dns_name
-  alb_target_group_arn              = module.frontend_alb.alb_target_group_arn
-  alb_zone_id                       = module.frontend_alb.alb_zone_id
-  dns_zone_id                       = local.dns_zone_id
-  environment                       = local.environment
-  environment_full_name             = local.environment_full_name_map[local.environment]
-  common_tags                       = local.common_tags
-  ip_allowlist                      = local.environment == "intg" ? local.ip_allowlist : ["0.0.0.0/0"]
-  region                            = local.region
-  vpc_id                            = module.shared_vpc.vpc_id
-  public_subnets                    = module.shared_vpc.public_subnets
-  private_subnets                   = module.shared_vpc.private_subnets
-  dns_zone_name_trimmed             = local.dns_zone_name_trimmed
-  auth_url                          = local.keycloak_auth_url
-  client_secret_path                = module.keycloak_ssm_parameters.params[local.keycloak_tdr_client_secret_name].name
-  export_api_url                    = module.export_api.api_url
-  backend_checks_api_url            = module.backend_checks_api.api_url
-  alb_id                            = module.frontend_alb.alb_id
-  public_subnet_ranges              = module.shared_vpc.public_subnet_ranges
-  otel_service_name                 = "frontend-${local.environment}"
-  block_automate_judgment_transfers = local.block_automate_judgment_transfers
-  block_draft_metadata_upload       = local.block_draft_metadata_upload
-  block_metadata_review             = local.block_metadata_review
-  draft_metadata_validator_api_url  = module.draft_metadata_api_gateway.api_url
-  draft_metadata_s3_kms_keys        = jsonencode([module.s3_internal_kms_key.kms_key_arn])
-  draft_metadata_s3_bucket_name     = local.draft_metadata_s3_bucket_name
-  notification_sns_topic_arn        = module.notifications_topic.sns_arn
-  notifications_topic_kms_key_arn   = module.encryption_key.kms_key_arn
+  app_name                         = "frontend"
+  source                           = "./modules/transfer-frontend"
+  alb_dns_name                     = module.frontend_alb.alb_dns_name
+  alb_target_group_arn             = module.frontend_alb.alb_target_group_arn
+  alb_zone_id                      = module.frontend_alb.alb_zone_id
+  dns_zone_id                      = local.dns_zone_id
+  environment                      = local.environment
+  environment_full_name            = local.environment_full_name_map[local.environment]
+  common_tags                      = local.common_tags
+  ip_allowlist                     = local.environment == "intg" ? local.ip_allowlist : ["0.0.0.0/0"]
+  region                           = local.region
+  vpc_id                           = module.shared_vpc.vpc_id
+  public_subnets                   = module.shared_vpc.public_subnets
+  private_subnets                  = module.shared_vpc.private_subnets
+  dns_zone_name_trimmed            = local.dns_zone_name_trimmed
+  auth_url                         = local.keycloak_auth_url
+  client_secret_path               = module.keycloak_ssm_parameters.params[local.keycloak_tdr_client_secret_name].name
+  export_api_url                   = module.export_api.api_url
+  backend_checks_api_url           = module.backend_checks_api.api_url
+  alb_id                           = module.frontend_alb.alb_id
+  public_subnet_ranges             = module.shared_vpc.public_subnet_ranges
+  otel_service_name                = "frontend-${local.environment}"
+  block_draft_metadata_upload      = local.block_draft_metadata_upload
+  block_metadata_review            = local.block_metadata_review
+  draft_metadata_validator_api_url = module.draft_metadata_api_gateway.api_url
+  draft_metadata_s3_kms_keys       = jsonencode([module.s3_internal_kms_key.kms_key_arn])
+  draft_metadata_s3_bucket_name    = local.draft_metadata_s3_bucket_name
+  notification_sns_topic_arn       = module.notifications_topic.sns_arn
+  notifications_topic_kms_key_arn  = module.encryption_key.kms_key_arn
 }
 
 module "alb_logs_s3" {

@@ -2,17 +2,19 @@ module "draft_metadata_validator_lambda" {
   source          = "./da-terraform-modules/lambda"
   function_name   = "tdr-draft-metadata-validator-${local.environment}"
   handler         = "uk.gov.nationalarchives.draftmetadatavalidator.Lambda::handleRequest"
-  runtime         = local.runtime_java_11
   tags            = local.common_tags
+  use_image       = true
+  image_url       = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/draft-metadata-validator:v41"
   timeout_seconds = 120
   memory_size     = 1024
   policies = {
-    "TDRDraftMetadataValidatorLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_validator_lambda.json.tpl", {
-      account_id     = var.tdr_account_number
-      environment    = local.environment
-      parameter_name = local.keycloak_backend_checks_secret_name
-      bucket_name    = local.draft_metadata_s3_bucket_name
-      kms_key_arn    = module.s3_internal_kms_key.kms_key_arn
+    "TDRDraftMetadataValidatorLambdaPolicyECR${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_validator_lambda.json.tpl", {
+      account_id            = var.tdr_account_number
+      environment           = local.environment
+      parameter_name        = local.keycloak_backend_checks_secret_name
+      bucket_name           = local.draft_metadata_s3_bucket_name
+      kms_key_arn           = module.s3_internal_kms_key.kms_key_arn
+      management_account_id = local.ecr_account_number
     })
   }
   plaintext_env_vars = {
