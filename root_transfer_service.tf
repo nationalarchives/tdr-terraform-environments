@@ -199,6 +199,18 @@ resource "aws_cloudwatch_event_connection" "transfer_service_api_connection" {
   }
 }
 
+resource "aws_iam_policy" "transfer_service_data_load_policy" {
+  name        = "TDRDataLoadPolicy${title(local.environment)}"
+  description = "Policy to allow necessary lambda executions from step function"
+
+  policy = templatefile("./templates/iam_policy/invoke_lambda_policy.json.tpl", {
+    resources = jsonencode([
+      module.yara_av_v2.lambda_arn,
+      module.draft_metadata_validator_lambda.lambda_arn
+    ])
+  })
+}
+
 resource "aws_iam_policy" "transfer_service_api_invoke_policy" {
   name = "TDRTransferServiceAPIInvokePolicy${title(local.environment)}"
 
@@ -207,11 +219,11 @@ resource "aws_iam_policy" "transfer_service_api_invoke_policy" {
     account_number    = var.tdr_account_number
     connection_arn    = aws_cloudwatch_event_connection.transfer_service_api_connection.arn
     api_url           = "https://${local.hosted_zone_name}"
-    step_function_arn = module.transfer_service_data_load.step_function_arn
+    step_function_arn = module.transfer_service_data_load_sfn.step_function_arn
   })
 }
 
-module "transfer_service_data_load" {
+module "transfer_service_data_load_sfn" {
   source             = "./da-terraform-modules/sfn"
   step_function_name = "TDRDataLoad${title(local.environment)}"
   step_function_definition = templatefile("./templates/step_function/data_load_definition.json.tpl", {
@@ -221,15 +233,4 @@ module "transfer_service_data_load" {
     "lambda-policy" : aws_iam_policy.transfer_service_api_invoke_policy.arn,
     "api-invoke-policy" : aws_iam_policy.transfer_service_api_invoke_policy.arn
   }
-}
-
-resource "aws_iam_policy" "transfer_service_data_load_policy" {
-  name        = "TDRTransferServiceDataLoadPolicy${title(local.environment)}"
-  description = "Policy to allow necessary lambda executions from step function"
-
-  policy = templatefile("./templates/iam_policy/invoke_lambda_policy.json.tpl", {
-    resources = jsonencode([
-      module.yara_av_v2.lambda_arn
-    ])
-  })
 }
