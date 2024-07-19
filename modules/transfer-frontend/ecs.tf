@@ -36,7 +36,6 @@ data "template_file" "app" {
     block_metadata_review                = var.block_metadata_review
     draft_metadata_validator_api_url     = var.draft_metadata_validator_api_url
     draft_metadata_s3_bucket_name        = var.draft_metadata_s3_bucket_name
-    block_automate_judgment_transfers    = var.block_automate_judgment_transfers
     notification_sns_topic_arn           = var.notification_sns_topic_arn
     file_checks_total_timeout_in_seconds = 480
   }
