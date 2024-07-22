@@ -4,11 +4,11 @@ module "draft_metadata_validator_lambda" {
   handler         = "uk.gov.nationalarchives.draftmetadatavalidator.Lambda::handleRequest"
   tags            = local.common_tags
   use_image       = true
-  image_url       = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/draft-metadata-validator:${environment}"
+  image_url       = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/draft-metadata-validator:${local.environment}"
   timeout_seconds = 120
   memory_size     = 1024
   policies = {
-    "TDRDraftMetadataValidatorLambdaPolicyECR${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_validator_lambda.json.tpl", {
+    "TDRDraftMetadataValidatorLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_validator_lambda.json.tpl", {
       account_id            = var.tdr_account_number
       environment           = local.environment
       parameter_name        = local.keycloak_backend_checks_secret_name
