@@ -23,9 +23,6 @@ module "draft_metadata_validator_lambda" {
     CLIENT_SECRET_PATH = local.keycloak_backend_checks_secret_name
     BUCKET_NAME        = local.draft_metadata_s3_bucket_name
   }
-  lambda_invoke_permissions = {
-    "apigateway.amazonaws.com" = "${module.draft_metadata_api_gateway.api_execution_arn}/*/POST/draft-metadata/validate/{consignmentId+}"
-  }
 }
 
 module "draft_metadata_api_gateway" {
