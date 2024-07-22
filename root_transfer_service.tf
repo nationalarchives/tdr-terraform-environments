@@ -58,16 +58,15 @@ module "transfer_service_certificate" {
 }
 
 module "transfer_service_route53" {
-  count                 = local.transfer_service_count
-  source                = "./tdr-terraform-modules/route53"
-  common_tags           = local.common_tags
-  environment_full_name = local.environment_full_name
-  project               = "tdr"
-  a_record_name         = "transfer-service"
-  alb_dns_name          = module.transfer_service_tdr_alb[0].alb_dns_name
-  alb_zone_id           = module.transfer_service_tdr_alb[0].alb_zone_id
-  create_hosted_zone    = false
-  hosted_zone_id        = data.aws_route53_zone.tdr_dns_zone.id
+  count              = local.transfer_service_count
+  source             = "./da-terraform-modules/route53"
+  common_tags        = local.common_tags
+  a_record_name      = "transfer-service"
+  alb_dns_name       = module.transfer_service_tdr_alb[0].alb_dns_name
+  alb_zone_id        = module.transfer_service_tdr_alb[0].alb_zone_id
+  create_hosted_zone = false
+  hosted_zone_name   = data.aws_route53_zone.tdr_dns_zone.name
+  hosted_zone_id     = data.aws_route53_zone.tdr_dns_zone.id
 }
 
 module "transfer_service_tdr_alb" {
