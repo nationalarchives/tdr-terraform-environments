@@ -38,6 +38,14 @@
         "kms:Decrypt"
       ],
       "Resource": "${kms_key_arn}"
+    },
+    {
+        "Effect": "Allow",
+        "Action": [
+         "ecr:BatchGetImage",
+         "ecr:GetDownloadUrlForLayer"
+     ],
+     "Resource": "arn:aws:ecr:eu-west-2:${ecr_account_number}:repository/draft-metadata-validator"
     }
   ]
 }
