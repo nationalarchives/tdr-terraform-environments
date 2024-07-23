@@ -45,7 +45,7 @@
          "ecr:BatchGetImage",
          "ecr:GetDownloadUrlForLayer"
      ],
-     "Resource": "arn:aws:ecr:eu-west-2:${management_account_id}:repository/draft-metadata-validator"
+     "Resource": "arn:aws:ecr:eu-west-2:${ecr_account_number}:repository/draft-metadata-validator"
     }
   ]
 }

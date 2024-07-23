@@ -9,12 +9,12 @@ module "draft_metadata_validator_lambda" {
   memory_size     = 1024
   policies = {
     "TDRDraftMetadataValidatorLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_validator_lambda.json.tpl", {
-      account_id            = var.tdr_account_number
-      environment           = local.environment
-      parameter_name        = local.keycloak_backend_checks_secret_name
-      bucket_name           = local.draft_metadata_s3_bucket_name
-      kms_key_arn           = module.s3_internal_kms_key.kms_key_arn
-      management_account_id = local.ecr_account_number
+      account_id         = var.tdr_account_number
+      environment        = local.environment
+      parameter_name     = local.keycloak_backend_checks_secret_name
+      bucket_name        = local.draft_metadata_s3_bucket_name
+      kms_key_arn        = module.s3_internal_kms_key.kms_key_arn
+      ecr_account_number = local.ecr_account_number
     })
   }
   plaintext_env_vars = {
