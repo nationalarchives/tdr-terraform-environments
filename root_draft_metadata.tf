@@ -1,6 +1,6 @@
 module "draft_metadata_validator_lambda" {
   source          = "./da-terraform-modules/lambda"
-  function_name   = "tdr-draft-metadata-validator-${local.environment}"
+  function_name   = "tdr-draft-metadata-validator-old-${local.environment}"
   handler         = "uk.gov.nationalarchives.draftmetadatavalidator.Lambda::handleRequest"
   runtime         = local.runtime_java_11
   tags            = local.common_tags
