@@ -66,6 +66,7 @@ locals {
 
   keycloak_backend_checks_secret_name        = "/${local.environment}/keycloak/backend_checks_client/secret"
   keycloak_tdr_client_secret_name            = "/${local.environment}/keycloak/client/secret"
+  keycloak_tdr_read_client_secret_name       = "/${local.environment}/keycloak/user_read/secret"
   keycloak_user_password_name                = "/${local.environment}/keycloak/password"
   keycloak_admin_password_name               = "/${local.environment}/keycloak/admin/password"
   keycloak_admin_user_name                   = "/${local.environment}/keycloak/admin/user"

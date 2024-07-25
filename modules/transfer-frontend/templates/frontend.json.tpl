@@ -37,6 +37,10 @@
       {
         "valueFrom": "${client_secret_path}",
         "name": "AUTH_SECRET"
+      },
+      {
+        "valueFrom": "${read_client_secret_path}",
+        "name": "READ_AUTH_SECRET"
       }
     ],
     "environment": [
