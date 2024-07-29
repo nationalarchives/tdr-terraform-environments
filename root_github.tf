@@ -81,6 +81,7 @@ module "run_keycloak_update_ecs" {
     app_environment            = local.environment
     management_account         = data.aws_ssm_parameter.mgmt_account_number.value
     client_secret_path         = local.keycloak_tdr_client_secret_name
+    read_client_secret_path    = local.keycloak_tdr_read_client_secret_name
     backend_checks_secret_path = local.keycloak_backend_checks_secret_name
     realm_admin_secret_path    = local.keycloak_realm_admin_client_secret_name
     keycloak_properties_path   = local.keycloak_configuration_properties_name
