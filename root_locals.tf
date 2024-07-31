@@ -133,8 +133,8 @@ locals {
 
   //feature access blocks
   block_shared_keycloak_pages   = local.environment == "intg" ? false : true
-  block_draft_metadata_upload   = local.environment == "prod" ? true : false
-  block_metadata_review         = local.environment == "prod" ? true : false
+  block_draft_metadata_upload   = local.environment == "intg" ? false : true
+  block_metadata_review         = local.environment == "intg" ? false : true
   draft_metadata_s3_bucket_name = "${var.project}-draft-metadata-${local.environment}"
 
   flat_format_bucket_name          = "tdr-export-${local.environment}"
