@@ -1,6 +1,6 @@
 locals {
   // Apply to intg environment only initially
-  transfer_service_count = local.environment == "intg" ? 1 : 0
+  transfer_service_count = local.environment == "prod" ? 0 : 1
   ip_allow_list          = local.environment == "intg" ? local.ip_allowlist : ["0.0.0.0/0"]
   domain                 = "nationalarchives.gov.uk"
   sub_domain             = "transfer-service"
