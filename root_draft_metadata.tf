@@ -1,7 +1,6 @@
 module "draft_metadata_validator_lambda" {
   source          = "./da-terraform-modules/lambda"
   function_name   = "tdr-draft-metadata-validator-${local.environment}"
-  handler         = "uk.gov.nationalarchives.draftmetadatavalidator.Lambda::handleRequest"
   tags            = local.common_tags
   use_image       = true
   image_url       = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/draft-metadata-validator:${local.environment}"
