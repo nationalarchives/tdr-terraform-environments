@@ -155,3 +155,12 @@ module "transfer_service_ecs_task" {
   task_family_name             = "transfer_service_${local.environment}"
   task_role                    = module.transfer_service_task_role[0].role_arn
 }
+
+module "transfer_service_process_dataload" {
+  count                                 = local.transfer_service_count
+  source                                = "./da-terraform-modules/sfn"
+  step_function_name                    = "TDRTransferServiceProcessDataload${title(local.environment)}"
+  step_function_definition              = templatefile("./templates/step_function/transfer_service_process_dataload.json.tpl", {})
+  step_function_role_policy_attachments = {}
+  common_tags                           = local.common_tags
+}
