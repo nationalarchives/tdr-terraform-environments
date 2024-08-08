@@ -500,6 +500,11 @@ module "flat_format_export_bucket" {
   bucket_name = local.flat_format_bucket_name
   kms_key_arn = module.s3_external_kms_key.kms_key_arn
   common_tags = local.common_tags
+  bucket_policy = templatefile("${path.module}/templates/s3/allow_read_access.json.tpl", {
+    bucket_name       = local.flat_format_bucket_name
+    read_access_roles = [local.dr2_copy_files_role]
+  })
+
 }
 
 module "flat_format_export_bucket_judgment" {
