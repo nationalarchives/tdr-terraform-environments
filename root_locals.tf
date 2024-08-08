@@ -114,6 +114,8 @@ locals {
 
   talend_export_role_arn = module.talend_configuration.terraform_config[local.environment]["remote_engine_instance_profile_role"]
 
+  dr2_copy_files_role = module.dr2_configuration.terraform_config[local.environment]["copy_from_tdr_lambda_role"]
+
   standard_export_bucket_read_access_roles = [local.tre_export_role_arn, local.talend_export_role_arn]
   judgment_export_bucket_read_access_roles = [local.tre_export_role_arn]
 
