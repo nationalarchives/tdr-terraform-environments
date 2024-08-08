@@ -138,7 +138,7 @@ module "transfer_service_ecs_task" {
       app_environment           = local.environment,
       aws_region                = local.region,
       records_upload_bucket     = module.upload_file_cloudfront_dirty_s3.s3_bucket_arn
-      metadata_upload_bucket    = module.draft_metadata_bucket.s3_bucket_arn
+      metadata_upload_bucket    = module.upload_file_cloudfront_dirty_s3.s3_bucket_arn
       auth_url                  = local.keycloak_auth_url
       consignment_api_url       = module.consignment_api.api_url
       transfer_service_api_port = "8080"
