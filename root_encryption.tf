@@ -10,6 +10,7 @@ module "s3_external_kms_key" {
     user_roles = concat([
       module.notification_lambda.notifications_lambda_role_arn[0],
       module.consignment_export_task_role.role.arn,
+      local.dr2_copy_files_role,
     ], local.aws_sso_export_bucket_access_roles, local.standard_export_bucket_read_access_roles, local.judgment_export_bucket_read_access_roles)
     ci_roles = [local.assume_role]
     service_details = [

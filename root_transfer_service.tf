@@ -129,7 +129,7 @@ module "transfer_service_ecs_task" {
   count                = local.transfer_service_count
   source               = "./tdr-terraform-modules/generic_ecs"
   alb_target_group_arn = module.transfer_service_tdr_alb[0].alb_target_group_arn
-  cluster_name         = "transfer_service_${local.environment}"
+  cluster_name         = "transferservice_${local.environment}"
   common_tags          = local.common_tags
   container_definition = templatefile(
     "${path.module}/templates/ecs_tasks/transfer_service.json.tpl", {
@@ -151,7 +151,7 @@ module "transfer_service_ecs_task" {
   memory                       = 1024
   private_subnets              = module.shared_vpc.private_backend_checks_subnets
   security_groups              = [module.transfer_service_ecs_security_group[0].security_group_id]
-  service_name                 = "transfer_service_${local.environment}"
+  service_name                 = "transferservice_service_${local.environment}"
   task_family_name             = "transfer_service_${local.environment}"
   task_role                    = module.transfer_service_task_role[0].role_arn
 }
