@@ -138,7 +138,7 @@ module "transfer_service_ecs_task" {
       app_environment           = local.environment,
       aws_region                = local.region,
       records_upload_bucket     = module.upload_file_cloudfront_dirty_s3.s3_bucket_arn
-      metadata_upload_bucket    = module.draft_metadata_bucket.s3_bucket_arn
+      metadata_upload_bucket    = module.upload_file_cloudfront_dirty_s3.s3_bucket_arn
       auth_url                  = local.keycloak_auth_url
       consignment_api_url       = module.consignment_api.api_url
       transfer_service_api_port = "8080"
@@ -154,4 +154,13 @@ module "transfer_service_ecs_task" {
   service_name                 = "transferservice_service_${local.environment}"
   task_family_name             = "transfer_service_${local.environment}"
   task_role                    = module.transfer_service_task_role[0].role_arn
+}
+
+module "transfer_service_process_dataload" {
+  count                                 = local.transfer_service_count
+  source                                = "./da-terraform-modules/sfn"
+  step_function_name                    = "TDRTransferServiceProcessDataload${title(local.environment)}"
+  step_function_definition              = templatefile("./templates/step_function/transfer_service_process_dataload.json.tpl", {})
+  step_function_role_policy_attachments = {}
+  common_tags                           = local.common_tags
 }
