@@ -1,16 +1,89 @@
 {
-  "Comment": "Reads object keys from s3 bucket to process objects individually",
-  "StartAt": "RetrieveS3ObjectKeys",
+  "Comment": "Reads metadata object keys from s3 bucket to process objects individually",
+  "StartAt": "RetrieveMetadataS3ObjectKeys",
   "States": {
-    "RetrieveS3ObjectKeys": {
+    "RetrieveMetadataS3ObjectKeys": {
       "Type": "Map",
       "ItemProcessor": {
         "ProcessorConfig": {
           "Mode": "DISTRIBUTED",
           "ExecutionType": "EXPRESS"
         },
-        "StartAt": "Succeed",
+        "StartAt": "FilterOutPrefixFromObjectKeys",
         "States": {
+          "FilterOutPrefixFromObjectKeys": {
+            "Type": "Choice",
+            "Choices": [
+              {
+                "Variable": "$.MapItem.Key",
+                "StringEqualsPath": "$.ExecutionInput.metatadataSourcePrefix",
+                "Next": "IgnorePrefixObjectKey"
+              }
+            ],
+            "Default": "RunMetadataAntivirusScan"
+          },
+          "RunMetadataAntivirusScan": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "FunctionName": "${antivirus_lambda_arn}:$LATEST",
+              "Payload": {
+                "s3SourceBucket.$": "$.ExecutionInput.metadataSourceBucket",
+                "s3SourceBucketKey.$": "$.MapItem.Key",
+                "s3UploadBucket.$": "$.ExecutionInput.metadataSourceBucket",
+                "s3UploadBucketKey.$": "$.MapItem.Key"
+              }
+            },
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException",
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 1,
+                "MaxAttempts": 3,
+                "BackoffRate": 2
+              }
+            ],
+            "Next": "CheckMetadataAntivirusResults",
+            "ResultPath": "$.AntivirusOutput"
+          },
+          "CheckMetadataAntivirusResults": {
+            "Type": "Choice",
+            "Choices": [
+              {
+                "Not": {
+                  "Variable": "$.AntivirusOutput.Payload.antivirus.result",
+                  "StringEquals": ""
+                },
+                "Next": "TagMetadataAntivirusCompletedWithIssues"
+              }
+            ],
+            "Default": "Succeed"
+          },
+          "TagMetadataAntivirusCompletedWithIssues": {
+            "Type": "Task",
+            "Parameters": {
+              "Bucket.$": "$.ExecutionInput.metadataSourceBucket",
+              "Key.$": "$.MapItem.Key",
+              "Tagging": {
+                "TagSet": [
+                  {
+                    "Key": "Antivirus",
+                    "Value": "CompletedWithIssues"
+                  }
+                ]
+              }
+            },
+            "Resource": "arn:aws:states:::aws-sdk:s3:putObjectTagging",
+            "Next": "Succeed"
+          },
+          "IgnorePrefixObjectKey": {
+           "Type": "Succeed",
+           "Comment": "Map Keys include the prefix which is not a digital object so cannot be processed"
+          },
           "Succeed": {
             "Type": "Succeed",
             "Comment": "Temporary state for skeleton step function"

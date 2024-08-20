@@ -157,10 +157,26 @@ module "transfer_service_ecs_task" {
 }
 
 module "transfer_service_process_dataload" {
-  count                                 = local.transfer_service_count
-  source                                = "./da-terraform-modules/sfn"
-  step_function_name                    = "TDRTransferServiceProcessDataload${title(local.environment)}"
-  step_function_definition              = templatefile("./templates/step_function/transfer_service_process_dataload.json.tpl", {})
-  step_function_role_policy_attachments = {}
-  common_tags                           = local.common_tags
+  count              = local.transfer_service_count
+  source             = "./da-terraform-modules/sfn"
+  step_function_name = "TDRTransferServiceProcessDataload${title(local.environment)}"
+  step_function_definition = templatefile("./templates/step_function/transfer_service_process_dataload.json.tpl", {
+    antivirus_lambda_arn = module.yara_av_v2.lambda_arn
+  })
+  step_function_role_policy_attachments = {
+    "invoke-lambda-policy" : module.transfer_service_process_dataload_policy[0].policy_arn
+  }
+  common_tags = local.common_tags
+}
+
+module "transfer_service_process_dataload_policy" {
+  count  = local.transfer_service_count
+  source = "./da-terraform-modules/iam_policy"
+  name   = "TDRProcessDataLoadPolicy${title(local.environment)}"
+  tags   = local.common_tags
+  policy_string = templatefile("./templates/iam_policy/invoke_lambda_policy.json.tpl", {
+    resources = jsonencode([
+      module.yara_av_v2.lambda_arn
+    ])
+  })
 }
