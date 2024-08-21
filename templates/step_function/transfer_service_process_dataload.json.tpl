@@ -81,11 +81,15 @@
               }
             },
             "Resource": "arn:aws:states:::aws-sdk:s3:putObjectTagging",
-            "Next": "Succeed"
+            "Next": "VirusDetected"
           },
           "IgnorePrefixObjectKey": {
            "Type": "Succeed",
            "Comment": "Map Keys include the prefix which is not a digital object so cannot be processed"
+          },
+          "VirusDetected": {
+            "Type": "Succeed",
+            "Comment": "Stop processing as virus detected in metadata json"
           },
           "Succeed": {
             "Type": "Succeed",
