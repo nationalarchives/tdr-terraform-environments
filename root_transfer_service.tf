@@ -164,19 +164,33 @@ module "transfer_service_process_dataload" {
     antivirus_lambda_arn = module.yara_av_v2.lambda_arn
   })
   step_function_role_policy_attachments = {
-    "invoke-lambda-policy" : module.transfer_service_process_dataload_policy[0].policy_arn
+    "invoke-lambda-policy" : module.transfer_service_process_dataload_invoke_lambda_policy[0].policy_arn
+    "s3-policy" : module.transfer_service_process_dataload_s3_policy[0].policy_arn
   }
   common_tags = local.common_tags
 }
 
-module "transfer_service_process_dataload_policy" {
+module "transfer_service_process_dataload_invoke_lambda_policy" {
   count  = local.transfer_service_count
   source = "./da-terraform-modules/iam_policy"
-  name   = "TDRProcessDataLoadPolicy${title(local.environment)}"
+  name   = "TDRProcessDataLoadInvokeLambdaPolicy${title(local.environment)}"
   tags   = local.common_tags
   policy_string = templatefile("./templates/iam_policy/invoke_lambda_policy.json.tpl", {
     resources = jsonencode([
-      module.yara_av_v2.lambda_arn
+      "${module.yara_av_v2.lambda_arn}:$LATEST"
+    ])
+  })
+}
+
+module "transfer_service_process_dataload_s3_policy" {
+  count  = local.transfer_service_count
+  source = "./da-terraform-modules/iam_policy"
+  name   = "TDRProcessDataLoadS3Policy${title(local.environment)}"
+  tags   = local.common_tags
+  policy_string = templatefile("./templates/iam_policy/dataload_sfn_s3_policy.json.tpl", {
+    s3_resources = jsonencode([
+      module.upload_file_cloudfront_dirty_s3.s3_bucket_arn,
+      "${module.upload_file_cloudfront_dirty_s3.s3_bucket_arn}/*"
     ])
   })
 }

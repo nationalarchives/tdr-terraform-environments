@@ -16,22 +16,25 @@
             "Choices": [
               {
                 "Variable": "$.MapItem.Key",
-                "StringEqualsPath": "$.ExecutionInput.metatadataSourcePrefix",
+                "StringEqualsPath": "$.ExecutionInput.metadataSourcePrefix",
                 "Next": "IgnorePrefixObjectKey"
               }
             ],
             "Default": "RunMetadataAntivirusScan"
           },
           "RunMetadataAntivirusScan": {
+            "Comment": "FileId is derived from the Item Key. No upload bucket as clean metadata json files remain in dirty bucket for processing",
             "Type": "Task",
             "Resource": "arn:aws:states:::lambda:invoke",
             "Parameters": {
               "FunctionName": "${antivirus_lambda_arn}:$LATEST",
               "Payload": {
+                "consignmentId.$": "$.ExecutionInput.transferId",
+                "fileId.$": "States.ArrayGetItem(States.StringSplit($.MapItem.Key, '/'), States.MathAdd(States.ArrayLength(States.StringSplit($.MapItem.Key, '/')), -1))",
                 "s3SourceBucket.$": "$.ExecutionInput.metadataSourceBucket",
                 "s3SourceBucketKey.$": "$.MapItem.Key",
-                "s3UploadBucket.$": "$.ExecutionInput.metadataSourceBucket",
-                "s3UploadBucketKey.$": "$.MapItem.Key"
+                "s3UploadBucket.$": "",
+                "s3UploadBucketKey.$": ""
               }
             },
             "Retry": [
@@ -94,7 +97,7 @@
         "Resource": "arn:aws:states:::s3:listObjectsV2",
         "Parameters": {
           "Bucket.$": "$$.Execution.Input.metadataSourceBucket",
-          "Prefix.$": "$$.Execution.Input.metatadataSourcePrefix"
+          "Prefix.$": "$$.Execution.Input.metadataSourcePrefix"
         }
       },
       "MaxConcurrency": 100,
