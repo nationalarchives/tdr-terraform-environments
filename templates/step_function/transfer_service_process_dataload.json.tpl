@@ -33,8 +33,8 @@
                 "fileId.$": "States.ArrayGetItem(States.StringSplit($.MapItem.Key, '/'), States.MathAdd(States.ArrayLength(States.StringSplit($.MapItem.Key, '/')), -1))",
                 "s3SourceBucket.$": "$.ExecutionInput.metadataSourceBucket",
                 "s3SourceBucketKey.$": "$.MapItem.Key",
-                "s3UploadBucket.$": "",
-                "s3UploadBucketKey.$": ""
+                "s3UploadBucket": "",
+                "s3UploadBucketKey": ""
               }
             },
             "Retry": [
