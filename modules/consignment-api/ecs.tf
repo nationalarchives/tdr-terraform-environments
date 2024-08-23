@@ -1,8 +1,8 @@
 locals {
   app_port           = 8080
   ecr_account_number = var.environment == "sbox" ? data.aws_caller_identity.current.account_id : data.aws_ssm_parameter.mgmt_account_number.value
-  cpu                = var.environment == "intg" ? "512" : "1024"
-  memory             = var.environment == "intg" ? "1024" : "2048"
+  cpu                = "1024"
+  memory             = "2048"
 
 }
 
