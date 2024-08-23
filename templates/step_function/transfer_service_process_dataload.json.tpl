@@ -31,6 +31,7 @@
               "Payload": {
                 "consignmentId.$": "$.ExecutionInput.transferId",
                 "fileId.$": "States.ArrayGetItem(States.StringSplit($.MapItem.Key, '/'), States.MathAdd(States.ArrayLength(States.StringSplit($.MapItem.Key, '/')), -1))",
+                "originalPath.$": "$.MapItem.Key",
                 "s3SourceBucket.$": "$.ExecutionInput.metadataSourceBucket",
                 "s3SourceBucketKey.$": "$.MapItem.Key",
                 "s3UploadBucket": "",
