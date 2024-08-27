@@ -14,7 +14,8 @@
       "Resource": [
         "${cloudwatch_log_group}",
         "${cloudwatch_log_group}:log-stream:*",
-        "arn:aws:ecr:eu-west-2:${ecr_account_number}:repository/auth-server"
+        "arn:aws:ecr:eu-west-2:${ecr_account_number}:repository/auth-server",
+        "${aws_guardduty_ecr_arn}"
       ]
     },
     {
