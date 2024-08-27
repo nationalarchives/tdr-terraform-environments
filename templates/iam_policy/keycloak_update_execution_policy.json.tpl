@@ -29,8 +29,8 @@
         "ecr:GetDownloadUrlForLayer"
       ],
       "Resource": [
-          "arn:aws:ecr:eu-west-2:${management_account_number}:repository/keycloak-update",
-          "${aws_guardduty_ecr_arn}"
+        "arn:aws:ecr:eu-west-2:${management_account_number}:repository/keycloak-update",
+        "${aws_guardduty_ecr_arn}"
       ]
     },
     {
