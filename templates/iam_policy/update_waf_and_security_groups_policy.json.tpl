@@ -8,13 +8,17 @@
         "ec2:AuthorizeSecurityGroupIngress",
         "ec2:CreateTags",
         "ec2:RevokeSecurityGroupIngress",
-        "wafv2:UpdateRuleGroup"
+        "wafv2:UpdateRuleGroup",
+        "wafv2:Get*",
+        "wafv2:List*",
+        "wafv2:UpdateIPSet"
       ],
       "Resource": [
         "${ip_set_arn}",
         "${rule_group_arn}",
         "arn:aws:ec2:eu-west-2:${account_id}:security-group/${security_group_id}",
-        "arn:aws:wafv2:eu-west-2:${account_id}:REGIONAL/regexpatternset/*/*"
+        "arn:aws:wafv2:eu-west-2:${account_id}:REGIONAL/regexpatternset/*/*",
+        "arn:aws:wafv2:eu-west-2:229554778675:regional/ipset/tdr-apps-${environment}-whitelist/*"
       ]
     },
     {
