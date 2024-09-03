@@ -60,3 +60,5 @@ variable "draft_metadata_s3_bucket_name" {}
 variable "notification_sns_topic_arn" {}
 
 variable "notifications_topic_kms_key_arn" {}
+
+variable "aws_guardduty_ecr_arn" {}
