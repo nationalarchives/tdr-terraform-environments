@@ -15,11 +15,10 @@
     {
       "Effect": "Allow",
       "Action": [
-        "ec2:CreateNetworkInterface",
-        "ec2:DescribeNetworkInterfaces",
-        "ec2:DeleteNetworkInterface"
+        "elasticfilesystem:ClientMount",
+        "elasticfilesystem:DescribeMountTargets"
       ],
-      "Resource": "*"
+      "Resource" : "${file_system_arn}"
     },
     {
       "Effect": "Allow",
@@ -29,8 +28,8 @@
         "ecr:GetDownloadUrlForLayer"
       ],
       "Resource": [
-        "arn:aws:ecr:eu-west-2:${management_account_number}:repository/keycloak-update",
-        "${aws_guardduty_ecr_arn}"
+          "arn:aws:ecr:eu-west-2:${management_account_number}:repository/consignment-export",
+          "${aws_guardduty_ecr_arn}"
       ]
     },
     {
