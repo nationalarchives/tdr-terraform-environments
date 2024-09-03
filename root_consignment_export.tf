@@ -81,7 +81,7 @@ module "consignment_export_ecs_task" {
       download_batch_delay_ms    = 10
   })
   container_name   = "consignmentexport"
-  cpu              = 512
+  cpu              = 1024
   environment      = local.environment
   execution_role   = module.consignment_export_execution_role.role.arn
   memory           = 1024
