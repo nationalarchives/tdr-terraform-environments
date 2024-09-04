@@ -32,11 +32,15 @@ module "transfer_service_task_role" {
 }
 
 module "transfer_service_execution_policy" {
-  count         = local.transfer_service_count
-  source        = "./da-terraform-modules/iam_policy"
-  name          = "TDRTransferServiceECSExecutionPolicy${title(local.environment)}"
-  tags          = local.common_tags
-  policy_string = templatefile("./templates/iam_policy/transfer_service_ecs_execution_policy.json.tpl", { management_account_number = data.aws_ssm_parameter.mgmt_account_number.value, cloudwatch_log_group = module.transfer_service_cloudwatch[0].log_group_arn })
+  count  = local.transfer_service_count
+  source = "./da-terraform-modules/iam_policy"
+  name   = "TDRTransferServiceECSExecutionPolicy${title(local.environment)}"
+  tags   = local.common_tags
+  policy_string = templatefile("./templates/iam_policy/transfer_service_ecs_execution_policy.json.tpl", {
+    management_account_number = data.aws_ssm_parameter.mgmt_account_number.value,
+    cloudwatch_log_group      = module.transfer_service_cloudwatch[0].log_group_arn,
+    aws_guardduty_ecr_arn     = local.aws_guardduty_ecr_arn
+  })
 }
 
 module "transfer_service_task_policy" {

@@ -5,9 +5,13 @@ module "keycloak_cloudwatch" {
 }
 
 module "keycloak_ecs_execution_policy" {
-  source        = "./tdr-terraform-modules/iam_policy"
-  name          = "KeycloakECSExecutionPolicy${title(local.environment)}"
-  policy_string = templatefile("${path.module}/templates/iam_policy/keycloak_ecs_execution_policy.json.tpl", { cloudwatch_log_group = module.keycloak_cloudwatch.log_group_arn, ecr_account_number = local.ecr_account_number })
+  source = "./tdr-terraform-modules/iam_policy"
+  name   = "KeycloakECSExecutionPolicy${title(local.environment)}"
+  policy_string = templatefile("${path.module}/templates/iam_policy/keycloak_ecs_execution_policy.json.tpl", {
+    cloudwatch_log_group  = module.keycloak_cloudwatch.log_group_arn,
+    ecr_account_number    = local.ecr_account_number,
+    aws_guardduty_ecr_arn = local.aws_guardduty_ecr_arn
+  })
 }
 
 module "keycloak_ecs_task_policy" {
