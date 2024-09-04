@@ -65,6 +65,7 @@ module "consignment_api" {
   create_users_security_group_id = flatten([module.create_db_users_lambda.create_users_lambda_security_group_id, module.create_bastion_user_lambda.create_users_lambda_security_group_id])
   da_reference_generator_url     = local.da_reference_generator_url
   da_reference_generator_limit   = local.da_reference_generator_limit
+  aws_guardduty_ecr_arn          = local.aws_guardduty_ecr_arn
 }
 
 module "frontend" {
@@ -98,6 +99,7 @@ module "frontend" {
   draft_metadata_s3_bucket_name    = local.draft_metadata_s3_bucket_name
   notification_sns_topic_arn       = module.notifications_topic.sns_arn
   notifications_topic_kms_key_arn  = module.encryption_key.kms_key_arn
+  aws_guardduty_ecr_arn            = local.aws_guardduty_ecr_arn
 }
 
 module "alb_logs_s3" {

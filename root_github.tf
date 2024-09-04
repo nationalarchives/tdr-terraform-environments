@@ -56,7 +56,8 @@ module "run_update_keycloak_execution_policy" {
   name   = "TDRKeycloakUpdateECSExecutionPolicy${title(local.environment)}"
   policy_string = templatefile("${path.module}/templates/iam_policy/keycloak_update_execution_policy.json.tpl", {
     log_group_arn             = module.keycloak_update_cloudwatch.log_group_arn,
-    management_account_number = data.aws_ssm_parameter.mgmt_account_number.value
+    management_account_number = data.aws_ssm_parameter.mgmt_account_number.value,
+    aws_guardduty_ecr_arn     = local.aws_guardduty_ecr_arn
   })
 }
 
@@ -90,10 +91,10 @@ module "run_keycloak_update_ecs" {
     github_secret_path         = data.aws_ssm_parameter.workflow_pat.name
   })
   container_name   = "${var.project}-keycloak-update"
-  cpu              = 512
+  cpu              = 1024
   environment      = local.environment
   execution_role   = module.run_update_keycloak_execution_role.role.arn
-  memory           = 1024
+  memory           = 2048
   private_subnets  = module.shared_vpc.private_subnets
   security_groups  = [module.keycloak_ecs_security_group.security_group_id]
   task_family_name = "keycloak-update-${local.environment}"
