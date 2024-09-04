@@ -91,10 +91,10 @@ module "run_keycloak_update_ecs" {
     github_secret_path         = data.aws_ssm_parameter.workflow_pat.name
   })
   container_name   = "${var.project}-keycloak-update"
-  cpu              = 512
+  cpu              = 1024
   environment      = local.environment
   execution_role   = module.run_update_keycloak_execution_role.role.arn
-  memory           = 1024
+  memory           = 2048
   private_subnets  = module.shared_vpc.private_subnets
   security_groups  = [module.keycloak_ecs_security_group.security_group_id]
   task_family_name = "keycloak-update-${local.environment}"
