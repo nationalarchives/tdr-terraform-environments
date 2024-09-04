@@ -161,10 +161,40 @@ module "transfer_service_ecs_task" {
 }
 
 module "transfer_service_process_dataload" {
-  count                                 = local.transfer_service_count
-  source                                = "./da-terraform-modules/sfn"
-  step_function_name                    = "TDRTransferServiceProcessDataload${title(local.environment)}"
-  step_function_definition              = templatefile("./templates/step_function/transfer_service_process_dataload.json.tpl", {})
-  step_function_role_policy_attachments = {}
-  common_tags                           = local.common_tags
+  count              = local.transfer_service_count
+  source             = "./da-terraform-modules/sfn"
+  step_function_name = "TDRTransferServiceProcessDataload${title(local.environment)}"
+  step_function_definition = templatefile("./templates/step_function/transfer_service_process_dataload.json.tpl", {
+    antivirus_lambda_arn = module.yara_av_v2.lambda_arn
+  })
+  step_function_role_policy_attachments = {
+    "invoke-lambda-policy" : module.transfer_service_process_dataload_invoke_lambda_policy[0].policy_arn
+    "s3-policy" : module.transfer_service_process_dataload_s3_policy[0].policy_arn
+  }
+  common_tags = local.common_tags
+}
+
+module "transfer_service_process_dataload_invoke_lambda_policy" {
+  count  = local.transfer_service_count
+  source = "./da-terraform-modules/iam_policy"
+  name   = "TDRProcessDataLoadInvokeLambdaPolicy${title(local.environment)}"
+  tags   = local.common_tags
+  policy_string = templatefile("./templates/iam_policy/invoke_lambda_policy.json.tpl", {
+    resources = jsonencode([
+      "${module.yara_av_v2.lambda_arn}:$LATEST"
+    ])
+  })
+}
+
+module "transfer_service_process_dataload_s3_policy" {
+  count  = local.transfer_service_count
+  source = "./da-terraform-modules/iam_policy"
+  name   = "TDRProcessDataLoadS3Policy${title(local.environment)}"
+  tags   = local.common_tags
+  policy_string = templatefile("./templates/iam_policy/dataload_sfn_s3_policy.json.tpl", {
+    s3_resources = jsonencode([
+      module.upload_file_cloudfront_dirty_s3.s3_bucket_arn,
+      "${module.upload_file_cloudfront_dirty_s3.s3_bucket_arn}/*"
+    ])
+  })
 }
