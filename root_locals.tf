@@ -141,4 +141,6 @@ locals {
 
   flat_format_bucket_name          = "tdr-export-${local.environment}"
   flat_format_judgment_bucket_name = "tdr-export-judgment-${local.environment}"
+
+  aws_guardduty_ecr_arn = module.tdr_configuration.terraform_config["aws_guardduty_ecr_arn"]
 }

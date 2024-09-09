@@ -35,9 +35,15 @@ module "consignment_export_task_role" {
 }
 
 module "consignment_export_execution_policy" {
-  source        = "./tdr-terraform-modules/iam_policy"
-  name          = "TDRConsignmentExportECSExecutionPolicy${title(local.environment)}"
-  policy_string = templatefile("./tdr-terraform-modules/iam_policy/templates/consignment_export_execution_policy.json.tpl", { log_group_arn = "${module.consignment_export_cloudwatch.log_group_arn}:*", file_system_arn = module.export_efs.file_system_arn, management_account_number = data.aws_ssm_parameter.mgmt_account_number.value })
+  source = "./tdr-terraform-modules/iam_policy"
+  name   = "TDRConsignmentExportECSExecutionPolicy${title(local.environment)}"
+  policy_string = templatefile("./templates/iam_policy/consignment_export_execution_policy.json.tpl", {
+    log_group_arn             = "${module.consignment_export_cloudwatch.log_group_arn}:*",
+    file_system_arn           = module.export_efs.file_system_arn,
+    management_account_number = data.aws_ssm_parameter.mgmt_account_number.value,
+    aws_guardduty_ecr_arn     = local.aws_guardduty_ecr_arn
+    }
+  )
 }
 
 module "consignment_export_task_policy" {
@@ -81,10 +87,10 @@ module "consignment_export_ecs_task" {
       download_batch_delay_ms    = 10
   })
   container_name   = "consignmentexport"
-  cpu              = 512
+  cpu              = 1024
   environment      = local.environment
   execution_role   = module.consignment_export_execution_role.role.arn
-  memory           = 1024
+  memory           = 2048
   private_subnets  = module.shared_vpc.private_subnets
   security_groups  = [module.consignment_export_ecs_security_group.security_group_id]
   task_family_name = "consignment-export-${local.environment}"
