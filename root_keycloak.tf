@@ -46,6 +46,7 @@ module "keycloak_ssm_parameters" {
     { name = local.keycloak_backend_checks_secret_name, description = "The Keycloak backend checks secret", value = random_uuid.backend_checks_client_secret.result, type = "SecureString" },
     { name = local.keycloak_tdr_client_secret_name, description = "The Keycloak tdr client secret", value = random_uuid.client_secret.result, type = "SecureString" },
     { name = local.keycloak_tdr_read_client_secret_name, description = "The Keycloak tdr-user-read client secret", value = random_uuid.client_secret.result, type = "SecureString" },
+    { name = local.keycloak_tdr_transfer_service_secret_name, description = "The Keycloak tdr-transfer-service client secret", value = random_uuid.client_secret.result, type = "SecureString" },
     { name = local.keycloak_user_password_name, description = "The Keycloak user password", value = random_password.keycloak_password.result, type = "SecureString" },
     { name = local.keycloak_admin_password_name, description = "The Keycloak admin password", value = random_password.password.result, type = "SecureString" },
     { name = local.keycloak_govuk_notify_api_key_name, description = "The GovUK Notify API key", value = "to_be_manually_added", type = "SecureString", tier = "Advanced" },
