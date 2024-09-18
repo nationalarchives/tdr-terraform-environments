@@ -11,7 +11,8 @@
     },
     {
       "Action": [
-        "s3:PutObject"
+        "s3:PutObject",
+        "S3:GetObject"
       ],
       "Effect": "Allow",
       "Resource": [
