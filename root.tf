@@ -825,20 +825,20 @@ module "api_database_security_group" {
 }
 
 module "consignment_api_database" {
-  source             = "./tdr-terraform-modules/rds_instance"
-  admin_username     = "api_admin"
-  availability_zone  = local.database_availability_zone
-  common_tags        = local.common_tags
-  database_name      = "consignmentapi"
-  database_version   = "14.12"
-  environment        = local.environment
-  kms_key_id         = module.encryption_key.kms_key_arn
-  private_subnets    = module.shared_vpc.private_subnets
-  security_group_ids = [module.api_database_security_group.security_group_id]
-  multi_az           = local.environment == "prod"
-  ca_cert_identifier = local.database_ca_cert_identifier
+  source                  = "./tdr-terraform-modules/rds_instance"
+  admin_username          = "api_admin"
+  availability_zone       = local.database_availability_zone
+  common_tags             = local.common_tags
+  database_name           = "consignmentapi"
+  database_version        = "14.12"
+  environment             = local.environment
+  kms_key_id              = module.encryption_key.kms_key_arn
+  private_subnets         = module.shared_vpc.private_subnets
+  security_group_ids      = [module.api_database_security_group.security_group_id]
+  multi_az                = local.environment == "prod"
+  ca_cert_identifier      = local.database_ca_cert_identifier
   backup_retention_period = local.rds_retention_period_days
-  apply_immediately  = true
+  apply_immediately       = true
 }
 
 module "waf_cloudwatch" {
