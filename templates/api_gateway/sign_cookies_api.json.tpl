@@ -79,7 +79,7 @@
                 "method.response.header.Access-Control-Allow-Origin" : "'${upload_cors_urls}'"
               },
               "responseTemplates" : {
-                "application/json" : "#if( $input.params('origin') == 'http://localhost:9000' && $context.stage == 'intg')   #set($context.responseOverride.header.Access-Control-Allow-Origin = 'http://localhost:9000') #end"
+                "application/json" : "#if( $input.params('origin') == 'http://localhost:9000' && $context.stage == 'intg') #set($context.responseOverride.header.Access-Control-Allow-Origin = 'http://localhost:9000') #elseif( $input.params('origin').contains('sharepoint.com')) #set($context.responseOverride.header.Access-Control-Allow-Origin = $input.params('origin'))#end"
               }
             }
           },
