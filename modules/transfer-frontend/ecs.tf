@@ -35,6 +35,7 @@ data "template_file" "app" {
     otel_service_name                    = var.otel_service_name
     block_draft_metadata_upload          = var.block_draft_metadata_upload
     block_metadata_review                = var.block_metadata_review
+    block_skip_metadata_review           = var.block_skip_metadata_review
     draft_metadata_validator_api_url     = var.draft_metadata_validator_api_url
     draft_metadata_s3_bucket_name        = var.draft_metadata_s3_bucket_name
     notification_sns_topic_arn           = var.notification_sns_topic_arn
