@@ -145,4 +145,6 @@ locals {
   flat_format_judgment_bucket_name = "tdr-export-judgment-${local.environment}"
 
   aws_guardduty_ecr_arn = module.tdr_configuration.terraform_config["aws_guardduty_ecr_arn"]
+
+  rds_retention_period_days = local.environment == "prod" ? 30 : 7
 }
