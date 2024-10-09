@@ -6,12 +6,24 @@
     "secrets": [],
     "environment": [
        {
-         "name": "RECORDS_UPLOAD_BUCKET",
-         "value": "${records_upload_bucket}"
+         "name": "AWS_REGION",
+         "value": "${aws_region}"
        },
        {
-         "name": "METADATA_UPLOAD_BUCKET",
-         "value": "${metadata_upload_bucket}"
+         "name": "RECORDS_UPLOAD_BUCKET_ARN",
+         "value": "${records_upload_bucket_arn}"
+       },
+       {
+         "name": "RECORDS_UPLOAD_BUCKET_NAME",
+         "value": "${records_upload_bucket_name}"
+       },
+       {
+         "name": "METADATA_UPLOAD_BUCKET_ARN",
+         "value": "${metadata_upload_bucket_arn}"
+       },
+       {
+         "name": "METADATA_UPLOAD_BUCKET_NAME",
+         "value": "${metadata_upload_bucket_name}"
        },
        {
          "name": "CONSIGNMENT_API_URL",
