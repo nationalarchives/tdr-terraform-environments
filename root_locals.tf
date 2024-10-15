@@ -42,7 +42,9 @@ locals {
 
   local_dev_frontend_url = "http://localhost:9000"
 
-  upload_cors_urls = local.environment == "intg" ? [module.frontend.frontend_url, local.local_dev_frontend_url] : [module.frontend.frontend_url]
+  sharepoint_domain = "https://*.sharepoint.com"
+
+  upload_cors_urls = local.environment == "intg" ? [module.frontend.frontend_url, local.local_dev_frontend_url, local.sharepoint_domain] : [module.frontend.frontend_url, local.sharepoint_domain]
 
   file_check_lambda_timeouts_in_seconds = {
     "antivirus"      = 180,
