@@ -102,6 +102,7 @@ resource "aws_iam_policy" "draft_metadata_checks_policy" {
       module.draft_metadata_validator_lambda.lambda_arn
     ]),
     draft_metadata_bucket = local.draft_metadata_s3_bucket_name
+    kms_key_arn           = module.s3_internal_kms_key.kms_key_arn
   })
 }
 

@@ -19,6 +19,14 @@
         "arn:aws:s3:::${draft_metadata_bucket}",
         "arn:aws:s3:::${draft_metadata_bucket}/*"
       ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
+      ],
+      "Resource": "${kms_key_arn}"
     }
   ]
 }
