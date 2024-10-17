@@ -47,7 +47,7 @@
       "ResultPath": "$.s3PutObjectResult",
       "Parameters": {
         "Bucket": "${draft_metadata_bucket}",
-        "Key": "draft-metadata-errors.json",
+        "Key.$": "States.Format('{}/draft-metadata-errors.json', $.consignmentId)",
         "Body": {
           "consignmentId.$": "$.consignmentId",
           "date.$": "States.Format('{}-{}-{}',$.splitDate.YYYY,$.splitDate.MM, $.splitDate.DD)",
