@@ -101,7 +101,7 @@ resource "aws_iam_policy" "draft_metadata_checks_policy" {
       module.yara_av_v2.lambda_arn,
       module.draft_metadata_validator_lambda.lambda_arn
     ]),
-    bucket_name = local.draft_metadata_s3_bucket_name
+    draft_metadata_bucket = local.draft_metadata_s3_bucket_name
   })
 }
 
