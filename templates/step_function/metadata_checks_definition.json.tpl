@@ -1,5 +1,5 @@
 {
-  "Comment": "Run antivirus checks on metadata, update database if positive, else trigger metadata validation",
+  "Comment": "Run antivirus checks on metadata, write error file to s3 and update status if virus found, else trigger metadata validation",
   "StartAt": "RunAntivirusLambda",
   "States": {
     "RunAntivirusLambda": {
@@ -62,7 +62,8 @@
                   "errorKey": "virus",
                   "message.$": "$.output.antivirus.result"
                 }
-              ]
+              ],
+              "data": []
             }
           ]
         },
