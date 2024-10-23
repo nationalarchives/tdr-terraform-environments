@@ -1,5 +1,5 @@
 {
-  "Comment": "Run antivirus checks on metadata, update database if positive, else trigger metadata validation",
+  "Comment": "Run antivirus checks on metadata, write error file to s3 and update status if virus found, else trigger metadata validation",
   "StartAt": "RunAntivirusLambda",
   "States": {
     "RunAntivirusLambda": {
@@ -26,10 +26,50 @@
             "Variable": "$.output.antivirus.result",
             "StringEquals": ""
           },
-          "Next": "PrepareVirusDetectedQueryParams"
+          "Next": "SplitDate"
         }
       ],
       "Default": "RunValidateMetadataLambda"
+    },
+    "SplitDate": {
+      "Type": "Pass",
+      "ResultPath": "$.splitDate",
+      "Parameters": {
+        "YYYY.$": "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'), 0), '-'), 0)",
+        "MM.$": "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'),0), '-'), 1)",
+        "DD.$": "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'),0), '-'), 2)"
+      },
+      "Next": "WriteVirusDetectedJsonToS3"
+    },
+    "WriteVirusDetectedJsonToS3": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:putObject",
+      "ResultPath": "$.s3PutObjectResult",
+      "Parameters": {
+        "Bucket": "${draft_metadata_bucket}",
+        "Key.$": "States.Format('{}/draft-metadata-errors.json', $.consignmentId)",
+        "Body": {
+          "consignmentId.$": "$.consignmentId",
+          "date.$": "States.Format('{}-{}-{}',$.splitDate.YYYY,$.splitDate.MM, $.splitDate.DD)",
+          "fileError": "VIRUS",
+          "validationErrors": [
+            {
+              "assetId.$": "$.fileName",
+              "errors": [
+                {
+                  "validationProcess": "FILE_CHECK",
+                  "property": "virus_check",
+                  "errorKey": "virus",
+                  "message.$": "$.output.antivirus.result"
+                }
+              ],
+              "data": []
+            }
+          ]
+        },
+        "ContentType": "application/json"
+      },
+      "Next": "PrepareVirusDetectedQueryParams"
     },
     "PrepareVirusDetectedQueryParams": {
       "Type": "Pass",
