@@ -23,12 +23,12 @@ module "reporting_lambda_ssm_parameters" {
   tags = merge(local.common_tags, local.manual_input_tag)
 }
 
-module "akka_token_ssm_parameters" {
+module "akka_licence_token_ssm_parameters" {
   source = "./da-terraform-modules/ssm_parameter"
   parameters = [
     {
-      name        = local.akka_token_secret_name,
-      description = "Token for Akka licence"
+      name        = local.akka_licence_token_name,
+      description = "Licence token for Akka"
       type        = "SecureString"
       value       = "To be manually added"
     }
