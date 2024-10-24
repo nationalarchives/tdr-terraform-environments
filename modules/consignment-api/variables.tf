@@ -52,3 +52,5 @@ variable "create_users_security_group_id" {
 variable "db_instance_resource_id" {}
 
 variable "aws_guardduty_ecr_arn" {}
+
+variable "akka_licence_token_name" {}

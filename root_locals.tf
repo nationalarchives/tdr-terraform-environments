@@ -66,6 +66,8 @@ locals {
 
   keycloak_auth_url = "https://auth.${local.dns_zone_name_trimmed}"
 
+  akka_licence_token_name = "/${local.environment}/akka/licence_token"
+
   keycloak_backend_checks_secret_name        = "/${local.environment}/keycloak/backend_checks_client/secret"
   keycloak_tdr_client_secret_name            = "/${local.environment}/keycloak/client/secret"
   keycloak_tdr_read_client_secret_name       = "/${local.environment}/keycloak/user_read_client/secret"
