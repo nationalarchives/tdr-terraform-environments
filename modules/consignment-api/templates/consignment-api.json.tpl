@@ -33,6 +33,10 @@
       {
         "valueFrom": "${url_path}",
         "name": "DB_ADDR"
+      },
+      {
+        "valueFrom": "${akka_token_name}",
+        "name": "AKKA_TOKEN"
       }
     ],
     "networkMode": "awsvpc",
