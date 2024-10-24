@@ -53,4 +53,4 @@ variable "db_instance_resource_id" {}
 
 variable "aws_guardduty_ecr_arn" {}
 
-variable "akka_token_name" {}
+variable "akka_licence_token_name" {}
