@@ -136,6 +136,7 @@ module "file_format_v2" {
   timeout_seconds      = 300
   storage_size         = 2560
   memory_size          = 2560
+  policies = {
     "TDRFileFormatV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_only_policy.json.tpl", {
       function_name   = local.file_format_v2_function_name,
       account_id      = data.aws_caller_identity.current.account_id,
