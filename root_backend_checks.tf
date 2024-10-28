@@ -219,8 +219,8 @@ module "statuses" {
   tags                 = local.common_tags
   function_name        = local.statuses_function_name
   handler              = "uk.gov.nationalarchives.Lambda::run"
-  reserved_concurrency = -1
-  timeout_seconds      = 30
+  reserved_concurrency = local.default_lambda_reserved_concurrency
+  timeout_seconds      = local.statuses_lambda_timeout_seconds
   policies = {
     "TDRStatusesLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/allow_iam_db_auth.json.tpl", {
       function_name  = local.statuses_function_name,
@@ -252,10 +252,10 @@ module "yara_av_v2" {
   tags                 = local.common_tags
   function_name        = local.yara_av_v2_function_name
   handler              = "matcher.matcher_lambda_handler"
-  reserved_concurrency = -1
-  timeout_seconds      = 300
-  storage_size         = 2560
-  memory_size          = 2560
+  reserved_concurrency = local.default_lambda_reserved_concurrency
+  timeout_seconds      = local.yara_av_v2_lambda_timeout_seconds
+  storage_size         = local.yara_av_v2_lambda_storage_size
+  memory_size          = local.yara_av_v2_lambda_memory_size
   policies = {
     "TDRYaraAVV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_av_policy.json.tpl", {
       function_name     = local.yara_av_v2_function_name,
