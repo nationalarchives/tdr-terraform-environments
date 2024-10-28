@@ -84,7 +84,7 @@ module "consignment_export_ecs_task" {
       auth_url                   = local.keycloak_auth_url
       region                     = local.region
       download_files_batch_size  = 40
-      download_batch_delay_ms    = 10
+      download_batch_delay_ms    = local.consignment_export_ecs_task_download_batch_delay_ms
   })
   container_name   = "consignmentexport"
   cpu              = 1024
