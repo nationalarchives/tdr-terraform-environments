@@ -1,7 +1,17 @@
 {
   "Comment": "Run antivirus checks on metadata, write error file to s3 and update status if virus found, else trigger metadata validation",
-  "StartAt": "RunAntivirusLambda",
+  "StartAt": "SplitDate",
   "States": {
+    "SplitDate": {
+      "Type": "Pass",
+      "ResultPath": "$.splitDate",
+      "Parameters": {
+        "YYYY.$": "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'), 0), '-'), 0)",
+        "MM.$": "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'),0), '-'), 1)",
+        "DD.$": "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'),0), '-'), 2)"
+      },
+      "Next": "RunAntivirusLambda"
+    },
     "RunAntivirusLambda": {
       "Type": "Task",
       "Resource": "${antivirus_lambda_arn}",
@@ -17,29 +27,14 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Variable": "$.output.antivirus.result",
-          "StringEquals": "",
-          "Next": "RunValidateMetadataLambda"
-        },
-        {
           "Not": {
             "Variable": "$.output.antivirus.result",
             "StringEquals": ""
           },
-          "Next": "SplitDate"
+          "Next": "WriteVirusDetectedJsonToS3"
         }
       ],
       "Default": "RunValidateMetadataLambda"
-    },
-    "SplitDate": {
-      "Type": "Pass",
-      "ResultPath": "$.splitDate",
-      "Parameters": {
-        "YYYY.$": "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'), 0), '-'), 0)",
-        "MM.$": "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'),0), '-'), 1)",
-        "DD.$": "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'),0), '-'), 2)"
-      },
-      "Next": "WriteVirusDetectedJsonToS3"
     },
     "WriteVirusDetectedJsonToS3": {
       "Type": "Task",
@@ -69,9 +64,9 @@
         },
         "ContentType": "application/json"
       },
-      "Next": "PrepareVirusDetectedQueryParams"
+      "Next": "PrepareStatusCompletedWithIssuesParameters"
     },
-    "PrepareVirusDetectedQueryParams": {
+    "PrepareStatusCompletedWithIssuesParameters": {
       "Type": "Pass",
       "ResultPath": "$.statusUpdate",
       "Parameters": {
@@ -108,7 +103,52 @@
       "Parameters": {
         "consignmentId.$": "$.consignmentId"
       },
-      "End": true
+      "ResultPath": "$.validatorLambdaResult",
+      "Next": "CheckValidatorLambdaResult"
+    },
+    "CheckValidatorLambdaResult": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.validatorLambdaResult.statusCode",
+          "NumericEquals": 500,
+          "Next": "WriteUnknownErrorJsonToS3"
+        }
+      ],
+      "Default": "EndState"
+    },
+    "WriteUnknownErrorJsonToS3": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:putObject",
+      "ResultPath": "$.s3PutObjectResult",
+      "Parameters": {
+        "Bucket": "${draft_metadata_bucket}",
+        "Key.$": "States.Format('{}/draft-metadata-errors.json', $.consignmentId)",
+        "Body": {
+          "consignmentId.$": "$.consignmentId",
+          "date.$": "States.Format('{}-{}-{}',$.splitDate.YYYY,$.splitDate.MM, $.splitDate.DD)",
+          "fileError": "UNKNOWN",
+          "validationErrors": [
+            {
+              "assetId.$": "$.fileName",
+              "errors": [
+                {
+                  "validationProcess": "LAMBDA",
+                  "property": "lambda_validation",
+                  "errorKey": "unexpected_error",
+                  "message.$": "$.validatorLambdaResult.body"
+                }
+              ],
+              "data": []
+            }
+          ]
+        },
+        "ContentType": "application/json"
+      },
+      "Next": "PrepareStatusCompletedWithIssuesParameters"
+    },
+    "EndState": {
+      "Type": "Succeed"
     }
   }
 }
