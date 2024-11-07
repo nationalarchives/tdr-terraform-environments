@@ -27,6 +27,15 @@
         "kms:Decrypt"
       ],
       "Resource": "${kms_key_arn}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sns:Publish"
+      ],
+      "Resource": [
+        "arn:aws:sns:eu-west-2:${account_id}:tdr-notifications-${environment}"
+      ]
     }
   ]
 }

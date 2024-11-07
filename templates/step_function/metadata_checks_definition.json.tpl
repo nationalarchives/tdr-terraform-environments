@@ -149,6 +149,15 @@
     },
     "EndState": {
       "Type": "Succeed"
+    },
+    "SendSNSMessage": {
+      "Type": "Task",
+       "Resource": "arn:aws:states:::sns:publish",
+       "Parameters": {
+          "TopicArn": "arn:aws:sns:eu-west-2:${account_id}:tdr-notifications-${environment}",
+          "Message": "Your custom message for Slack"
+       },
+       "End": true
     }
   }
 }
