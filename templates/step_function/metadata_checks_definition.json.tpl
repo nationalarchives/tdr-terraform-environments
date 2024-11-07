@@ -112,10 +112,24 @@
         {
           "Variable": "$.validatorLambdaResult.statusCode",
           "NumericEquals": 500,
-          "Next": "WriteUnknownErrorJsonToS3"
+          "Next": "SendSNSErrorMessage"
         }
       ],
       "Default": "EndState"
+    },
+    "SendSNSErrorMessage": {
+      "Type": "Task",
+        "Resource": "arn:aws:states:::sns:publish",
+         "Parameters": {
+         "TopicArn": "arn:aws:sns:eu-west-2:${account_id}:tdr-notifications-${environment}",
+         "Message": "{
+           \"consignmentId\" : \"$.consignmentId\",
+           \"environment\"   : \"${environment}\",
+           \"error\"         : \"Unexpected error in draft metadata validation\",
+           \"cause\"         : \"$.validatorLambdaResult.body\"
+         }"
+       },
+      "Next": "WriteUnknownErrorJsonToS3"
     },
     "WriteUnknownErrorJsonToS3": {
       "Type": "Task",
@@ -149,15 +163,6 @@
     },
     "EndState": {
       "Type": "Succeed"
-    },
-    "SendSNSMessage": {
-      "Type": "Task",
-       "Resource": "arn:aws:states:::sns:publish",
-       "Parameters": {
-          "TopicArn": "arn:aws:sns:eu-west-2:${account_id}:tdr-notifications-${environment}",
-          "Message": "Your custom message for Slack"
-       },
-       "End": true
     }
   }
 }
