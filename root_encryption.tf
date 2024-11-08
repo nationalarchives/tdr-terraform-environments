@@ -70,7 +70,8 @@ module "s3_upload_kms_key" {
       module.yara_av_v2.lambda_role_arn,
       module.file_upload_data.lambda_role_arn,
       module.file_format_v2.lambda_role_arn,
-      module.checksum_v2.lambda_role_arn
+      module.checksum_v2.lambda_role_arn,
+      module.aws_guard_duty_s3_malware_scan_role.role_arn
     ], local.aws_sso_internal_bucket_access_roles)
     ci_roles = [local.assume_role]
     service_details = [

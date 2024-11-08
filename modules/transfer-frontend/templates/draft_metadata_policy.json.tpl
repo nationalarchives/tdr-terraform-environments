@@ -11,8 +11,10 @@
     },
     {
       "Action": [
+        "S3:GetObject",
+        "s3:GetObjectTagging",
         "s3:PutObject",
-        "S3:GetObject"
+        "s3:PutObjectTagging"
       ],
       "Effect": "Allow",
       "Resource": [
