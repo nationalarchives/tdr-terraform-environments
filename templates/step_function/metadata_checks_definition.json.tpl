@@ -125,8 +125,8 @@
          "Message": "{
            \"consignmentId\" : \"$.consignmentId\",
            \"environment\"   : \"${environment}\",
-           \"metaDataError\" : \"Unexpected error in draft metadata validation\",
-           \"cause\"         : \"$.validatorLambdaResult.body\"
+           \"metaDataError\" : \"An unknown error has been triggered\",
+           \"cause\"         : \"Metadata validation lambda: $.validatorLambdaResult.body\"
          }"
        },
       "Next": "WriteUnknownErrorJsonToS3"
