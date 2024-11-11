@@ -113,14 +113,27 @@
     },
     "CheckValidatorLambdaResult": {
       "Type": "Choice",
-      "Choices": [
-        {
-          "Variable": "$.validatorLambdaResult.statusCode",
-          "NumericEquals": 500,
-          "Next": "SendSNSErrorMessage"
-        }
-      ],
-      "Default": "EndState"
+     "Choices": [
+       {
+         "And": [
+           {
+             "Variable": "$.validatorLambdaResult.statusCode",
+             "NumericEquals": 500
+           },
+           {
+             "Variable": "$.environment",
+             "StringEquals": "prod"
+           }
+         ],
+         "Next": "SendSNSErrorMessage"
+       },
+       {
+         "Variable": "$.validatorLambdaResult.statusCode",
+         "NumericEquals": 500,
+         "Next": "WriteUnknownErrorJsonToS3"
+       }
+     ],
+     "Default": "EndState"
     },
     "SendSNSErrorMessage": {
       "Type": "Task",

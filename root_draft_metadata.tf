@@ -103,6 +103,8 @@ resource "aws_iam_policy" "draft_metadata_checks_policy" {
     ]),
     draft_metadata_bucket = local.draft_metadata_s3_bucket_name
     kms_key_arn           = module.s3_internal_kms_key.kms_key_arn
+    account_id            = data.aws_caller_identity.current.account_id,
+    environment           = local.environment
   })
 }
 
@@ -127,6 +129,8 @@ module "draft_metadata_checks" {
     consignment_api_connection_arn = aws_cloudwatch_event_connection.consignment_api_connection.arn,
     validator_lambda_arn           = module.draft_metadata_validator_lambda.lambda_arn,
     draft_metadata_bucket          = local.draft_metadata_s3_bucket_name
+    environment                    = local.environment
+    account_id                     = data.aws_caller_identity.current.account_id
   })
   step_function_role_policy_attachments = {
     "lambda-policy" : aws_iam_policy.draft_metadata_checks_policy.arn,
