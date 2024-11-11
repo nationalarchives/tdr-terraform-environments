@@ -125,7 +125,7 @@
          "Message": "{
            \"consignmentId\" : \"$.consignmentId\",
            \"environment\"   : \"${environment}\",
-           \"error\"         : \"Unexpected error in draft metadata validation\",
+           \"metaDataError\" : \"Unexpected error in draft metadata validation\",
            \"cause\"         : \"$.validatorLambdaResult.body\"
          }"
        },
