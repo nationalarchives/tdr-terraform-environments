@@ -27,6 +27,11 @@
       "Type": "Choice",
       "Choices": [
         {
+          "Variable": "$.output.antivirus.result",
+          "StringEquals": "",
+          "Next": "RunValidateMetadataLambda"
+        },
+        {
           "Not": {
             "Variable": "$.output.antivirus.result",
             "StringEquals": ""
