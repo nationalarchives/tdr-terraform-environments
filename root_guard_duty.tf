@@ -28,10 +28,11 @@ module "aws_guard_duty_s3_malware_scan_policy" {
   name   = "TDRGuardDutyS3MalwareScanPolicy${title(local.environment)}"
   tags   = local.common_tags
   policy_string = templatefile("./templates/iam_policy/guard_duty_s3_malware_scan_policy.json.tpl", {
-    account_id                = data.aws_caller_identity.current.account_id,
+    account_id                 = data.aws_caller_identity.current.account_id,
     bucket_encryption_key_arns = [module.s3_upload_kms_key.kms_key_arn, module.s3_internal_kms_key.kms_key_arn]
-    enabled_bucket_arns = [for bucket_name in local.malware_scan_bucket_enabled_names: "arn:aws:s3:::${bucket_name}"]
-    malware_validation_objects = [for bucket_name in local.malware_scan_bucket_enabled_names:
+    enabled_bucket_arns        = [for bucket_name in local.malware_scan_bucket_enabled_names : "arn:aws:s3:::${bucket_name}"]
+    enabled_bucket_object_arns = [for bucket_name in local.malware_scan_bucket_enabled_names : "arn:aws:s3:::${bucket_name}/*"]
+    malware_validation_objects = [for bucket_name in local.malware_scan_bucket_enabled_names :
       "arn:aws:s3:::${bucket_name}/malware-protection-resource-validation-object"
     ]
   })
