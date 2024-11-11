@@ -1,11 +1,14 @@
 # Note: currently cannot define the s3 malware scan rules as using an out of date AWS provider version.
 # To implement the s3 malware scan rules do the following steps:
 # 1. Run this Terraform
-# 2. In the AWS console add the Guard Duty malware scan protection to the TDR dirty bucket
+# 2. In the AWS console add the Guard Duty malware scan protection to the TDR dirty buckets
 # 3. In the options to set up the malware scan, for the role, use the created role in this Terraform: TDRGuardDutyS3MalwareScanRole{environment}
 
 locals {
-  dirty_bucket_name = module.upload_file_cloudfront_dirty_s3.s3_bucket_name
+  malware_scan_bucket_enabled_names = [
+    module.upload_file_cloudfront_dirty_s3.s3_bucket_name,
+    module.draft_metadata_bucket.s3_bucket_name
+  ]
 }
 
 module "aws_guard_duty_s3_malware_scan_role" {
@@ -26,15 +29,18 @@ module "aws_guard_duty_s3_malware_scan_policy" {
   tags   = local.common_tags
   policy_string = templatefile("./templates/iam_policy/guard_duty_s3_malware_scan_policy.json.tpl", {
     account_id                = data.aws_caller_identity.current.account_id,
-    bucket_name               = local.dirty_bucket_name
-    bucket_encryption_key_arn = module.s3_upload_kms_key.kms_key_arn
+    bucket_encryption_key_arns = [module.s3_upload_kms_key.kms_key_arn, module.s3_internal_kms_key.kms_key_arn]
+    enabled_bucket_arns = [for bucket_name in local.malware_scan_bucket_enabled_names: "arn:aws:s3:::${bucket_name}"]
+    malware_validation_objects = [for bucket_name in local.malware_scan_bucket_enabled_names:
+      "arn:aws:s3:::${bucket_name}/malware-protection-resource-validation-object"
+    ]
   })
 }
 
 module "aws_guard_duty_s3_malware_scan_threat_found_event" {
   source = "./da-terraform-modules/cloudwatch_events"
   event_pattern = templatefile("${path.module}/templates/guard_duty/guard_duty_s3_malware_scan_pattern.json.tpl", {
-    bucket_name = local.dirty_bucket_name
+    bucket_names = local.malware_scan_bucket_enabled_names
   })
   sns_topic_event_target_arn = module.notifications_topic.sns_arn
   rule_name                  = "guard-duty-s3-malware-threat-found"
