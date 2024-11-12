@@ -104,7 +104,7 @@ resource "aws_iam_policy" "draft_metadata_checks_policy" {
     draft_metadata_bucket = local.draft_metadata_s3_bucket_name
     kms_key_arn           = module.s3_internal_kms_key.kms_key_arn
     sns_key_arn           = module.encryption_key.kms_key_arn
-    account_id            = data.aws_caller_identity.current.account_id,
+    account_id            = data.aws_caller_identity.current.account_id
     environment           = local.environment
   })
 }

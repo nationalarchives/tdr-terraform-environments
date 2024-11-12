@@ -30,7 +30,7 @@
       ],
       "Resource": [
         "${kms_key_arn}",
-        "${sns_key_arn}
+        "${sns_key_arn}"
       ]
     },
     {
