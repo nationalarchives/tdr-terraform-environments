@@ -106,16 +106,14 @@
     },
     "CheckValidatorLambdaResult": {
       "Type": "Choice",
-     "Choices": [
-       {
-          {
-             "Variable": "$.validatorLambdaResult.statusCode",
-             "NumericEquals": 500
-           }
-         "Next": "SendSNSErrorMessage"
-       }
-     ],
-     "Default": "EndState"
+      "Choices": [
+        {
+          "Variable": "$.validatorLambdaResult.statusCode",
+          "NumericEquals": 500,
+          "Next": "SendSNSErrorMessage"
+        }
+      ],
+      "Default": "EndState"
     },
     "SendSNSErrorMessage": {
       "Type": "Task",

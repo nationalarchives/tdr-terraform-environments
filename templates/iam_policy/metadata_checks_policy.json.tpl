@@ -29,8 +29,8 @@
         "kms:Decrypt"
       ],
       "Resource": [
-        "${kms_key_arn}",
-        "${sns_key_arn}"
+        "${s3_kms_key_arn}",
+        "${sns_kms_key_arn}"
       ]
     },
     {
