@@ -148,6 +148,9 @@ module "transfer_service_ecs_task" {
       auth_url                    = local.keycloak_auth_url
       consignment_api_url         = module.consignment_api.api_url
       transfer_service_api_port   = "8080"
+      max_number_records          = 3000
+      max_individual_file_size_mb = 2000
+      max_transfer_size_mb        = 5000
   })
   container_name               = "transfer-service"
   cpu                          = 512
