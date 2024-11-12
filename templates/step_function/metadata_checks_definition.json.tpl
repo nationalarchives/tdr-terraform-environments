@@ -32,7 +32,22 @@
           "Next": "RunValidateMetadataLambda"
         }
       ],
-      "Default": "WriteVirusDetectedJsonToS3"
+      "Default": "SendSNSVirusMessage"
+    },
+    "SendSNSVirusMessage": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn": "arn:aws:sns:eu-west-2:${account_id}:tdr-notifications-${environment}",
+        "Message": {
+          "consignmentId.$": "$.consignmentId",
+          "environment": "${environment}",
+          "metaDataError": "Virus found in metadata file",
+          "cause.$": "$.output.antivirus.result"
+        }
+      },
+      "Next": "WriteVirusDetectedJsonToS3",
+      "ResultPath": null
     },
     "WriteVirusDetectedJsonToS3": {
       "Type": "Task",
@@ -117,16 +132,16 @@
     },
     "SendSNSErrorMessage": {
       "Type": "Task",
-        "Resource": "arn:aws:states:::sns:publish",
-         "Parameters": {
-         "TopicArn": "arn:aws:sns:eu-west-2:${account_id}:tdr-notifications-${environment}",
-         "Message": {
-           "consignmentId.$" : "$.consignmentId",
-           "environment"   : "${environment}",
-           "metaDataError" : "An unknown error has been triggered",
-           "cause.$"         : "States.Format('Metadata validation lambda: {}',$.validatorLambdaResult.body)"
-         }
-       },
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn": "arn:aws:sns:eu-west-2:${account_id}:tdr-notifications-${environment}",
+        "Message": {
+          "consignmentId.$": "$.consignmentId",
+          "environment": "${environment}",
+          "metaDataError": "An unknown error has been triggered",
+          "cause.$": "States.Format('Metadata validation lambda: {}',$.validatorLambdaResult.body)"
+        }
+      },
       "Next": "WriteUnknownErrorJsonToS3",
       "ResultPath": null
     },
