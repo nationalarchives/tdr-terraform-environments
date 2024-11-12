@@ -28,7 +28,10 @@
         "kms:GenerateDataKey",
         "kms:Decrypt"
       ],
-      "Resource": "${kms_key_arn}"
+      "Resource": [
+        "${kms_key_arn}",
+        "${sns_key_arn}
+      ]
     },
     {
       "Effect": "Allow",

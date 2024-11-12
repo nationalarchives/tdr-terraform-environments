@@ -30,16 +30,9 @@
           "Variable": "$.output.antivirus.result",
           "StringEquals": "",
           "Next": "RunValidateMetadataLambda"
-        },
-        {
-          "Not": {
-            "Variable": "$.output.antivirus.result",
-            "StringEquals": ""
-          },
-          "Next": "WriteVirusDetectedJsonToS3"
         }
       ],
-      "Default": "RunValidateMetadataLambda"
+      "Default": "WriteVirusDetectedJsonToS3"
     },
     "WriteVirusDetectedJsonToS3": {
       "Type": "Task",
@@ -115,22 +108,11 @@
       "Type": "Choice",
      "Choices": [
        {
-         "And": [
-           {
+          {
              "Variable": "$.validatorLambdaResult.statusCode",
              "NumericEquals": 500
-           },
-           {
-             "Variable": "$.environment",
-             "StringEquals": "prod"
            }
-         ],
          "Next": "SendSNSErrorMessage"
-       },
-       {
-         "Variable": "$.validatorLambdaResult.statusCode",
-         "NumericEquals": 500,
-         "Next": "WriteUnknownErrorJsonToS3"
        }
      ],
      "Default": "EndState"
@@ -140,14 +122,15 @@
         "Resource": "arn:aws:states:::sns:publish",
          "Parameters": {
          "TopicArn": "arn:aws:sns:eu-west-2:${account_id}:tdr-notifications-${environment}",
-         "Message": "{
-           \"consignmentId\" : \"$.consignmentId\",
-           \"environment\"   : \"${environment}\",
-           \"metaDataError\" : \"An unknown error has been triggered\",
-           \"cause\"         : \"Metadata validation lambda: $.validatorLambdaResult.body\"
-         }"
+         "Message": {
+           "consignmentId.$" : "$.consignmentId",
+           "environment"   : "${environment}",
+           "metaDataError" : "An unknown error has been triggered",
+           "cause.$"         : "States.Format('Metadata validation lambda: {}',$.validatorLambdaResult.body)"
+         }
        },
-      "Next": "WriteUnknownErrorJsonToS3"
+      "Next": "WriteUnknownErrorJsonToS3",
+      "ResultPath": null
     },
     "WriteUnknownErrorJsonToS3": {
       "Type": "Task",
