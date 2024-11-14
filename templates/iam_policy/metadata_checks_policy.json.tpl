@@ -28,7 +28,19 @@
         "kms:GenerateDataKey",
         "kms:Decrypt"
       ],
-      "Resource": "${kms_key_arn}"
+      "Resource": [
+        "${s3_kms_key_arn}",
+        "${sns_kms_key_arn}"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sns:Publish"
+      ],
+      "Resource": [
+        "arn:aws:sns:eu-west-2:${account_id}:tdr-notifications-${environment}"
+      ]
     }
   ]
 }
