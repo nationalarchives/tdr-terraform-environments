@@ -3,7 +3,12 @@
     "name": "transfer-service",
     "image": "${app_image}",
     "networkMode": "awsvpc",
-    "secrets": [],
+    "secrets": [
+      {
+        "name": "TRANSFER_SERVICE_CLIENT_SECRET",
+        "valueFrom": "${transfer_service_client_secret_path}"
+      }
+    ],
     "environment": [
        {
          "name": "AWS_REGION",
