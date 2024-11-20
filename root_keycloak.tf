@@ -92,7 +92,7 @@ module "keycloak_database_security_group" {
   common_tags = local.common_tags
   ingress_security_group_rules = [
     { port = 5432, security_group_id = module.keycloak_ecs_security_group.security_group_id, description = "Allow Postgres port from the ECS task" },
-    { port = 5432, security_group_id = module.create_keycloak_db_users_lambda_new.create_keycloak_user_lambda_security_group_new[0], description = "Allow Postgres port from the create user lambda" }
+    { port = 5432, security_group_id = module.create_keycloak_db_users_lambda_new.create_users_lambda_security_group_id[0], description = "Allow Postgres port from the create user lambda" }
   ]
   egress_security_group_rules = [{ port = 5432, security_group_id = module.keycloak_ecs_security_group.security_group_id, description = "Allow Postgres port from the ECS task", protocol = "-1" }]
 }
@@ -176,18 +176,20 @@ module "keycloak_database_instance" {
 }
 
 module "create_keycloak_db_users_lambda_new" {
-  source                              = "./tdr-terraform-modules/lambda"
-  project                             = var.project
-  common_tags                         = local.common_tags
-  lambda_create_keycloak_db_users_new = true
-  vpc_id                              = module.shared_vpc.vpc_id
-  private_subnet_ids                  = module.shared_vpc.private_subnets
-  db_admin_user                       = module.keycloak_database_instance.database_user
-  db_admin_password                   = module.keycloak_database_instance.database_password
-  db_url                              = module.keycloak_database_instance.database_url
-  kms_key_arn                         = module.encryption_key.kms_key_arn
-  keycloak_password                   = module.keycloak_ssm_parameters.params[local.keycloak_user_password_name].value
-  keycloak_database_security_group    = module.keycloak_database_security_group.security_group_id
+  source                  = "./tdr-terraform-modules/lambda"
+  project                 = var.project
+  common_tags             = local.common_tags
+  lambda_create_db_users  = true
+  database_name           = "keycloak"
+  lambda_name             = "create-keycloak-user"
+  vpc_id                  = module.shared_vpc.vpc_id
+  private_subnet_ids      = module.shared_vpc.private_subnets
+  db_admin_user           = module.keycloak_database_instance.database_user
+  db_admin_password       = module.keycloak_database_instance.database_password
+  db_url                  = module.keycloak_database_instance.database_url
+  kms_key_arn             = module.encryption_key.kms_key_arn
+  keycloak_password       = module.keycloak_ssm_parameters.params[local.keycloak_user_password_name].value
+  database_security_group = module.keycloak_database_security_group.security_group_id
 }
 
 module "keycloak_route53" {
