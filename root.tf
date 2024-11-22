@@ -66,6 +66,7 @@ module "consignment_api" {
   da_reference_generator_url     = local.da_reference_generator_url
   da_reference_generator_limit   = local.da_reference_generator_limit
   aws_guardduty_ecr_arn          = local.aws_guardduty_ecr_arn
+  akka_licence_token_name        = local.akka_licence_token_name
 }
 
 module "frontend" {

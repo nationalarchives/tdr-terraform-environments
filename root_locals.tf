@@ -42,7 +42,9 @@ locals {
 
   local_dev_frontend_url = "http://localhost:9000"
 
-  upload_cors_urls = local.environment == "intg" ? [module.frontend.frontend_url, local.local_dev_frontend_url] : [module.frontend.frontend_url]
+  sharepoint_domain = "https://*.sharepoint.com"
+
+  upload_cors_urls = local.environment == "intg" ? [module.frontend.frontend_url, local.local_dev_frontend_url, local.sharepoint_domain] : [module.frontend.frontend_url, local.sharepoint_domain]
 
   file_check_lambda_timeouts_in_seconds = {
     "antivirus"      = 180,
@@ -63,6 +65,8 @@ locals {
   user_session_timeout_mins = 120
 
   keycloak_auth_url = "https://auth.${local.dns_zone_name_trimmed}"
+
+  akka_licence_token_name = "/${local.environment}/akka/licence_token"
 
   keycloak_backend_checks_secret_name        = "/${local.environment}/keycloak/backend_checks_client/secret"
   keycloak_tdr_client_secret_name            = "/${local.environment}/keycloak/client/secret"
@@ -137,8 +141,8 @@ locals {
   //feature access blocks
   block_shared_keycloak_pages   = local.environment == "intg" ? false : true
   block_draft_metadata_upload   = local.environment == "prod" ? true : false
-  block_metadata_review         = local.environment == "prod" ? true : false
-  block_skip_metadata_review    = local.environment == "prod" ? true : false
+  block_metadata_review         = false
+  block_skip_metadata_review    = false
   draft_metadata_s3_bucket_name = "${var.project}-draft-metadata-${local.environment}"
 
   flat_format_bucket_name          = "tdr-export-${local.environment}"
