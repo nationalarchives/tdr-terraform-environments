@@ -48,7 +48,9 @@ module "s3_internal_kms_key" {
       module.file_upload_data.lambda_role_arn,
       module.consignment_export_task_role.role.arn,
       module.draft_metadata_validator_lambda.lambda_role_arn,
-      module.frontend.task_role_arn
+      module.frontend.task_role_arn,
+      module.draft_metadata_checks.step_function_role_arn,
+      module.aws_guard_duty_s3_malware_scan_role.role_arn
     ], local.aws_sso_internal_bucket_access_roles, local.e2e_testing_role_arns)
     ci_roles = [local.assume_role]
     service_details = [
@@ -69,7 +71,8 @@ module "s3_upload_kms_key" {
       module.yara_av_v2.lambda_role_arn,
       module.file_upload_data.lambda_role_arn,
       module.file_format_v2.lambda_role_arn,
-      module.checksum_v2.lambda_role_arn
+      module.checksum_v2.lambda_role_arn,
+      module.aws_guard_duty_s3_malware_scan_role.role_arn
     ], local.aws_sso_internal_bucket_access_roles)
     ci_roles = [local.assume_role]
     service_details = [

@@ -22,8 +22,10 @@
       "Effect": "Allow",
       "Action": [
         "s3:GetObject",
+        "s3:GetObjectTagging",
         "s3:ListBucket",
         "s3:PutObject",
+        "s3:PutObjectTagging",
         "states:StartExecution"
       ],
       "Resource": [
