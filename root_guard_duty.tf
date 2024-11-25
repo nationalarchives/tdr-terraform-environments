@@ -6,12 +6,12 @@ locals {
 }
 
 resource "aws_guardduty_malware_protection_plan" "guard_duty_s3_malware_scan" {
-  for_each = { for bucket in local.malware_scan_bucket_enabled : bucket.s3_bucket_arn => bucket }
+  for_each = { for bucket in local.malware_scan_bucket_enabled : bucket.s3_bucket_id => bucket.s3_bucket_id }
   role     = module.aws_guard_duty_s3_malware_scan_role.role_arn
 
   protected_resource {
     s3_bucket {
-      bucket_name = each.value.s3_bucket_id
+      bucket_name = each.value
     }
   }
 
