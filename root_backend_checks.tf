@@ -271,8 +271,10 @@ module "yara_av_v2" {
   role_name = "TDRYaraAVV2LambdaRole${title(local.environment)}"
   runtime   = local.runtime_python_3_9
   plaintext_env_vars = {
-    ENVIRONMENT    = local.environment
-    ROOT_DIRECTORY = local.tmp_directory
+    ENVIRONMENT             = local.environment
+    ROOT_DIRECTORY          = local.tmp_directory
+    DELETE_OBJECT_TAG_KEY   = local.delete_object_tag_key
+    DELETE_OBJECT_TAG_VALUE = local.delete_object_tag_value
   }
   vpc_config = [
     {
