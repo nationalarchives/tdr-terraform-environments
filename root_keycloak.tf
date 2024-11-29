@@ -1,5 +1,5 @@
 locals {
-   app_port = 8080
+  app_port = 8080
 }
 
 module "keycloak_cloudwatch" {
