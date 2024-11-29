@@ -1,3 +1,7 @@
+locals {
+   app_port = 8080
+}
+
 module "keycloak_cloudwatch" {
   source      = "./tdr-terraform-modules/cloudwatch_logs"
   common_tags = local.common_tags
@@ -104,7 +108,7 @@ module "tdr_keycloak_ecs" {
   common_tags          = local.common_tags
   container_definition = templatefile("${path.module}/templates/ecs_tasks/keycloak.json.tpl", {
     app_image                         = "${local.ecr_account_number}.dkr.ecr.eu-west-2.amazonaws.com/auth-server:${local.environment}"
-    app_port                          = 8080
+    app_port                          = local.app_port
     app_environment                   = local.environment
     aws_region                        = local.region
     url_path                          = local.keycloak_db_url
@@ -122,7 +126,7 @@ module "tdr_keycloak_ecs" {
     reporting_client_secret_path      = local.keycloak_reporting_client_secret_name
     rotate_client_secrets_client_path = local.keycloak_rotate_secrets_client_secret_name
     sns_topic_arn                     = module.notifications_topic.sns_arn
-    keycloak_host                     = "auth.${local.environment_domain}"
+    keycloak_host                     = "https://auth.${local.environment_domain}:${local.app_port}"
     block_shared_pages                = local.block_shared_keycloak_pages
   })
   container_name               = "keycloak"
