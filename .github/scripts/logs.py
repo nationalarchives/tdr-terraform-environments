@@ -6,7 +6,7 @@ import os
 
 client = boto3.client("logs")
 timestamp = int(time.time()) * 1000
-log_group_name = f"terraform-plan-outputs-{sys.argv[3]}"
+log_group_name = sys.argv[3]
 log_stream_name = sys.argv[2]
 
 with open(sys.argv[1]) as file:
