@@ -18,11 +18,12 @@ def split_message(s, length):
 log_event = []
 with open(sys.argv[1]) as file:
     message = file.read()
-    if len(message.encode("utf-8")) > 262144:
-        for chunk in split_message(message, 262100):
+    main_message = message.split("::debug::stdout:")[0]
+    if len(main_message.encode("utf-8")) > 262144:
+        for chunk in split_message(main_message, 262100):
             log_event.append({'timestamp': timestamp, 'message': chunk})
     else:
-        log_event = [{'timestamp': timestamp, 'message': message}]
+        log_event = [{'timestamp': timestamp, 'message': main_message}]
 
 client.create_log_stream(logGroupName=log_group_name, logStreamName=log_stream_name)
 response = client.put_log_events(logGroupName=log_group_name,
