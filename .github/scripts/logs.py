@@ -19,7 +19,7 @@ log_event = []
 with open(sys.argv[1]) as file:
     message = file.read()
     if len(message.encode("utf-8")) > 262144:
-        for chunk in split_message(message, 262140):
+        for chunk in split_message(message, 262100):
             log_event.append({'timestamp': timestamp, 'message': chunk})
     else:
         log_event = [{'timestamp': timestamp, 'message': message}]
