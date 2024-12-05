@@ -9,14 +9,18 @@ timestamp = int(time.time()) * 1000
 log_group_name = sys.argv[3]
 log_stream_name = sys.argv[2]
 
+
+def split_message(s, length):
+    for i in range(0, len(s), length):
+        yield s[i:i + length]
+
+
+log_event = []
 with open(sys.argv[1]) as file:
     message = file.read()
     if len(message.encode("utf-8")) > 262144:
-        message_list = message.split("\n")
-        mid_point = len(message_list) // 2
-        first_half = "\n".join(message_list[0: mid_point])
-        second_half = "\n".join(message_list[mid_point:])
-        log_event = [{'timestamp': timestamp, 'message': first_half}, {'timestamp': timestamp, 'message': second_half}]
+        for chunk in split_message(message, 262140):
+            log_event.append({'timestamp': timestamp, 'message': chunk})
     else:
         log_event = [{'timestamp': timestamp, 'message': message}]
 
@@ -29,7 +33,6 @@ base_url = "https://eu-west-2.console.aws.amazon.com/cloudwatch/home"
 encoded_stream_name = quote_plus(quote_plus(log_stream_name))
 fragment = f"logsV2:log-groups/log-group/{log_group_name}/log-events/{encoded_stream_name}"
 url = f"{base_url}?region=eu-west-2#{fragment}"
-
 
 with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
     print(f"log-url={url}", file=fh)
