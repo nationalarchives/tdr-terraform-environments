@@ -67,7 +67,8 @@ module "keycloak_ecs_security_group" {
   vpc_id      = module.shared_vpc.vpc_id
   common_tags = local.common_tags
   ingress_security_group_rules = [
-    { port = 8080, security_group_id = module.keycloak_alb_security_group.security_group_id, description = "Allow the load balancer to access the task" }
+    { port = 8080, security_group_id = module.keycloak_alb_security_group.security_group_id, description = "Allow the load balancer to access the task" },
+    { port = 9000, security_group_id = module.keycloak_alb_security_group.security_group_id, description = "Allow the load balancer to access the task health endpoints" }
   ]
   egress_cidr_rules = [{ port = 0, cidr_blocks = ["0.0.0.0/0"], description = "Allow outbound access on all ports", protocol = "-1" }]
 }
@@ -146,6 +147,7 @@ module "keycloak_tdr_alb" {
   alb_log_bucket        = module.alb_logs_s3.s3_bucket_id
   alb_security_group_id = module.keycloak_alb_security_group.security_group_id
   alb_target_group_port = 8080
+  health_check_port     = 9000
   alb_target_type       = "ip"
   certificate_arn       = module.keycloak_certificate.certificate_arn
   health_check_matcher  = "200,303"
