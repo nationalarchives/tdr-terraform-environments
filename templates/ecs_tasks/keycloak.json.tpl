@@ -109,6 +109,10 @@
       {
         "containerPort": 8080,
         "hostPort": 8080
+      },
+      {
+        "containerPort": 9000,
+        "hostPort": 9000
       }
     ]
   }
