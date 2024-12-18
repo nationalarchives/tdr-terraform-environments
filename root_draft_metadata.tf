@@ -50,9 +50,8 @@ resource "aws_iam_role" "draft_metadata_api_gateway_execution_role" {
   assume_role_policy = templatefile("./templates/iam_policy/assume_role_policy.json.tpl", { service = "apigateway.amazonaws.com" })
 }
 
-resource "aws_iam_role_policy" "api_gateway_execution_policy" {
+resource "aws_iam_policy" "api_gateway_execution_policy" {
   name = "TDRMetadataChecksAPIGatewayStepFunctionExecutionPolicy${title(local.environment)}"
-  role = aws_iam_role.draft_metadata_api_gateway_execution_role.id
   policy = templatefile(
     "./templates/iam_policy/api_gateway_state_machine_policy.json.tpl",
     {
@@ -60,6 +59,11 @@ resource "aws_iam_role_policy" "api_gateway_execution_policy" {
       state_machine_arn = module.draft_metadata_checks.step_function_arn
     }
   )
+}
+
+resource "aws_iam_role_policy_attachment" "api_gateway_execution_policy" {
+  role       = aws_iam_role.draft_metadata_api_gateway_execution_role.name
+  policy_arn = aws_iam_policy.api_gateway_execution_policy.arn
 }
 
 module "draft_metadata_bucket" {
