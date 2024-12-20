@@ -144,7 +144,10 @@ module "upload_file_cloudfront_dirty_s3" {
   cloudfront_oai               = module.cloudfront_upload.cloudfront_oai_iam_arn
   cloudfront_distribution_arns = [module.cloudfront_upload.cloudfront_arn]
 }
-
+# This is the only module that uses the canonical user grants in the tdr-terraform-modules/s3 module
+# Grants are no longer the recommended way to grant access to a bucket, so the s3 module will use the canonical user grants id
+# in the bucket policy with permissions equivalent to 'FULL_CONTROL'
+# Tdr-terraform-modules/s3 module will be deprecated in the future.
 module "upload_file_cloudfront_logs" {
   source      = "./tdr-terraform-modules/s3"
   project     = var.project
