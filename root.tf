@@ -427,7 +427,7 @@ module "export_status_update_lambda" {
   api_url                           = "${module.consignment_api.api_url}/graphql"
   backend_checks_client_secret_path = local.keycloak_backend_checks_secret_name
 }
-// auth_url ??
+
 module "another_export_status_update_lambda" {
   source          = "./da-terraform-modules/lambda"
   function_name   = "tdr-export-status-update-${local.environment}"
@@ -443,15 +443,15 @@ module "another_export_status_update_lambda" {
   policies = {
     "TDRExportStatusUpdateLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/export_status_update_lambda.json.tpl", {
       account_id     = data.aws_caller_identity.current.account_id,
-      environment    = local.environment, kms_arn = var.kms_key_arn,
-      parameter_name = var.backend_checks_client_secret_path
+      environment    = local.environment,
+      parameter_name = local.keycloak_backend_checks_secret_name
     })
   }
 
   plaintext_env_vars = {
-    AUTH_URL           = var.auth_url
-    API_URL            = var.api_url
-    CLIENT_SECRET_PATH = var.backend_checks_client_secret_path
+    AUTH_URL           = local.keycloak_auth_url
+    API_URL            = "${module.consignment_api.api_url}/graphql"
+    CLIENT_SECRET_PATH = local.keycloak_backend_checks_secret_name
   }
 
 }
