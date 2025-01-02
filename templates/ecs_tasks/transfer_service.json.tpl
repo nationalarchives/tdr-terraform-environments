@@ -53,7 +53,15 @@
        {
          "name": "MAX_TRANSFER_SIZE_MB",
          "value": "${max_transfer_size_mb}"
-       }
+       },
+      {
+        "name": "THROTTLE_AMOUNT",
+        "value": "${throttle_amount}"
+      },
+      {
+        "name": "THROTTLE_PER_MS",
+        "value": "${throttle_per_ms}"
+      }
     ],
     "logConfiguration": {
       "logDriver": "awslogs",
