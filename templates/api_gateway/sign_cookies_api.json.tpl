@@ -22,9 +22,6 @@
               },
               "Access-Control-Allow-Credentials" : {
                 "type" : "string"
-              },
-              "Strict-Transport-Security" : {
-                "type" : "string"
               }
             }
           }
