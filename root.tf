@@ -427,6 +427,34 @@ module "export_status_update_lambda" {
   api_url                           = "${module.consignment_api.api_url}/graphql"
   backend_checks_client_secret_path = local.keycloak_backend_checks_secret_name
 }
+// auth_url ??
+module "another_export_status_update_lambda" {
+  source          = "./da-terraform-modules/lambda"
+  function_name   = "tdr-export-status-update-${local.environment}"
+  tags            = local.common_tags
+  use_image       = false
+
+  timeout_seconds = 60
+  memory_size     = 1024
+  runtime         = "java11"
+  handler         = "uk.gov.nationalarchives.exportstatusupdate.Lambda::handleRequest"
+
+
+  policies = {
+    "TDRExportStatusUpdateLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/export_status_update_lambda.json.tpl", {
+      account_id     = data.aws_caller_identity.current.account_id,
+      environment    = local.environment, kms_arn = var.kms_key_arn,
+      parameter_name = var.backend_checks_client_secret_path
+    })
+  }
+
+  plaintext_env_vars = {
+    AUTH_URL           = var.auth_url
+    API_URL            = var.api_url
+    CLIENT_SECRET_PATH = var.backend_checks_client_secret_path
+  }
+
+}
 
 module "reporting_lambda" {
   source                           = "./tdr-terraform-modules/lambda"
