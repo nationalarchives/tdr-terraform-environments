@@ -440,7 +440,7 @@ module "export_status_update_lambda" {
 
   vpc_config = {
     security_group_ids = [module.export_status_update_security_group.security_group_id]
-    subnet_ids = module.shared_vpc.private_backend_checks_subnets
+    subnet_ids         = module.shared_vpc.private_backend_checks_subnets
   }
 
   policies = {
@@ -465,8 +465,8 @@ module "export_status_update_security_group" {
   description = "Export Status Update Lambda Security Group"
   common_tags = local.common_tags
   egress_cidr_rules = [{
-    protocol = "tcp"
-    port = 443
+    protocol    = "tcp"
+    port        = 443
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow outbound tcp traffic on port 443"
   }]
