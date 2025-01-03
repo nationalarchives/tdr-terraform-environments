@@ -127,7 +127,7 @@ module "tdr_keycloak_ecs" {
     block_shared_pages                = local.block_shared_keycloak_pages
   })
   container_name               = "keycloak"
-  cpu                          = 1024
+  cpu                          = local.environment == "intg" ? 2048 : 1024
   environment                  = local.environment
   execution_role               = module.keycloak_execution_role.role.arn
   load_balancer_container_port = 8080
