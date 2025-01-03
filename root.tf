@@ -832,7 +832,7 @@ module "consignment_api_database" {
   availability_zone       = local.database_availability_zone
   common_tags             = local.common_tags
   database_name           = "consignmentapi"
-  database_version        = "14.12"
+  database_version        = "16.3"
   environment             = local.environment
   kms_key_id              = module.encryption_key.kms_key_arn
   private_subnets         = module.shared_vpc.private_subnets
