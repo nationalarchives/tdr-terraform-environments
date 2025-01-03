@@ -414,31 +414,34 @@ module "signed_cookies_lambda" {
   user_session_timeout_mins = local.user_session_timeout_mins
 }
 
-module "export_status_update_lambda" {
-  source                            = "./tdr-terraform-modules/lambda"
-  common_tags                       = local.common_tags
-  project                           = "tdr"
-  lambda_export_status_update       = true
-  auth_url                          = local.keycloak_auth_url
-  timeout_seconds                   = 60
-  private_subnet_ids                = module.shared_vpc.private_backend_checks_subnets
-  vpc_id                            = module.shared_vpc.vpc_id
-  environment_full                  = local.environment_full_name
-  api_url                           = "${module.consignment_api.api_url}/graphql"
-  backend_checks_client_secret_path = local.keycloak_backend_checks_secret_name
-}
+# module "export_status_update_lambda" {
+#   source                            = "./tdr-terraform-modules/lambda"
+#   common_tags                       = local.common_tags
+#   project                           = "tdr"
+#   lambda_export_status_update       = true
+#   auth_url                          = local.keycloak_auth_url
+#   timeout_seconds                   = 60
+#   private_subnet_ids                = module.shared_vpc.private_backend_checks_subnets
+#   vpc_id                            = module.shared_vpc.vpc_id
+#   environment_full                  = local.environment_full_name
+#   api_url                           = "${module.consignment_api.api_url}/graphql"
+#   backend_checks_client_secret_path = local.keycloak_backend_checks_secret_name
+# }
 
-module "another_export_status_update_lambda" {
+module "export_status_update_lambda" {
   source          = "./da-terraform-modules/lambda"
   function_name   = "tdr-export-status-update-${local.environment}"
   tags            = local.common_tags
   use_image       = false
-
   timeout_seconds = 60
   memory_size     = 1024
   runtime         = "java11"
   handler         = "uk.gov.nationalarchives.exportstatusupdate.Lambda::handleRequest"
 
+  vpc_config = {
+    security_group_ids = [module.export_status_update_security_group.security_group_id]
+    subnet_ids = module.shared_vpc.private_backend_checks_subnets
+  }
 
   policies = {
     "TDRExportStatusUpdateLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/export_status_update_lambda.json.tpl", {
@@ -453,7 +456,20 @@ module "another_export_status_update_lambda" {
     API_URL            = "${module.consignment_api.api_url}/graphql"
     CLIENT_SECRET_PATH = local.keycloak_backend_checks_secret_name
   }
+}
 
+module "export_status_update_security_group" {
+  source      = "./da-terraform-modules/security_group"
+  name        = "TDR-lambda-export_status_update"
+  vpc_id      = module.shared_vpc.vpc_id
+  description = "Export Status Update Lambda Security Group"
+  common_tags = local.common_tags
+  egress_cidr_rules = [{
+    protocol = "tcp"
+    port = 443
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow outbound tcp traffic on port 443"
+  }]
 }
 
 module "reporting_lambda" {
