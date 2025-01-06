@@ -127,11 +127,11 @@ module "tdr_keycloak_ecs" {
     block_shared_pages                = local.block_shared_keycloak_pages
   })
   container_name               = "keycloak"
-  cpu                          = 1024
+  cpu                          = local.environment == "intg" ? 2048 : 1024
   environment                  = local.environment
   execution_role               = module.keycloak_execution_role.role.arn
   load_balancer_container_port = 8080
-  memory                       = 3072
+  memory                       = local.environment == "intg" ? 4096 : 3072
   private_subnets              = module.shared_vpc.private_backend_checks_subnets
   security_groups              = [module.keycloak_ecs_security_group.security_group_id]
   service_name                 = "keycloak_service_${local.environment}"
