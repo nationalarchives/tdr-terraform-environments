@@ -60,6 +60,8 @@ locals {
 
   ip_allowlist = concat(local.developer_ip_list, local.trusted_ip_list)
 
+  ip_blocked_list = "10.120.2.120"
+
   ecr_account_number = local.environment == "sbox" ? data.aws_caller_identity.current.account_id : data.aws_ssm_parameter.mgmt_account_number.value
 
   user_session_timeout_mins = 120

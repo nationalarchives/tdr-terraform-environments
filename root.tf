@@ -276,8 +276,9 @@ module "waf" {
   common_tags       = local.common_tags
   alb_target_groups = [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn]
   trusted_ips       = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
+  blocked_ips       = local.ip_blocked_list
   geo_match         = split(",", var.geo_match)
-  restricted_uri    = "admin"
+  restricted_uri    = local.ip_blocked_list
   log_destinations  = [module.waf_cloudwatch.log_group_arn]
 }
 
