@@ -43,7 +43,7 @@
          "value": "${transfer_service_api_port}"
        },
        {
-        "name": " MAX_NUMBER_RECORDS",
+        "name": "MAX_NUMBER_RECORDS",
         "value": "${max_number_records}"
        },
        {
