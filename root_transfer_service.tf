@@ -152,6 +152,8 @@ module "transfer_service_ecs_task" {
       max_individual_file_size_mb         = 2000
       max_transfer_size_mb                = 5000
       transfer_service_client_secret_path = local.keycloak_tdr_transfer_service_secret_name
+      throttle_amount                     = 50
+      throttle_per_ms                     = 10
   })
   container_name               = "transfer-service"
   cpu                          = 512

@@ -43,7 +43,7 @@
          "value": "${transfer_service_api_port}"
        },
        {
-        "name": " MAX_NUMBER_RECORDS",
+        "name": "MAX_NUMBER_RECORDS",
         "value": "${max_number_records}"
        },
        {
@@ -53,7 +53,15 @@
        {
          "name": "MAX_TRANSFER_SIZE_MB",
          "value": "${max_transfer_size_mb}"
-       }
+       },
+      {
+        "name": "THROTTLE_AMOUNT",
+        "value": "${throttle_amount}"
+      },
+      {
+        "name": "THROTTLE_PER_MS",
+        "value": "${throttle_per_ms}"
+      }
     ],
     "logConfiguration": {
       "logDriver": "awslogs",
