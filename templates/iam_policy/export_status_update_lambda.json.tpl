@@ -13,15 +13,6 @@
       ]
     },
     {
-      "Effect": "Allow",
-      "Action": [
-        "ec2:CreateNetworkInterface",
-        "ec2:DeleteNetworkInterface",
-        "ec2:DescribeNetworkInterfaces"
-      ],
-      "Resource": "*"
-    },
-    {
     "Effect": "Allow",
     "Action": [
     "ssm:GetParameter"
