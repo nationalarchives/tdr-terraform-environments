@@ -15,7 +15,7 @@ module "consignment_export_cloudwatch" {
 
 module "consignment_export_execution_role" {
   source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./templates/iam_policy/ecs_assume_role_policy.json.tpl", {})
+  assume_role_policy = templatefile("./templates/iam_policy/ecs_assume_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id })
   common_tags        = local.common_tags
   name               = "TDRConsignmentExportECSExecutionRole${title(local.environment)}"
   policy_attachments = {
@@ -41,7 +41,8 @@ module "consignment_export_execution_policy" {
     log_group_arn             = "${module.consignment_export_cloudwatch.log_group_arn}:*",
     file_system_arn           = module.export_efs.file_system_arn,
     management_account_number = data.aws_ssm_parameter.mgmt_account_number.value,
-    aws_guardduty_ecr_arn     = local.aws_guardduty_ecr_arn
+    aws_guardduty_ecr_arn     = local.aws_guardduty_ecr_arn,
+    account_id = data.aws_caller_identity.current.account_id
     }
   )
 }
@@ -51,6 +52,7 @@ module "consignment_export_task_policy" {
   name   = "TDRConsignmentExportECSTaskPolicy${title(local.environment)}"
   policy_string = templatefile(
     "${path.module}/templates/iam_policy/consignment_export_task_policy.json.tpl", {
+      account_id = data.aws_caller_identity.current.account_id
       environment          = local.environment,
       titleEnvironment     = title(local.environment),
       aws_region           = local.region,
