@@ -16,7 +16,12 @@
         "${cloudwatch_log_group}:log-stream:*",
         "arn:aws:ecr:eu-west-2:${ecr_account_number}:repository/auth-server",
         "${aws_guardduty_ecr_arn}"
-      ]
+      ],
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     },
     {
       "Sid": "",
@@ -24,7 +29,12 @@
       "Action": [
         "ecr:GetAuthorizationToken"
       ],
-      "Resource" : "*"
+      "Resource" : "*",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     }
   ]
 }

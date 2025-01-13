@@ -11,7 +11,7 @@ locals {
 module "transfer_service_execution_role" {
   count              = local.transfer_service_count
   source             = "./da-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./templates/iam_policy/ecs_assume_role_policy.json.tpl", {})
+  assume_role_policy = templatefile("./templates/iam_policy/ecs_assume_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id })
   tags               = local.common_tags
   name               = "TDRTransferServiceECSExecutionRole${title(local.environment)}"
   policy_attachments = {
@@ -23,7 +23,7 @@ module "transfer_service_execution_role" {
 module "transfer_service_task_role" {
   count              = local.transfer_service_count
   source             = "./da-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./templates/iam_policy/ecs_assume_role_policy.json.tpl", {})
+  assume_role_policy = templatefile("./templates/iam_policy/ecs_assume_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id })
   tags               = local.common_tags
   name               = "TDRTransferServiceECSTaskRole${title(local.environment)}"
   policy_attachments = {

@@ -8,7 +8,12 @@
       ],
       "Resource": [
         "${task_arn}"
-      ]
+      ],
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     },
     {
       "Effect": "Allow",
@@ -16,7 +21,12 @@
         "ecs:DescribeTasks",
         "ecs:StopTask"
       ],
-      "Resource": "*"
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     },
     {
       "Effect": "Allow",
@@ -27,7 +37,12 @@
       ],
       "Resource": [
         "arn:aws:events:eu-west-2:${account_id}:rule/StepFunctionsGetEventsForECSTaskRule"
-      ]
+      ],
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     },
     {
       "Effect": "Allow",
@@ -37,7 +52,12 @@
       "Resource": [
         "${task_role}",
         "${execution_role}"
-      ]
+      ],
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     },
     {
       "Effect": "Allow",
@@ -55,14 +75,24 @@
         "xray:GetSamplingRules",
         "xray:GetSamplingTargets"
       ],
-      "Resource": "*"
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     },
     {
       "Effect": "Allow",
       "Action": [
         "sns:Publish"
       ],
-      "Resource": "${sns_topic}"
+      "Resource": "${sns_topic}",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     },
     {
       "Effect": "Allow",
@@ -70,16 +100,26 @@
         "kms:GenerateDataKey",
         "kms:Decrypt"
       ],
-      "Resource": "${kms_key_arn}"
+      "Resource": "${kms_key_arn}",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     },
     {
       "Effect": "Allow",
       "Action": [
-      "lambda:InvokeFunction"
+        "lambda:InvokeFunction"
       ],
       "Resource": [
-      "arn:aws:lambda:eu-west-2:${account_id}:function:tdr-export-status-update-${environment}"
-      ]
+        "arn:aws:lambda:eu-west-2:${account_id}:function:tdr-export-status-update-${environment}"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     }
   ]
 }

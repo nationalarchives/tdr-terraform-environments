@@ -127,6 +127,11 @@ data "aws_iam_policy_document" "sns_notifications_publish" {
   statement {
     actions   = ["sns:Publish"]
     resources = [var.notification_sns_topic_arn]
+    condition {
+      test     = "StringEquals"
+      values   = [data.aws_caller_identity.current.account_id]
+      variable = "AWS:SourceAccount"
+    }
   }
 }
 
@@ -147,6 +152,11 @@ data "aws_iam_policy_document" "frontend_kms_key_use" {
       "kms:GenerateDataKey"
     ]
     resources = [var.notifications_topic_kms_key_arn]
+    condition {
+      test     = "StringEquals"
+      values   = [data.aws_caller_identity.current.account_id]
+      variable = "AWS:SourceAccount"
+    }
   }
 }
 
@@ -193,7 +203,7 @@ resource "aws_iam_policy" "frontend_draft_metadata" {
     "modules/transfer-frontend/templates/draft_metadata_policy.json.tpl", {
       environment         = var.environment,
       titleEnvironment    = title(var.environment),
-      account             = data.aws_caller_identity.current.account_id,
+      account_id          = data.aws_caller_identity.current.account_id,
       kms_bucket_key_arns = var.draft_metadata_s3_kms_keys
   })
 }
@@ -225,6 +235,11 @@ data "aws_iam_policy_document" "frontend_ecs_execution" {
       "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/events/ecs-task-events-${var.environment}:*",
       var.aws_guardduty_ecr_arn
     ]
+    condition {
+      test     = "StringEquals"
+      values   = [data.aws_caller_identity.current.account_id]
+      variable = "AWS:SourceAccount"
+    }
   }
   statement {
     actions   = ["ecr:GetAuthorizationToken"]

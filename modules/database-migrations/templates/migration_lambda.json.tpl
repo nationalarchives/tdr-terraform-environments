@@ -6,7 +6,12 @@
       "Action": "rds-db:connect",
       "Resource": [
         "arn:aws:rds-db:eu-west-2:${account_id}:dbuser:${instance_id}/migrations_user"
-      ]
+      ],
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     },
     {
       "Effect": "Allow",
@@ -20,7 +25,12 @@
         "arn:aws:s3:::tdr-database-migrations/*",
         "arn:aws:s3:::tdr-database-migrations",
         "${log_group_arn}"
-      ]
+      ],
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     },
     {
       "Effect": "Allow",
@@ -32,7 +42,12 @@
         "ec2:DescribeNetworkInterfaces",
         "autoscaling:CompleteLifecycleAction"
       ],
-      "Resource": ["*"]
+      "Resource": ["*"],
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     }
   ]
 }

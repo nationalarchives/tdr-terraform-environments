@@ -7,6 +7,11 @@
         "kms:GenerateDataKey"
       ],
       "Effect": "Allow",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      },
       "Resource": ${kms_bucket_key_arns}
     },
     {
@@ -20,7 +25,12 @@
       "Resource": [
         "arn:aws:s3:::tdr-draft-metadata-${environment}/*",
         "arn:aws:s3:::tdr-draft-metadata-${environment}"
-      ]
+      ],
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     }
   ],
   "Version": "2012-10-17"

@@ -10,7 +10,12 @@
       "Resource": [
         "arn:aws:logs:eu-west-2:${account_id}:log-group:/aws/lambda/${function_name}",
         "arn:aws:logs:eu-west-2:${account_id}:log-group:/aws/lambda/${function_name}:log-stream:*"
-      ]
+      ],
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     },
     {
       "Effect": "Allow",
@@ -19,7 +24,12 @@
         "ec2:DeleteNetworkInterface",
         "ec2:DescribeNetworkInterfaces"
       ],
-      "Resource": "*"
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     },
     {
       "Effect": "Allow",
@@ -31,7 +41,12 @@
       "Resource": [
         "arn:aws:s3:::${bucket_name}",
         "arn:aws:s3:::${bucket_name}/*"
-      ]
+      ],
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     },
     {
       "Effect": "Allow",
@@ -45,23 +60,43 @@
       "Resource": [
         "arn:aws:s3:::${backend_checks_bucket_name}",
         "arn:aws:s3:::${backend_checks_bucket_name}/*"
-      ]
+      ],
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     },
     {
       "Effect": "Allow",
       "Action": [
         "ssm:GetParameter"
       ],
-      "Resource": "arn:aws:ssm:eu-west-2:${account_id}:parameter${parameter_name}"
+      "Resource": "arn:aws:ssm:eu-west-2:${account_id}:parameter${parameter_name}",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     },
     {
       "Effect": "Allow",
       "Action": "kms:Decrypt",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      },
       "Resource": ${decryption_keys}
     },
     {
       "Effect": "Allow",
       "Action": "kms:Encrypt",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      },
       "Resource": ${encryption_keys}
     }
   ]
