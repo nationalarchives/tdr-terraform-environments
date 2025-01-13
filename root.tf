@@ -278,7 +278,7 @@ module "waf" {
   trusted_ips       = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
   blocked_ips       = local.ip_blocked_list
   geo_match         = split(",", var.geo_match)
-  restricted_uri    = local.ip_blocked_list
+  restricted_uri    = "admin"
   log_destinations  = [module.waf_cloudwatch.log_group_arn]
 }
 
