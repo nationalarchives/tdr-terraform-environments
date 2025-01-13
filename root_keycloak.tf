@@ -11,7 +11,7 @@ module "keycloak_ecs_execution_policy" {
     cloudwatch_log_group  = module.keycloak_cloudwatch.log_group_arn,
     ecr_account_number    = local.ecr_account_number,
     aws_guardduty_ecr_arn = local.aws_guardduty_ecr_arn,
-    account_id = data.aws_caller_identity.current.account_id
+    account_id            = data.aws_caller_identity.current.account_id
   })
 }
 
