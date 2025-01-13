@@ -16,7 +16,12 @@
         "${redacted_files_lambda_arn}",
         "${statuses_lambda_arn}",
         "${yara_av_v2_lambda_arn}"
-      ]
+      ],
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     },
     {
       "Effect": "Allow",
@@ -32,7 +37,12 @@
         "${backend_checks_bucket_arn}/*",
         "${backend_checks_bucket_arn}",
         "${state_machine_arn}"
-      ]
+      ],
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     },
     {
       "Effect": "Allow",
@@ -42,7 +52,12 @@
         "xray:GetSamplingRules",
         "xray:GetSamplingTargets"
       ],
-      "Resource": "*"
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     }
   ]
 }

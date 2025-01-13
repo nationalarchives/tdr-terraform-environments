@@ -339,5 +339,6 @@ module "backend_checks_step_function" {
     notification_lambda_arn     = module.notification_lambda.ecr_scan_notification_lambda_arn[0],
     backend_checks_bucket_arn   = module.backend_lambda_function_bucket.s3_bucket_arn
     state_machine_arn           = module.backend_checks_step_function.state_machine_arn
+    account_id                  = data.aws_caller_identity.current.account_id
   })
 }

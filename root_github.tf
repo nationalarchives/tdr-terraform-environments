@@ -57,6 +57,7 @@ module "run_update_keycloak_execution_policy" {
   source = "./tdr-terraform-modules/iam_policy"
   name   = "TDRKeycloakUpdateECSExecutionPolicy${title(local.environment)}"
   policy_string = templatefile("${path.module}/templates/iam_policy/keycloak_update_execution_policy.json.tpl", {
+    account_id                = data.aws_caller_identity.current.account_id
     log_group_arn             = module.keycloak_update_cloudwatch.log_group_arn,
     management_account_number = data.aws_ssm_parameter.mgmt_account_number.value,
     aws_guardduty_ecr_arn     = local.aws_guardduty_ecr_arn

@@ -157,6 +157,11 @@ data "aws_iam_policy_document" "consignment_api_ecs_execution" {
       "arn:aws:ecr:eu-west-2:${local.ecr_account_number}:repository/consignment-api",
       var.aws_guardduty_ecr_arn
     ]
+    condition {
+      test     = "StringEquals"
+      values   = [local.ecr_account_number]
+      variable = "AWS:SourceAccount"
+    }
   }
   statement {
     actions   = ["ecr:GetAuthorizationToken"]

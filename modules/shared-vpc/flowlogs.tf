@@ -56,6 +56,11 @@ data "aws_iam_policy_document" "tdr_flowlog_policy" {
     resources = [
       "arn:aws:logs:*:*:log-group:/flowlogs/tdr-vpc-*"
     ]
+    condition {
+      test     = "StringEquals"
+      values   = [data.aws_caller_identity.current.account_id]
+      variable = "AWS:SourceAccount"
+    }
   }
 }
 
