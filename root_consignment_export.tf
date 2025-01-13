@@ -42,7 +42,7 @@ module "consignment_export_execution_policy" {
     file_system_arn           = module.export_efs.file_system_arn,
     management_account_number = data.aws_ssm_parameter.mgmt_account_number.value,
     aws_guardduty_ecr_arn     = local.aws_guardduty_ecr_arn,
-    account_id = data.aws_caller_identity.current.account_id
+    account_id                = data.aws_caller_identity.current.account_id
     }
   )
 }
@@ -52,7 +52,7 @@ module "consignment_export_task_policy" {
   name   = "TDRConsignmentExportECSTaskPolicy${title(local.environment)}"
   policy_string = templatefile(
     "${path.module}/templates/iam_policy/consignment_export_task_policy.json.tpl", {
-      account_id = data.aws_caller_identity.current.account_id
+      account_id           = data.aws_caller_identity.current.account_id
       environment          = local.environment,
       titleEnvironment     = title(local.environment),
       aws_region           = local.region,
