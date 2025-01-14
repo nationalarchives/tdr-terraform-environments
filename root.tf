@@ -740,6 +740,7 @@ module "rotate_keycloak_secrets_lambda" {
   vpc_id                            = module.shared_vpc.vpc_id
   kms_key_arn                       = module.encryption_key.kms_key_arn
   rotate_keycloak_secrets_event_arn = module.periodic_rotate_keycloak_secrets_event.event_arn
+  api_connection_arn                = aws_cloudwatch_event_connection.consignment_api_connection.arn
 }
 
 module "periodic_rotate_keycloak_secrets_event" {
