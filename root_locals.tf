@@ -153,4 +153,6 @@ locals {
   aws_guardduty_ecr_arn = module.tdr_configuration.terraform_config["aws_guardduty_ecr_arn"]
 
   rds_retention_period_days = local.environment == "prod" ? 30 : 7
+
+  aws_logs_delivery_account_id = module.tdr_configuration.terraform_config["aws_logs_delivery_account_id"]
 }
