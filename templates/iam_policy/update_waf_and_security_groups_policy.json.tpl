@@ -11,8 +11,7 @@
         "wafv2:UpdateRuleGroup",
         "wafv2:Get*",
         "wafv2:List*",
-        "wafv2:UpdateIPSet",
-        "wafv2:DeleteIPSet"
+        "wafv2:UpdateIPSet"
       ],
       "Resource": [
         "${ip_set_arn}",
