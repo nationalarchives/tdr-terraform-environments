@@ -2,12 +2,12 @@ module "github_update_waf_and_security_groups_policy" {
   source = "./tdr-terraform-modules/iam_policy"
   name   = "TDRUpdateWAFAndSecurityGroupsPolicy${title(local.environment)}"
   policy_string = templatefile("${path.module}/templates/iam_policy/update_waf_and_security_groups_policy.json.tpl", {
-    ip_set_arn             = module.waf.ip_set_arn,
-    rule_group_arn         = module.waf.rule_group_arn,
-    blocked_ip_set_arn     = module.waf.blocked_ip_set_arn,
-    account_id             = data.aws_caller_identity.current.account_id,
-    security_group_id      = module.frontend.alb_security_group_id,
-    environment            = local.environment
+    ip_set_arn         = module.waf.ip_set_arn,
+    rule_group_arn     = module.waf.rule_group_arn,
+    blocked_ip_set_arn = module.waf.blocked_ip_set_arn,
+    account_id         = data.aws_caller_identity.current.account_id,
+    security_group_id  = module.frontend.alb_security_group_id,
+    environment        = local.environment
   })
 }
 
