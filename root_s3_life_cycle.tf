@@ -6,6 +6,10 @@ locals {
   clean_bucket_expiration_days = local.environment == "prod" ? 30 : 7
   clean_bucket_policy_status   = "Disabled"
 
+  backend_checks_buckets                = [module.backend_lambda_function_bucket]
+  backend_checks_bucket_expiration_days = local.environment == "prod" ? 30 : 7
+  backend_checks_bucket_policy_status   = local.environment == "prod" ? "Disabled" : "Enabled"
+
   dirty_buckets                = [module.upload_file_cloudfront_dirty_s3]
   dirty_bucket_expiration_days = local.environment == "prod" ? 7 : 1
   dirty_bucket_policy_status   = local.environment == "intg" ? "Enabled" : "Disabled"
@@ -51,6 +55,18 @@ resource "aws_s3_bucket_lifecycle_configuration" "quarantine_s3_buckets" {
     }
     expiration {
       days = local.quarantine_bucket_expiration_days
+    }
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "backend_checks_s3_buckets" {
+  for_each = { for bucket in local.backend_checks_buckets: bucket.s3_bucket_name => bucket }
+  bucket   = each.value.s3_bucket_id
+  rule {
+    id     = "delete-backend-checks-buckets-objects"
+    status = local.backend_checks_bucket_policy_status
+    expiration {
+      days = local.backend_checks_bucket_expiration_days
     }
   }
 }
