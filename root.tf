@@ -146,15 +146,13 @@ module "upload_file_cloudfront_dirty_s3" {
 }
 
 module "upload_file_cloudfront_logs" {
-  source      = "./tdr-terraform-modules/s3"
-  project     = var.project
-  function    = "upload-cloudfront-logs"
-  common_tags = local.common_tags
-  access_logs = false
-  canonical_user_grants = [
-    { id = local.logs_delivery_canonical_user_id, permissions = ["FULL_CONTROL"] },
-    { id = data.aws_canonical_user_id.canonical_user.id, permissions = ["FULL_CONTROL"] }
-  ]
+  source                       = "./tdr-terraform-modules/s3"
+  project                      = var.project
+  function                     = "upload-cloudfront-logs"
+  common_tags                  = local.common_tags
+  bucket_policy                = "upload_cloudfront_logs"
+  aws_logs_delivery_account_id = local.aws_logs_delivery_account_id
+  access_logs                  = false
 }
 
 module "cloudfront_upload" {
@@ -737,6 +735,7 @@ module "rotate_keycloak_secrets_lambda" {
   vpc_id                            = module.shared_vpc.vpc_id
   kms_key_arn                       = module.encryption_key.kms_key_arn
   rotate_keycloak_secrets_event_arn = module.periodic_rotate_keycloak_secrets_event.event_arn
+  api_connection_arn                = aws_cloudwatch_event_connection.consignment_api_connection.arn
 }
 
 module "periodic_rotate_keycloak_secrets_event" {
@@ -832,7 +831,7 @@ module "consignment_api_database" {
   availability_zone       = local.database_availability_zone
   common_tags             = local.common_tags
   database_name           = "consignmentapi"
-  database_version        = "16.3"
+  database_version        = "17.2"
   environment             = local.environment
   kms_key_id              = module.encryption_key.kms_key_arn
   private_subnets         = module.shared_vpc.private_subnets
