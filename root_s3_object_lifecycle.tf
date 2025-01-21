@@ -1,5 +1,6 @@
 locals {
   default_expiration_days             = local.environment == "prod" ? 30 : 7
+  
   backend_checks_bucket_policy_status = local.environment == "intg" ? "Enabled" : "Disabled"
 }
 
@@ -10,6 +11,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "backend_checks_results_s3_buck
     status = local.backend_checks_bucket_policy_status
     expiration {
       days = local.default_expiration_days
+    }
+    noncurrent_version_expiration {
+      noncurrent_days = local.default_expiration_days
     }
   }
 }
