@@ -1,6 +1,6 @@
 locals {
-  default_expiration_days             = local.environment == "prod" ? 30 : 7
-  
+  default_expiration_days = local.environment == "prod" ? 30 : 7
+
   backend_checks_bucket_policy_status = local.environment == "intg" ? "Enabled" : "Disabled"
 }
 
