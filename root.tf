@@ -576,6 +576,7 @@ module "notification_lambda" {
   standard_export_s3_bucket_name = module.export_bucket.s3_bucket_name
   da_event_bus_arn               = local.da_event_bus_arn
   da_event_bus_kms_key_arn       = local.da_event_bus_kms_key
+  slack_bau_webhook              = local.slack_bau_webhook
   notifications_vpc_config = {
     subnet_ids         = module.shared_vpc.private_subnets
     security_group_ids = [module.outbound_only_security_group.security_group_id]
