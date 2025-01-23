@@ -34,7 +34,7 @@ module "akka_licence_token_ssm_parameters" {
   tags = merge(local.common_tags, local.manual_input_tag)
 }
 
-module "bau_slack_channel_ssm_parameters" {
+module "bau_slack_channel_ssm_parameter" {
   source = "./da-terraform-modules/ssm_parameter"
   parameters = [
     {
@@ -45,6 +45,5 @@ module "bau_slack_channel_ssm_parameters" {
     }
   ]
   tags = merge(local.common_tags, local.manual_input_tag)
-
 }
 
