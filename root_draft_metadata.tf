@@ -10,7 +10,7 @@ module "draft_metadata_validator_lambda" {
     "TDRDraftMetadataValidatorLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_validator_lambda.json.tpl", {
       account_id         = var.tdr_account_number
       environment        = local.environment
-      parameter_name     = local.keycloak_backend_checks_secret_name
+      parameter_name     = local.keycloak_tdr_draft_metadata_client_secret_name
       bucket_name        = local.draft_metadata_s3_bucket_name
       kms_key_arn        = module.s3_internal_kms_key.kms_key_arn
       ecr_account_number = local.ecr_account_number
@@ -19,7 +19,7 @@ module "draft_metadata_validator_lambda" {
   plaintext_env_vars = {
     API_URL            = "${module.consignment_api.api_url}/graphql"
     AUTH_URL           = local.keycloak_auth_url
-    CLIENT_SECRET_PATH = local.keycloak_backend_checks_secret_name
+    CLIENT_SECRET_PATH = local.keycloak_tdr_draft_metadata_client_secret_name //here
     BUCKET_NAME        = local.draft_metadata_s3_bucket_name
   }
 }
