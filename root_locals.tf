@@ -60,6 +60,8 @@ locals {
 
   ip_allowlist = concat(local.developer_ip_list, local.trusted_ip_list)
 
+  ip_blocked_list = module.tdr_configuration.terraform_config["ip_blocked_list"]
+
   ecr_account_number = local.environment == "sbox" ? data.aws_caller_identity.current.account_id : data.aws_ssm_parameter.mgmt_account_number.value
 
   user_session_timeout_mins = 120
@@ -68,22 +70,26 @@ locals {
 
   akka_licence_token_name = "/${local.environment}/akka/licence_token"
 
-  keycloak_backend_checks_secret_name        = "/${local.environment}/keycloak/backend_checks_client/secret"
-  keycloak_tdr_client_secret_name            = "/${local.environment}/keycloak/client/secret"
-  keycloak_tdr_read_client_secret_name       = "/${local.environment}/keycloak/user_read_client/secret"
-  keycloak_tdr_transfer_service_secret_name  = "/${local.environment}/keycloak/transfer_service_client/secret"
-  keycloak_user_password_name                = "/${local.environment}/keycloak/password"
-  keycloak_admin_password_name               = "/${local.environment}/keycloak/admin/password"
-  keycloak_admin_user_name                   = "/${local.environment}/keycloak/admin/user"
-  keycloak_realm_admin_client_secret_name    = "/${local.environment}/keycloak/realm_admin_client/secret"
-  keycloak_configuration_properties_name     = "/${local.environment}/keycloak/configuration_properties"
-  keycloak_user_admin_client_secret_name     = "/${local.environment}/keycloak/user_admin_client/secret"
-  keycloak_govuk_notify_api_key_name         = "/${local.environment}/keycloak/govuk_notify/api_key"
-  keycloak_govuk_notify_template_id_name     = "/${local.environment}/keycloak/govuk_notify/template_id"
-  keycloak_reporting_client_secret_name      = "/${local.environment}/keycloak/reporting_client/secret"
-  keycloak_rotate_secrets_client_secret_name = "/${local.environment}/keycloak/rotate_secrets_client/secret"
-  keycloak_db_url                            = "/${local.environment}/keycloak/instance/url"
-  slack_bot_token_name                       = "/${local.environment}/slack/bot"
+  keycloak_backend_checks_secret_name            = "/${local.environment}/keycloak/backend_checks_client/secret"
+  keycloak_tdr_client_secret_name                = "/${local.environment}/keycloak/client/secret"
+  keycloak_tdr_draft_metadata_client_secret_name = "/${local.environment}/keycloak/draft_metadata_client/secret"
+  keycloak_tdr_read_client_secret_name           = "/${local.environment}/keycloak/user_read_client/secret"
+  keycloak_tdr_transfer_service_secret_name      = "/${local.environment}/keycloak/transfer_service_client/secret"
+  keycloak_user_password_name                    = "/${local.environment}/keycloak/password"
+  keycloak_admin_password_name                   = "/${local.environment}/keycloak/admin/password"
+  keycloak_admin_user_name                       = "/${local.environment}/keycloak/admin/user"
+  keycloak_realm_admin_client_secret_name        = "/${local.environment}/keycloak/realm_admin_client/secret"
+  keycloak_configuration_properties_name         = "/${local.environment}/keycloak/configuration_properties"
+  keycloak_user_admin_client_secret_name         = "/${local.environment}/keycloak/user_admin_client/secret"
+  keycloak_govuk_notify_api_key_name             = "/${local.environment}/keycloak/govuk_notify/api_key"
+  keycloak_govuk_notify_template_id_name         = "/${local.environment}/keycloak/govuk_notify/template_id"
+  keycloak_reporting_client_secret_name          = "/${local.environment}/keycloak/reporting_client/secret"
+  keycloak_rotate_secrets_client_secret_name     = "/${local.environment}/keycloak/rotate_secrets_client/secret"
+  keycloak_db_url                                = "/${local.environment}/keycloak/instance/url"
+
+  slack_bot_token_name           = "/${local.environment}/slack/bot"
+  slack_bau_webhook              = "/${local.environment}/slack/bau/webhook"
+  tdr_reporting_slack_channel_id = "/${local.environment}/slack/tdr_reporting/channel_id"
 
   keycloak_reporting_client_id      = "tdr-reporting"
   keycloak_backend-checks_client_id = "tdr-backend-checks"
@@ -140,7 +146,7 @@ locals {
 
   //feature access blocks
   block_shared_keycloak_pages   = local.environment == "intg" ? false : true
-  block_draft_metadata_upload   = local.environment == "prod" ? true : false
+  block_draft_metadata_upload   = false
   block_metadata_review         = false
   block_skip_metadata_review    = false
   draft_metadata_s3_bucket_name = "${var.project}-draft-metadata-${local.environment}"

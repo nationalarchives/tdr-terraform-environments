@@ -274,6 +274,7 @@ module "waf" {
   common_tags       = local.common_tags
   alb_target_groups = [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn]
   trusted_ips       = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
+  blocked_ips       = local.ip_blocked_list
   geo_match         = split(",", var.geo_match)
   restricted_uri    = "admin"
   log_destinations  = [module.waf_cloudwatch.log_group_arn]
@@ -735,6 +736,9 @@ module "rotate_keycloak_secrets_lambda" {
   vpc_id                            = module.shared_vpc.vpc_id
   kms_key_arn                       = module.encryption_key.kms_key_arn
   rotate_keycloak_secrets_event_arn = module.periodic_rotate_keycloak_secrets_event.event_arn
+  api_connection_auth_type          = aws_cloudwatch_event_connection.consignment_api_connection.authorization_type
+  api_connection_name               = aws_cloudwatch_event_connection.consignment_api_connection.name
+  api_connection_secret_arn         = aws_cloudwatch_event_connection.consignment_api_connection.secret_arn
 }
 
 module "periodic_rotate_keycloak_secrets_event" {
