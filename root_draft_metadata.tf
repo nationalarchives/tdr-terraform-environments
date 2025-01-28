@@ -73,8 +73,8 @@ module "draft_metadata_bucket" {
   kms_key_arn = module.s3_internal_kms_key.kms_key_arn
 }
 
-data "aws_ssm_parameter" "backend_checks_keycloak_secret" {
-  name            = local.keycloak_backend_checks_secret_name
+data "aws_ssm_parameter" "draft_metadata_keycloak_secret" {
+  name            = local.keycloak_tdr_draft_metadata_client_secret_name
   with_decryption = true
 }
 
@@ -85,8 +85,8 @@ resource "aws_cloudwatch_event_connection" "consignment_api_connection" {
   auth_parameters {
     oauth {
       client_parameters {
-        client_id     = local.keycloak_backend-checks_client_id
-        client_secret = data.aws_ssm_parameter.backend_checks_keycloak_secret.value
+        client_id     = local.keycloak_draft-metadata_client_id
+        client_secret = data.aws_ssm_parameter.draft_metadata_keycloak_secret.value
       }
 
       authorization_endpoint = "${local.keycloak_auth_url}/realms/tdr/protocol/openid-connect/token"
