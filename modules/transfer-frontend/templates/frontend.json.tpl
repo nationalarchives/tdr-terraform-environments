@@ -1,27 +1,5 @@
 [
   {
-    "name": "aws-otel-collector",
-    "image": "${collector_image}",
-    "cpu": 256,
-    "memory": 512,
-    "portMappings": [],
-    "essential": true,
-    "command": [
-      "--config=/etc/ecs/custom-config.yml"
-    ],
-    "environment": [],
-    "mountPoints": [],
-    "volumesFrom": [],
-    "logConfiguration": {
-      "logDriver": "awslogs",
-      "options": {
-        "awslogs-group": "/ecs/aws-otel-collector-${app_environment}",
-        "awslogs-region": "${aws_region}",
-        "awslogs-stream-prefix": "ecs"
-      }
-    }
-  },
-  {
     "name": "frontend",
     "image": "${app_image}",
     "cpu": 0,
