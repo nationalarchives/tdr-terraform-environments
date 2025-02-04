@@ -282,10 +282,11 @@ module "waf" {
 }
 
 module "backend_lambda_function_bucket" {
-  source      = "./tdr-terraform-modules/s3"
-  common_tags = local.common_tags
-  function    = "backend-checks"
-  project     = var.project
+  source          = "./tdr-terraform-modules/s3"
+  common_tags     = local.common_tags
+  function        = "backend-checks"
+  project         = var.project
+  lifecycle_rules = local.backend_checks_results_bucket_lifecycle_rules
 }
 
 module "create_db_users_lambda" {
