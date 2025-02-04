@@ -143,6 +143,7 @@ module "upload_file_cloudfront_dirty_s3" {
   abort_incomplete_uploads     = true
   cloudfront_oai               = module.cloudfront_upload.cloudfront_oai_iam_arn
   cloudfront_distribution_arns = [module.cloudfront_upload.cloudfront_arn]
+  lifecycle_rules              = local.dirty_bucket_lifecycle_rules
 }
 
 module "upload_file_cloudfront_logs" {
