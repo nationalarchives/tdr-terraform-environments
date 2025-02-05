@@ -16,18 +16,15 @@ locals {
         noncurrent_days = local.default_expiration_days
       }
   }]
-}
 
-resource "aws_s3_bucket_lifecycle_configuration" "backend_checks_results_s3_bucket" {
-  bucket = module.backend_lambda_function_bucket.s3_bucket_id
-  rule {
+  backend_checks_results_bucket_lifecycle_rules = [{
     id     = "delete-backend-checks-results-bucket-objects"
     status = local.backend_checks_bucket_policy_status
-    expiration {
+    expiration = {
       days = local.default_expiration_days
     }
-    noncurrent_version_expiration {
+    noncurrent_version_expiration = {
       noncurrent_days = local.default_expiration_days
     }
-  }
+  }]
 }
