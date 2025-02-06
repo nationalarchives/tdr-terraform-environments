@@ -117,18 +117,13 @@
         "consignmentId.$": "$.consignmentId"
       },
       "ResultPath": "$.validatorLambdaResult",
-      "Next": "CheckValidatorLambdaResult"
-    },
-    "CheckValidatorLambdaResult": {
-      "Type": "Choice",
-      "Choices": [
+      "Next": "EndState",
+      "Catch": [
         {
-          "Variable": "$.validatorLambdaResult.statusCode",
-          "NumericEquals": 500,
+          "ErrorEquals": ["States.ALL"],
           "Next": "SendSNSErrorMessage"
         }
-      ],
-      "Default": "EndState"
+      ]
     },
     "SendSNSErrorMessage": {
       "Type": "Task",
