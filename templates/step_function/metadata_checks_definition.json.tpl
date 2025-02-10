@@ -117,18 +117,16 @@
         "consignmentId.$": "$.consignmentId"
       },
       "ResultPath": "$.validatorLambdaResult",
-      "Next": "CheckValidatorLambdaResult"
-    },
-    "CheckValidatorLambdaResult": {
-      "Type": "Choice",
-      "Choices": [
+      "Catch": [
         {
-          "Variable": "$.validatorLambdaResult.statusCode",
-          "NumericEquals": 500,
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.error",
           "Next": "SendSNSErrorMessage"
         }
       ],
-      "Default": "EndState"
+      "Next": "EndState"
     },
     "SendSNSErrorMessage": {
       "Type": "Task",
@@ -139,7 +137,7 @@
           "consignmentId.$": "$.consignmentId",
           "environment": "${environment}",
           "metaDataError": "An unknown error has been triggered",
-          "cause.$": "States.Format('Metadata validation lambda: {}',$.validatorLambdaResult.body)"
+          "cause.$": "States.Format('Metadata validation lambda: {}',$.error.Cause)"
         }
       },
       "Next": "WriteUnknownErrorJsonToS3",
@@ -164,7 +162,7 @@
                   "validationProcess": "LAMBDA",
                   "property": "lambda_validation",
                   "errorKey": "unexpected_error",
-                  "message.$": "$.validatorLambdaResult.body"
+                  "message.$": "$.error.Cause"
                 }
               ],
               "data": []
