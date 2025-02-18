@@ -17,6 +17,9 @@ module "s3_external_kms_key" {
       {
         service_name : "cloudwatch"
         service_source_account : data.aws_caller_identity.current.account_id
+      },
+      {
+        service_name : "backup"
       }
     ]
   }
