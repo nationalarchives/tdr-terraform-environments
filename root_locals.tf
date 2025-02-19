@@ -11,7 +11,7 @@ locals {
 
   environment_full_name = local.environment_full_name_map[local.environment]
 
-  aws_back_up_tags = { "BackupPolicy" = "7-day-no-cold" }
+  aws_back_up_tags = local.environment == "intg" ? { "BackupPolicy" = "7-day-no-cold" } : null
 
   common_tags = tomap(
     {
