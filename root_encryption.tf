@@ -1,5 +1,12 @@
 locals {
   e2e_testing_role_arns = local.environment == "prod" ? [] : [module.tdr_configuration.terraform_config[local.environment]["e2e_testing_role_arn"]]
+  s3_external_service_details = local.environment == "intg" ? [{
+    service_name : "cloudwatch"
+    service_source_account : data.aws_caller_identity.current.account_id
+    }, { service_name : "backup" }] : [{
+    service_name : "cloudwatch"
+    service_source_account : data.aws_caller_identity.current.account_id
+  }]
 }
 
 module "s3_external_kms_key" {
@@ -12,13 +19,8 @@ module "s3_external_kms_key" {
       module.consignment_export_task_role.role.arn,
       local.dr2_copy_files_role,
     ], local.aws_sso_export_bucket_access_roles, local.standard_export_bucket_read_access_roles, local.judgment_export_bucket_read_access_roles)
-    ci_roles = [local.assume_role]
-    service_details = [
-      {
-        service_name : "cloudwatch"
-        service_source_account : data.aws_caller_identity.current.account_id
-      }
-    ]
+    ci_roles        = [local.assume_role]
+    service_details = local.s3_external_service_details
   }
 }
 
