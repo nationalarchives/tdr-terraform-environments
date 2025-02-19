@@ -534,14 +534,15 @@ module "external_sns_notifications_topic" {
 }
 
 module "export_bucket" {
-  source                = "./tdr-terraform-modules/s3"
-  project               = var.project
-  function              = "consignment-export"
-  common_tags           = local.common_tags
-  kms_key_id            = module.s3_external_kms_key.kms_key_arn
-  bucket_key_enabled    = true
-  read_access_role_arns = local.standard_export_bucket_read_access_roles
-  bucket_policy         = "export_bucket"
+  source                    = "./tdr-terraform-modules/s3"
+  project                   = var.project
+  function                  = "consignment-export"
+  common_tags               = local.common_tags
+  kms_key_id                = module.s3_external_kms_key.kms_key_arn
+  bucket_key_enabled        = true
+  read_access_role_arns     = local.standard_export_bucket_read_access_roles
+  bucket_policy             = "export_bucket"
+  s3_bucket_additional_tags = local.aws_back_up_tags
 }
 
 module "export_bucket_judgment" {
