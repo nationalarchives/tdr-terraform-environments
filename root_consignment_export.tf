@@ -87,10 +87,10 @@ module "consignment_export_ecs_task" {
       download_batch_delay_ms    = 10
   })
   container_name   = "consignmentexport"
-  cpu              = 1024
+  cpu              = local.environment == "staging" ? 2048 : 1024
   environment      = local.environment
   execution_role   = module.consignment_export_execution_role.role.arn
-  memory           = 2048
+  memory           = local.environment == "staging" ? 4096 : 2048
   private_subnets  = module.shared_vpc.private_subnets
   security_groups  = [module.consignment_export_ecs_security_group.security_group_id]
   task_family_name = "consignment-export-${local.environment}"
