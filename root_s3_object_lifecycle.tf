@@ -3,7 +3,7 @@ locals {
 
   backend_checks_bucket_policy_status = "Enabled"
 
-  dirty_bucket_policy_status = local.environment == "intg" ? "Enabled" : "Disabled"
+  dirty_bucket_policy_status = local.environment == "prod" ? "Disabled" : "Enabled"
 
   dirty_bucket_lifecycle_rules = [
     {
