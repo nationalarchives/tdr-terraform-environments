@@ -22,6 +22,11 @@ module "tdr_configuration" {
   project = "tdr"
 }
 
+module "aws_backup_configuration" {
+  source  = "./da-terraform-configurations"
+  project = "aws-backup"
+}
+
 module "shared_vpc" {
   source                      = "./modules/shared-vpc"
   az_count                    = 2
@@ -258,12 +263,13 @@ module "frontend_alb" {
 }
 
 module "encryption_key" {
-  source      = "./tdr-terraform-modules/kms"
-  project     = var.project
-  function    = "encryption"
-  key_policy  = "message_system_access"
-  environment = local.environment
-  common_tags = local.common_tags
+  source              = "./tdr-terraform-modules/kms"
+  project             = var.project
+  function            = "encryption"
+  key_policy          = "message_system_access"
+  environment         = local.environment
+  common_tags         = local.common_tags
+  aws_backup_role_arn = local.aws_back_up_role
 }
 
 module "waf" {
@@ -846,6 +852,7 @@ module "consignment_api_database" {
   ca_cert_identifier      = local.database_ca_cert_identifier
   backup_retention_period = local.rds_retention_period_days
   apply_immediately       = true
+  aws_backup_tag          = local.aws_back_up_tags
 }
 
 module "waf_cloudwatch" {
