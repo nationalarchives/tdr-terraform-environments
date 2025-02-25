@@ -54,3 +54,8 @@ variable "db_instance_resource_id" {}
 variable "aws_guardduty_ecr_arn" {}
 
 variable "akka_licence_token_name" {}
+
+variable "aws_backup_tag" {
+  description = "Tag to mark resource to be backed up"
+  default     = null
+}
