@@ -4,7 +4,10 @@
       "Sid": "restrict-access-dirty-bucket-download",
       "Effect": "Allow",
       "Principal": "*",
-      "Action": "s3:GetObject",
+      "Action": [
+        "s3:GetObject",
+        "s3:GetObjectTagging"
+      ],
       "Resource": "arn:aws:s3:::tdr-upload-files-cloudfront-dirty-${environment}/*",
       "Condition": {
         "ArnEquals": {
@@ -21,7 +24,9 @@
       "Principal": "*",
       "Action": [
         "s3:GetObject",
-        "s3:PutObject"
+        "s3:GetObjectTagging",
+        "s3:PutObject",
+        "s3:PutObjectTagging"
       ],
       "Resource": [
         "arn:aws:s3:::${upload_bucket_name}/*",
@@ -38,11 +43,12 @@
       }
     },
     {
-      "Sid": "restrict-acess-to-export-role",
+      "Sid": "restrict-access-to-export-role",
       "Effect": "Allow",
       "Principal": "*",
       "Action": [
-        "s3:GetObject"
+        "s3:GetObject",
+        "s3:GetObjectTagging"
       ],
       "Resource": [
         "arn:aws:s3:::${upload_bucket_name}/*",
@@ -57,7 +63,7 @@
       }
     },
     {
-      "Sid": "restrict-acess-to-cloud-custodian",
+      "Sid": "restrict-access-to-cloud-custodian",
       "Effect": "Allow",
       "Principal": "*",
       "Action": [

@@ -10,7 +10,7 @@ module "draft_metadata_validator_lambda" {
     "TDRDraftMetadataValidatorLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_validator_lambda.json.tpl", {
       account_id         = var.tdr_account_number
       environment        = local.environment
-      parameter_name     = local.keycloak_backend_checks_secret_name
+      parameter_name     = local.keycloak_tdr_draft_metadata_client_secret_name
       bucket_name        = local.draft_metadata_s3_bucket_name
       kms_key_arn        = module.s3_internal_kms_key.kms_key_arn
       ecr_account_number = local.ecr_account_number
@@ -19,7 +19,7 @@ module "draft_metadata_validator_lambda" {
   plaintext_env_vars = {
     API_URL            = "${module.consignment_api.api_url}/graphql"
     AUTH_URL           = local.keycloak_auth_url
-    CLIENT_SECRET_PATH = local.keycloak_backend_checks_secret_name
+    CLIENT_SECRET_PATH = local.keycloak_tdr_draft_metadata_client_secret_name
     BUCKET_NAME        = local.draft_metadata_s3_bucket_name
   }
 }
@@ -48,11 +48,22 @@ module "draft_metadata_api_gateway" {
 resource "aws_iam_role" "draft_metadata_api_gateway_execution_role" {
   name               = "TDRMetadataChecksAPIGatewayExecutionRole${title(local.environment)}"
   assume_role_policy = templatefile("./templates/iam_policy/assume_role_policy.json.tpl", { service = "apigateway.amazonaws.com" })
+}
 
-  inline_policy {
-    name   = "TDRMetadataChecksAPIGatewayStepFunctionExecutionPolicy${title(local.environment)}"
-    policy = templatefile("./templates/iam_policy/api_gateway_state_machine_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, state_machine_arn = module.draft_metadata_checks.step_function_arn })
-  }
+resource "aws_iam_policy" "api_gateway_execution_policy" {
+  name = "TDRMetadataChecksAPIGatewayStepFunctionExecutionPolicy${title(local.environment)}"
+  policy = templatefile(
+    "./templates/iam_policy/api_gateway_state_machine_policy.json.tpl",
+    {
+      account_id        = data.aws_caller_identity.current.account_id,
+      state_machine_arn = module.draft_metadata_checks.step_function_arn
+    }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "api_gateway_execution_policy" {
+  role       = aws_iam_role.draft_metadata_api_gateway_execution_role.name
+  policy_arn = aws_iam_policy.api_gateway_execution_policy.arn
 }
 
 module "draft_metadata_bucket" {
@@ -62,8 +73,8 @@ module "draft_metadata_bucket" {
   kms_key_arn = module.s3_internal_kms_key.kms_key_arn
 }
 
-data "aws_ssm_parameter" "backend_checks_keycloak_secret" {
-  name            = local.keycloak_backend_checks_secret_name
+data "aws_ssm_parameter" "draft_metadata_keycloak_secret" {
+  name            = local.keycloak_tdr_draft_metadata_client_secret_name
   with_decryption = true
 }
 
@@ -74,8 +85,8 @@ resource "aws_cloudwatch_event_connection" "consignment_api_connection" {
   auth_parameters {
     oauth {
       client_parameters {
-        client_id     = local.keycloak_backend-checks_client_id
-        client_secret = data.aws_ssm_parameter.backend_checks_keycloak_secret.value
+        client_id     = local.keycloak_draft-metadata_client_id
+        client_secret = data.aws_ssm_parameter.draft_metadata_keycloak_secret.value
       }
 
       authorization_endpoint = "${local.keycloak_auth_url}/realms/tdr/protocol/openid-connect/token"
@@ -94,13 +105,18 @@ resource "aws_cloudwatch_event_connection" "consignment_api_connection" {
 
 resource "aws_iam_policy" "draft_metadata_checks_policy" {
   name        = "TDRMetadataChecksPolicy${title(local.environment)}"
-  description = "Policy to allow necessary lambda executions from step function"
+  description = "Policy to allow necessary lambda executions from step function and s3 access"
 
-  policy = templatefile("./templates/iam_policy/invoke_lambda_policy.json.tpl", {
+  policy = templatefile("./templates/iam_policy/metadata_checks_policy.json.tpl", {
     resources = jsonencode([
       module.yara_av_v2.lambda_arn,
       module.draft_metadata_validator_lambda.lambda_arn
-    ])
+    ]),
+    draft_metadata_bucket = local.draft_metadata_s3_bucket_name
+    s3_kms_key_arn        = module.s3_internal_kms_key.kms_key_arn
+    sns_kms_key_arn       = module.encryption_key.kms_key_arn
+    account_id            = data.aws_caller_identity.current.account_id
+    environment           = local.environment
   })
 }
 
@@ -123,7 +139,10 @@ module "draft_metadata_checks" {
     antivirus_lambda_arn           = module.yara_av_v2.lambda_arn,
     consignment_api_url            = module.consignment_api.api_url,
     consignment_api_connection_arn = aws_cloudwatch_event_connection.consignment_api_connection.arn,
-    validator_lambda_arn           = module.draft_metadata_validator_lambda.lambda_arn
+    validator_lambda_arn           = module.draft_metadata_validator_lambda.lambda_arn,
+    draft_metadata_bucket          = local.draft_metadata_s3_bucket_name
+    environment                    = local.environment
+    account_id                     = data.aws_caller_identity.current.account_id
   })
   step_function_role_policy_attachments = {
     "lambda-policy" : aws_iam_policy.draft_metadata_checks_policy.arn,

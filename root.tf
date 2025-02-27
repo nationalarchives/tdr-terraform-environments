@@ -22,6 +22,11 @@ module "tdr_configuration" {
   project = "tdr"
 }
 
+module "aws_backup_configuration" {
+  source  = "./da-terraform-configurations"
+  project = "aws-backup"
+}
+
 module "shared_vpc" {
   source                      = "./modules/shared-vpc"
   az_count                    = 2
@@ -66,6 +71,7 @@ module "consignment_api" {
   da_reference_generator_url     = local.da_reference_generator_url
   da_reference_generator_limit   = local.da_reference_generator_limit
   aws_guardduty_ecr_arn          = local.aws_guardduty_ecr_arn
+  akka_licence_token_name        = local.akka_licence_token_name
 }
 
 module "frontend" {
@@ -142,18 +148,17 @@ module "upload_file_cloudfront_dirty_s3" {
   abort_incomplete_uploads     = true
   cloudfront_oai               = module.cloudfront_upload.cloudfront_oai_iam_arn
   cloudfront_distribution_arns = [module.cloudfront_upload.cloudfront_arn]
+  lifecycle_rules              = local.dirty_bucket_lifecycle_rules
 }
 
 module "upload_file_cloudfront_logs" {
-  source      = "./tdr-terraform-modules/s3"
-  project     = var.project
-  function    = "upload-cloudfront-logs"
-  common_tags = local.common_tags
-  access_logs = false
-  canonical_user_grants = [
-    { id = local.logs_delivery_canonical_user_id, permissions = ["FULL_CONTROL"] },
-    { id = data.aws_canonical_user_id.canonical_user.id, permissions = ["FULL_CONTROL"] }
-  ]
+  source                       = "./tdr-terraform-modules/s3"
+  project                      = var.project
+  function                     = "upload-cloudfront-logs"
+  common_tags                  = local.common_tags
+  bucket_policy                = "upload_cloudfront_logs"
+  aws_logs_delivery_account_id = local.aws_logs_delivery_account_id
+  access_logs                  = false
 }
 
 module "cloudfront_upload" {
@@ -258,12 +263,13 @@ module "frontend_alb" {
 }
 
 module "encryption_key" {
-  source      = "./tdr-terraform-modules/kms"
-  project     = var.project
-  function    = "encryption"
-  key_policy  = "message_system_access"
-  environment = local.environment
-  common_tags = local.common_tags
+  source              = "./tdr-terraform-modules/kms"
+  project             = var.project
+  function            = "encryption"
+  key_policy          = "message_system_access"
+  environment         = local.environment
+  common_tags         = local.common_tags
+  aws_backup_role_arn = local.aws_back_up_role
 }
 
 module "waf" {
@@ -275,48 +281,50 @@ module "waf" {
   common_tags       = local.common_tags
   alb_target_groups = [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn]
   trusted_ips       = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
+  blocked_ips       = local.ip_blocked_list
   geo_match         = split(",", var.geo_match)
   restricted_uri    = "admin"
   log_destinations  = [module.waf_cloudwatch.log_group_arn]
 }
 
 module "backend_lambda_function_bucket" {
-  source      = "./tdr-terraform-modules/s3"
-  common_tags = local.common_tags
-  function    = "backend-checks"
-  project     = var.project
+  source          = "./tdr-terraform-modules/s3"
+  common_tags     = local.common_tags
+  function        = "backend-checks"
+  project         = var.project
+  lifecycle_rules = local.backend_checks_results_bucket_lifecycle_rules
 }
 
 module "create_db_users_lambda" {
-  source                      = "./tdr-terraform-modules/lambda"
-  project                     = var.project
-  common_tags                 = local.common_tags
-  lambda_create_db_users      = true
-  vpc_id                      = module.shared_vpc.vpc_id
-  private_subnet_ids          = module.shared_vpc.private_backend_checks_subnets
-  db_admin_user               = module.consignment_api_database.database_user
-  db_admin_password           = module.consignment_api_database.database_password
-  db_url                      = module.consignment_api_database.database_url
-  kms_key_arn                 = module.encryption_key.kms_key_arn
-  api_database_security_group = module.api_database_security_group.security_group_id
-  lambda_name                 = "create-db-users"
-  database_name               = "consignmentapi"
+  source                  = "./tdr-terraform-modules/lambda"
+  project                 = var.project
+  common_tags             = local.common_tags
+  lambda_create_db_users  = true
+  vpc_id                  = module.shared_vpc.vpc_id
+  private_subnet_ids      = module.shared_vpc.private_backend_checks_subnets
+  db_admin_user           = module.consignment_api_database.database_user
+  db_admin_password       = module.consignment_api_database.database_password
+  db_url                  = module.consignment_api_database.database_url
+  kms_key_arn             = module.encryption_key.kms_key_arn
+  database_security_group = module.api_database_security_group.security_group_id
+  lambda_name             = "create-db-users"
+  database_name           = "consignmentapi"
 }
 
 module "create_bastion_user_lambda" {
-  source                      = "./tdr-terraform-modules/lambda"
-  project                     = var.project
-  common_tags                 = local.common_tags
-  lambda_create_db_users      = true
-  vpc_id                      = module.shared_vpc.vpc_id
-  private_subnet_ids          = module.shared_vpc.private_backend_checks_subnets
-  db_admin_user               = module.consignment_api_database.database_user
-  db_admin_password           = module.consignment_api_database.database_password
-  db_url                      = module.consignment_api_database.database_url
-  kms_key_arn                 = module.encryption_key.kms_key_arn
-  api_database_security_group = module.api_database_security_group.security_group_id
-  lambda_name                 = "create-bastion-user"
-  database_name               = "bastion"
+  source                  = "./tdr-terraform-modules/lambda"
+  project                 = var.project
+  common_tags             = local.common_tags
+  lambda_create_db_users  = true
+  vpc_id                  = module.shared_vpc.vpc_id
+  private_subnet_ids      = module.shared_vpc.private_backend_checks_subnets
+  db_admin_user           = module.consignment_api_database.database_user
+  db_admin_password       = module.consignment_api_database.database_password
+  db_url                  = module.consignment_api_database.database_url
+  kms_key_arn             = module.encryption_key.kms_key_arn
+  database_security_group = module.api_database_security_group.security_group_id
+  lambda_name             = "create-bastion-user"
+  database_name           = "bastion"
 }
 
 module "service_unavailable_lambda" {
@@ -532,14 +540,15 @@ module "external_sns_notifications_topic" {
 }
 
 module "export_bucket" {
-  source                = "./tdr-terraform-modules/s3"
-  project               = var.project
-  function              = "consignment-export"
-  common_tags           = local.common_tags
-  kms_key_id            = module.s3_external_kms_key.kms_key_arn
-  bucket_key_enabled    = true
-  read_access_role_arns = local.standard_export_bucket_read_access_roles
-  bucket_policy         = "export_bucket"
+  source                    = "./tdr-terraform-modules/s3"
+  project                   = var.project
+  function                  = "consignment-export"
+  common_tags               = local.common_tags
+  kms_key_id                = module.s3_external_kms_key.kms_key_arn
+  bucket_key_enabled        = true
+  read_access_role_arns     = local.standard_export_bucket_read_access_roles
+  bucket_policy             = "export_bucket"
+  s3_bucket_additional_tags = local.aws_back_up_tags
 }
 
 module "export_bucket_judgment" {
@@ -736,6 +745,9 @@ module "rotate_keycloak_secrets_lambda" {
   vpc_id                            = module.shared_vpc.vpc_id
   kms_key_arn                       = module.encryption_key.kms_key_arn
   rotate_keycloak_secrets_event_arn = module.periodic_rotate_keycloak_secrets_event.event_arn
+  api_connection_auth_type          = aws_cloudwatch_event_connection.consignment_api_connection.authorization_type
+  api_connection_name               = aws_cloudwatch_event_connection.consignment_api_connection.name
+  api_connection_secret_arn         = aws_cloudwatch_event_connection.consignment_api_connection.secret_arn
 }
 
 module "periodic_rotate_keycloak_secrets_event" {
@@ -831,7 +843,7 @@ module "consignment_api_database" {
   availability_zone       = local.database_availability_zone
   common_tags             = local.common_tags
   database_name           = "consignmentapi"
-  database_version        = "14.12"
+  database_version        = "17.2"
   environment             = local.environment
   kms_key_id              = module.encryption_key.kms_key_arn
   private_subnets         = module.shared_vpc.private_subnets
@@ -840,6 +852,7 @@ module "consignment_api_database" {
   ca_cert_identifier      = local.database_ca_cert_identifier
   backup_retention_period = local.rds_retention_period_days
   apply_immediately       = true
+  aws_backup_tag          = local.aws_back_up_tags
 }
 
 module "waf_cloudwatch" {

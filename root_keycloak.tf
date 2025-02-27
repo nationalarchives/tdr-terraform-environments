@@ -45,6 +45,7 @@ module "keycloak_ssm_parameters" {
   random_parameters = [
     { name = local.keycloak_backend_checks_secret_name, description = "The Keycloak backend checks secret", value = random_uuid.backend_checks_client_secret.result, type = "SecureString" },
     { name = local.keycloak_tdr_client_secret_name, description = "The Keycloak tdr client secret", value = random_uuid.client_secret.result, type = "SecureString" },
+    { name = local.keycloak_tdr_draft_metadata_client_secret_name, description = "The Keycloak tdr-draft-metadata client secret", value = random_uuid.client_secret.result, type = "SecureString" },
     { name = local.keycloak_tdr_read_client_secret_name, description = "The Keycloak tdr-user-read client secret", value = random_uuid.client_secret.result, type = "SecureString" },
     { name = local.keycloak_tdr_transfer_service_secret_name, description = "The Keycloak tdr-transfer-service client secret", value = random_uuid.client_secret.result, type = "SecureString" },
     { name = local.keycloak_user_password_name, description = "The Keycloak user password", value = random_password.keycloak_password.result, type = "SecureString" },
@@ -67,7 +68,8 @@ module "keycloak_ecs_security_group" {
   vpc_id      = module.shared_vpc.vpc_id
   common_tags = local.common_tags
   ingress_security_group_rules = [
-    { port = 8080, security_group_id = module.keycloak_alb_security_group.security_group_id, description = "Allow the load balancer to access the task" }
+    { port = 8080, security_group_id = module.keycloak_alb_security_group.security_group_id, description = "Allow the load balancer to access the task" },
+    { port = 9000, security_group_id = module.keycloak_alb_security_group.security_group_id, description = "Allow the load balancer to access the task health endpoints" }
   ]
   egress_cidr_rules = [{ port = 0, cidr_blocks = ["0.0.0.0/0"], description = "Allow outbound access on all ports", protocol = "-1" }]
 }
@@ -92,7 +94,7 @@ module "keycloak_database_security_group" {
   common_tags = local.common_tags
   ingress_security_group_rules = [
     { port = 5432, security_group_id = module.keycloak_ecs_security_group.security_group_id, description = "Allow Postgres port from the ECS task" },
-    { port = 5432, security_group_id = module.create_keycloak_db_users_lambda_new.create_keycloak_user_lambda_security_group_new[0], description = "Allow Postgres port from the create user lambda" }
+    { port = 5432, security_group_id = module.create_keycloak_db_users_lambda_new.create_users_lambda_security_group_id[0], description = "Allow Postgres port from the create user lambda" }
   ]
   egress_security_group_rules = [{ port = 5432, security_group_id = module.keycloak_ecs_security_group.security_group_id, description = "Allow Postgres port from the ECS task", protocol = "-1" }]
 }
@@ -104,6 +106,7 @@ module "tdr_keycloak_ecs" {
   common_tags          = local.common_tags
   container_definition = templatefile("${path.module}/templates/ecs_tasks/keycloak.json.tpl", {
     app_image                         = "${local.ecr_account_number}.dkr.ecr.eu-west-2.amazonaws.com/auth-server:${local.environment}"
+    app_port                          = 8080
     app_environment                   = local.environment
     aws_region                        = local.region
     url_path                          = local.keycloak_db_url
@@ -121,15 +124,15 @@ module "tdr_keycloak_ecs" {
     reporting_client_secret_path      = local.keycloak_reporting_client_secret_name
     rotate_client_secrets_client_path = local.keycloak_rotate_secrets_client_secret_name
     sns_topic_arn                     = module.notifications_topic.sns_arn
-    keycloak_host                     = "https://auth.${local.environment_domain}:8080"
+    keycloak_host                     = "https://auth.${local.environment_domain}"
     block_shared_pages                = local.block_shared_keycloak_pages
   })
   container_name               = "keycloak"
-  cpu                          = 1024
+  cpu                          = local.environment == "intg" ? 2048 : 1024
   environment                  = local.environment
   execution_role               = module.keycloak_execution_role.role.arn
   load_balancer_container_port = 8080
-  memory                       = 3072
+  memory                       = local.environment == "intg" ? 4096 : 3072
   private_subnets              = module.shared_vpc.private_backend_checks_subnets
   security_groups              = [module.keycloak_ecs_security_group.security_group_id]
   service_name                 = "keycloak_service_${local.environment}"
@@ -145,6 +148,7 @@ module "keycloak_tdr_alb" {
   alb_log_bucket        = module.alb_logs_s3.s3_bucket_id
   alb_security_group_id = module.keycloak_alb_security_group.security_group_id
   alb_target_group_port = 8080
+  health_check_port     = 9000
   alb_target_type       = "ip"
   certificate_arn       = module.keycloak_certificate.certificate_arn
   health_check_matcher  = "200,303"
@@ -163,7 +167,7 @@ module "keycloak_database_instance" {
   availability_zone       = local.database_availability_zone
   common_tags             = local.common_tags
   database_name           = "keycloak"
-  database_version        = "14.12"
+  database_version        = "17.2"
   environment             = local.environment
   kms_key_id              = module.encryption_key.kms_key_arn
   private_subnets         = module.shared_vpc.private_subnets
@@ -175,18 +179,20 @@ module "keycloak_database_instance" {
 }
 
 module "create_keycloak_db_users_lambda_new" {
-  source                              = "./tdr-terraform-modules/lambda"
-  project                             = var.project
-  common_tags                         = local.common_tags
-  lambda_create_keycloak_db_users_new = true
-  vpc_id                              = module.shared_vpc.vpc_id
-  private_subnet_ids                  = module.shared_vpc.private_subnets
-  db_admin_user                       = module.keycloak_database_instance.database_user
-  db_admin_password                   = module.keycloak_database_instance.database_password
-  db_url                              = module.keycloak_database_instance.database_url
-  kms_key_arn                         = module.encryption_key.kms_key_arn
-  keycloak_password                   = module.keycloak_ssm_parameters.params[local.keycloak_user_password_name].value
-  keycloak_database_security_group    = module.keycloak_database_security_group.security_group_id
+  source                  = "./tdr-terraform-modules/lambda"
+  project                 = var.project
+  common_tags             = local.common_tags
+  lambda_create_db_users  = true
+  database_name           = "keycloak"
+  lambda_name             = "create-keycloak-user"
+  vpc_id                  = module.shared_vpc.vpc_id
+  private_subnet_ids      = module.shared_vpc.private_subnets
+  db_admin_user           = module.keycloak_database_instance.database_user
+  db_admin_password       = module.keycloak_database_instance.database_password
+  db_url                  = module.keycloak_database_instance.database_url
+  kms_key_arn             = module.encryption_key.kms_key_arn
+  keycloak_password       = module.keycloak_ssm_parameters.params[local.keycloak_user_password_name].value
+  database_security_group = module.keycloak_database_security_group.security_group_id
 }
 
 module "keycloak_route53" {

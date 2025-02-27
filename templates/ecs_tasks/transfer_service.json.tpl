@@ -3,7 +3,12 @@
     "name": "transfer-service",
     "image": "${app_image}",
     "networkMode": "awsvpc",
-    "secrets": [],
+    "secrets": [
+      {
+        "name": "TRANSFER_SERVICE_CLIENT_SECRET",
+        "valueFrom": "${transfer_service_client_secret_path}"
+      }
+    ],
     "environment": [
        {
          "name": "AWS_REGION",
@@ -36,7 +41,27 @@
        {
          "name": "API_PORT",
          "value": "${transfer_service_api_port}"
-       }
+       },
+       {
+        "name": "MAX_NUMBER_RECORDS",
+        "value": "${max_number_records}"
+       },
+       {
+         "name": "MAX_INDIVIDUAL_FILE_SIZE_MB",
+         "value": "${max_individual_file_size_mb}"
+       },
+       {
+         "name": "MAX_TRANSFER_SIZE_MB",
+         "value": "${max_transfer_size_mb}"
+       },
+      {
+        "name": "THROTTLE_AMOUNT",
+        "value": "${throttle_amount}"
+      },
+      {
+        "name": "THROTTLE_PER_MS",
+        "value": "${throttle_per_ms}"
+      }
     ],
     "logConfiguration": {
       "logDriver": "awslogs",

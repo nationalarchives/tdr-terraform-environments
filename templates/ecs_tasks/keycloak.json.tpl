@@ -10,11 +10,11 @@
       },
       {
         "valueFrom": "${admin_user_path}",
-        "name": "KEYCLOAK_ADMIN"
+        "name": "KC_BOOTSTRAP_ADMIN_USERNAME"
       },
       {
         "valueFrom": "${admin_password_path}",
-        "name": "KEYCLOAK_ADMIN_PASSWORD"
+        "name": "KC_BOOTSTRAP_ADMIN_PASSWORD"
       },
       {
         "valueFrom" : "${client_secret_path}",
@@ -109,6 +109,10 @@
       {
         "containerPort": 8080,
         "hostPort": 8080
+      },
+      {
+        "containerPort": 9000,
+        "hostPort": 9000
       }
     ]
   }
