@@ -149,10 +149,12 @@ locals {
   da_reference_generator_limit = module.tdr_configuration.terraform_config["reference_generator_limit"]
 
   //feature access blocks
-  block_shared_keycloak_pages   = local.environment == "intg" ? false : true
-  block_draft_metadata_upload   = false
-  block_metadata_review         = false
-  block_skip_metadata_review    = false
+  block_shared_keycloak_pages = local.environment == "intg" ? false : true
+  block_draft_metadata_upload = false
+  block_metadata_review       = false
+  block_skip_metadata_review  = false
+  block_utf8_validator        = local.environment == "intg" ? false : true
+
   draft_metadata_s3_bucket_name = "${var.project}-draft-metadata-${local.environment}"
 
   flat_format_bucket_name          = "tdr-export-${local.environment}"
