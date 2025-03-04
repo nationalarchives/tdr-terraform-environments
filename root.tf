@@ -515,7 +515,7 @@ module "flat_format_export_bucket" {
     bucket_name       = local.flat_format_bucket_name
     read_access_roles = [local.dr2_copy_files_role]
   })
-
+  s3_data_bucket_additional_tags = local.aws_back_up_tags
 }
 
 module "flat_format_export_bucket_judgment" {
@@ -852,7 +852,6 @@ module "consignment_api_database" {
   ca_cert_identifier      = local.database_ca_cert_identifier
   backup_retention_period = local.rds_retention_period_days
   apply_immediately       = true
-  aws_backup_tag          = local.aws_back_up_tags
 }
 
 module "waf_cloudwatch" {

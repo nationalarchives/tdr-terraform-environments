@@ -7,6 +7,7 @@ locals {
     service_name : "cloudwatch"
     service_source_account : data.aws_caller_identity.current.account_id
   }]
+  aws_backup_role_local = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/org-deploy-backup-role"
 }
 
 module "s3_external_kms_key" {
@@ -18,6 +19,7 @@ module "s3_external_kms_key" {
       module.notification_lambda.notifications_lambda_role_arn[0],
       module.consignment_export_task_role.role.arn,
       local.dr2_copy_files_role,
+      local.aws_backup_role_local,
     ], local.aws_sso_export_bucket_access_roles, local.standard_export_bucket_read_access_roles, local.judgment_export_bucket_read_access_roles)
     ci_roles        = [local.assume_role]
     service_details = local.s3_external_service_details
