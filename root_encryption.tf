@@ -7,7 +7,7 @@ locals {
     service_name : "cloudwatch"
     service_source_account : data.aws_caller_identity.current.account_id
   }]
-  wiz_role_arns = local.environment == "prod" ? [] : ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/org-wiz-access-role"]
+  wiz_role_arns = module.tdr_configuration.terraform_config[local.environment]["wiz_role_arns"]
 }
 
 module "s3_external_kms_key" {
