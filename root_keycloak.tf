@@ -165,7 +165,7 @@ module "keycloak_database_instance" {
   source                  = "./tdr-terraform-modules/rds_instance"
   admin_username          = "keycloak_admin"
   availability_zone       = local.database_availability_zone
-  common_tags             = local.common_tags
+  common_tags             = merge(local.common_tags, local.aws_back_up_tags)
   database_name           = "keycloak"
   database_version        = "17.2"
   environment             = local.environment
