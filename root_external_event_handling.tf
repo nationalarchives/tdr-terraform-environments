@@ -26,6 +26,7 @@ module "external_event_handler_lambda" {
   policies = {
     "TDRExternalEventHandlerLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/external_event_handler_lambda_policy.json.tpl", {
       function_name = local.external_event_handler_function_name
+      account_id         = var.tdr_account_number
     })
   }
 }
