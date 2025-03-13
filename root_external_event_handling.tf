@@ -16,6 +16,7 @@ module "external_event_handling_sqs_queue" {
 }
 
 module "external_event_handler_lambda" {
+  count           = local.event_handling_count
   source          = "./da-terraform-modules/lambda"
   function_name   = local.external_event_handler_function_name
   tags            = local.common_tags
