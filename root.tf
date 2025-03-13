@@ -263,13 +263,13 @@ module "frontend_alb" {
 }
 
 module "encryption_key" {
-  source              = "./tdr-terraform-modules/kms"
-  project             = var.project
-  function            = "encryption"
-  key_policy          = "message_system_access"
-  environment         = local.environment
-  common_tags         = local.common_tags
-  aws_backup_role_arn = local.aws_back_up_role
+  source                      = "./tdr-terraform-modules/kms"
+  project                     = var.project
+  function                    = "encryption"
+  key_policy                  = "message_system_access"
+  environment                 = local.environment
+  common_tags                 = local.common_tags
+  aws_backup_service_role_arn = local.aws_back_up_role
 }
 
 module "waf" {
