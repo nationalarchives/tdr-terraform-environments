@@ -20,7 +20,7 @@ locals {
 
   clean_bucket_lifecycle_rules = [
     {
-      id     = "clean-dirty-buckets-objects"
+      id     = "delete-clean-bucket-objects"
       status = local.clean_bucket_policy_status
       expiration = {
         days = local.default_expiration_days
@@ -32,7 +32,7 @@ locals {
 
   dirty_bucket_lifecycle_rules = [
     {
-      id     = "delete-dirty-buckets-objects"
+      id     = "delete-dirty-bucket-objects"
       status = local.dirty_bucket_policy_status
       expiration = {
         days = local.default_expiration_days
@@ -44,7 +44,7 @@ locals {
 
   export_bucket_lifecycle_rules = [
     {
-      id     = "delete-export-buckets-objects"
+      id     = "delete-export-bucket-objects"
       status = local.export_bucket_policy_status
       expiration = {
         days = local.default_expiration_days
@@ -56,7 +56,7 @@ locals {
 
   quarantine_bucket_lifecycle_rules = [
     {
-      id     = "quarantine-export-buckets-objects"
+      id     = "delete-quarantine-bucket-objects"
       status = local.quarantine_bucket_policy_status
       expiration = {
         days = local.default_expiration_days
