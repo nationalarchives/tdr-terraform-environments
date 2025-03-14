@@ -165,7 +165,7 @@ module "keycloak_database_instance" {
   source                  = "./tdr-terraform-modules/rds_instance"
   admin_username          = "keycloak_admin"
   availability_zone       = local.database_availability_zone
-  common_tags             = merge(local.common_tags, local.aws_back_up_tags)
+  common_tags             = local.common_tags
   database_name           = "keycloak"
   database_version        = "17.2"
   environment             = local.environment
@@ -176,6 +176,7 @@ module "keycloak_database_instance" {
   ca_cert_identifier      = local.database_ca_cert_identifier
   backup_retention_period = local.rds_retention_period_days
   apply_immediately       = true
+  aws_backup_tag          = local.aws_back_up_tags
 }
 
 module "create_keycloak_db_users_lambda_new" {
