@@ -519,8 +519,9 @@ module "flat_format_export_bucket" {
   kms_key_arn = module.s3_external_kms_key.kms_key_arn
   common_tags = local.common_tags
   bucket_policy = templatefile("${path.module}/templates/s3/allow_read_access.json.tpl", {
-    bucket_name       = local.flat_format_bucket_name
-    read_access_roles = [local.dr2_copy_files_role]
+    bucket_name           = local.flat_format_bucket_name
+    read_access_roles     = [local.dr2_copy_files_role]
+    aws_backup_local_role = local.aws_back_up_local_role
   })
   s3_data_bucket_additional_tags = local.aws_back_up_tags
 }
@@ -530,6 +531,12 @@ module "flat_format_export_bucket_judgment" {
   bucket_name = local.flat_format_judgment_bucket_name
   kms_key_arn = module.s3_external_kms_key.kms_key_arn
   common_tags = local.common_tags
+  bucket_policy = templatefile("${path.module}/templates/s3/allow_read_access.json.tpl", {
+    bucket_name           = local.flat_format_judgment_bucket_name
+    read_access_roles     = []
+    aws_backup_local_role = local.aws_back_up_local_role
+  })
+  s3_data_bucket_additional_tags = local.aws_back_up_tags
 }
 
 module "external_sns_notifications_topic" {
