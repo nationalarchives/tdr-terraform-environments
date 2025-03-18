@@ -14,7 +14,7 @@ locals {
   aws_backup_local_role_name = module.aws_backup_configuration.terraform_config["local_account_backup_role_name"]
   aws_back_up_service_role   = local.environment == "prod" ? module.aws_backup_configuration.terraform_config["aws_service_backup_role"] : ""
   aws_back_up_local_role     = local.environment == "prod" ? "arn:aws:iam::${var.tdr_account_number}:role/${local.aws_backup_local_role_name}" : ""
-  aws_back_up_tags           = local.environment == "prod" ? module.tdr_configuration.terraform_config["aws_backup_7_day_no_cold_tag"] : null
+  aws_back_up_tags           = local.environment == "prod" ? module.tdr_configuration.terraform_config["aws_backup_daily_short_term_retain_tag"] : null
 
   common_tags = tomap(
     {
