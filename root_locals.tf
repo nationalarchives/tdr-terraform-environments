@@ -153,7 +153,6 @@ locals {
   block_draft_metadata_upload = false
   block_metadata_review       = false
   block_skip_metadata_review  = false
-  block_utf8_validator        = local.environment == "intg" ? false : true
 
   draft_metadata_s3_bucket_name = "${var.project}-draft-metadata-${local.environment}"
 
