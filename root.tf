@@ -125,7 +125,7 @@ module "upload_bucket" {
   bucket_key_enabled = local.internal_bucket_key_enabled
   kms_key_id         = local.internal_s3_encryption_key_arn
   common_tags        = local.common_tags
-  lifecycle_rules    = local.clean_bucket_lifecycle_rules
+  lifecycle_rules    = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
 }
 
 module "upload_bucket_quarantine" {
@@ -135,7 +135,7 @@ module "upload_bucket_quarantine" {
   bucket_key_enabled = local.internal_bucket_key_enabled
   kms_key_id         = local.internal_s3_encryption_key_arn
   common_tags        = local.common_tags
-  lifecycle_rules    = local.quarantine_bucket_lifecycle_rules
+  lifecycle_rules    = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
 }
 
 module "upload_file_cloudfront_dirty_s3" {
@@ -517,7 +517,7 @@ module "flat_format_export_bucket" {
     bucket_name       = local.flat_format_bucket_name
     read_access_roles = [local.dr2_copy_files_role]
   })
-  lifecycle_rules = local.export_bucket_lifecycle_rules
+  lifecycle_rules = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
 }
 
 module "flat_format_export_bucket_judgment" {
@@ -525,7 +525,7 @@ module "flat_format_export_bucket_judgment" {
   bucket_name     = local.flat_format_judgment_bucket_name
   kms_key_arn     = module.s3_external_kms_key.kms_key_arn
   common_tags     = local.common_tags
-  lifecycle_rules = local.export_bucket_lifecycle_rules
+  lifecycle_rules = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
 }
 
 module "external_sns_notifications_topic" {
@@ -552,7 +552,7 @@ module "export_bucket" {
   read_access_role_arns     = local.standard_export_bucket_read_access_roles
   bucket_policy             = "export_bucket"
   s3_bucket_additional_tags = local.aws_back_up_tags
-  lifecycle_rules           = local.export_bucket_lifecycle_rules
+  lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
 }
 
 module "export_bucket_judgment" {
@@ -564,7 +564,7 @@ module "export_bucket_judgment" {
   bucket_key_enabled    = true
   read_access_role_arns = local.judgment_export_bucket_read_access_roles
   bucket_policy         = "export_bucket"
-  lifecycle_rules       = local.export_bucket_lifecycle_rules
+  lifecycle_rules       = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
 }
 
 module "notifications_topic" {
