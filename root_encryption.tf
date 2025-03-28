@@ -1,13 +1,11 @@
 locals {
   e2e_testing_role_arns = local.environment == "prod" ? [] : [module.tdr_configuration.terraform_config[local.environment]["e2e_testing_role_arn"]]
-  s3_external_service_details = local.environment == "intg" ? [{
-    service_name : "cloudwatch"
-    service_source_account : data.aws_caller_identity.current.account_id
-    }, { service_name : "backup" }] : [{
+  s3_external_service_details = [{
     service_name : "cloudwatch"
     service_source_account : data.aws_caller_identity.current.account_id
   }]
-  wiz_role_arns = module.tdr_configuration.terraform_config[local.environment]["wiz_role_arns"]
+  wiz_role_arns     = module.tdr_configuration.terraform_config[local.environment]["wiz_role_arns"]
+  aws_back_up_roles = local.environment == "prod" ? [local.aws_back_up_local_role] : []
 }
 
 module "s3_external_kms_key" {
@@ -19,7 +17,7 @@ module "s3_external_kms_key" {
       module.notification_lambda.notifications_lambda_role_arn[0],
       module.consignment_export_task_role.role.arn,
       local.dr2_copy_files_role,
-    ], local.aws_sso_export_bucket_access_roles, local.standard_export_bucket_read_access_roles, local.judgment_export_bucket_read_access_roles)
+    ], local.aws_sso_export_bucket_access_roles, local.standard_export_bucket_read_access_roles, local.judgment_export_bucket_read_access_roles, local.aws_back_up_roles)
     ci_roles        = [local.assume_role]
     service_details = local.s3_external_service_details
     wiz_roles       = local.wiz_role_arns
@@ -56,7 +54,7 @@ module "s3_internal_kms_key" {
       module.frontend.task_role_arn,
       module.draft_metadata_checks.step_function_role_arn,
       module.aws_guard_duty_s3_malware_scan_role.role_arn
-    ], local.aws_sso_internal_bucket_access_roles, local.e2e_testing_role_arns)
+    ], local.aws_sso_internal_bucket_access_roles, local.e2e_testing_role_arns, local.aws_back_up_roles)
     ci_roles = [local.assume_role]
     service_details = [
       {
@@ -78,7 +76,7 @@ module "s3_upload_kms_key" {
       module.file_format_v2.lambda_role_arn,
       module.checksum_v2.lambda_role_arn,
       module.aws_guard_duty_s3_malware_scan_role.role_arn
-    ], local.aws_sso_internal_bucket_access_roles)
+    ], local.aws_sso_internal_bucket_access_roles, local.aws_back_up_roles)
     ci_roles = [local.assume_role]
     service_details = [
       {

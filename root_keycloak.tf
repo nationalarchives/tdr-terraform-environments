@@ -176,6 +176,7 @@ module "keycloak_database_instance" {
   ca_cert_identifier      = local.database_ca_cert_identifier
   backup_retention_period = local.rds_retention_period_days
   apply_immediately       = true
+  aws_backup_tag          = local.aws_back_up_tags
 }
 
 module "create_keycloak_db_users_lambda_new" {
