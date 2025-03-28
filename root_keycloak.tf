@@ -187,9 +187,8 @@ module "create_keycloak_db_users_lambda_new" {
   lambda_name             = "create-keycloak-user"
   vpc_id                  = module.shared_vpc.vpc_id
   private_subnet_ids      = module.shared_vpc.private_subnets
-  db_admin_user           = module.keycloak_database_instance.database_user
-  db_admin_password       = module.keycloak_database_instance.database_password
   db_url                  = module.keycloak_database_instance.database_url
+  db_secrets_arn          = module.keycloak_database_instance.database_master_user_secret_arn
   kms_key_arn             = module.encryption_key.kms_key_arn
   keycloak_password       = module.keycloak_ssm_parameters.params[local.keycloak_user_password_name].value
   database_security_group = module.keycloak_database_security_group.security_group_id
