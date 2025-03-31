@@ -305,9 +305,8 @@ module "create_db_users_lambda" {
   lambda_create_db_users  = true
   vpc_id                  = module.shared_vpc.vpc_id
   private_subnet_ids      = module.shared_vpc.private_backend_checks_subnets
-  db_admin_user           = module.consignment_api_database.database_user
-  db_admin_password       = module.consignment_api_database.database_password
   db_url                  = module.consignment_api_database.database_url
+  db_secrets_arn          = module.consignment_api_database.database_master_user_secret_arn
   kms_key_arn             = module.encryption_key.kms_key_arn
   database_security_group = module.api_database_security_group.security_group_id
   lambda_name             = "create-db-users"
@@ -321,9 +320,8 @@ module "create_bastion_user_lambda" {
   lambda_create_db_users  = true
   vpc_id                  = module.shared_vpc.vpc_id
   private_subnet_ids      = module.shared_vpc.private_backend_checks_subnets
-  db_admin_user           = module.consignment_api_database.database_user
-  db_admin_password       = module.consignment_api_database.database_password
   db_url                  = module.consignment_api_database.database_url
+  db_secrets_arn          = module.consignment_api_database.database_master_user_secret_arn
   kms_key_arn             = module.encryption_key.kms_key_arn
   database_security_group = module.api_database_security_group.security_group_id
   lambda_name             = "create-bastion-user"
