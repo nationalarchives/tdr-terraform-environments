@@ -4,7 +4,7 @@ module "draft_metadata_validator_lambda" {
   tags            = local.common_tags
   use_image       = true
   image_url       = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/draft-metadata-validator:${local.environment}"
-  timeout_seconds = 120
+  timeout_seconds = 240
   memory_size     = 1024
   policies = {
     "TDRDraftMetadataValidatorLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_validator_lambda.json.tpl", {
@@ -17,11 +17,10 @@ module "draft_metadata_validator_lambda" {
     })
   }
   plaintext_env_vars = {
-    API_URL              = "${module.consignment_api.api_url}/graphql"
-    AUTH_URL             = local.keycloak_auth_url
-    CLIENT_SECRET_PATH   = local.keycloak_tdr_draft_metadata_client_secret_name
-    BUCKET_NAME          = local.draft_metadata_s3_bucket_name
-    BLOCK_UTF8_VALIDATOR = local.block_utf8_validator
+    API_URL            = "${module.consignment_api.api_url}/graphql"
+    AUTH_URL           = local.keycloak_auth_url
+    CLIENT_SECRET_PATH = local.keycloak_tdr_draft_metadata_client_secret_name
+    BUCKET_NAME        = local.draft_metadata_s3_bucket_name
   }
 }
 

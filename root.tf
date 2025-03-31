@@ -119,12 +119,13 @@ module "alb_logs_s3" {
 }
 
 module "upload_bucket" {
-  source                    = "./tdr-terraform-modules/s3"
-  project                   = var.project
-  function                  = "upload-files"
-  bucket_key_enabled        = local.internal_bucket_key_enabled
-  kms_key_id                = local.internal_s3_encryption_key_arn
-  common_tags               = local.common_tags
+  source             = "./tdr-terraform-modules/s3"
+  project            = var.project
+  function           = "upload-files"
+  bucket_key_enabled = local.internal_bucket_key_enabled
+  kms_key_id         = local.internal_s3_encryption_key_arn
+  common_tags        = local.common_tags
+  lifecycle_rules    = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
   aws_backup_local_role_arn = local.aws_back_up_local_role
   s3_bucket_additional_tags = local.aws_back_up_tags
 }
@@ -136,6 +137,7 @@ module "upload_bucket_quarantine" {
   bucket_key_enabled        = local.internal_bucket_key_enabled
   kms_key_id                = local.internal_s3_encryption_key_arn
   common_tags               = local.common_tags
+  lifecycle_rules    = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
   aws_backup_local_role_arn = local.aws_back_up_local_role
   s3_bucket_additional_tags = local.aws_back_up_tags
 }
@@ -227,6 +229,7 @@ module "consignment_api_alb" {
   public_subnets        = module.shared_vpc.public_subnets
   vpc_id                = module.shared_vpc.vpc_id
   common_tags           = local.common_tags
+  idle_timeout          = 180
 }
 
 module "keycloak_certificate" {
@@ -309,9 +312,8 @@ module "create_db_users_lambda" {
   lambda_create_db_users  = true
   vpc_id                  = module.shared_vpc.vpc_id
   private_subnet_ids      = module.shared_vpc.private_backend_checks_subnets
-  db_admin_user           = module.consignment_api_database.database_user
-  db_admin_password       = module.consignment_api_database.database_password
   db_url                  = module.consignment_api_database.database_url
+  db_secrets_arn          = module.consignment_api_database.database_master_user_secret_arn
   kms_key_arn             = module.encryption_key.kms_key_arn
   database_security_group = module.api_database_security_group.security_group_id
   lambda_name             = "create-db-users"
@@ -325,9 +327,8 @@ module "create_bastion_user_lambda" {
   lambda_create_db_users  = true
   vpc_id                  = module.shared_vpc.vpc_id
   private_subnet_ids      = module.shared_vpc.private_backend_checks_subnets
-  db_admin_user           = module.consignment_api_database.database_user
-  db_admin_password       = module.consignment_api_database.database_password
   db_url                  = module.consignment_api_database.database_url
+  db_secrets_arn          = module.consignment_api_database.database_master_user_secret_arn
   kms_key_arn             = module.encryption_key.kms_key_arn
   database_security_group = module.api_database_security_group.security_group_id
   lambda_name             = "create-bastion-user"
@@ -523,6 +524,7 @@ module "flat_format_export_bucket" {
     read_access_roles     = [local.dr2_copy_files_role]
     aws_backup_local_role = local.aws_back_up_local_role
   })
+  lifecycle_rules = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
   s3_data_bucket_additional_tags = local.aws_back_up_tags
 }
 
@@ -536,6 +538,7 @@ module "flat_format_export_bucket_judgment" {
     read_access_roles     = []
     aws_backup_local_role = local.aws_back_up_local_role
   })
+  lifecycle_rules = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
   s3_data_bucket_additional_tags = local.aws_back_up_tags
 }
 
@@ -563,6 +566,7 @@ module "export_bucket" {
   read_access_role_arns     = local.standard_export_bucket_read_access_roles
   bucket_policy             = "export_bucket"
   s3_bucket_additional_tags = local.aws_back_up_tags
+  lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
   aws_backup_local_role_arn = local.aws_back_up_local_role
 }
 
@@ -575,6 +579,7 @@ module "export_bucket_judgment" {
   bucket_key_enabled        = true
   read_access_role_arns     = local.judgment_export_bucket_read_access_roles
   bucket_policy             = "export_bucket"
+  lifecycle_rules       = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
   s3_bucket_additional_tags = local.aws_back_up_tags
   aws_backup_local_role_arn = local.aws_back_up_local_role
 }
