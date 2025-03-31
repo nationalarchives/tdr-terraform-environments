@@ -119,13 +119,13 @@ module "alb_logs_s3" {
 }
 
 module "upload_bucket" {
-  source             = "./tdr-terraform-modules/s3"
-  project            = var.project
-  function           = "upload-files"
-  bucket_key_enabled = local.internal_bucket_key_enabled
-  kms_key_id         = local.internal_s3_encryption_key_arn
-  common_tags        = local.common_tags
-  lifecycle_rules    = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  source                    = "./tdr-terraform-modules/s3"
+  project                   = var.project
+  function                  = "upload-files"
+  bucket_key_enabled        = local.internal_bucket_key_enabled
+  kms_key_id                = local.internal_s3_encryption_key_arn
+  common_tags               = local.common_tags
+  lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
   aws_backup_local_role_arn = local.aws_back_up_local_role
   s3_bucket_additional_tags = local.aws_back_up_tags
 }
@@ -137,7 +137,7 @@ module "upload_bucket_quarantine" {
   bucket_key_enabled        = local.internal_bucket_key_enabled
   kms_key_id                = local.internal_s3_encryption_key_arn
   common_tags               = local.common_tags
-  lifecycle_rules    = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
   aws_backup_local_role_arn = local.aws_back_up_local_role
   s3_bucket_additional_tags = local.aws_back_up_tags
 }
@@ -524,7 +524,7 @@ module "flat_format_export_bucket" {
     read_access_roles     = [local.dr2_copy_files_role]
     aws_backup_local_role = local.aws_back_up_local_role
   })
-  lifecycle_rules = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  lifecycle_rules                = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
   s3_data_bucket_additional_tags = local.aws_back_up_tags
 }
 
@@ -538,7 +538,7 @@ module "flat_format_export_bucket_judgment" {
     read_access_roles     = []
     aws_backup_local_role = local.aws_back_up_local_role
   })
-  lifecycle_rules = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  lifecycle_rules                = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
   s3_data_bucket_additional_tags = local.aws_back_up_tags
 }
 
@@ -579,7 +579,7 @@ module "export_bucket_judgment" {
   bucket_key_enabled        = true
   read_access_role_arns     = local.judgment_export_bucket_read_access_roles
   bucket_policy             = "export_bucket"
-  lifecycle_rules       = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
   s3_bucket_additional_tags = local.aws_back_up_tags
   aws_backup_local_role_arn = local.aws_back_up_local_role
 }
