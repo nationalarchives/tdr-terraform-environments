@@ -535,7 +535,7 @@ module "flat_format_export_bucket_judgment" {
   common_tags = local.common_tags
   bucket_policy = templatefile("${path.module}/templates/s3/allow_read_access.json.tpl", {
     bucket_name           = local.flat_format_judgment_bucket_name
-    read_access_roles     = []
+    read_access_roles     = [local.dr2_copy_files_role]
     aws_backup_local_role = local.aws_back_up_local_role
   })
   lifecycle_rules                = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
