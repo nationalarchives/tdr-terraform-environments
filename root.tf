@@ -119,23 +119,27 @@ module "alb_logs_s3" {
 }
 
 module "upload_bucket" {
-  source             = "./tdr-terraform-modules/s3"
-  project            = var.project
-  function           = "upload-files"
-  bucket_key_enabled = local.internal_bucket_key_enabled
-  kms_key_id         = local.internal_s3_encryption_key_arn
-  common_tags        = local.common_tags
-  lifecycle_rules    = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  source                    = "./tdr-terraform-modules/s3"
+  project                   = var.project
+  function                  = "upload-files"
+  bucket_key_enabled        = local.internal_bucket_key_enabled
+  kms_key_id                = local.internal_s3_encryption_key_arn
+  common_tags               = local.common_tags
+  lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  aws_backup_local_role_arn = local.aws_back_up_local_role
+  s3_bucket_additional_tags = local.aws_back_up_tags
 }
 
 module "upload_bucket_quarantine" {
-  source             = "./tdr-terraform-modules/s3"
-  project            = var.project
-  function           = "upload-files-quarantine"
-  bucket_key_enabled = local.internal_bucket_key_enabled
-  kms_key_id         = local.internal_s3_encryption_key_arn
-  common_tags        = local.common_tags
-  lifecycle_rules    = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  source                    = "./tdr-terraform-modules/s3"
+  project                   = var.project
+  function                  = "upload-files-quarantine"
+  bucket_key_enabled        = local.internal_bucket_key_enabled
+  kms_key_id                = local.internal_s3_encryption_key_arn
+  common_tags               = local.common_tags
+  lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  aws_backup_local_role_arn = local.aws_back_up_local_role
+  s3_bucket_additional_tags = local.aws_back_up_tags
 }
 
 module "upload_file_cloudfront_dirty_s3" {
@@ -151,6 +155,8 @@ module "upload_file_cloudfront_dirty_s3" {
   cloudfront_oai               = module.cloudfront_upload.cloudfront_oai_iam_arn
   cloudfront_distribution_arns = [module.cloudfront_upload.cloudfront_arn]
   lifecycle_rules              = local.dirty_bucket_lifecycle_rules
+  aws_backup_local_role_arn    = local.aws_back_up_local_role
+  s3_bucket_additional_tags    = local.aws_back_up_tags
 }
 
 module "upload_file_cloudfront_logs" {
@@ -272,7 +278,8 @@ module "encryption_key" {
   key_policy                  = "message_system_access"
   environment                 = local.environment
   common_tags                 = local.common_tags
-  aws_backup_service_role_arn = local.aws_back_up_role
+  aws_backup_service_role_arn = local.aws_back_up_service_role
+  aws_backup_local_role_arn   = local.aws_back_up_local_role
 }
 
 module "waf" {
@@ -513,18 +520,26 @@ module "flat_format_export_bucket" {
   kms_key_arn = module.s3_external_kms_key.kms_key_arn
   common_tags = local.common_tags
   bucket_policy = templatefile("${path.module}/templates/s3/allow_read_access.json.tpl", {
-    bucket_name       = local.flat_format_bucket_name
-    read_access_roles = [local.dr2_copy_files_role]
+    bucket_name           = local.flat_format_bucket_name
+    read_access_roles     = [local.dr2_copy_files_role]
+    aws_backup_local_role = local.aws_back_up_local_role
   })
-  lifecycle_rules = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  lifecycle_rules                = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  s3_data_bucket_additional_tags = local.aws_back_up_tags
 }
 
 module "flat_format_export_bucket_judgment" {
-  source          = "./da-terraform-modules/s3"
-  bucket_name     = local.flat_format_judgment_bucket_name
-  kms_key_arn     = module.s3_external_kms_key.kms_key_arn
-  common_tags     = local.common_tags
-  lifecycle_rules = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  source      = "./da-terraform-modules/s3"
+  bucket_name = local.flat_format_judgment_bucket_name
+  kms_key_arn = module.s3_external_kms_key.kms_key_arn
+  common_tags = local.common_tags
+  bucket_policy = templatefile("${path.module}/templates/s3/allow_read_access.json.tpl", {
+    bucket_name           = local.flat_format_judgment_bucket_name
+    read_access_roles     = []
+    aws_backup_local_role = local.aws_back_up_local_role
+  })
+  lifecycle_rules                = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  s3_data_bucket_additional_tags = local.aws_back_up_tags
 }
 
 module "external_sns_notifications_topic" {
@@ -552,18 +567,21 @@ module "export_bucket" {
   bucket_policy             = "export_bucket"
   s3_bucket_additional_tags = local.aws_back_up_tags
   lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  aws_backup_local_role_arn = local.aws_back_up_local_role
 }
 
 module "export_bucket_judgment" {
-  source                = "./tdr-terraform-modules/s3"
-  project               = var.project
-  function              = "consignment-export-judgment"
-  common_tags           = local.common_tags
-  kms_key_id            = module.s3_external_kms_key.kms_key_arn
-  bucket_key_enabled    = true
-  read_access_role_arns = local.judgment_export_bucket_read_access_roles
-  bucket_policy         = "export_bucket"
-  lifecycle_rules       = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  source                    = "./tdr-terraform-modules/s3"
+  project                   = var.project
+  function                  = "consignment-export-judgment"
+  common_tags               = local.common_tags
+  kms_key_id                = module.s3_external_kms_key.kms_key_arn
+  bucket_key_enabled        = true
+  read_access_role_arns     = local.judgment_export_bucket_read_access_roles
+  bucket_policy             = "export_bucket"
+  lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  s3_bucket_additional_tags = local.aws_back_up_tags
+  aws_backup_local_role_arn = local.aws_back_up_local_role
 }
 
 module "notifications_topic" {
