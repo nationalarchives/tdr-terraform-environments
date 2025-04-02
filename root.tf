@@ -566,7 +566,6 @@ module "export_bucket" {
   read_access_role_arns     = local.standard_export_bucket_read_access_roles
   bucket_policy             = "export_bucket"
   s3_bucket_additional_tags = local.aws_back_up_tags
-  lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
   aws_backup_local_role_arn = local.aws_back_up_local_role
 }
 
