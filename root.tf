@@ -567,6 +567,7 @@ module "export_bucket" {
   bucket_policy             = "export_bucket"
   s3_bucket_additional_tags = local.aws_back_up_tags
   aws_backup_local_role_arn = local.aws_back_up_local_role
+  lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
 }
 
 module "export_bucket_judgment" {
