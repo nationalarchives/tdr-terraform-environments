@@ -6,7 +6,12 @@
       "Principal": {
         "Service": "ecs-tasks.amazonaws.com"
       },
-      "Effect": "Allow"
+      "Effect": "Allow",
+      "Condition": {
+        "StringEquals": {
+          "aws:SourceAccount": "${account_id}"
+        }
+      }
     }
   ]
 }
