@@ -21,10 +21,12 @@ module "keycloak_ecs_task_policy" {
 }
 
 module "keycloak_execution_role" {
-  source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("${path.module}/templates/iam_policy/ecs_assume_role_policy.json.tpl", {})
-  common_tags        = local.common_tags
-  name               = "KeycloakECSExecutionRole${title(local.environment)}"
+  source = "./tdr-terraform-modules/iam_role"
+  assume_role_policy = templatefile("${path.module}/templates/iam_policy/ecs_assume_role_policy.json.tpl", {
+    account_id = data.aws_caller_identity.current.account_id
+  })
+  common_tags = local.common_tags
+  name        = "KeycloakECSExecutionRole${title(local.environment)}"
   policy_attachments = {
     ssm_policy       = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess",
     execution_policy = module.keycloak_ecs_execution_policy.policy_arn
@@ -32,8 +34,10 @@ module "keycloak_execution_role" {
 }
 
 module "keycloak_task_role" {
-  source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("${path.module}/templates/iam_policy/ecs_assume_role_policy.json.tpl", {})
+  source = "./tdr-terraform-modules/iam_role"
+  assume_role_policy = templatefile("${path.module}/templates/iam_policy/ecs_assume_role_policy.json.tpl", {
+    account_id = data.aws_caller_identity.current.account_id
+  })
   common_tags        = local.common_tags
   name               = "KeycloakECSTaskRole${title(local.environment)}"
   policy_attachments = { task_policy = module.keycloak_ecs_task_policy.policy_arn }

@@ -65,10 +65,12 @@ module "run_update_keycloak_execution_policy" {
 }
 
 module "run_update_keycloak_execution_role" {
-  source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./templates/iam_policy/ecs_assume_role_policy.json.tpl", {})
-  common_tags        = local.common_tags
-  name               = "TDRKeycloakUpdateECSExecutionRole${title(local.environment)}"
+  source = "./tdr-terraform-modules/iam_role"
+  assume_role_policy = templatefile("./templates/iam_policy/ecs_assume_role_policy.json.tpl", {
+    account_id = data.aws_caller_identity.current.account_id
+  })
+  common_tags = local.common_tags
+  name        = "TDRKeycloakUpdateECSExecutionRole${title(local.environment)}"
   policy_attachments = {
     run_updates = module.run_update_keycloak_execution_policy.policy_arn,
     ssm         = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"

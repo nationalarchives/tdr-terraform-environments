@@ -7,6 +7,11 @@
         "Service": "ecs-tasks.amazonaws.com"
       },
       "Effect": "Allow",
+      "Condition": {
+        "StringEquals": {
+          "aws:SourceAccount": "${account_id}"
+        }
+      },
       "Sid": ""
     }
   ]
