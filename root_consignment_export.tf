@@ -14,10 +14,12 @@ module "consignment_export_cloudwatch" {
 }
 
 module "consignment_export_execution_role" {
-  source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./templates/iam_policy/ecs_assume_role_policy.json.tpl", {})
-  common_tags        = local.common_tags
-  name               = "TDRConsignmentExportECSExecutionRole${title(local.environment)}"
+  source = "./tdr-terraform-modules/iam_role"
+  assume_role_policy = templatefile("./templates/iam_policy/ecs_assume_role_policy.json.tpl", {
+    account_id = data.aws_caller_identity.current.account_id
+  })
+  common_tags = local.common_tags
+  name        = "TDRConsignmentExportECSExecutionRole${title(local.environment)}"
   policy_attachments = {
     execution_policy = module.consignment_export_execution_policy.policy_arn,
     ssm_policy       = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
@@ -25,10 +27,12 @@ module "consignment_export_execution_role" {
 }
 
 module "consignment_export_task_role" {
-  source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./templates/iam_policy/ecs_assume_role_policy.json.tpl", {})
-  common_tags        = local.common_tags
-  name               = "TDRConsignmentExportEcsTaskRole${title(local.environment)}"
+  source = "./tdr-terraform-modules/iam_role"
+  assume_role_policy = templatefile("./templates/iam_policy/ecs_assume_role_policy.json.tpl", {
+    account_id = data.aws_caller_identity.current.account_id
+  })
+  common_tags = local.common_tags
+  name        = "TDRConsignmentExportEcsTaskRole${title(local.environment)}"
   policy_attachments = {
     task_policy = module.consignment_export_task_policy.policy_arn
   }
