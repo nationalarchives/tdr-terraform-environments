@@ -2,7 +2,7 @@
 
 locals {
   aws_sso_export_bucket_access_roles   = local.environment == "prod" ? [] : [data.aws_ssm_parameter.aws_sso_admin_role.value, data.aws_ssm_parameter.aws_sso_export_role.value]
-  aws_sso_internal_bucket_access_roles = local.environment == "prod" ? [] : [data.aws_ssm_parameter.aws_sso_admin_role.value]
+  aws_sso_internal_bucket_access_roles = local.environment == "prod" ? [data.aws_ssm_parameter.aws_sso_admin_role.value] : [data.aws_ssm_parameter.aws_sso_admin_role.value]
 }
 
 data "aws_ssm_parameter" "aws_sso_admin_role" {
