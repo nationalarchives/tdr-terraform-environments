@@ -73,10 +73,6 @@
         "value": "${otel_service_name}"
       },
       {
-        "name": "BLOCK_DRAFT_METADATA_UPLOAD",
-        "value": "${block_draft_metadata_upload}"
-      },
-      {
         "name": "DRAFT_METADATA_VALIDATOR_API_URL",
         "value": "${draft_metadata_validator_api_url}"
       },
@@ -87,14 +83,6 @@
       {
         "name": "NOTIFICATION_SNS_TOPIC_ARN",
         "value": "${notification_sns_topic_arn}"
-      },
-      {
-        "name": "BLOCK_METADATA_REVIEW",
-        "value": "${block_metadata_review}"
-      },
-      {
-        "name": "BLOCK_SKIP_METADATA_REVIEW",
-        "value": "${block_skip_metadata_review}"
       },
       {
         "name": "FILE_CHECKS_TOTAL_TIMEOUT_IN_SECONDS",

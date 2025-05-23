@@ -47,12 +47,6 @@ variable "public_subnet_ranges" {
   type = list(string)
 }
 
-variable "block_draft_metadata_upload" {}
-
-variable "block_metadata_review" {}
-
-variable "block_skip_metadata_review" {}
-
 variable "draft_metadata_validator_api_url" {}
 
 variable "draft_metadata_s3_kms_keys" {}
