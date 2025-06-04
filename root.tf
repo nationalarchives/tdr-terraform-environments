@@ -684,7 +684,8 @@ module "athena" {
 // We'll attach policies to the role when the bastion is created.
 module "bastion_role" {
   source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./tdr-terraform-modules/ec2/templates/ec2_assume_role.json.tpl", {})
+  assume_role_policy = templatefile("./tdr-terraform-modules/ec2/templates/ec2_assume_role.json.tpl", {
+   account_id = data.aws_caller_identity.current.id })
   common_tags        = local.common_tags
   name               = "BastionEC2Role${title(local.environment)}"
   policy_attachments = {}
