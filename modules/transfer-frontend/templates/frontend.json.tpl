@@ -87,6 +87,10 @@
       {
         "name": "FILE_CHECKS_TOTAL_TIMEOUT_IN_SECONDS",
         "value": "${file_checks_total_timeout_in_seconds}"
+      },
+      {
+        "name": "BLOCK_SKIP_METADATA_REVIEW",
+        "value": "${block_skip_metadata_review}"
       }
     ],
     "networkMode": "awsvpc",
