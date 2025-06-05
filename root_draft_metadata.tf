@@ -47,7 +47,7 @@ module "draft_metadata_api_gateway" {
 
 resource "aws_iam_role" "draft_metadata_api_gateway_execution_role" {
   name               = "TDRMetadataChecksAPIGatewayExecutionRole${title(local.environment)}"
-  assume_role_policy = templatefile("./templates/iam_policy/assume_role_policy.json.tpl", { service = "apigateway.amazonaws.com" })
+  assume_role_policy = templatefile("./templates/iam_policy/assume_role_policy.json.tpl", { service = "apigateway.amazonaws.com", account_id = data.aws_caller_identity.current.id })
 }
 
 resource "aws_iam_policy" "api_gateway_execution_policy" {
