@@ -683,8 +683,9 @@ module "athena" {
 // Create bastion role here so we can attach it to the EFS file system policy as you can't add roles that don't exist
 // We'll attach policies to the role when the bastion is created.
 module "bastion_role" {
-  source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./tdr-terraform-modules/ec2/templates/ec2_assume_role.json.tpl", {})
+  source = "./tdr-terraform-modules/iam_role"
+  assume_role_policy = templatefile("./tdr-terraform-modules/ec2/templates/ec2_assume_role.json.tpl", {
+  account_id = data.aws_caller_identity.current.id })
   common_tags        = local.common_tags
   name               = "BastionEC2Role${title(local.environment)}"
   policy_attachments = {}
