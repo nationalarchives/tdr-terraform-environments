@@ -171,7 +171,7 @@ module "keycloak_database_instance" {
   availability_zone       = local.database_availability_zone
   common_tags             = local.common_tags
   database_name           = "keycloak"
-  database_version        = "17.2"
+  database_version        = "17.4"
   environment             = local.environment
   kms_key_id              = module.encryption_key.kms_key_arn
   private_subnets         = module.shared_vpc.private_subnets
