@@ -126,7 +126,38 @@
           "Next": "SendSNSErrorMessage"
         }
       ],
-      "Next": "EndState"
+      "Next": "LogValidationDetails"
+    },
+    "LogValidationDetails": {
+      "Type": "Pass",
+      "Parameters": {
+        "logMessage.$": "States.Format('Validation completed for consignment {} in {}', $.validatorLambdaResult.consignmentId, $.validatorLambdaResult.validationTime)"
+      },
+      "ResultPath": "$.validationLog",
+      "Next": "CheckValidationStatus"
+    },
+    "CheckValidationStatus": {
+      "Type": "Choice",
+      "Choices": [
+        {
+           "Not": {
+             "Variable": "$.validatorLambdaResult.validationStatus",
+             "IsPresent": true
+           },
+           "Next": "EndState"
+        },
+        {
+          "Variable": "$.validatorLambdaResult.validationStatus",
+          "StringEquals": "success",
+          "Next": "EndState"
+        },
+        {
+          "Variable": "$.validatorLambdaResult.validationStatus",
+          "StringEquals": "failed",
+          "Next": "EndState"
+        }
+      ],
+      "Default": "EndState"
     },
     "SendSNSErrorMessage": {
       "Type": "Task",
