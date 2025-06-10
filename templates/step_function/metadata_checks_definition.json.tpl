@@ -116,7 +116,7 @@
       "Parameters": {
         "consignmentId.$": "$.consignmentId"
       },
-      "ResultPath": "$.validatorLambdaResult",
+      "ResultPath": "$.metadataValidationResult",
       "Catch": [
         {
           "ErrorEquals": [
@@ -126,33 +126,33 @@
           "Next": "SendSNSErrorMessage"
         }
       ],
-      "Next": "LogValidationDetails"
+      "Next": "LogCompleteDetails"
     },
-    "LogValidationDetails": {
+    "LogCompleteDetails": {
       "Type": "Pass",
       "Parameters": {
-        "logMessage.$": "States.Format('Validation completed for consignment {} in {}', $.validatorLambdaResult.consignmentId, $.validatorLambdaResult.validationTime)"
+        "logMessage.$": "States.If(And(States.IsPresent($.metadataValidationResult.consignmentId), States.IsPresent($.metadataValidationResult.validationTime)), States.Format('Validation completed for consignment {} in {}', $.metadataValidationResult.consignmentId, $.metadataValidationResult.validationTime), 'Validation completed but details are missing')"
       },
       "ResultPath": "$.validationLog",
-      "Next": "CheckValidationStatus"
+      "Next": "CheckMetadataValidationStatus"
     },
-    "CheckValidationStatus": {
+    "CheckMetadataValidationStatus": {
       "Type": "Choice",
       "Choices": [
         {
-           "Not": {
-             "Variable": "$.validatorLambdaResult.validationStatus",
-             "IsPresent": true
-           },
-           "Next": "EndState"
+          "Not": {
+            "Variable": "$.metadataValidationResult.validationStatus",
+            "IsPresent": true
+          },
+          "Next": "EndState"
         },
         {
-          "Variable": "$.validatorLambdaResult.validationStatus",
+          "Variable": "$.metadataValidationResult.validationStatus",
           "StringEquals": "success",
           "Next": "EndState"
         },
         {
-          "Variable": "$.validatorLambdaResult.validationStatus",
+          "Variable": "$.metadataValidationResult.validationStatus",
           "StringEquals": "failed",
           "Next": "EndState"
         }
