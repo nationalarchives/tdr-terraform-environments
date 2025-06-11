@@ -116,7 +116,7 @@
       "Parameters": {
         "consignmentId.$": "$.consignmentId"
       },
-      "ResultPath": "$.metadataValidationResult",
+      "ResultPath": "$.validatorLambdaResult",
       "Catch": [
         {
           "ErrorEquals": [
@@ -133,19 +133,19 @@
       "Choices": [
         {
           "Not": {
-            "Variable": "$.metadataValidationResult.validationStatus",
+            "Variable": "$.validatorLambdaResult.validationStatus",
             "IsPresent": true
           },
           "Next": "EndState"
         },
         {
-          "Variable": "$.metadataValidationResult.validationStatus",
+          "Variable": "$.validatorLambdaResult.validationStatus",
           "StringEquals": "success",
           "Comment": "After refactoring of the metadata validation lambda the next will be to save the metadata to the database",
           "Next": "WriteUnknownErrorJsonToS3"
         },
         {
-          "Variable": "$.metadataValidationResult.validationStatus",
+          "Variable": "$.validatorLambdaResult.validationStatus",
           "StringEquals": "failed",
           "Next": "PrepareStatusCompletedWithIssuesParameters"
         }
