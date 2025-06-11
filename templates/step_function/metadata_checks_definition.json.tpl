@@ -126,14 +126,6 @@
           "Next": "SendSNSErrorMessage"
         }
       ],
-      "Next": "LogCompleteDetails"
-    },
-    "LogCompleteDetails": {
-      "Type": "Pass",
-      "Parameters": {
-        "logMessage.$": "States.If(And(States.IsPresent($.metadataValidationResult.consignmentId), States.IsPresent($.metadataValidationResult.validationTime)), States.Format('Validation completed for consignment {} in {}', $.metadataValidationResult.consignmentId, $.metadataValidationResult.validationTime), 'Validation completed but details are missing')"
-      },
-      "ResultPath": "$.validationLog",
       "Next": "CheckMetadataValidationStatus"
     },
     "CheckMetadataValidationStatus": {
@@ -149,12 +141,13 @@
         {
           "Variable": "$.metadataValidationResult.validationStatus",
           "StringEquals": "success",
-          "Next": "EndState"
+          "Comment": "After refactoring of the metadata validation lambda the next will be to save the metadata to the database",
+          "Next": "WriteUnknownErrorJsonToS3"
         },
         {
           "Variable": "$.metadataValidationResult.validationStatus",
           "StringEquals": "failed",
-          "Next": "EndState"
+          "Next": "PrepareStatusCompletedWithIssuesParameters"
         }
       ],
       "Default": "EndState"
