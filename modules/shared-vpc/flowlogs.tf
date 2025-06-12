@@ -26,14 +26,30 @@ resource "aws_iam_role" "tdr_flowlog_role" {
   )
 }
 
+// Getting the flow-log-id would create a cyclic depandancy and it's created name is not
+// predicatble so wildcard is used
+// https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs-iam-role.html
 data "aws_iam_policy_document" "tdr_flowlog_assume_role_policy" {
   version = "2012-10-17"
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
+
     principals {
       type        = "Service"
       identifiers = ["vpc-flow-logs.amazonaws.com"]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:vpc-flow-log/*"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = ["${data.aws_caller_identity.current.id}"]
     }
   }
 }
