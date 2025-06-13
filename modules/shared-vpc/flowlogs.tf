@@ -6,7 +6,8 @@ resource "aws_flow_log" "tdr_flowlog" {
 }
 
 resource "aws_cloudwatch_log_group" "tdr_flowlog_log_group" {
-  name = "/flowlogs/tdr-vpc-${var.environment}"
+  name              = "/flowlogs/tdr-vpc-${var.environment}"
+  retention_in_days = var.cloudwatch_rentention_period
   tags = merge(
     var.common_tags,
     tomap(
