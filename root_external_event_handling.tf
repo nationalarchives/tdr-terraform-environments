@@ -8,11 +8,11 @@ locals {
 }
 
 module "external_event_handling_sqs_queue" {
-  count              = local.event_handling_count
-  source             = "./da-terraform-modules/sqs"
-  tags               = local.common_tags
-  queue_name         = local.sqs_name
-  sqs_policy         = templatefile("./templates/sqs/external_event_handling_policy.json.tpl", {
+  count      = local.event_handling_count
+  source     = "./da-terraform-modules/sqs"
+  tags       = local.common_tags
+  queue_name = local.sqs_name
+  sqs_policy = templatefile("./templates/sqs/external_event_handling_policy.json.tpl", {
     region           = local.region,
     environment      = local.environment,
     account_id       = data.aws_caller_identity.current.account_id,
