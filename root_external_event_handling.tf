@@ -25,6 +25,13 @@ module "external_event_handling_sqs_queue" {
   visibility_timeout = 6 * local.lambda_timeout
 }
 
+resource "aws_sns_topic_subscription" "dr2_ingest_complete" {
+  endpoint             = "arn:aws:sqs:eu-west-2:${var.tdr_account_number}:${local.sqs_name}"
+  protocol             = "sqs"
+  topic_arn            = "arn:aws:sns:${local.region}:${module.dr2_configuration.account_numbers[local.environment]}:${local.dr2_ingest_topic}"
+  raw_message_delivery = true
+}
+
 module "external_event_handler_lambda" {
   count         = local.event_handling_count
   source        = "./da-terraform-modules/lambda"
@@ -43,7 +50,8 @@ module "external_event_handler_lambda" {
       function_name = local.external_event_handler_function_name
       account_id    = var.tdr_account_number
       kms_key_id    = module.encryption_key.kms_key_arn
-      sqs_queue     = local.sqs_name
+      sqs_queue     = local.sqs_name,
+      export_bucket = local.flat_format_bucket_name
     })
   }
 }
