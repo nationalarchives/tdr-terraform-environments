@@ -37,7 +37,9 @@
        ],
        "Resource": [
          "arn:aws:s3:::${export_bucket}",
-         "arn:aws:s3:::${export_bucket}/*"
+         "arn:aws:s3:::${export_bucket}/*",
+         "arn:aws:s3:::${judgment_export_bucket}",
+         "arn:aws:s3:::${judgment_export_bucket}/*"
        ]
     }
   ]

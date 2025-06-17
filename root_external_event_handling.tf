@@ -47,11 +47,12 @@ module "external_event_handler_lambda" {
   runtime         = "java21"
   policies = {
     "TDRExternalEventHandlerLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/external_event_handler_lambda_policy.json.tpl", {
-      function_name = local.external_event_handler_function_name
-      account_id    = var.tdr_account_number
-      kms_key_id    = module.encryption_key.kms_key_arn
-      sqs_queue     = local.sqs_name,
-      export_bucket = local.flat_format_bucket_name
+      function_name          = local.external_event_handler_function_name
+      account_id             = var.tdr_account_number
+      kms_key_id             = module.encryption_key.kms_key_arn
+      sqs_queue              = local.sqs_name,
+      export_bucket          = local.flat_format_bucket_name,
+      judgment_export_bucket = local.flat_format_judgment_bucket_name
     })
   }
 }
