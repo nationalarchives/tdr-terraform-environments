@@ -33,7 +33,7 @@ module "draft_metadata_persistence_lambda" {
   timeout_seconds = 240
   memory_size     = 1024
   policies = {
-    "TDRDraftMetadataPersistenceLambdaPolicy${title(local.environment)}" = templatefile("draft_metadata_persistence_lambda.json.tpl", {
+    "TDRDraftMetadataPersistenceLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_persistence_lambda.json.tpl", {
       account_id     = var.tdr_account_number
       environment    = local.environment
       parameter_name = local.keycloak_tdr_draft_metadata_client_secret_name
@@ -58,7 +58,7 @@ module "draft_metadata_validation_lambda" {
   timeout_seconds = 240
   memory_size     = 1024
   policies = {
-    "TDRDraftMetadataValidationLambdaPolicy${title(local.environment)}" = templatefile("draft_metadata_validation_lambda.json.tpl", {
+    "TDRDraftMetadataValidationLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_validation_lambda.json.tpl", {
       account_id     = var.tdr_account_number
       environment    = local.environment
       parameter_name = local.keycloak_tdr_draft_metadata_client_secret_name
