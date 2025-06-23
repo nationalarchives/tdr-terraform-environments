@@ -27,7 +27,7 @@ module "draft_metadata_validator_lambda" {
 module "draft_metadata_persistence_lambda" {
   source          = "./da-terraform-modules/lambda"
   function_name   = "tdr-draft-metadata-persistence-${local.environment}"
-  handler         = "uk.gov.nationalarchives.draftmetadatapersistence.Lambda::handleRequest"
+  handler         = "uk.gov.nationalarchives.tdr.draftmetadatapersistence.Lambda::handleRequest"
   runtime         = local.runtime_java_21
   tags            = local.common_tags
   timeout_seconds = 240
@@ -52,7 +52,7 @@ module "draft_metadata_persistence_lambda" {
 module "draft_metadata_validation_lambda" {
   source          = "./da-terraform-modules/lambda"
   function_name   = "tdr-draft-metadata-validation-${local.environment}"
-  handler         = "uk.gov.nationalarchives.draftmetadatavalidation.Lambda::handleRequest"
+  handler         = "uk.gov.nationalarchives.tdr.draftmetadatavalidation.Lambda::handleRequest"
   runtime         = local.runtime_java_21
   tags            = local.common_tags
   timeout_seconds = 240
