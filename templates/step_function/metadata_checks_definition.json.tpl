@@ -126,7 +126,31 @@
           "Next": "SendSNSErrorMessage"
         }
       ],
-      "Next": "EndState"
+      "Next": "CheckMetadataValidationStatus"
+    },
+    "CheckMetadataValidationStatus": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Not": {
+            "Variable": "$.validatorLambdaResult.validationStatus",
+            "IsPresent": true
+          },
+          "Next": "EndState"
+        },
+        {
+          "Variable": "$.validatorLambdaResult.validationStatus",
+          "StringEquals": "success",
+          "Comment": "After refactoring of the metadata validation lambda the next will be to save the metadata to the database",
+          "Next": "WriteUnknownErrorJsonToS3"
+        },
+        {
+          "Variable": "$.validatorLambdaResult.validationStatus",
+          "StringEquals": "failed",
+          "Next": "PrepareStatusCompletedWithIssuesParameters"
+        }
+      ],
+      "Default": "EndState"
     },
     "SendSNSErrorMessage": {
       "Type": "Task",
