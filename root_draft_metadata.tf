@@ -160,7 +160,9 @@ resource "aws_iam_policy" "draft_metadata_checks_policy" {
   policy = templatefile("./templates/iam_policy/metadata_checks_policy.json.tpl", {
     resources = jsonencode([
       module.yara_av_v2.lambda_arn,
-      module.draft_metadata_validator_lambda.lambda_arn
+      module.draft_metadata_validator_lambda.lambda_arn,
+      module.draft_metadata_validation_lambda.lambda_arn,
+      module.draft_metadata_persistence_lambda.lambda_arn
     ]),
     draft_metadata_bucket = local.draft_metadata_s3_bucket_name
     s3_kms_key_arn        = module.s3_internal_kms_key.kms_key_arn
