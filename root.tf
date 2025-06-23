@@ -355,7 +355,7 @@ module "export_api_policy" {
 
 module "export_api_role" {
   source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./templates/iam_policy/assume_role_policy.json.tpl", { service = "apigateway.amazonaws.com" })
+  assume_role_policy = templatefile("./templates/iam_policy/api_gateway_assume_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.id })
   common_tags        = local.common_tags
   name               = "TDRExportAPIRole${title(local.environment)}"
   policy_attachments = {
