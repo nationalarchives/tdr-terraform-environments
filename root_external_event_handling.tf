@@ -25,7 +25,7 @@ module "external_event_handling_sqs_queue" {
   visibility_timeout = 6 * local.lambda_timeout
 }
 
-resource "aws_sns_topic_subscription" "dr2_ingest_complete" {
+resource "aws_sns_topic_subscription" "dr2_ingest" {
   endpoint             = "arn:aws:sqs:eu-west-2:${var.tdr_account_number}:${local.sqs_name}"
   protocol             = "sqs"
   topic_arn            = "arn:aws:sns:${local.region}:${module.dr2_configuration.account_numbers[local.environment]}:${local.dr2_ingest_topic}"
