@@ -32,7 +32,7 @@
       "Resource": "arn:aws:sqs:${region}:${account_id}:${sqs_name}",
       "Condition": {
                 "ArnEquals": {
-                  "aws:SourceArn": "arn:aws:sns:${region}:${dr2_account_id}:${dr2_ingest_topic}"
+                  "aws:SourceArn": "${dr2_ingest_topic_arn}"
                 }
       }
     }
