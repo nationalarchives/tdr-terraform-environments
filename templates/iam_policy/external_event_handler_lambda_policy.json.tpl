@@ -25,6 +25,22 @@
       "Action": "kms:Decrypt",
       "Effect": "Allow",
       "Resource": "${kms_key_id}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+         "s3:GetObject",
+         "s3:GetObjectTagging",
+         "s3:ListBucket",
+         "s3:PutObject",
+         "s3:PutObjectTagging"
+       ],
+       "Resource": [
+         "arn:aws:s3:::${export_bucket}",
+         "arn:aws:s3:::${export_bucket}/*",
+         "arn:aws:s3:::${judgment_export_bucket}",
+         "arn:aws:s3:::${judgment_export_bucket}/*"
+       ]
     }
   ]
 }
