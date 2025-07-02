@@ -8,8 +8,8 @@
         "logs:PutLogEvents"
       ],
       "Resource": [
-        "arn:aws:logs:eu-west-2:${account_id}:log-group:/aws/lambda/tdr-draft-metadata-validation-${environment}",
-        "arn:aws:logs:eu-west-2:${account_id}:log-group:/aws/lambda/tdr-draft-metadata-validation-${environment}:log-stream:*"
+        "arn:aws:logs:eu-west-2:${account_id}:log-group:/aws/lambda/tdr-draft-metadata-checks-${environment}",
+        "arn:aws:logs:eu-west-2:${account_id}:log-group:/aws/lambda/tdr-draft-metadata-checks-${environment}:log-stream:*"
       ]
     },
     {

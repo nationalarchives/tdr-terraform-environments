@@ -49,16 +49,16 @@ module "draft_metadata_persistence_lambda" {
   }
 }
 
-module "draft_metadata_validation_lambda" {
+module "draft_metadata_checks_lambda" {
   source          = "./da-terraform-modules/lambda"
-  function_name   = "tdr-draft-metadata-validation-${local.environment}"
-  handler         = "uk.gov.nationalarchives.tdr.draftmetadatavalidation.Lambda::handleRequest"
+  function_name   = "tdr-draft-metadata-checks-${local.environment}"
+  handler         = "uk.gov.nationalarchives.tdr.draftmetadatachecks.Lambda::handleRequest"
   runtime         = local.runtime_java_21
   tags            = local.common_tags
   timeout_seconds = 240
   memory_size     = 1024
   policies = {
-    "TDRDraftMetadataValidationLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_validation_lambda.json.tpl", {
+    "TDRDraftMetadataValidationLambdaPolicy${title(local.environment)}" = templatefile("draft_metadata_checks_lambda.json.tpl", {
       account_id     = var.tdr_account_number
       environment    = local.environment
       parameter_name = local.keycloak_tdr_draft_metadata_client_secret_name
@@ -161,7 +161,7 @@ resource "aws_iam_policy" "draft_metadata_checks_policy" {
     resources = jsonencode([
       module.yara_av_v2.lambda_arn,
       module.draft_metadata_validator_lambda.lambda_arn,
-      module.draft_metadata_validation_lambda.lambda_arn,
+      module.draft_metadata_checks_lambda.lambda_arn,
       module.draft_metadata_persistence_lambda.lambda_arn
     ]),
     draft_metadata_bucket = local.draft_metadata_s3_bucket_name
