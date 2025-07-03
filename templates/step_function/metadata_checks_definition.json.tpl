@@ -152,6 +152,24 @@
       ],
       "Default": "EndState"
     },
+    "RunPersistenceMetadataLambda": {
+          "Type": "Task",
+          "Resource": "${validator_lambda_arn}",
+          "Parameters": {
+            "consignmentId.$": "$.consignmentId"
+          },
+          "ResultPath": "$.validatorLambdaResult",
+          "Catch": [
+            {
+              "ErrorEquals": [
+                "States.ALL"
+              ],
+              "ResultPath": "$.error",
+              "Next": "SendSNSErrorMessage"
+            }
+          ],
+          "Next": "CheckMetadataValidationStatus"
+        }
     "SendSNSErrorMessage": {
       "Type": "Task",
       "Resource": "arn:aws:states:::sns:publish",
