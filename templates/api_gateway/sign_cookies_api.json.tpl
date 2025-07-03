@@ -79,7 +79,7 @@
                 "method.response.header.Access-Control-Allow-Origin" : "'${upload_cors_urls}'"
               },
               "responseTemplates" : {
-                "application/json" : "#if( $input.params('origin') == 'http://localhost:9000' && $context.stage == 'intg') #set($context.responseOverride.header.Access-Control-Allow-Origin = 'http://localhost:9000') #elseif( $input.params('origin').contains('sharepoint.com')) #set($context.responseOverride.header.Access-Control-Allow-Origin = $input.params('origin'))#end"
+                "application/json" : "#if( $input.params('origin') == 'https://app.tdr-local.nationalarchives.gov.uk:9000' && $context.stage == 'intg') #set($context.responseOverride.header.Access-Control-Allow-Origin = 'https://app.tdr-local.nationalarchives.gov.uk:9000') #elseif( $input.params('origin').contains('sharepoint.com')) #set($context.responseOverride.header.Access-Control-Allow-Origin = $input.params('origin'))#end"
               }
             }
           },

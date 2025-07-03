@@ -45,7 +45,7 @@ locals {
 
   upload_domain = "upload.${local.environment_domain}"
 
-  local_dev_frontend_url = "http://localhost:9000"
+  local_dev_frontend_url = "https://app.tdr-local.nationalarchives.gov.uk:9000"
 
   sharepoint_domain = "https://*.sharepoint.com"
 

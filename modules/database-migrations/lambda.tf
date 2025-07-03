@@ -13,6 +13,11 @@ data "aws_iam_policy_document" "lambda_assume_role_document" {
       type        = "Service"
       identifiers = ["lambda.amazonaws.com"]
     }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = ["${data.aws_caller_identity.current.id}"]
+    }
   }
 }
 
