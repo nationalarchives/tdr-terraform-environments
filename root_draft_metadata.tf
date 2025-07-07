@@ -24,6 +24,56 @@ module "draft_metadata_validator_lambda" {
   }
 }
 
+module "draft_metadata_persistence_lambda" {
+  source          = "./da-terraform-modules/lambda"
+  function_name   = "tdr-draft-metadata-persistence-${local.environment}"
+  handler         = "uk.gov.nationalarchives.tdr.draftmetadatapersistence.Lambda::handleRequest"
+  runtime         = local.runtime_java_21
+  tags            = local.common_tags
+  timeout_seconds = 240
+  memory_size     = 1024
+  policies = {
+    "TDRDraftMetadataPersistenceLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_persistence_lambda.json.tpl", {
+      account_id     = var.tdr_account_number
+      environment    = local.environment
+      parameter_name = local.keycloak_tdr_draft_metadata_client_secret_name
+      bucket_name    = local.draft_metadata_s3_bucket_name
+      kms_key_arn    = module.s3_internal_kms_key.kms_key_arn
+    })
+  }
+  plaintext_env_vars = {
+    API_URL            = "${module.consignment_api.api_url}/graphql"
+    AUTH_URL           = local.keycloak_auth_url
+    CLIENT_SECRET_PATH = local.keycloak_tdr_draft_metadata_client_secret_name
+    BUCKET_NAME        = local.draft_metadata_s3_bucket_name
+  }
+}
+
+module "draft_metadata_checks_lambda" {
+  source          = "./da-terraform-modules/lambda"
+  function_name   = "tdr-draft-metadata-checks-${local.environment}"
+  handler         = "uk.gov.nationalarchives.tdr.draftmetadatachecks.Lambda::handleRequest"
+  runtime         = local.runtime_java_21
+  tags            = local.common_tags
+  timeout_seconds = 240
+  memory_size     = 1024
+  policies = {
+    "TDRDraftMetadataValidationLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_checks_lambda.json.tpl", {
+      account_id     = var.tdr_account_number
+      environment    = local.environment
+      parameter_name = local.keycloak_tdr_draft_metadata_client_secret_name
+      bucket_name    = local.draft_metadata_s3_bucket_name
+      kms_key_arn    = module.s3_internal_kms_key.kms_key_arn
+    })
+  }
+  plaintext_env_vars = {
+    API_URL            = "${module.consignment_api.api_url}/graphql"
+    AUTH_URL           = local.keycloak_auth_url
+    CLIENT_SECRET_PATH = local.keycloak_tdr_draft_metadata_client_secret_name
+    BUCKET_NAME        = local.draft_metadata_s3_bucket_name
+  }
+}
+
 module "draft_metadata_api_gateway" {
   source = "./da-terraform-modules/apigateway"
   api_definition = templatefile("./templates/api_gateway/draft_metadata.json.tpl", {
@@ -110,7 +160,9 @@ resource "aws_iam_policy" "draft_metadata_checks_policy" {
   policy = templatefile("./templates/iam_policy/metadata_checks_policy.json.tpl", {
     resources = jsonencode([
       module.yara_av_v2.lambda_arn,
-      module.draft_metadata_validator_lambda.lambda_arn
+      module.draft_metadata_validator_lambda.lambda_arn,
+      module.draft_metadata_checks_lambda.lambda_arn,
+      module.draft_metadata_persistence_lambda.lambda_arn
     ]),
     draft_metadata_bucket = local.draft_metadata_s3_bucket_name
     s3_kms_key_arn        = module.s3_internal_kms_key.kms_key_arn
