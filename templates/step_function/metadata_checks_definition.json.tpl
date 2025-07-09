@@ -251,9 +251,6 @@
         "ContentType": "application/json"
       },
       "Next": "PrepareStatusCompletedWithIssuesParameters"
-    },
-    "EndState": {
-      "Type": "Succeed"
     }
   }
 }
