@@ -158,6 +158,7 @@ module "transfer_service_ecs_task" {
       transfer_service_client_secret_path = local.keycloak_tdr_transfer_service_secret_name
       throttle_amount                     = 50
       throttle_per_ms                     = 10
+      user_email_sns_topic_arn            = module.notifications_topic.sns_arn
   })
   container_name               = "transfer-service"
   cpu                          = 512
