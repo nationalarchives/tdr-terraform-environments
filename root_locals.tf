@@ -75,6 +75,8 @@ locals {
 
   akka_licence_token_name = "/${local.environment}/akka/licence_token"
 
+  akka_licence_key_name = "/${local.environment}/akka/licence_key"
+
   keycloak_backend_checks_secret_name            = "/${local.environment}/keycloak/backend_checks_client/secret"
   keycloak_tdr_client_secret_name                = "/${local.environment}/keycloak/client/secret"
   keycloak_tdr_draft_metadata_client_secret_name = "/${local.environment}/keycloak/draft_metadata_client/secret"
