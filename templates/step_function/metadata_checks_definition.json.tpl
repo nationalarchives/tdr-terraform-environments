@@ -29,7 +29,7 @@
         {
           "Variable": "$.output.antivirus.result",
           "StringEquals": "",
-          "Next": "RunValidateMetadataLambda"
+          "Next": "RunMetadataChecksLambda"
         }
       ],
       "Default": "SendSNSVirusMessage"
@@ -94,6 +94,21 @@
       },
       "Next": "UpdateDraftMetadataStatus"
     },
+    "PrepareStatusCompletedParameters": {
+          "Type": "Pass",
+          "ResultPath": "$.statusUpdate",
+          "Parameters": {
+            "query": "mutation updateConsignmentStatus($updateConsignmentStatusInput: ConsignmentStatusInput!) { updateConsignmentStatus(updateConsignmentStatusInput: $updateConsignmentStatusInput) }",
+            "variables": {
+              "updateConsignmentStatusInput": {
+                "consignmentId.$": "$.consignmentId",
+                "statusType": "DraftMetadata",
+                "statusValue": "Completed"
+              }
+            }
+          },
+          "Next": "UpdateDraftMetadataStatus"
+    },
     "UpdateDraftMetadataStatus": {
       "Type": "Task",
       "Resource": "arn:aws:states:::http:invoke",
@@ -110,13 +125,13 @@
       },
       "End": true
     },
-    "RunValidateMetadataLambda": {
+    "RunMetadataChecksLambda": {
       "Type": "Task",
-      "Resource": "${validator_lambda_arn}",
+      "Resource": "${checks_lambda_arn}",
       "Parameters": {
         "consignmentId.$": "$.consignmentId"
       },
-      "ResultPath": "$.validatorLambdaResult",
+      "ResultPath": "$.checksLambdaResult",
       "Catch": [
         {
           "ErrorEquals": [
@@ -126,7 +141,71 @@
           "Next": "SendSNSErrorMessage"
         }
       ],
-      "Next": "EndState"
+      "Next": "CheckMetadataValidationStatus"
+    },
+    "CheckMetadataValidationStatus": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Not": {
+            "Variable": "$.checksLambdaResult.validationStatus",
+            "IsPresent": true
+          },
+          "Next": "SendSNSErrorMessage"
+        },
+        {
+          "Variable": "$.checksLambdaResult.validationStatus",
+          "StringEquals": "success",
+          "Next": "RunPersistenceMetadataLambda"
+        },
+        {
+          "Variable": "$.checksLambdaResult.validationStatus",
+          "StringEquals": "failure",
+          "Next": "PrepareStatusCompletedWithIssuesParameters"
+        }
+      ],
+      "Default": "SendSNSErrorMessage"
+    },
+    "RunPersistenceMetadataLambda": {
+      "Type": "Task",
+      "Resource": "${persistence_lambda_arn}",
+      "Parameters": {
+        "consignmentId.$": "$.consignmentId"
+      },
+      "ResultPath": "$.checksLambdaResult",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.error",
+          "Next": "SendSNSErrorMessage"
+        }
+      ],
+      "Next": "CheckMetadataPersistenceStatus"
+    },
+    "CheckMetadataPersistenceStatus": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Not": {
+            "Variable": "$.checksLambdaResult.persistenceStatus",
+            "IsPresent": true
+          },
+          "Next": "SendSNSErrorMessage"
+        },
+        {
+          "Variable": "$.checksLambdaResult.persistenceStatus",
+          "StringEquals": "failure",
+          "Next": "PrepareStatusCompletedWithIssuesParameters"
+        },
+        {
+          "Variable": "$.checksLambdaResult.persistenceStatus",
+          "StringEquals": "success",
+          "Next": "PrepareStatusCompletedParameters"
+        }
+      ],
+      "Default": "SendSNSErrorMessage"
     },
     "SendSNSErrorMessage": {
       "Type": "Task",
@@ -172,9 +251,6 @@
         "ContentType": "application/json"
       },
       "Next": "PrepareStatusCompletedWithIssuesParameters"
-    },
-    "EndState": {
-      "Type": "Succeed"
     }
   }
 }
