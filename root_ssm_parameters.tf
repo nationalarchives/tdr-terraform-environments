@@ -41,7 +41,7 @@ module "akka_licence_key_ssm_parameters" {
       name        = local.akka_licence_key_name,
       description = "Licence key for Akka"
       type        = "SecureString"
-      value       = "To be manually added"
+      value       = "nonProdDummyLicenceKey"
     }
   ]
   tags = merge(local.common_tags, local.manual_input_tag)
