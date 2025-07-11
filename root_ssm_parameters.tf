@@ -39,7 +39,7 @@ module "akka_licence_key_ssm_parameters" {
   parameters = [
     {
       name        = local.akka_licence_key_name,
-      description = "Licence token for Akka"
+      description = "Licence key for Akka"
       type        = "SecureString"
       value       = "To be manually added"
     }
