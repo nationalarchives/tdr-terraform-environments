@@ -61,6 +61,18 @@
       {
         "name": "THROTTLE_PER_MS",
         "value": "${throttle_per_ms}"
+      },
+      {
+        "name": "USER_EMAIL_SNS_TOPIC_ARN",
+        "value": "${user_email_sns_topic_arn}"
+      },
+      {
+        "name": "USER_READ_CLIENT_ID",
+        "value": "${user_read_client_id}"
+      },
+      {
+        "name": "USER_READ_CLIENT_SECRET",
+        "value": "${user_read_client_secret}"
       }
     ],
     "logConfiguration": {
