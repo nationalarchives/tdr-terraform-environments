@@ -35,10 +35,6 @@
         "name": "DB_ADDR"
       },
       {
-        "valueFrom": "${akka_licence_token_name}",
-        "name": "AKKA_LICENCE_TOKEN"
-      },
-      {
         "valueFrom": "${akka_licence_key_name}",
         "name": "AKKA_LICENCE_KEY"
       }
