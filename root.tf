@@ -737,6 +737,34 @@ module "create_keycloak_users_s3_lambda" {
   s3_bucket_arn                  = module.create_bulk_users_bucket.s3_bucket_arn
 }
 
+module "disable_keycloak_users_api_lambda" {
+  source                           = "./tdr-terraform-modules/lambda"
+  common_tags                      = local.common_tags
+  project                          = var.project
+  user_admin_client_secret         = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
+  user_admin_client_secret_path    = local.keycloak_user_admin_client_secret_name
+  reporting_client_secret          = module.keycloak_ssm_parameters.params[local.keycloak_reporting_client_secret_name].value
+  reporting_client_secret_path     = local.keycloak_reporting_client_secret_name
+  kms_key_arn                      = module.encryption_key.kms_key_arn
+  auth_url                         = local.keycloak_auth_url
+  vpc_id                           = module.shared_vpc.vpc_id
+  lambda_disable_keycloak_user_api = true
+  private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
+  scheduled_disable_judgment_arn   = module.create_disable_judgment_users_scheduled_event.event_arn
+}
+
+module "create_disable_judgment_users_scheduled_event" {
+  source                  = "./da-terraform-modules/cloudwatch_events"
+  rule_description        = "Scheduled event to disable judgment Keycloak users"
+  schedule                = "rate(30 day)"
+  rule_name               = "disable-judgment-keycloak-users"
+  lambda_event_target_arn = module.disable_keycloak_users_api_lambda.disable_keycloak_users_api_lambda_arn
+  input = jsonencode({
+    userType         = "judgment_user"
+    inactivityPeriod = 6
+  })
+}
+
 module "create_keycloak_users_api" {
   source        = "./tdr-terraform-modules/apigatewayv2"
   body_template = templatefile("${path.module}/templates/api_gateway/create_keycloak_users.json.tpl", { region = local.region, lambda_arn = module.create_keycloak_users_api_lambda.create_keycloak_users_api_lambda_arn, auth_url = local.keycloak_auth_url })
