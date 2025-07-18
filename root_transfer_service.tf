@@ -5,7 +5,8 @@ locals {
   domain                 = "nationalarchives.gov.uk"
   sub_domain             = "transfer-service"
   # Require abbreviated name for staging as ALB name cannot be more than 32 characters which is the case for staging
-  alb_function_name = local.environment == "staging" ? "transfer-serv" : "transfer-service"
+  alb_function_name                  = local.environment == "staging" ? "transfer-serv" : "transfer-service"
+  aggregate_processing_function_name = "tdr-aggregate-processing-${local.environment}"
 }
 
 module "transfer_service_execution_role" {
@@ -173,4 +174,21 @@ module "transfer_service_ecs_task" {
   service_name                 = "transferservice_service_${local.environment}"
   task_family_name             = "transfer_service_${local.environment}"
   task_role                    = module.transfer_service_task_role[0].role_arn
+}
+
+module "aggregate_processing_lambda" {
+  count           = local.transfer_service_count
+  source          = "./da-terraform-modules/lambda"
+  function_name   = local.aggregate_processing_function_name
+  tags            = local.common_tags
+  handler         = "uk.gov.nationalarchives.aggregate.processing.AggregateProcessingLambda::processDataLoad"
+  timeout_seconds = 60
+  memory_size     = 512
+  runtime         = "java21"
+  policies = {
+    "TDRAggregateProcessingLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/aggregate_processing_lambda_policy.json.tpl", {
+      function_name = local.aggregate_processing_function_name
+      account_id    = var.tdr_account_number
+    })
+  }
 }
