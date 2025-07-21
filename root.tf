@@ -754,6 +754,7 @@ module "disable_keycloak_users_api_lambda" {
   }
   plaintext_env_vars = {
     AUTH_URL                      = local.keycloak_auth_url
+    API_URL                       = "${module.consignment_api.api_url}/graphql"
     USER_ADMIN_CLIENT_SECRET      = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
     USER_ADMIN_CLIENT_SECRET_PATH = local.keycloak_user_admin_client_secret_name
     REPORTING_CLIENT_SECRET       = module.keycloak_ssm_parameters.params[local.keycloak_reporting_client_secret_name].value
