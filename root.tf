@@ -737,7 +737,7 @@ module "create_keycloak_users_s3_lambda" {
   s3_bucket_arn                  = module.create_bulk_users_bucket.s3_bucket_arn
 }
 
-module "inactive_keycloak_users" {
+module "inactive_keycloak_users_lambda" {
   source        = "./da-terraform-modules/lambda"
   function_name = local.inactive_keycloak_users_function_name
   tags          = local.common_tags
