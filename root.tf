@@ -737,15 +737,15 @@ module "create_keycloak_users_s3_lambda" {
   s3_bucket_arn                  = module.create_bulk_users_bucket.s3_bucket_arn
 }
 
-module "disable_keycloak_users_api_lambda" {
+module "inactive_keycloak_users" {
   source        = "./da-terraform-modules/lambda"
-  function_name = "${var.project}-disable-keycloak-users-${local.environment}"
+  function_name = local.inactive_keycloak_users_function_name
   tags          = local.common_tags
-  handler       = "uk.gov.nationalarchives.keycloak.users.DisableKeycloakUsersLambda::handleRequest"
+  handler       = "uk.gov.nationalarchives.keycloak.users.InactiveKeycloakUsersLambda::handleRequest"
   runtime       = local.runtime_java_21
   policies = {
-    "TDRDisableKeycloakUsersLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/disable_keycloak_users_api_lambda.json.tpl", {
-      function_name                 = local.disable_keycloak_user_api_function_name
+    "TDRInactiveKeycloakUsersLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/inactive_keycloak_users_lambda.json.tpl", {
+      function_name                 = local.inactive_keycloak_users_function_name
       account_id                    = var.tdr_account_number
       kms_arn                       = module.encryption_key.kms_key_arn
       user_admin_client_secret_path = local.keycloak_user_admin_client_secret_name
@@ -760,18 +760,6 @@ module "disable_keycloak_users_api_lambda" {
     REPORTING_CLIENT_SECRET       = module.keycloak_ssm_parameters.params[local.keycloak_reporting_client_secret_name].value
     REPORTING_CLIENT_SECRET_PATH  = local.keycloak_reporting_client_secret_name
   }
-}
-
-module "create_disable_judgment_users_scheduled_event" {
-  source                  = "./da-terraform-modules/cloudwatch_events"
-  rule_description        = "Scheduled event to disable judgment Keycloak users"
-  schedule                = "rate(30 day)"
-  rule_name               = "disable-judgment-keycloak-users"
-  lambda_event_target_arn = module.disable_keycloak_users_api_lambda.lambda_arn
-  input = jsonencode({
-    userType             = "judgment_user"
-    inactivityPeriodDays = 180
-  })
 }
 
 module "create_keycloak_users_api" {
