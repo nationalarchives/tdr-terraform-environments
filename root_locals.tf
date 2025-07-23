@@ -107,14 +107,15 @@ locals {
   //Set to true to create security audit IAM user group
   security_audit = false
 
-  file_upload_data_function_name       = "${var.project}-file-upload-data-${local.environment}"
-  api_update_v2_function_name          = "${var.project}-api-update-v2-${local.environment}"
-  backend_checks_results_function_name = "${var.project}-backend-checks-results-${local.environment}"
-  yara_av_v2_function_name             = "${var.project}-yara-av-v2-${local.environment}"
-  file_format_v2_function_name         = "${var.project}-file-format-v2-${local.environment}"
-  checksum_v2_function_name            = "${var.project}-checksum-v2-${local.environment}"
-  redacted_files_function_name         = "${var.project}-redacted-files-${local.environment}"
-  statuses_function_name               = "${var.project}-statuses-${local.environment}"
+  file_upload_data_function_name        = "${var.project}-file-upload-data-${local.environment}"
+  api_update_v2_function_name           = "${var.project}-api-update-v2-${local.environment}"
+  backend_checks_results_function_name  = "${var.project}-backend-checks-results-${local.environment}"
+  yara_av_v2_function_name              = "${var.project}-yara-av-v2-${local.environment}"
+  file_format_v2_function_name          = "${var.project}-file-format-v2-${local.environment}"
+  checksum_v2_function_name             = "${var.project}-checksum-v2-${local.environment}"
+  redacted_files_function_name          = "${var.project}-redacted-files-${local.environment}"
+  statuses_function_name                = "${var.project}-statuses-${local.environment}"
+  inactive_keycloak_users_function_name = "${var.project}-inactive-keycloak-users-${local.environment}"
 
   runtime_python_3_9 = "python3.9"
   runtime_python_3_7 = "python3.7"
