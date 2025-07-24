@@ -21,7 +21,7 @@ jobs:
     with:
       repo-name: tdr-terraform-environments
       environment: ${{ github.event.inputs.environment }}
-      terraform-version: '1.9.8'
+      terraform-version: 1.12.2
     secrets:
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
