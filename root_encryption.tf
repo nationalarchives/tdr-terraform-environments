@@ -64,6 +64,7 @@ module "s3_internal_kms_key" {
         service_source_account : data.aws_caller_identity.current.account_id
       }
     ]
+    wiz_roles = local.wiz_role_arns
   }
 }
 
@@ -87,5 +88,6 @@ module "s3_upload_kms_key" {
       }
     ]
     cloudfront_distributions = [module.cloudfront_upload.cloudfront_arn]
+    wiz_roles                = local.wiz_role_arns
   }
 }
