@@ -39,4 +39,22 @@ locals {
         noncurrent_days = local.default_expiration_days
       }
   }]
+
+  non_prod_export_bucket_lifecycle_rules = [
+    {
+      id     = "delete-export-bucket-objects"
+      status = "Enabled"
+      expiration = {
+        days = local.default_non_prod_expiration_days
+      }
+      filter = {
+        tag = {
+          key   = "PreserveDigitalAssetIngest"
+          value = "Complete"
+        }
+      }
+      noncurrent_version_expiration = {
+        noncurrent_days = local.default_non_prod_expiration_days
+      }
+    }]
 }
