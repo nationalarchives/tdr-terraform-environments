@@ -58,5 +58,7 @@ module "external_event_handler_lambda" {
   plaintext_env_vars = {
     EXPORT_BUCKET          = local.flat_format_bucket_name,
     JUDGMENT_EXPORT_BUCKET = local.flat_format_judgment_bucket_name,
+    DR2_INGEST_TAG_KEY     = local.object_tag_dr2_ingest_key,
+    DR2_INGEST_TAG_VALUE   = local.object_tag_dr2_ingest_value,
   }
 }

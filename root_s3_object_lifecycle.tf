@@ -5,6 +5,9 @@ locals {
   backend_checks_bucket_policy_status = "Enabled"
   dirty_bucket_policy_status          = local.environment == "prod" ? "Disabled" : "Enabled"
 
+  object_tag_dr2_ingest_key   = "PreserveDigitalAssetIngest"
+  object_tag_dr2_ingest_value = "Complete"
+
   backend_checks_results_bucket_lifecycle_rules = [{
     id     = "delete-backend-checks-results-bucket-objects"
     status = local.backend_checks_bucket_policy_status
@@ -49,12 +52,12 @@ locals {
       }
       filter = {
         tag = {
-          key   = "PreserveDigitalAssetIngest"
-          value = "Complete"
+          key   = local.object_tag_dr2_ingest_key
+          value = local.object_tag_dr2_ingest_value
         }
       }
       noncurrent_version_expiration = {
         noncurrent_days = local.default_non_prod_expiration_days
       }
-    }]
+  }]
 }
