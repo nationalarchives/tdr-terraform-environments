@@ -738,11 +738,12 @@ module "create_keycloak_users_s3_lambda" {
 }
 
 module "inactive_keycloak_users_lambda" {
-  source        = "./da-terraform-modules/lambda"
-  function_name = local.inactive_keycloak_users_function_name
-  tags          = local.common_tags
-  handler       = "uk.gov.nationalarchives.keycloak.users.InactiveKeycloakUsersLambda::handleRequest"
-  runtime       = local.runtime_java_21
+  source          = "./da-terraform-modules/lambda"
+  function_name   = local.inactive_keycloak_users_function_name
+  tags            = local.common_tags
+  handler         = "uk.gov.nationalarchives.keycloak.users.InactiveKeycloakUsersLambda::handleRequest"
+  runtime         = local.runtime_java_21
+  timeout_seconds = 240
   policies = {
     "TDRInactiveKeycloakUsersLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/inactive_keycloak_users_lambda.json.tpl", {
       function_name                 = local.inactive_keycloak_users_function_name
