@@ -522,7 +522,7 @@ module "flat_format_export_bucket" {
     read_access_roles     = [local.dr2_copy_files_role]
     aws_backup_local_role = local.aws_back_up_local_role
   })
-  lifecycle_rules                = local.environment == "prod" ? [] : local.non_prod_export_bucket_lifecycle_rules
+  lifecycle_rules                = local.environment == "prod" ? [] : local.export_bucket_lifecycle_rules
   s3_data_bucket_additional_tags = local.aws_back_up_tags
 }
 
