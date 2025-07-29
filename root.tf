@@ -753,6 +753,11 @@ module "inactive_keycloak_users_lambda" {
       reporting_client_secret_path  = local.keycloak_reporting_client_secret_name
     })
   }
+  vpc_config = {
+    subnet_ids         = module.shared_vpc.private_backend_checks_subnets
+    security_group_ids = [module.outbound_only_security_group.security_group_id]
+  }
+
   plaintext_env_vars = {
     AUTH_URL                      = local.keycloak_auth_url
     API_URL                       = "${module.consignment_api.api_url}/graphql"
