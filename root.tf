@@ -768,6 +768,19 @@ module "inactive_keycloak_users_lambda" {
   }
 }
 
+module "disable_inactive_judgment_users_scheduled_event" {
+  source                  = "./da-terraform-modules/cloudwatch_events"
+  count                   = local.environment == "prod" ? 0 : 1
+  rule_description        = "Scheduled event to disable inactive judgment Keycloak users"
+  schedule                = "rate(30 day)"
+  rule_name               = "disable-inactive-judgment-keycloak-users"
+  lambda_event_target_arn = module.inactive_keycloak_users_lambda.lambda_arn
+  input = jsonencode({
+    userType             = "judgment_user"
+    inactivityPeriodDays = 180
+  })
+}
+
 module "create_keycloak_users_api" {
   source        = "./tdr-terraform-modules/apigatewayv2"
   body_template = templatefile("${path.module}/templates/api_gateway/create_keycloak_users.json.tpl", { region = local.region, lambda_arn = module.create_keycloak_users_api_lambda.create_keycloak_users_api_lambda_arn, auth_url = local.keycloak_auth_url })
