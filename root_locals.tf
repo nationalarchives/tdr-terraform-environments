@@ -94,6 +94,7 @@ locals {
 
   slack_bot_token_name           = "/${local.environment}/slack/bot"
   slack_bau_webhook              = "/${local.environment}/slack/bau/webhook"
+  slack_transfers_webhook        = "/${local.environment}/slack/transfers/webhook"
   tdr_reporting_slack_channel_id = "/${local.environment}/slack/tdr_reporting/channel_id"
 
   keycloak_reporting_client_id      = "tdr-reporting"
