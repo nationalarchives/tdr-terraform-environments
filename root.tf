@@ -522,7 +522,7 @@ module "flat_format_export_bucket" {
     read_access_roles     = [local.dr2_copy_files_role]
     aws_backup_local_role = local.aws_back_up_local_role
   })
-  lifecycle_rules                = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  lifecycle_rules                = local.environment == "prod" ? [] : local.export_bucket_lifecycle_rules
   s3_data_bucket_additional_tags = local.aws_back_up_tags
 }
 
@@ -738,11 +738,12 @@ module "create_keycloak_users_s3_lambda" {
 }
 
 module "inactive_keycloak_users_lambda" {
-  source        = "./da-terraform-modules/lambda"
-  function_name = local.inactive_keycloak_users_function_name
-  tags          = local.common_tags
-  handler       = "uk.gov.nationalarchives.keycloak.users.InactiveKeycloakUsersLambda::handleRequest"
-  runtime       = local.runtime_java_21
+  source          = "./da-terraform-modules/lambda"
+  function_name   = local.inactive_keycloak_users_function_name
+  tags            = local.common_tags
+  handler         = "uk.gov.nationalarchives.keycloak.users.InactiveKeycloakUsersLambda::handleRequest"
+  runtime         = local.runtime_java_21
+  timeout_seconds = 240
   policies = {
     "TDRInactiveKeycloakUsersLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/inactive_keycloak_users_lambda.json.tpl", {
       function_name                 = local.inactive_keycloak_users_function_name
@@ -752,6 +753,11 @@ module "inactive_keycloak_users_lambda" {
       reporting_client_secret_path  = local.keycloak_reporting_client_secret_name
     })
   }
+  vpc_config = {
+    subnet_ids         = module.shared_vpc.private_backend_checks_subnets
+    security_group_ids = [module.outbound_only_security_group.security_group_id]
+  }
+
   plaintext_env_vars = {
     AUTH_URL                      = local.keycloak_auth_url
     API_URL                       = "${module.consignment_api.api_url}/graphql"
@@ -760,6 +766,19 @@ module "inactive_keycloak_users_lambda" {
     REPORTING_CLIENT_SECRET       = module.keycloak_ssm_parameters.params[local.keycloak_reporting_client_secret_name].value
     REPORTING_CLIENT_SECRET_PATH  = local.keycloak_reporting_client_secret_name
   }
+}
+
+module "disable_inactive_judgment_users_scheduled_event" {
+  source                  = "./da-terraform-modules/cloudwatch_events"
+  count                   = local.environment == "prod" ? 0 : 1
+  rule_description        = "Scheduled event to disable inactive judgment Keycloak users"
+  schedule                = "rate(30 days)"
+  rule_name               = "disable-inactive-judgment-keycloak-users"
+  lambda_event_target_arn = module.inactive_keycloak_users_lambda.lambda_arn
+  input = jsonencode({
+    userType             = "judgment_user"
+    inactivityPeriodDays = 180
+  })
 }
 
 module "create_keycloak_users_api" {

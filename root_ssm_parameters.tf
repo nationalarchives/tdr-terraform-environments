@@ -47,3 +47,16 @@ module "bau_slack_channel_ssm_parameter" {
   tags = merge(local.common_tags, local.manual_input_tag)
 }
 
+module "transfers_slack_channel_ssm_parameter" {
+  source = "./da-terraform-modules/ssm_parameter"
+  parameters = [
+    {
+      name        = local.slack_transfers_webhook,
+      description = "Webhook for TDR transfers slack channel. Value to be added manually"
+      type        = "SecureString"
+      value       = "To be manually added"
+    }
+  ]
+  tags = merge(local.common_tags, local.manual_input_tag)
+}
+
