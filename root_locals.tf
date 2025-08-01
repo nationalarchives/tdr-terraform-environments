@@ -118,10 +118,11 @@ locals {
   statuses_function_name                = "${var.project}-statuses-${local.environment}"
   inactive_keycloak_users_function_name = "${var.project}-inactive-keycloak-users-${local.environment}"
 
-  runtime_python_3_9 = "python3.9"
-  runtime_python_3_7 = "python3.7"
-  runtime_java_11    = "java11"
-  runtime_java_21    = "java21"
+  runtime_python_3_13 = "python3.13"
+  runtime_python_3_9  = "python3.9"
+  runtime_python_3_7  = "python3.7"
+  runtime_java_11     = "java11"
+  runtime_java_21     = "java21"
 
   upload_files_cloudfront_dirty_bucket_name = "${var.project}-upload-files-cloudfront-dirty-${local.environment}"
 
