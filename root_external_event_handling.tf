@@ -42,10 +42,10 @@ module "external_event_handler_lambda" {
     sqs_queue_arn         = "arn:aws:sqs:eu-west-2:${var.tdr_account_number}:${local.sqs_name}",
     ignore_enabled_status = false
   }]
-  timeout_seconds = local.lambda_timeout
+  timeout_seconds      = local.lambda_timeout
   reserved_concurrency = 10
-  memory_size     = 512
-  runtime         = "java21"
+  memory_size          = 512
+  runtime              = "java21"
   policies = {
     "TDRExternalEventHandlerLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/external_event_handler_lambda_policy.json.tpl", {
       function_name          = local.external_event_handler_function_name
