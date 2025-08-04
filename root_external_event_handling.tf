@@ -43,6 +43,7 @@ module "external_event_handler_lambda" {
     ignore_enabled_status = false
   }]
   timeout_seconds = local.lambda_timeout
+  reserved_concurrency = 10
   memory_size     = 512
   runtime         = "java21"
   policies = {
