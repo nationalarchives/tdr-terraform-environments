@@ -119,8 +119,6 @@ locals {
   inactive_keycloak_users_function_name = "${var.project}-inactive-keycloak-users-${local.environment}"
 
   runtime_python_3_13 = "python3.13"
-  runtime_python_3_9  = "python3.9"
-  runtime_python_3_7  = "python3.7"
   runtime_java_11     = "java11"
   runtime_java_21     = "java21"
 
