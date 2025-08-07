@@ -78,7 +78,7 @@ module "file_upload_data" {
     })
   }
   role_name = "TDRFileUploadDataLambdaRole${title(local.environment)}"
-  runtime   = local.runtime_python_3_9
+  runtime   = local.runtime_python_3_13
   plaintext_env_vars = {
     API_URL                    = "${module.consignment_api.api_url}/graphql"
     AUTH_URL                   = local.keycloak_auth_url
@@ -270,7 +270,7 @@ module "yara_av_v2" {
     })
   }
   role_name = "TDRYaraAVV2LambdaRole${title(local.environment)}"
-  runtime   = local.runtime_python_3_9
+  runtime   = local.runtime_python_3_13
   plaintext_env_vars = {
     ENVIRONMENT    = local.environment
     ROOT_DIRECTORY = local.tmp_directory
@@ -297,7 +297,7 @@ module "backend_checks_results" {
     })
   }
   role_name = "TDRBackendChecksResultsLambdaRole${title(local.environment)}"
-  runtime   = local.runtime_python_3_9
+  runtime   = local.runtime_python_3_13
   plaintext_env_vars = {
     ENVIRONMENT    = local.environment
     ROOT_DIRECTORY = local.tmp_directory
