@@ -194,6 +194,7 @@ module "redacted_files" {
   function_name        = local.redacted_files_function_name
   handler              = "uk.gov.nationalarchives.Lambda::run"
   reserved_concurrency = -1
+  timeout_seconds      = 30
   policies = {
     "TDRRedactedFilesLambda${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_backend_checks_policy.json.tpl", {
       function_name = local.redacted_files_function_name
