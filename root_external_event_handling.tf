@@ -5,6 +5,7 @@ locals {
   external_event_handler_function_name = "tdr-external-events-handler-${local.environment}"
   dr2_ingest_topic_arn                 = module.dr2_configuration.terraform_config[local.environment]["notifications_sns_topic_arn"]
   lambda_timeout                       = 60
+  allow_file_status_update             = local.environment == "intg" ? "true" : "false"
 }
 
 module "external_event_handling_sqs_queue" {
@@ -57,9 +58,14 @@ module "external_event_handler_lambda" {
     })
   }
   plaintext_env_vars = {
-    EXPORT_BUCKET          = local.flat_format_bucket_name,
-    JUDGMENT_EXPORT_BUCKET = local.flat_format_judgment_bucket_name,
-    DR2_INGEST_TAG_KEY     = local.object_tag_dr2_ingest_key,
-    DR2_INGEST_TAG_VALUE   = local.object_tag_dr2_ingest_value_complete,
+    EXPORT_BUCKET            = local.flat_format_bucket_name,
+    JUDGMENT_EXPORT_BUCKET   = local.flat_format_judgment_bucket_name,
+    DR2_INGEST_TAG_KEY       = local.object_tag_dr2_ingest_key,
+    DR2_INGEST_TAG_VALUE     = local.object_tag_dr2_ingest_value_complete,
+    API_URL                  = "${module.consignment_api.api_url}/graphql",
+    AUTH_URL                 = local.keycloak_auth_url
+    CLIENT_ID                = local.keycloak_backend-checks_client_id
+    CLIENT_SECRET_PATH       = local.keycloak_backend_checks_secret_name
+    ALLOW_FILE_STATUS_UPDATE = local.allow_file_status_update
   }
 }
