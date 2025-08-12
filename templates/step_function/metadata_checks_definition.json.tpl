@@ -123,6 +123,16 @@
         },
         "RequestBody.$": "$.statusUpdate"
       },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Events.ConnectionResource.ConcurrentModification"
+          ],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
       "End": true
     },
     "RunMetadataChecksLambda": {
