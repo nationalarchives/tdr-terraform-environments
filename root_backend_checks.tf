@@ -78,7 +78,7 @@ module "file_upload_data" {
     })
   }
   role_name = "TDRFileUploadDataLambdaRole${title(local.environment)}"
-  runtime   = local.runtime_python_3_9
+  runtime   = local.runtime_python_3_13
   plaintext_env_vars = {
     API_URL                    = "${module.consignment_api.api_url}/graphql"
     AUTH_URL                   = local.keycloak_auth_url
@@ -194,6 +194,7 @@ module "redacted_files" {
   function_name        = local.redacted_files_function_name
   handler              = "uk.gov.nationalarchives.Lambda::run"
   reserved_concurrency = -1
+  timeout_seconds      = 30
   policies = {
     "TDRRedactedFilesLambda${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_backend_checks_policy.json.tpl", {
       function_name = local.redacted_files_function_name
@@ -269,7 +270,7 @@ module "yara_av_v2" {
     })
   }
   role_name = "TDRYaraAVV2LambdaRole${title(local.environment)}"
-  runtime   = local.runtime_python_3_9
+  runtime   = local.runtime_python_3_13
   plaintext_env_vars = {
     ENVIRONMENT    = local.environment
     ROOT_DIRECTORY = local.tmp_directory
@@ -296,7 +297,7 @@ module "backend_checks_results" {
     })
   }
   role_name = "TDRBackendChecksResultsLambdaRole${title(local.environment)}"
-  runtime   = local.runtime_python_3_9
+  runtime   = local.runtime_python_3_13
   plaintext_env_vars = {
     ENVIRONMENT    = local.environment
     ROOT_DIRECTORY = local.tmp_directory
