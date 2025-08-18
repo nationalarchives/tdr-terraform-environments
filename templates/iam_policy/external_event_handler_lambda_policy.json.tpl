@@ -41,6 +41,13 @@
          "arn:aws:s3:::${judgment_export_bucket}",
          "arn:aws:s3:::${judgment_export_bucket}/*"
        ]
-    }
+    },
+     {
+          "Effect": "Allow",
+          "Action": [
+            "ssm:GetParameter"
+          ],
+          "Resource": "arn:aws:ssm:eu-west-2:${account_id}:parameter${parameter_name}"
+        }
   ]
 }
