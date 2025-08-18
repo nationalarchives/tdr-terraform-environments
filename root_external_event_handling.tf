@@ -55,6 +55,7 @@ module "external_event_handler_lambda" {
       sqs_queue              = local.sqs_name,
       export_bucket          = local.flat_format_bucket_name,
       judgment_export_bucket = local.flat_format_judgment_bucket_name
+      parameter_name         = local.keycloak_backend_checks_secret_name
     })
   }
   plaintext_env_vars = {
