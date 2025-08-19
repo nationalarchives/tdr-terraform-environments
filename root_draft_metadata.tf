@@ -190,13 +190,19 @@ module "draft_metadata_checks" {
   source             = "./da-terraform-modules/sfn"
   step_function_name = "TDRMetadataChecks${title(local.environment)}"
   step_function_definition = templatefile("./templates/step_function/metadata_checks_definition.json.tpl", {
-    antivirus_lambda_arn           = module.yara_av_v2.lambda_arn,
+    environment                    = local.environment
     consignment_api_url            = module.consignment_api.api_url,
     consignment_api_connection_arn = aws_cloudwatch_event_connection.consignment_api_connection.arn,
     checks_lambda_arn              = module.draft_metadata_checks_lambda.lambda_arn,
     persistence_lambda_arn         = module.draft_metadata_persistence_lambda.lambda_arn,
     draft_metadata_bucket          = local.draft_metadata_s3_bucket_name
-    environment                    = local.environment
+    dirty_source_bucket            = local.upload_files_cloudfront_dirty_bucket_name
+    quarantine_bucket              = local.upload_files_quarantine_bucket_name
+    upload_bucket                  = local.upload_files_bucket_name
+    scan_complete_tag_key          = local.scan_complete_tag_key
+    threat_found_value             = local.scan_complete_threat_found_value
+    threat_clear_value             = local.scan_complete_threat_clear_value
+    threat_found_result            = local.threat_found_result
     account_id                     = data.aws_caller_identity.current.account_id
   })
   step_function_role_policy_attachments = {

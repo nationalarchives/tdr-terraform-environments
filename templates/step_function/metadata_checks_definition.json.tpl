@@ -12,17 +12,110 @@
       },
       "Next": "RunAntivirusLambda"
     },
-    "RunAntivirusLambda": {
-      "Type": "Task",
-      "Resource": "${antivirus_lambda_arn}",
-      "Parameters": {
-        "consignmentId.$": "$.consignmentId",
-        "fileId.$": "$.fileName",
-        "scanType": "metadata"
-      },
-      "ResultPath": "$.output",
-      "Next": "CheckAntivirusResults"
-    },
+    "GetObjectTagging": {
+          "Type": "Task",
+          "Parameters": {
+            "Bucket": "${draft_metadata_bucket}",
+            "Key.$": "States.Format('{}/{}',$.consignmentId,$.fileId)"
+          },
+          "Resource": "arn:aws:states:::aws-sdk:s3:getObjectTagging",
+          "ResultPath": "$.TaggingResult",
+          "Next": "CheckTagsPresent"
+        },
+        "CheckTagsPresent": {
+          "Type": "Choice",
+          "Choices": [
+            {
+              "Next": "CheckTagsValue",
+              "And": [
+                {
+                  "Variable": "$.TaggingResult.TagSet[0].Key",
+                  "IsPresent": true
+                },
+                {
+                  "Variable": "$.TaggingResult.TagSet[0].Value",
+                  "IsPresent": true
+                }
+              ]
+            }
+          ],
+          "Default": "WaitForAntivirus"
+        },
+        "WaitForAntivirus": {
+          "Type": "Wait",
+          "Seconds": 5,
+          "Next": "GetObjectTagging"
+        },
+        "CheckTagsValue": {
+          "Type": "Choice",
+          "Choices": [
+            {
+              "Next": "CopyToUpload",
+              "And": [
+                {
+                  "Variable": "$.TaggingResult.TagSet[0].Key",
+                  "StringMatches": "${scan_complete_tag_key}"
+                },
+                {
+                  "Variable": "$.TaggingResult.TagSet[0].Value",
+                  "StringMatches": "${threat_clear_value}"
+                }
+              ]
+            },
+            {
+              "Next": "QuarantineFile",
+              "And": [
+                {
+                  "Variable": "$.TaggingResult.TagSet[0].Key",
+                  "StringMatches": "${scan_complete_tag_key}"
+                },
+                {
+                  "Variable": "$.TaggingResult.TagSet[0].Value",
+                  "StringMatches": "${threat_found_value}"
+                }
+              ]
+            }
+          ],
+          "Default": "WaitForVirusScan"
+        },
+        "CopyToUpload": {
+          "Type": "Task",
+          "Parameters": {
+            "Bucket": "${upload_bucket}",
+            "CopySource.$": "States.Format('${draft_metadata_bucket}/{}/{}',$.consignmentId, $.fileId)",
+            "Key.$": "States.Format('{}/metadata/{}', $.consignmentId, $.fileId)"
+          },
+          "Resource": "arn:aws:states:::aws-sdk:s3:copyObject",
+          "Next": "CheckAntivirusResults",
+          "ResultPath": "$.output",
+          "ResultSelector": {
+            "antivirus": {
+              "software": "awsGuardDutyMalwareScan",
+              "softwareVersion": "AWSGuardDuty",
+              "databaseVersion": "$LATEST",
+              "result": ""
+            }
+          }
+        },
+        "QuarantineFile": {
+              "Type": "Task",
+              "Parameters": {
+                "Bucket": "${upload_quarantine_bucket}",
+                "CopySource.$": "States.Format('${draft_metadata_bucket}/{}/{}',$.consignmentId, $.fileId)",
+                "Key.$": "States.Format('{}/metadata/{}', $.consignmentId, $.fileId)"
+              },
+              "Resource": "arn:aws:states:::aws-sdk:s3:copyObject",
+              "Next": "CheckAntivirusResults",
+              "ResultPath": "$.output",
+              "ResultSelector": {
+                "antivirus": {
+                  "software": "awsGuardDutyMalwareScan",
+                  "softwareVersion": "AWSGuardDuty",
+                  "databaseVersion": "$LATEST",
+                  "result": "${threat_found_result}"
+                }
+              }
+            },
     "CheckAntivirusResults": {
       "Type": "Choice",
       "Choices": [
