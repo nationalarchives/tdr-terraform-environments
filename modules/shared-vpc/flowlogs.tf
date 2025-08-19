@@ -44,7 +44,7 @@ data "aws_iam_policy_document" "tdr_flowlog_assume_role_policy" {
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = ["arn:${data.aws_partition.current.id}:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:vpc-flow-log/*"]
+      values   = ["arn:${data.aws_partition.current.id}:ec2:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:vpc-flow-log/*"]
     }
 
     condition {
