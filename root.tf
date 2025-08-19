@@ -691,6 +691,15 @@ module "bastion_role" {
   policy_attachments = {}
 }
 
+module "endpoint_security_group" {
+  source             = "./da-terraform-modules/security_group"
+  name               = "endpoint_security_group"
+  description        = "Allow 443 TCP inbound"
+  common_tags        = local.common_tags
+  vpc_id             = module.shared_vpc.vpc_id
+  ingress_cidr_rules = [{ "port" : 443, "description" : "HTTPS inbound", "cidr_blocks" : ["${module.shared_vpc.vpc_cidr_block}"] }]
+}
+
 module "s3_vpc_endpoint" {
   source       = "./tdr-terraform-modules/endpoint"
   common_tags  = local.common_tags
@@ -708,6 +717,8 @@ module "s3_vpc_endpoint" {
     }
   )
 }
+
+
 
 module "create_keycloak_users_api_lambda" {
   source                           = "./tdr-terraform-modules/lambda"
