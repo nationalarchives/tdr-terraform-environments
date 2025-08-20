@@ -13,6 +13,7 @@ locals {
   scan_complete_threat_found_value = "THREATS_FOUND"
   scan_complete_threat_clear_value = "NO_THREATS_FOUND"
   threat_found_result              = "awsGuardDutyThreatFound"
+  retry_scan_delay_seconds         = 5
 }
 
 module "aws_guard_duty_s3_malware_scan_role" {
