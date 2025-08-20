@@ -10,7 +10,7 @@
         "MM.$": "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'),0), '-'), 1)",
         "DD.$": "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'),0), '-'), 2)"
       },
-      "Next": "RunAntivirusLambda"
+      "Next": "GetObjectTagging"
     },
     "GetObjectTagging": {
           "Type": "Task",
@@ -76,7 +76,7 @@
               ]
             }
           ],
-          "Default": "WaitForVirusScan"
+          "Default": "WaitForAntivirus"
         },
         "CopyToUpload": {
           "Type": "Task",
@@ -100,7 +100,7 @@
         "QuarantineFile": {
               "Type": "Task",
               "Parameters": {
-                "Bucket": "${upload_quarantine_bucket}",
+                "Bucket": "${quarantine_bucket}",
                 "CopySource.$": "States.Format('${draft_metadata_bucket}/{}/{}',$.consignmentId, $.fileId)",
                 "Key.$": "States.Format('{}/metadata/{}', $.consignmentId, $.fileId)"
               },
