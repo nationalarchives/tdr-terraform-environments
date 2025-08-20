@@ -16,7 +16,7 @@
           "Type": "Task",
           "Parameters": {
             "Bucket": "${draft_metadata_bucket}",
-            "Key.$": "States.Format('{}/{}',$.consignmentId,$.fileId)"
+            "Key.$": "States.Format('{}/{}',$.consignmentId,$.fileName)"
           },
           "Resource": "arn:aws:states:::aws-sdk:s3:getObjectTagging",
           "ResultPath": "$.TaggingResult",
@@ -82,8 +82,8 @@
           "Type": "Task",
           "Parameters": {
             "Bucket": "${upload_bucket}",
-            "CopySource.$": "States.Format('${draft_metadata_bucket}/{}/{}',$.consignmentId, $.fileId)",
-            "Key.$": "States.Format('{}/metadata/{}', $.consignmentId, $.fileId)"
+            "CopySource.$": "States.Format('${draft_metadata_bucket}/{}/{}',$.consignmentId, $.fileName)",
+            "Key.$": "States.Format('{}/metadata/{}', $.consignmentId, $.fileName)"
           },
           "Resource": "arn:aws:states:::aws-sdk:s3:copyObject",
           "Next": "CheckAntivirusResults",
@@ -101,8 +101,8 @@
               "Type": "Task",
               "Parameters": {
                 "Bucket": "${quarantine_bucket}",
-                "CopySource.$": "States.Format('${draft_metadata_bucket}/{}/{}',$.consignmentId, $.fileId)",
-                "Key.$": "States.Format('{}/metadata/{}', $.consignmentId, $.fileId)"
+                "CopySource.$": "States.Format('${draft_metadata_bucket}/{}/{}',$.consignmentId, $.fileName)",
+                "Key.$": "States.Format('{}/metadata/{}', $.consignmentId, $.fileName)"
               },
               "Resource": "arn:aws:states:::aws-sdk:s3:copyObject",
               "Next": "CheckAntivirusResults",
