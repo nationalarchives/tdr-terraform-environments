@@ -43,7 +43,7 @@
         },
         "WaitForAntivirus": {
           "Type": "Wait",
-          "Seconds": 5,
+          "Seconds": 1,
           "Next": "GetObjectTagging"
         },
         "CheckTagsValue": {
