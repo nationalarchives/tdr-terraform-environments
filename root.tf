@@ -700,26 +700,45 @@ module "endpoint_security_group" {
   ingress_cidr_rules = [{ "port" : 443, "description" : "HTTPS inbound", "cidr_blocks" : ["${module.shared_vpc.vpc_cidr_block}"] }]
 }
 
-module "ecr_dkr_vpc_endpoint" {
+module "ecr_dkr_vpc_endpoint_backend_checks_subnets" {
   source             = "./tdr-terraform-modules/endpoint"
   common_tags        = local.common_tags
   service_name       = "com.amazonaws.${local.region}.ecr.dkr"
   vpc_id             = module.shared_vpc.vpc_id
-  subnet_ids         = concat(module.shared_vpc.private_backend_checks_subnets, module.shared_vpc.private_subnets)
+  subnet_ids         = module.shared_vpc.private_backend_checks_subnets
   security_group_ids = ["${module.endpoint_security_group.security_group_id}"]
   vpc_endpoint_type  = "Interface"
 }
 
-module "ecr_api_vpc_endpoint" {
+module "ecr_dkr_vpc_endpoint_private_subnets" {
+  source             = "./tdr-terraform-modules/endpoint"
+  common_tags        = local.common_tags
+  service_name       = "com.amazonaws.${local.region}.ecr.dkr"
+  vpc_id             = module.shared_vpc.vpc_id
+  subnet_ids         = module.shared_vpc.private_subnets
+  security_group_ids = ["${module.endpoint_security_group.security_group_id}"]
+  vpc_endpoint_type  = "Interface"
+}
+
+module "ecr_api_vpc_endpoint_backend_checks_subnets" {
   source             = "./tdr-terraform-modules/endpoint"
   common_tags        = local.common_tags
   service_name       = "com.amazonaws.${local.region}.ecr.api"
   vpc_id             = module.shared_vpc.vpc_id
-  subnet_ids         = concat(module.shared_vpc.private_backend_checks_subnets, module.shared_vpc.private_subnets)
+  subnet_ids         = module.shared_vpc.private_backend_checks_subnets
   security_group_ids = ["${module.endpoint_security_group.security_group_id}"]
   vpc_endpoint_type  = "Interface"
 }
 
+module "ecr_api_vpc_endpoint_private_subnets" {
+  source             = "./tdr-terraform-modules/endpoint"
+  common_tags        = local.common_tags
+  service_name       = "com.amazonaws.${local.region}.ecr.api"
+  vpc_id             = module.shared_vpc.vpc_id
+  subnet_ids         = module.shared_vpc.private_subnets
+  security_group_ids = ["${module.endpoint_security_group.security_group_id}"]
+  vpc_endpoint_type  = "Interface"
+}
 
 module "s3_vpc_endpoint" {
   source       = "./tdr-terraform-modules/endpoint"
