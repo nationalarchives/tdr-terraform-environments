@@ -10,29 +10,75 @@
         "MM.$": "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'),0), '-'), 1)",
         "DD.$": "States.ArrayGetItem(States.StringSplit(States.ArrayGetItem(States.StringSplit($$.Execution.StartTime, 'T'),0), '-'), 2)"
       },
-      "Next": "RunAntivirusLambda"
+      "Next": "GetObjectTagging"
     },
-    "RunAntivirusLambda": {
+    "GetObjectTagging": {
       "Type": "Task",
-      "Resource": "${antivirus_lambda_arn}",
       "Parameters": {
-        "consignmentId.$": "$.consignmentId",
-        "fileId.$": "$.fileName",
-        "scanType": "metadata"
+        "Bucket": "${draft_metadata_bucket}",
+        "Key.$": "States.Format('{}/{}',$.consignmentId,$.fileName)"
       },
-      "ResultPath": "$.output",
-      "Next": "CheckAntivirusResults"
+      "Resource": "arn:aws:states:::aws-sdk:s3:getObjectTagging",
+      "ResultPath": "$.TaggingResult",
+      "Next": "CheckTagsPresent"
+    },
+    "CheckTagsPresent": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Next": "CheckAntivirusResults",
+          "And": [
+            {
+             "Variable": "$.TaggingResult.TagSet[0].Key",
+             "IsPresent": true
+            },
+            {
+             "Variable": "$.TaggingResult.TagSet[0].Key",
+             "StringMatches": "${scan_complete_tag_key}"
+            },
+            {
+             "Variable": "$.TaggingResult.TagSet[0].Value",
+             "IsPresent": true
+            }
+          ]
+        }
+      ],
+      "Default": "WaitForAntivirus"
+    },
+    "WaitForAntivirus": {
+      "Type": "Wait",
+      "Seconds": ${wait_time_seconds},
+      "Next": "GetObjectTagging"
     },
     "CheckAntivirusResults": {
       "Type": "Choice",
       "Choices": [
         {
-          "Variable": "$.output.antivirus.result",
-          "StringEquals": "",
+          "Variable": "$.TaggingResult.TagSet[0].Value",
+          "StringEquals": "${threat_clear_value}",
           "Next": "RunMetadataChecksLambda"
         }
       ],
-      "Default": "SendSNSVirusMessage"
+      "Default": "QuarantineFile"
+    },
+    "QuarantineFile": {
+      "Type": "Task",
+      "Parameters": {
+        "Bucket": "${quarantine_bucket}",
+        "CopySource.$": "States.Format('${draft_metadata_bucket}/{}/{}',$.consignmentId, $.fileName)",
+        "Key.$": "States.Format('{}/metadata/{}', $.consignmentId, $.fileName)"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:s3:copyObject",
+      "Next": "SendSNSVirusMessage",
+      "ResultPath": "$.output",
+      "ResultSelector": {
+        "antivirus": {
+           "software": "awsGuardDutyMalwareScan",
+           "softwareVersion": "AWSGuardDuty",
+           "databaseVersion": "$LATEST",
+           "result": "${threat_found_result}"
+        }
+      }
     },
     "SendSNSVirusMessage": {
       "Type": "Task",

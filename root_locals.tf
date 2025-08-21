@@ -123,6 +123,7 @@ locals {
   runtime_java_21     = "java21"
 
   upload_files_cloudfront_dirty_bucket_name = "${var.project}-upload-files-cloudfront-dirty-${local.environment}"
+  upload_files_quarantine_bucket_name       = "${var.project}-upload-files-quarantine-${local.environment}"
 
   url_path              = "/${local.environment}/consignmentapi/instance/url"
   tmp_directory         = "/tmp"
