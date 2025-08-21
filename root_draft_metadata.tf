@@ -1,3 +1,7 @@
+locals {
+  retry_check_scan_result_delay_seconds = 5
+}
+
 module "draft_metadata_validator_lambda" {
   source          = "./da-terraform-modules/lambda"
   function_name   = "tdr-draft-metadata-validator-${local.environment}"
@@ -168,7 +172,6 @@ resource "aws_iam_policy" "draft_metadata_checks_policy" {
     ]),
     draft_metadata_bucket = local.draft_metadata_s3_bucket_name
     quarantine_bucket     = local.upload_files_quarantine_bucket_name
-    upload_bucket         = local.upload_files_bucket_name
     s3_kms_key_arn        = module.s3_internal_kms_key.kms_key_arn
     sns_kms_key_arn       = module.encryption_key.kms_key_arn
     account_id            = data.aws_caller_identity.current.account_id
@@ -198,8 +201,7 @@ module "draft_metadata_checks" {
     checks_lambda_arn              = module.draft_metadata_checks_lambda.lambda_arn,
     persistence_lambda_arn         = module.draft_metadata_persistence_lambda.lambda_arn,
     draft_metadata_bucket          = local.draft_metadata_s3_bucket_name
-    wait_time_seconds              = local.retry_scan_delay_seconds
-    dirty_source_bucket            = local.upload_files_cloudfront_dirty_bucket_name
+    wait_time_seconds              = local.retry_check_scan_result_delay_seconds
     quarantine_bucket              = local.upload_files_quarantine_bucket_name
     scan_complete_tag_key          = local.scan_complete_tag_key
     threat_found_value             = local.scan_complete_threat_found_value

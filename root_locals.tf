@@ -123,7 +123,6 @@ locals {
   runtime_java_21     = "java21"
 
   upload_files_cloudfront_dirty_bucket_name = "${var.project}-upload-files-cloudfront-dirty-${local.environment}"
-  upload_files_bucket_name                  = "${var.project}-upload-files-${local.environment}"
   upload_files_quarantine_bucket_name       = "${var.project}-upload-files-quarantine-${local.environment}"
 
   url_path              = "/${local.environment}/consignmentapi/instance/url"
@@ -163,7 +162,6 @@ locals {
 
   flat_format_bucket_name          = "tdr-export-${local.environment}"
   flat_format_judgment_bucket_name = "tdr-export-judgment-${local.environment}"
-
 
   aws_guardduty_ecr_arn = module.tdr_configuration.terraform_config["aws_guardduty_ecr_arn"]
 
