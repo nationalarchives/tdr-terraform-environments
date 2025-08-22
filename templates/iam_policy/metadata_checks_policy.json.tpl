@@ -19,7 +19,9 @@
       ],
       "Resource": [
         "arn:aws:s3:::${draft_metadata_bucket}",
-        "arn:aws:s3:::${draft_metadata_bucket}/*"
+        "arn:aws:s3:::${draft_metadata_bucket}/*",
+        "arn:aws:s3:::${quarantine_bucket}",
+        "arn:aws:s3:::${quarantine_bucket}/*"
       ]
     },
     {

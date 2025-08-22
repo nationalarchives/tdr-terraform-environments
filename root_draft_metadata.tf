@@ -1,3 +1,7 @@
+locals {
+  retry_check_scan_result_delay_seconds = 5
+}
+
 module "draft_metadata_validator_lambda" {
   source          = "./da-terraform-modules/lambda"
   function_name   = "tdr-draft-metadata-validator-${local.environment}"
@@ -167,6 +171,7 @@ resource "aws_iam_policy" "draft_metadata_checks_policy" {
       module.draft_metadata_persistence_lambda.lambda_arn
     ]),
     draft_metadata_bucket = local.draft_metadata_s3_bucket_name
+    quarantine_bucket     = local.upload_files_quarantine_bucket_name
     s3_kms_key_arn        = module.s3_internal_kms_key.kms_key_arn
     sns_kms_key_arn       = module.encryption_key.kms_key_arn
     account_id            = data.aws_caller_identity.current.account_id
@@ -190,13 +195,18 @@ module "draft_metadata_checks" {
   source             = "./da-terraform-modules/sfn"
   step_function_name = "TDRMetadataChecks${title(local.environment)}"
   step_function_definition = templatefile("./templates/step_function/metadata_checks_definition.json.tpl", {
-    antivirus_lambda_arn           = module.yara_av_v2.lambda_arn,
+    environment                    = local.environment
     consignment_api_url            = module.consignment_api.api_url,
     consignment_api_connection_arn = aws_cloudwatch_event_connection.consignment_api_connection.arn,
     checks_lambda_arn              = module.draft_metadata_checks_lambda.lambda_arn,
     persistence_lambda_arn         = module.draft_metadata_persistence_lambda.lambda_arn,
     draft_metadata_bucket          = local.draft_metadata_s3_bucket_name
-    environment                    = local.environment
+    wait_time_seconds              = local.retry_check_scan_result_delay_seconds
+    quarantine_bucket              = local.upload_files_quarantine_bucket_name
+    scan_complete_tag_key          = local.scan_complete_tag_key
+    threat_found_value             = local.scan_complete_threat_found_value
+    threat_clear_value             = local.scan_complete_threat_clear_value
+    threat_found_result            = local.threat_found_result
     account_id                     = data.aws_caller_identity.current.account_id
   })
   step_function_role_policy_attachments = {
