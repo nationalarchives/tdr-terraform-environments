@@ -713,7 +713,6 @@ module "create_keycloak_users_api_lambda" {
   source                           = "./tdr-terraform-modules/lambda"
   common_tags                      = local.common_tags
   project                          = var.project
-  user_admin_client_secret         = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
   user_admin_client_secret_path    = local.keycloak_user_admin_client_secret_name
   kms_key_arn                      = module.encryption_key.kms_key_arn
   auth_url                         = local.keycloak_auth_url
@@ -727,7 +726,6 @@ module "create_keycloak_users_s3_lambda" {
   source                         = "./tdr-terraform-modules/lambda"
   common_tags                    = local.common_tags
   project                        = var.project
-  user_admin_client_secret       = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
   user_admin_client_secret_path  = local.keycloak_user_admin_client_secret_name
   kms_key_arn                    = module.encryption_key.kms_key_arn
   auth_url                       = local.keycloak_auth_url
@@ -761,9 +759,7 @@ module "inactive_keycloak_users_lambda" {
   plaintext_env_vars = {
     AUTH_URL                      = local.keycloak_auth_url
     API_URL                       = "${module.consignment_api.api_url}/graphql"
-    USER_ADMIN_CLIENT_SECRET      = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
     USER_ADMIN_CLIENT_SECRET_PATH = local.keycloak_user_admin_client_secret_name
-    REPORTING_CLIENT_SECRET       = module.keycloak_ssm_parameters.params[local.keycloak_reporting_client_secret_name].value
     REPORTING_CLIENT_SECRET_PATH  = local.keycloak_reporting_client_secret_name
   }
 }
