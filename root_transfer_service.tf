@@ -189,6 +189,7 @@ module "aggregate_processing_lambda" {
     "TDRAggregateProcessingLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/aggregate_processing_lambda_policy.json.tpl", {
       function_name = local.aggregate_processing_function_name
       account_id    = var.tdr_account_number
+      bucket_name   = local.upload_files_cloudfront_dirty_bucket_name
     })
   }
 }
