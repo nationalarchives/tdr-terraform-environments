@@ -26,7 +26,7 @@
       "Sid": "DR2IngestSubscription",
       "Effect": "Allow",
       "Principal": {
-             "AWS": "arn:aws:iam::${dr2_account_id}:root"
+             "AWS": "*"
       },
       "Action": "SQS:SendMessage",
       "Resource": "arn:aws:sqs:${region}:${account_id}:${sqs_name}",
