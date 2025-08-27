@@ -20,8 +20,8 @@
         "s3:ListBucket"
       ],
       "Resource": [
-        "arn:aws:s3:::${bucket_name}",
-        "arn:aws:s3:::${bucket_name}/*"
+        "arn:aws:s3:::${dirty_upload_bucket_name}",
+        "arn:aws:s3:::${dirty_upload_bucket_name}/*"
       ]
     }
   ]
