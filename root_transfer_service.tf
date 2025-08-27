@@ -187,9 +187,10 @@ module "aggregate_processing_lambda" {
   runtime         = "java21"
   policies = {
     "TDRAggregateProcessingLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/aggregate_processing_lambda_policy.json.tpl", {
-      function_name           = local.aggregate_processing_function_name
-      account_id              = var.tdr_account_number
-      auth_client_secret_path = local.keycloak_tdr_transfer_service_secret_name
+      function_name            = local.aggregate_processing_function_name
+      account_id               = var.tdr_account_number
+      dirty_upload_bucket_name = local.upload_files_cloudfront_dirty_bucket_name
+      auth_client_secret_path  = local.keycloak_tdr_transfer_service_secret_name
     })
   }
   plaintext_env_vars = {

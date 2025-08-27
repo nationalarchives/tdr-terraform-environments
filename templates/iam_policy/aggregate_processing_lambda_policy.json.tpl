@@ -13,6 +13,18 @@
       ]
     },
     {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:GetObjectTagging",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${dirty_upload_bucket_name}",
+        "arn:aws:s3:::${dirty_upload_bucket_name}/*"
+      ]
+    },
+    {
       "Action": [
         "ssm:GetParameter"
       ],
