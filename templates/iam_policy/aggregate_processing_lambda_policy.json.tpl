@@ -11,6 +11,13 @@
         "arn:aws:logs:eu-west-2:${account_id}:log-group:/aws/lambda/${function_name}",
         "arn:aws:logs:eu-west-2:${account_id}:log-group:/aws/lambda/${function_name}:log-stream:*"
       ]
+    },
+    {
+      "Action": [
+        "ssm:GetParameter"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:ssm:eu-west-2:${account_id}:parameter${auth_client_secret_path}"
     }
   ]
 }
