@@ -45,7 +45,7 @@ locals {
 
   upload_domain = "upload.${local.environment_domain}"
 
-  local_dev_frontend_url = "http://localhost:9000"
+  local_dev_frontend_url = "https://app.tdr-local.nationalarchives.gov.uk:9000"
 
   sharepoint_domain = "https://*.sharepoint.com"
 
@@ -73,7 +73,7 @@ locals {
 
   keycloak_auth_url = "https://auth.${local.dns_zone_name_trimmed}"
 
-  akka_licence_token_name = "/${local.environment}/akka/licence_token"
+  akka_licence_key_name = "/${local.environment}/akka/licence_key"
 
   keycloak_backend_checks_secret_name            = "/${local.environment}/keycloak/backend_checks_client/secret"
   keycloak_tdr_client_secret_name                = "/${local.environment}/keycloak/client/secret"
@@ -94,11 +94,13 @@ locals {
 
   slack_bot_token_name           = "/${local.environment}/slack/bot"
   slack_bau_webhook              = "/${local.environment}/slack/bau/webhook"
+  slack_transfers_webhook        = "/${local.environment}/slack/transfers/webhook"
   tdr_reporting_slack_channel_id = "/${local.environment}/slack/tdr_reporting/channel_id"
 
   keycloak_reporting_client_id      = "tdr-reporting"
   keycloak_backend-checks_client_id = "tdr-backend-checks"
   keycloak_draft-metadata_client_id = "tdr-draft-metadata"
+  keycloak_user_read_client_id      = "tdr-user-read"
 
   //Used for allowing full access for Cloudfront logging. More information at https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html#AccessLogsBucketAndFileOwnership
   logs_delivery_canonical_user_id = "c4c1ede66af53448b93c283ce9448c4ba468c9432aa01d700d3878632f77d2d0"
@@ -106,21 +108,22 @@ locals {
   //Set to true to create security audit IAM user group
   security_audit = false
 
-  file_upload_data_function_name       = "${var.project}-file-upload-data-${local.environment}"
-  api_update_v2_function_name          = "${var.project}-api-update-v2-${local.environment}"
-  backend_checks_results_function_name = "${var.project}-backend-checks-results-${local.environment}"
-  yara_av_v2_function_name             = "${var.project}-yara-av-v2-${local.environment}"
-  file_format_v2_function_name         = "${var.project}-file-format-v2-${local.environment}"
-  checksum_v2_function_name            = "${var.project}-checksum-v2-${local.environment}"
-  redacted_files_function_name         = "${var.project}-redacted-files-${local.environment}"
-  statuses_function_name               = "${var.project}-statuses-${local.environment}"
+  file_upload_data_function_name        = "${var.project}-file-upload-data-${local.environment}"
+  api_update_v2_function_name           = "${var.project}-api-update-v2-${local.environment}"
+  backend_checks_results_function_name  = "${var.project}-backend-checks-results-${local.environment}"
+  yara_av_v2_function_name              = "${var.project}-yara-av-v2-${local.environment}"
+  file_format_v2_function_name          = "${var.project}-file-format-v2-${local.environment}"
+  checksum_v2_function_name             = "${var.project}-checksum-v2-${local.environment}"
+  redacted_files_function_name          = "${var.project}-redacted-files-${local.environment}"
+  statuses_function_name                = "${var.project}-statuses-${local.environment}"
+  inactive_keycloak_users_function_name = "${var.project}-inactive-keycloak-users-${local.environment}"
 
-  runtime_python_3_9 = "python3.9"
-  runtime_python_3_7 = "python3.7"
-  runtime_java_11    = "java11"
-  runtime_java_21    = "java21"
+  runtime_python_3_13 = "python3.13"
+  runtime_java_11     = "java11"
+  runtime_java_21     = "java21"
 
   upload_files_cloudfront_dirty_bucket_name = "${var.project}-upload-files-cloudfront-dirty-${local.environment}"
+  upload_files_quarantine_bucket_name       = "${var.project}-upload-files-quarantine-${local.environment}"
 
   url_path              = "/${local.environment}/consignmentapi/instance/url"
   tmp_directory         = "/tmp"
@@ -152,8 +155,9 @@ locals {
   da_reference_generator_limit = module.tdr_configuration.terraform_config["reference_generator_limit"]
 
   //feature access blocks
-  block_shared_keycloak_pages = local.environment == "intg" ? false : true
-  block_skip_metadata_review  = false
+  block_shared_keycloak_pages    = local.environment == "intg" ? false : true
+  block_skip_metadata_review     = false
+  block_judgment_press_summaries = local.environment == "prod" ? true : false
 
   draft_metadata_s3_bucket_name = "${var.project}-draft-metadata-${local.environment}"
 

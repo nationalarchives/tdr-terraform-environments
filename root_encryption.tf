@@ -51,6 +51,8 @@ module "s3_internal_kms_key" {
       module.file_upload_data.lambda_role_arn,
       module.consignment_export_task_role.role.arn,
       module.draft_metadata_validator_lambda.lambda_role_arn,
+      module.draft_metadata_persistence_lambda.lambda_role_arn,
+      module.draft_metadata_checks_lambda.lambda_role_arn,
       module.frontend.task_role_arn,
       module.draft_metadata_checks.step_function_role_arn,
       module.aws_guard_duty_s3_malware_scan_role.role_arn
@@ -62,6 +64,7 @@ module "s3_internal_kms_key" {
         service_source_account : data.aws_caller_identity.current.account_id
       }
     ]
+    wiz_roles = local.wiz_role_arns
   }
 }
 
@@ -85,5 +88,6 @@ module "s3_upload_kms_key" {
       }
     ]
     cloudfront_distributions = [module.cloudfront_upload.cloudfront_arn]
+    wiz_roles                = local.wiz_role_arns
   }
 }

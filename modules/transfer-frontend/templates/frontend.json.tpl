@@ -91,6 +91,10 @@
       {
         "name": "BLOCK_SKIP_METADATA_REVIEW",
         "value": "${block_skip_metadata_review}"
+      },
+      {
+        "name": "BLOCK_JUDGMENT_PRESS_SUMMARIES",
+        "value": "${block_judgment_press_summaries}"
       }
     ],
     "networkMode": "awsvpc",

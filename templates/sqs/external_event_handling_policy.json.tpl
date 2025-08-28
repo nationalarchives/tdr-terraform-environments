@@ -21,6 +21,20 @@
                   "aws:PrincipalAccount" : "${account_id}"
                 }
       }
+    },
+    {
+      "Sid": "DR2IngestSubscription",
+      "Effect": "Allow",
+      "Principal": {
+             "AWS": "*"
+      },
+      "Action": "SQS:SendMessage",
+      "Resource": "arn:aws:sqs:${region}:${account_id}:${sqs_name}",
+      "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": "${dr2_ingest_topic_arn}"
+                }
+      }
     }
   ]
 }

@@ -9,6 +9,10 @@ locals {
     module.upload_file_cloudfront_dirty_s3.s3_bucket_name,
     module.draft_metadata_bucket.s3_bucket_name
   ]
+  scan_complete_tag_key            = "GuardDutyMalwareScanStatus"
+  scan_complete_threat_found_value = "THREATS_FOUND"
+  scan_complete_threat_clear_value = "NO_THREATS_FOUND"
+  threat_found_result              = "awsGuardDutyThreatFound"
 }
 
 module "aws_guard_duty_s3_malware_scan_role" {
@@ -41,7 +45,8 @@ module "aws_guard_duty_s3_malware_scan_policy" {
 module "aws_guard_duty_s3_malware_scan_threat_found_event" {
   source = "./da-terraform-modules/cloudwatch_events"
   event_pattern = templatefile("${path.module}/templates/guard_duty/guard_duty_s3_malware_scan_pattern.json.tpl", {
-    bucket_names = local.malware_scan_bucket_enabled_names
+    bucket_names       = local.malware_scan_bucket_enabled_names
+    scan_result_status = local.scan_complete_threat_found_value
   })
   sns_topic_event_target_arn = module.notifications_topic.sns_arn
   rule_name                  = "guard-duty-s3-malware-threat-found"

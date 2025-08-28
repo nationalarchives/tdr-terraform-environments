@@ -71,7 +71,7 @@ module "consignment_api" {
   da_reference_generator_url     = local.da_reference_generator_url
   da_reference_generator_limit   = local.da_reference_generator_limit
   aws_guardduty_ecr_arn          = local.aws_guardduty_ecr_arn
-  akka_licence_token_name        = local.akka_licence_token_name
+  akka_licence_key_name          = local.akka_licence_key_name
 }
 
 module "frontend" {
@@ -99,6 +99,7 @@ module "frontend" {
   public_subnet_ranges             = module.shared_vpc.public_subnet_ranges
   otel_service_name                = "frontend-${local.environment}"
   block_skip_metadata_review       = local.block_skip_metadata_review
+  block_judgment_press_summaries   = local.block_judgment_press_summaries
   draft_metadata_validator_api_url = module.draft_metadata_api_gateway.api_url
   draft_metadata_s3_kms_keys       = jsonencode([module.s3_internal_kms_key.kms_key_arn])
   draft_metadata_s3_bucket_name    = local.draft_metadata_s3_bucket_name
@@ -355,7 +356,7 @@ module "export_api_policy" {
 
 module "export_api_role" {
   source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./templates/iam_policy/assume_role_policy.json.tpl", { service = "apigateway.amazonaws.com" })
+  assume_role_policy = templatefile("./templates/iam_policy/api_gateway_assume_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.id })
   common_tags        = local.common_tags
   name               = "TDRExportAPIRole${title(local.environment)}"
   policy_attachments = {
@@ -522,7 +523,7 @@ module "flat_format_export_bucket" {
     read_access_roles     = [local.dr2_copy_files_role]
     aws_backup_local_role = local.aws_back_up_local_role
   })
-  lifecycle_rules                = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  lifecycle_rules                = local.environment == "prod" ? [] : local.export_bucket_lifecycle_rules
   s3_data_bucket_additional_tags = local.aws_back_up_tags
 }
 
@@ -713,7 +714,6 @@ module "create_keycloak_users_api_lambda" {
   source                           = "./tdr-terraform-modules/lambda"
   common_tags                      = local.common_tags
   project                          = var.project
-  user_admin_client_secret         = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
   user_admin_client_secret_path    = local.keycloak_user_admin_client_secret_name
   kms_key_arn                      = module.encryption_key.kms_key_arn
   auth_url                         = local.keycloak_auth_url
@@ -727,7 +727,6 @@ module "create_keycloak_users_s3_lambda" {
   source                         = "./tdr-terraform-modules/lambda"
   common_tags                    = local.common_tags
   project                        = var.project
-  user_admin_client_secret       = module.keycloak_ssm_parameters.params[local.keycloak_user_admin_client_secret_name].value
   user_admin_client_secret_path  = local.keycloak_user_admin_client_secret_name
   kms_key_arn                    = module.encryption_key.kms_key_arn
   auth_url                       = local.keycloak_auth_url
@@ -735,6 +734,48 @@ module "create_keycloak_users_s3_lambda" {
   lambda_create_keycloak_user_s3 = true
   private_subnet_ids             = module.shared_vpc.private_backend_checks_subnets
   s3_bucket_arn                  = module.create_bulk_users_bucket.s3_bucket_arn
+}
+
+module "inactive_keycloak_users_lambda" {
+  source          = "./da-terraform-modules/lambda"
+  function_name   = local.inactive_keycloak_users_function_name
+  tags            = local.common_tags
+  handler         = "uk.gov.nationalarchives.keycloak.users.InactiveKeycloakUsersLambda::handleRequest"
+  runtime         = local.runtime_java_21
+  timeout_seconds = 240
+  policies = {
+    "TDRInactiveKeycloakUsersLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/inactive_keycloak_users_lambda.json.tpl", {
+      function_name                 = local.inactive_keycloak_users_function_name
+      account_id                    = var.tdr_account_number
+      kms_arn                       = module.encryption_key.kms_key_arn
+      user_admin_client_secret_path = local.keycloak_user_admin_client_secret_name
+      reporting_client_secret_path  = local.keycloak_reporting_client_secret_name
+    })
+  }
+  vpc_config = {
+    subnet_ids         = module.shared_vpc.private_backend_checks_subnets
+    security_group_ids = [module.outbound_only_security_group.security_group_id]
+  }
+
+  plaintext_env_vars = {
+    AUTH_URL                      = local.keycloak_auth_url
+    API_URL                       = "${module.consignment_api.api_url}/graphql"
+    USER_ADMIN_CLIENT_SECRET_PATH = local.keycloak_user_admin_client_secret_name
+    REPORTING_CLIENT_SECRET_PATH  = local.keycloak_reporting_client_secret_name
+  }
+}
+
+module "disable_inactive_judgment_users_scheduled_event" {
+  source                  = "./da-terraform-modules/cloudwatch_events"
+  count                   = local.environment == "prod" ? 0 : 1
+  rule_description        = "Scheduled event to disable inactive judgment Keycloak users"
+  schedule                = "rate(30 days)"
+  rule_name               = "disable-inactive-judgment-keycloak-users"
+  lambda_event_target_arn = module.inactive_keycloak_users_lambda.lambda_arn
+  input = jsonencode({
+    userType             = "judgment_user"
+    inactivityPeriodDays = 180
+  })
 }
 
 module "create_keycloak_users_api" {

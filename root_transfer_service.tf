@@ -5,7 +5,8 @@ locals {
   domain                 = "nationalarchives.gov.uk"
   sub_domain             = "transfer-service"
   # Require abbreviated name for staging as ALB name cannot be more than 32 characters which is the case for staging
-  alb_function_name = local.environment == "staging" ? "transfer-serv" : "transfer-service"
+  alb_function_name                  = local.environment == "staging" ? "transfer-serv" : "transfer-service"
+  aggregate_processing_function_name = "tdr-aggregate-processing-${local.environment}"
 }
 
 module "transfer_service_execution_role" {
@@ -158,6 +159,9 @@ module "transfer_service_ecs_task" {
       transfer_service_client_secret_path = local.keycloak_tdr_transfer_service_secret_name
       throttle_amount                     = 50
       throttle_per_ms                     = 10
+      user_email_sns_topic_arn            = module.notifications_topic.sns_arn
+      user_read_client_secret             = local.keycloak_tdr_read_client_secret_name
+      user_read_client_id                 = local.keycloak_user_read_client_id
   })
   container_name               = "transfer-service"
   cpu                          = 512
@@ -172,41 +176,26 @@ module "transfer_service_ecs_task" {
   task_role                    = module.transfer_service_task_role[0].role_arn
 }
 
-module "transfer_service_process_dataload" {
-  count              = local.transfer_service_count
-  source             = "./da-terraform-modules/sfn"
-  step_function_name = "TDRTransferServiceProcessDataload${title(local.environment)}"
-  step_function_definition = templatefile("./templates/step_function/transfer_service_process_dataload.json.tpl", {
-    antivirus_lambda_arn = module.yara_av_v2.lambda_arn
-  })
-  step_function_role_policy_attachments = {
-    "invoke-lambda-policy" : module.transfer_service_process_dataload_invoke_lambda_policy[0].policy_arn
-    "s3-policy" : module.transfer_service_process_dataload_s3_policy[0].policy_arn
+module "aggregate_processing_lambda" {
+  count           = local.transfer_service_count
+  source          = "./da-terraform-modules/lambda"
+  function_name   = local.aggregate_processing_function_name
+  tags            = local.common_tags
+  handler         = "uk.gov.nationalarchives.aggregate.processing.AggregateProcessingLambda::handleRequest"
+  timeout_seconds = 60
+  memory_size     = 512
+  runtime         = "java21"
+  policies = {
+    "TDRAggregateProcessingLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/aggregate_processing_lambda_policy.json.tpl", {
+      function_name            = local.aggregate_processing_function_name
+      account_id               = var.tdr_account_number
+      dirty_upload_bucket_name = local.upload_files_cloudfront_dirty_bucket_name
+      auth_client_secret_path  = local.keycloak_tdr_transfer_service_secret_name
+    })
   }
-  common_tags = local.common_tags
-}
-
-module "transfer_service_process_dataload_invoke_lambda_policy" {
-  count  = local.transfer_service_count
-  source = "./da-terraform-modules/iam_policy"
-  name   = "TDRProcessDataLoadInvokeLambdaPolicy${title(local.environment)}"
-  tags   = local.common_tags
-  policy_string = templatefile("./templates/iam_policy/invoke_lambda_policy.json.tpl", {
-    resources = jsonencode([
-      "${module.yara_av_v2.lambda_arn}:$LATEST"
-    ])
-  })
-}
-
-module "transfer_service_process_dataload_s3_policy" {
-  count  = local.transfer_service_count
-  source = "./da-terraform-modules/iam_policy"
-  name   = "TDRProcessDataLoadS3Policy${title(local.environment)}"
-  tags   = local.common_tags
-  policy_string = templatefile("./templates/iam_policy/dataload_sfn_s3_policy.json.tpl", {
-    s3_resources = jsonencode([
-      module.upload_file_cloudfront_dirty_s3.s3_bucket_arn,
-      "${module.upload_file_cloudfront_dirty_s3.s3_bucket_arn}/*"
-    ])
-  })
+  plaintext_env_vars = {
+    GRAPHQL_API_URL         = "${module.consignment_api.api_url}/graphql"
+    AUTH_URL                = local.keycloak_auth_url
+    AUTH_CLIENT_SECRET_PATH = local.keycloak_tdr_transfer_service_secret_name
+  }
 }

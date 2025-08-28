@@ -1,3 +1,7 @@
+locals {
+  retry_check_scan_result_delay_seconds = 5
+}
+
 module "draft_metadata_validator_lambda" {
   source          = "./da-terraform-modules/lambda"
   function_name   = "tdr-draft-metadata-validator-${local.environment}"
@@ -14,6 +18,58 @@ module "draft_metadata_validator_lambda" {
       bucket_name        = local.draft_metadata_s3_bucket_name
       kms_key_arn        = module.s3_internal_kms_key.kms_key_arn
       ecr_account_number = local.ecr_account_number
+    })
+  }
+  plaintext_env_vars = {
+    API_URL            = "${module.consignment_api.api_url}/graphql"
+    AUTH_URL           = local.keycloak_auth_url
+    CLIENT_SECRET_PATH = local.keycloak_tdr_draft_metadata_client_secret_name
+    BUCKET_NAME        = local.draft_metadata_s3_bucket_name
+  }
+}
+
+module "draft_metadata_persistence_lambda" {
+  source          = "./da-terraform-modules/lambda"
+  function_name   = "tdr-draft-metadata-persistence-${local.environment}"
+  handler         = "uk.gov.nationalarchives.tdr.draftmetadatapersistence.Lambda::handleRequest"
+  runtime         = local.runtime_java_21
+  tags            = local.common_tags
+  timeout_seconds = 240
+  memory_size     = 1024
+  policies = {
+    "TDRDraftMetadataPersistenceLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_persistence_lambda.json.tpl", {
+      account_id     = var.tdr_account_number
+      environment    = local.environment
+      parameter_name = local.keycloak_tdr_draft_metadata_client_secret_name
+      bucket_name    = local.draft_metadata_s3_bucket_name
+      kms_key_arn    = module.s3_internal_kms_key.kms_key_arn
+    })
+  }
+  plaintext_env_vars = {
+    API_URL                      = "${module.consignment_api.api_url}/graphql"
+    AUTH_URL                     = local.keycloak_auth_url
+    CLIENT_SECRET_PATH           = local.keycloak_tdr_draft_metadata_client_secret_name
+    BUCKET_NAME                  = local.draft_metadata_s3_bucket_name
+    BATCH_SIZE_FOR_METADATA      = 400
+    MAX_CONCURRENCY_FOR_METADATA = 10
+  }
+}
+
+module "draft_metadata_checks_lambda" {
+  source          = "./da-terraform-modules/lambda"
+  function_name   = "tdr-draft-metadata-checks-${local.environment}"
+  handler         = "uk.gov.nationalarchives.tdr.draftmetadatachecks.Lambda::handleRequest"
+  runtime         = local.runtime_java_21
+  tags            = local.common_tags
+  timeout_seconds = 240
+  memory_size     = 1024
+  policies = {
+    "TDRDraftMetadataValidationLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_checks_lambda.json.tpl", {
+      account_id     = var.tdr_account_number
+      environment    = local.environment
+      parameter_name = local.keycloak_tdr_draft_metadata_client_secret_name
+      bucket_name    = local.draft_metadata_s3_bucket_name
+      kms_key_arn    = module.s3_internal_kms_key.kms_key_arn
     })
   }
   plaintext_env_vars = {
@@ -47,7 +103,7 @@ module "draft_metadata_api_gateway" {
 
 resource "aws_iam_role" "draft_metadata_api_gateway_execution_role" {
   name               = "TDRMetadataChecksAPIGatewayExecutionRole${title(local.environment)}"
-  assume_role_policy = templatefile("./templates/iam_policy/assume_role_policy.json.tpl", { service = "apigateway.amazonaws.com" })
+  assume_role_policy = templatefile("./templates/iam_policy/api_gateway_assume_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.id })
 }
 
 resource "aws_iam_policy" "api_gateway_execution_policy" {
@@ -110,9 +166,12 @@ resource "aws_iam_policy" "draft_metadata_checks_policy" {
   policy = templatefile("./templates/iam_policy/metadata_checks_policy.json.tpl", {
     resources = jsonencode([
       module.yara_av_v2.lambda_arn,
-      module.draft_metadata_validator_lambda.lambda_arn
+      module.draft_metadata_validator_lambda.lambda_arn,
+      module.draft_metadata_checks_lambda.lambda_arn,
+      module.draft_metadata_persistence_lambda.lambda_arn
     ]),
     draft_metadata_bucket = local.draft_metadata_s3_bucket_name
+    quarantine_bucket     = local.upload_files_quarantine_bucket_name
     s3_kms_key_arn        = module.s3_internal_kms_key.kms_key_arn
     sns_kms_key_arn       = module.encryption_key.kms_key_arn
     account_id            = data.aws_caller_identity.current.account_id
@@ -136,12 +195,18 @@ module "draft_metadata_checks" {
   source             = "./da-terraform-modules/sfn"
   step_function_name = "TDRMetadataChecks${title(local.environment)}"
   step_function_definition = templatefile("./templates/step_function/metadata_checks_definition.json.tpl", {
-    antivirus_lambda_arn           = module.yara_av_v2.lambda_arn,
+    environment                    = local.environment
     consignment_api_url            = module.consignment_api.api_url,
     consignment_api_connection_arn = aws_cloudwatch_event_connection.consignment_api_connection.arn,
-    validator_lambda_arn           = module.draft_metadata_validator_lambda.lambda_arn,
+    checks_lambda_arn              = module.draft_metadata_checks_lambda.lambda_arn,
+    persistence_lambda_arn         = module.draft_metadata_persistence_lambda.lambda_arn,
     draft_metadata_bucket          = local.draft_metadata_s3_bucket_name
-    environment                    = local.environment
+    wait_time_seconds              = local.retry_check_scan_result_delay_seconds
+    quarantine_bucket              = local.upload_files_quarantine_bucket_name
+    scan_complete_tag_key          = local.scan_complete_tag_key
+    threat_found_value             = local.scan_complete_threat_found_value
+    threat_clear_value             = local.scan_complete_threat_clear_value
+    threat_found_result            = local.threat_found_result
     account_id                     = data.aws_caller_identity.current.account_id
   })
   step_function_role_policy_attachments = {
