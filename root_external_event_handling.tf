@@ -18,11 +18,9 @@ module "external_event_handling_sqs_queue" {
     environment          = local.environment,
     account_id           = data.aws_caller_identity.current.account_id,
     sqs_name             = local.sqs_name,
-    dr2_account_id       = module.dr2_configuration.account_numbers[local.environment],
     dr2_ingest_topic_arn = local.dr2_ingest_topic_arn
   })
-  encryption_type    = "kms"
-  kms_key_id         = module.encryption_key.kms_key_arn
+  encryption_type    = "sse"
   visibility_timeout = 6 * local.lambda_timeout
 }
 
