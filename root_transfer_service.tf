@@ -181,7 +181,7 @@ module "aggregate_processing_lambda" {
   source          = "./da-terraform-modules/lambda"
   function_name   = local.aggregate_processing_function_name
   tags            = local.common_tags
-  handler         = "uk.gov.nationalarchives.aggregate.processing.AggregateProcessingLambda::processDataLoad"
+  handler         = "uk.gov.nationalarchives.aggregate.processing.AggregateProcessingLambda::handleRequest"
   timeout_seconds = 60
   memory_size     = 512
   runtime         = "java21"
@@ -190,6 +190,12 @@ module "aggregate_processing_lambda" {
       function_name            = local.aggregate_processing_function_name
       account_id               = var.tdr_account_number
       dirty_upload_bucket_name = local.upload_files_cloudfront_dirty_bucket_name
+      auth_client_secret_path  = local.keycloak_tdr_transfer_service_secret_name
     })
+  }
+  plaintext_env_vars = {
+    GRAPHQL_API_URL         = "${module.consignment_api.api_url}/graphql"
+    AUTH_URL                = local.keycloak_auth_url
+    AUTH_CLIENT_SECRET_PATH = local.keycloak_tdr_transfer_service_secret_name
   }
 }

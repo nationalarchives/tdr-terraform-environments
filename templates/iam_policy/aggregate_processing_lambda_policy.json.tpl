@@ -23,6 +23,13 @@
         "arn:aws:s3:::${dirty_upload_bucket_name}",
         "arn:aws:s3:::${dirty_upload_bucket_name}/*"
       ]
+    },
+    {
+      "Action": [
+        "ssm:GetParameter"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:ssm:eu-west-2:${account_id}:parameter${auth_client_secret_path}"
     }
   ]
 }
