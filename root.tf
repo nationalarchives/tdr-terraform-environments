@@ -721,6 +721,7 @@ module "create_keycloak_users_api_lambda" {
   lambda_create_keycloak_user_api  = true
   private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
   keycloak_user_management_api_arn = module.create_keycloak_users_api.api_arn
+  disable_users_dry_run            = local.disable_users_dry_run
 }
 
 module "create_keycloak_users_s3_lambda" {
@@ -767,7 +768,6 @@ module "inactive_keycloak_users_lambda" {
 
 module "disable_inactive_judgment_users_scheduled_event" {
   source                  = "./da-terraform-modules/cloudwatch_events"
-  count                   = local.environment == "prod" ? 0 : 1
   rule_description        = "Scheduled event to disable inactive judgment Keycloak users"
   schedule                = "rate(30 days)"
   rule_name               = "disable-inactive-judgment-keycloak-users"

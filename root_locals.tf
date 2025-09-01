@@ -159,6 +159,7 @@ locals {
   block_skip_metadata_review     = false
   block_judgment_press_summaries = local.environment == "prod" ? true : false
 
+  disable_users_dry_run           = true
   draft_metadata_s3_bucket_name = "${var.project}-draft-metadata-${local.environment}"
 
   flat_format_bucket_name          = "tdr-export-${local.environment}"
