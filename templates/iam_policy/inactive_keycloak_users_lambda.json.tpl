@@ -37,6 +37,13 @@
       ],
       "Resource": ["arn:aws:ssm:eu-west-2:${account_id}:parameter${user_admin_client_secret_path}",
         "arn:aws:ssm:eu-west-2:${account_id}:parameter${reporting_client_secret_path}"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sns:Publish"
+      ],
+      "Resource": "${notifications_topic_arn}"
     }
   ]
 }

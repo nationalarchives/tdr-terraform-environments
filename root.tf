@@ -750,6 +750,7 @@ module "inactive_keycloak_users_lambda" {
       kms_arn                       = module.encryption_key.kms_key_arn
       user_admin_client_secret_path = local.keycloak_user_admin_client_secret_name
       reporting_client_secret_path  = local.keycloak_reporting_client_secret_name
+      notifications_topic_arn       = module.notifications_topic.sns_arn
     })
   }
   vpc_config = {
@@ -762,6 +763,8 @@ module "inactive_keycloak_users_lambda" {
     API_URL                       = "${module.consignment_api.api_url}/graphql"
     USER_ADMIN_CLIENT_SECRET_PATH = local.keycloak_user_admin_client_secret_name
     REPORTING_CLIENT_SECRET_PATH  = local.keycloak_reporting_client_secret_name
+    ENVIRONMENT                   = local.environment
+    NOTIFICATIONS_TOPIC_ARN       = module.notifications_topic.sns_arn
   }
 }
 
