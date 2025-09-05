@@ -721,7 +721,6 @@ module "create_keycloak_users_api_lambda" {
   lambda_create_keycloak_user_api  = true
   private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
   keycloak_user_management_api_arn = module.create_keycloak_users_api.api_arn
-  disable_users_dry_run            = local.disable_users_dry_run
 }
 
 module "create_keycloak_users_s3_lambda" {
@@ -763,6 +762,7 @@ module "inactive_keycloak_users_lambda" {
     API_URL                       = "${module.consignment_api.api_url}/graphql"
     USER_ADMIN_CLIENT_SECRET_PATH = local.keycloak_user_admin_client_secret_name
     REPORTING_CLIENT_SECRET_PATH  = local.keycloak_reporting_client_secret_name
+    DISABLE_USERS_DRY_RUN         = local.disable_users_dry_run
   }
 }
 
