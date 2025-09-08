@@ -187,6 +187,10 @@ module "aggregate_processing_lambda" {
   timeout_seconds = local.aggregate_processing_lambda_timeout
   memory_size     = 512
   runtime         = "java21"
+  lambda_sqs_queue_mappings = [{
+    sqs_queue_arn         = "arn:aws:sqs:eu-west-2:${var.tdr_account_number}:${local.aggregate_processing_sqs_name}",
+    ignore_enabled_status = false
+  }]
   policies = {
     "TDRAggregateProcessingLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/aggregate_processing_lambda_policy.json.tpl", {
       function_name            = local.aggregate_processing_function_name
@@ -214,8 +218,7 @@ module "aggregate_processing_sqs_queue" {
     account_id     = data.aws_caller_identity.current.account_id,
     sqs_queue_name = local.aggregate_processing_sqs_name
   })
-  encryption_type      = "kms"
-  kms_key_id           = module.encryption_key.kms_alias_arn
-  visibility_timeout   = 6 * local.lambda_timeout
-  lambda_function_name = local.aggregate_processing_function_name
+  encryption_type    = "kms"
+  kms_key_id         = module.encryption_key.kms_alias_arn
+  visibility_timeout = 6 * local.lambda_timeout
 }
