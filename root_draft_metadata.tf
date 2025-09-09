@@ -2,32 +2,6 @@ locals {
   retry_check_scan_result_delay_seconds = 5
 }
 
-module "draft_metadata_validator_lambda" {
-  source          = "./da-terraform-modules/lambda"
-  function_name   = "tdr-draft-metadata-validator-${local.environment}"
-  tags            = local.common_tags
-  use_image       = true
-  image_url       = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/draft-metadata-validator:${local.environment}"
-  timeout_seconds = 240
-  memory_size     = 1024
-  policies = {
-    "TDRDraftMetadataValidatorLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_validator_lambda.json.tpl", {
-      account_id         = var.tdr_account_number
-      environment        = local.environment
-      parameter_name     = local.keycloak_tdr_draft_metadata_client_secret_name
-      bucket_name        = local.draft_metadata_s3_bucket_name
-      kms_key_arn        = module.s3_internal_kms_key.kms_key_arn
-      ecr_account_number = local.ecr_account_number
-    })
-  }
-  plaintext_env_vars = {
-    API_URL            = "${module.consignment_api.api_url}/graphql"
-    AUTH_URL           = local.keycloak_auth_url
-    CLIENT_SECRET_PATH = local.keycloak_tdr_draft_metadata_client_secret_name
-    BUCKET_NAME        = local.draft_metadata_s3_bucket_name
-  }
-}
-
 module "draft_metadata_persistence_lambda" {
   source          = "./da-terraform-modules/lambda"
   function_name   = "tdr-draft-metadata-persistence-${local.environment}"
@@ -166,7 +140,6 @@ resource "aws_iam_policy" "draft_metadata_checks_policy" {
   policy = templatefile("./templates/iam_policy/metadata_checks_policy.json.tpl", {
     resources = jsonencode([
       module.yara_av_v2.lambda_arn,
-      module.draft_metadata_validator_lambda.lambda_arn,
       module.draft_metadata_checks_lambda.lambda_arn,
       module.draft_metadata_persistence_lambda.lambda_arn
     ]),

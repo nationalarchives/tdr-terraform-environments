@@ -50,7 +50,6 @@ module "s3_internal_kms_key" {
       module.yara_av_v2.lambda_role_arn,
       module.file_upload_data.lambda_role_arn,
       module.consignment_export_task_role.role.arn,
-      module.draft_metadata_validator_lambda.lambda_role_arn,
       module.draft_metadata_persistence_lambda.lambda_role_arn,
       module.draft_metadata_checks_lambda.lambda_role_arn,
       module.frontend.task_role_arn,
