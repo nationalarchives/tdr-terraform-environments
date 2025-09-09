@@ -8,7 +8,6 @@ locals {
   alb_function_name                   = local.environment == "staging" ? "transfer-serv" : "transfer-service"
   aggregate_processing_function_name  = "tdr-aggregate-processing-${local.environment}"
   aggregate_processing_lambda_timeout = 60
-  aggregate_processing_sqs_name       = "tdr-aggregate-processing-sqs-${local.environment}"
 }
 
 module "transfer_service_execution_role" {
@@ -188,7 +187,7 @@ module "aggregate_processing_lambda" {
   memory_size     = 512
   runtime         = "java21"
   lambda_sqs_queue_mappings = [{
-    sqs_queue_arn         = "arn:aws:sqs:eu-west-2:${var.tdr_account_number}:${local.aggregate_processing_sqs_name}",
+    sqs_queue_arn         = "arn:aws:sqs:eu-west-2:${var.tdr_account_number}:${local.aggregate_processing_function_name}",
     ignore_enabled_status = false
   }]
   policies = {
@@ -197,7 +196,7 @@ module "aggregate_processing_lambda" {
       account_id               = var.tdr_account_number
       dirty_upload_bucket_name = local.upload_files_cloudfront_dirty_bucket_name
       auth_client_secret_path  = local.keycloak_tdr_transfer_service_secret_name
-      sqs_queue_name           = local.aggregate_processing_sqs_name
+      sqs_queue_name           = local.aggregate_processing_function_name
     })
   }
   plaintext_env_vars = {
@@ -211,12 +210,12 @@ module "aggregate_processing_sqs_queue" {
   count      = local.transfer_service_count
   source     = "./da-terraform-modules/sqs"
   tags       = local.common_tags
-  queue_name = local.aggregate_processing_sqs_name
+  queue_name = local.aggregate_processing_function_name
   sqs_policy = templatefile("./templates/sqs/aggregate_processing_policy.json.tpl", {
     region         = local.region,
     environment    = local.environment,
     account_id     = data.aws_caller_identity.current.account_id,
-    sqs_queue_name = local.aggregate_processing_sqs_name
+    sqs_queue_name = local.aggregate_processing_function_name
   })
   encryption_type    = "kms"
   kms_key_id         = module.encryption_key.kms_alias_arn

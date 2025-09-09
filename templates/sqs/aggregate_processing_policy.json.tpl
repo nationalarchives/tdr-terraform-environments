@@ -9,17 +9,17 @@
         "AWS": "arn:aws:iam::${account_id}:root"
       },
       "Action": [
-        "SQS:GetQueueAttributes",
-        "SQS:GetQueueUrl",
-        "SQS:ListDeadLetterSourceQueues",
-        "SQS:ReceiveMessage",
-        "SQS:SendMessage"
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:ListDeadLetterSourceQueues",
+        "sqs:ReceiveMessage",
+        "sqs:SendMessage"
       ],
       "Resource": "arn:aws:sqs:${region}:${account_id}:${sqs_queue_name}",
       "Condition": {
-                "StringEquals": {
-                  "aws:PrincipalAccount" : "${account_id}"
-                }
+        "StringEquals": {
+          "aws:PrincipalAccount": "${account_id}"
+        }
       }
     }
   ]
