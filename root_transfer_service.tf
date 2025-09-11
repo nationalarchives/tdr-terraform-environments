@@ -197,6 +197,7 @@ module "aggregate_processing_lambda" {
       dirty_upload_bucket_name = local.upload_files_cloudfront_dirty_bucket_name
       auth_client_secret_path  = local.keycloak_tdr_transfer_service_secret_name
       sqs_queue_name           = local.aggregate_processing_function_name
+      kms_arn                  = module.encryption_key.kms_key_arn
     })
   }
   plaintext_env_vars = {

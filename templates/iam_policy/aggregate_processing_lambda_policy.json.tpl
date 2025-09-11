@@ -39,6 +39,14 @@
         "sqs:GetQueueAttributes"
       ],
       "Resource": "arn:aws:sqs:eu-west-2:${account_id}:${sqs_queue_name}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
+      ],
+      "Resource": "${kms_arn}"
     }
   ]
 }
