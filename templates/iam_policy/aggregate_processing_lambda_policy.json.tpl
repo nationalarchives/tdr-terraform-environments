@@ -56,6 +56,6 @@
         "kms:GenerateDataKey"
       ],
       "Resource": "${kms_arn}"
-    },
+    }
   ]
 }
