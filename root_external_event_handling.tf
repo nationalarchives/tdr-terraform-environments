@@ -6,6 +6,7 @@ locals {
   dr2_ingest_topic_arn                 = module.dr2_configuration.terraform_config[local.environment]["notifications_sns_topic_arn"]
   lambda_timeout                       = 60
   allow_file_status_update             = local.environment == "intg" ? "true" : "false"
+  default_debug_mode                   = false
 }
 
 module "external_event_handling_sqs_queue" {
@@ -66,5 +67,6 @@ module "external_event_handler_lambda" {
     CLIENT_ID                = local.keycloak_backend-checks_client_id
     CLIENT_SECRET_PATH       = local.keycloak_backend_checks_secret_name
     ALLOW_FILE_STATUS_UPDATE = local.allow_file_status_update
+    DEBUG_INCOMING_MESSAGE   = local.default_debug_mode
   }
 }
