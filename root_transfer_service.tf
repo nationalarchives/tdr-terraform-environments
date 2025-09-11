@@ -198,12 +198,14 @@ module "aggregate_processing_lambda" {
       auth_client_secret_path  = local.keycloak_tdr_transfer_service_secret_name
       sqs_queue_name           = local.aggregate_processing_function_name
       kms_arn                  = module.encryption_key.kms_key_arn
+      backend_checks_arn       = module.backend_checks_step_function.state_machine_arn
     })
   }
   plaintext_env_vars = {
     GRAPHQL_API_URL         = "${module.consignment_api.api_url}/graphql"
     AUTH_URL                = local.keycloak_auth_url
     AUTH_CLIENT_SECRET_PATH = local.keycloak_tdr_transfer_service_secret_name
+    BACKEND_CHECKS_ARN      = module.backend_checks_step_function.state_machine_arn
   }
 }
 
