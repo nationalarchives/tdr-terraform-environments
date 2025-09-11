@@ -30,6 +30,23 @@
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:ssm:eu-west-2:${account_id}:parameter${auth_client_secret_path}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sqs:ReceiveMessage",
+        "sqs:DeleteMessage",
+        "sqs:GetQueueAttributes"
+      ],
+      "Resource": "arn:aws:sqs:eu-west-2:${account_id}:${sqs_queue_name}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
+      ],
+      "Resource": "${kms_arn}"
     }
   ]
 }

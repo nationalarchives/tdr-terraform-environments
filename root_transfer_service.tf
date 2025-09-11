@@ -5,8 +5,9 @@ locals {
   domain                 = "nationalarchives.gov.uk"
   sub_domain             = "transfer-service"
   # Require abbreviated name for staging as ALB name cannot be more than 32 characters which is the case for staging
-  alb_function_name                  = local.environment == "staging" ? "transfer-serv" : "transfer-service"
-  aggregate_processing_function_name = "tdr-aggregate-processing-${local.environment}"
+  alb_function_name                   = local.environment == "staging" ? "transfer-serv" : "transfer-service"
+  aggregate_processing_function_name  = "tdr-aggregate-processing-${local.environment}"
+  aggregate_processing_lambda_timeout = 60
 }
 
 module "transfer_service_execution_role" {
@@ -182,15 +183,21 @@ module "aggregate_processing_lambda" {
   function_name   = local.aggregate_processing_function_name
   tags            = local.common_tags
   handler         = "uk.gov.nationalarchives.aggregate.processing.AggregateProcessingLambda::handleRequest"
-  timeout_seconds = 60
+  timeout_seconds = local.aggregate_processing_lambda_timeout
   memory_size     = 512
   runtime         = "java21"
+  lambda_sqs_queue_mappings = [{
+    sqs_queue_arn         = "arn:aws:sqs:eu-west-2:${var.tdr_account_number}:${local.aggregate_processing_function_name}",
+    ignore_enabled_status = false
+  }]
   policies = {
     "TDRAggregateProcessingLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/aggregate_processing_lambda_policy.json.tpl", {
       function_name            = local.aggregate_processing_function_name
       account_id               = var.tdr_account_number
       dirty_upload_bucket_name = local.upload_files_cloudfront_dirty_bucket_name
       auth_client_secret_path  = local.keycloak_tdr_transfer_service_secret_name
+      sqs_queue_name           = local.aggregate_processing_function_name
+      kms_arn                  = module.encryption_key.kms_key_arn
     })
   }
   plaintext_env_vars = {
@@ -198,4 +205,20 @@ module "aggregate_processing_lambda" {
     AUTH_URL                = local.keycloak_auth_url
     AUTH_CLIENT_SECRET_PATH = local.keycloak_tdr_transfer_service_secret_name
   }
+}
+
+module "aggregate_processing_sqs_queue" {
+  count      = local.transfer_service_count
+  source     = "./da-terraform-modules/sqs"
+  tags       = local.common_tags
+  queue_name = local.aggregate_processing_function_name
+  sqs_policy = templatefile("./templates/sqs/aggregate_processing_policy.json.tpl", {
+    region         = local.region,
+    environment    = local.environment,
+    account_id     = data.aws_caller_identity.current.account_id,
+    sqs_queue_name = local.aggregate_processing_function_name
+  })
+  encryption_type    = "kms"
+  kms_key_id         = module.encryption_key.kms_alias_arn
+  visibility_timeout = 6 * local.lambda_timeout
 }
