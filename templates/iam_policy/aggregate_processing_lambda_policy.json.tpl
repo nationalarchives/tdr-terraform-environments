@@ -43,6 +43,15 @@
     {
       "Effect": "Allow",
       "Action": [
+        "states:StartExecution"
+      ],
+      "Resource": [
+        "${backend_checks_arn}"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
         "kms:Decrypt",
         "kms:GenerateDataKey"
       ],
