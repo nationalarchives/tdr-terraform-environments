@@ -5,9 +5,9 @@ locals {
   domain                 = "nationalarchives.gov.uk"
   sub_domain             = "transfer-service"
   # Require abbreviated name for staging as ALB name cannot be more than 32 characters which is the case for staging
-  alb_function_name                   = local.environment == "staging" ? "transfer-serv" : "transfer-service"
-  aggregate_processing_function_name  = "tdr-aggregate-processing-${local.environment}"
-  aggregate_processing_lambda_timeout = 60
+  alb_function_name                        = local.environment == "staging" ? "transfer-serv" : "transfer-service"
+  aggregate_processing_function_name       = "tdr-aggregate-processing-${local.environment}"
+  aggregate_processing_lambda_timeout_secs = 60
 }
 
 module "transfer_service_execution_role" {
@@ -184,7 +184,7 @@ module "aggregate_processing_lambda" {
   function_name   = local.aggregate_processing_function_name
   tags            = local.common_tags
   handler         = "uk.gov.nationalarchives.aggregate.processing.AggregateProcessingLambda::handleRequest"
-  timeout_seconds = local.aggregate_processing_lambda_timeout
+  timeout_seconds = local.aggregate_processing_lambda_timeout_secs
   memory_size     = 512
   runtime         = "java21"
   lambda_sqs_queue_mappings = [{
