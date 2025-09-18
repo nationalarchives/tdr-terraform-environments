@@ -163,6 +163,7 @@ module "transfer_service_ecs_task" {
       user_email_sns_topic_arn            = module.notifications_topic.sns_arn
       user_read_client_secret             = local.keycloak_tdr_read_client_secret_name
       user_read_client_id                 = local.keycloak_user_read_client_id
+      aggregate_processing_queue_url      = module.aggregate_processing_sqs_queue[0].sqs_queue_url
   })
   container_name               = "transfer-service"
   cpu                          = 512

@@ -73,6 +73,10 @@
       {
         "name": "USER_READ_CLIENT_SECRET",
         "value": "${user_read_client_secret}"
+      },
+      {
+        "name": "AGGREGATE_PROCESSING_QUEUE_URL",
+        "value": "${aggregate_processing_queue_url}"
       }
     ],
     "logConfiguration": {
