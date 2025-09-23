@@ -52,6 +52,13 @@
     {
       "Effect": "Allow",
       "Action": [
+        "sns:Publish"
+      ],
+      "Resource": "${notifications_topic_arn}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
         "kms:Decrypt",
         "kms:GenerateDataKey"
       ],
