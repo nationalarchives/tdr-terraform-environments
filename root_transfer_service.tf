@@ -209,6 +209,7 @@ module "aggregate_processing_lambda" {
     AUTH_CLIENT_SECRET_PATH = local.keycloak_tdr_transfer_service_secret_name
     BACKEND_CHECKS_ARN      = module.backend_checks_step_function.state_machine_arn
     NOTIFICATIONS_TOPIC_ARN = module.notifications_topic.sns_arn
+    READ_AUTH_SECRET_PATH   = module.keycloak_ssm_parameters.params[local.keycloak_tdr_read_client_secret_name].name
   }
 }
 
