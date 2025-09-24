@@ -4,10 +4,10 @@
     {
       "Effect": "Allow",
       "Action": [
-        "sns:Publish"
+        "sqs:SendMessage"
       ],
       "Resource": [
-        "arn:aws:sns:eu-west-2:${account_id}:tdr-notifications-${environment}"
+        "arn:aws:sqs:eu-west-2:${account_id}:tdr-aggregate-processing-${environment}"
       ]
     }
   ]
