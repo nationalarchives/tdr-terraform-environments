@@ -200,6 +200,7 @@ module "aggregate_processing_lambda" {
       sqs_queue_name           = local.aggregate_processing_function_name
       kms_arn                  = module.encryption_key.kms_key_arn
       backend_checks_arn       = module.backend_checks_step_function.state_machine_arn
+      notifications_topic_arn  = module.notifications_topic.sns_arn
     })
   }
   plaintext_env_vars = {
@@ -207,6 +208,7 @@ module "aggregate_processing_lambda" {
     AUTH_URL                = local.keycloak_auth_url
     AUTH_CLIENT_SECRET_PATH = local.keycloak_tdr_transfer_service_secret_name
     BACKEND_CHECKS_ARN      = module.backend_checks_step_function.state_machine_arn
+    NOTIFICATIONS_TOPIC_ARN = module.notifications_topic.sns_arn
   }
 }
 

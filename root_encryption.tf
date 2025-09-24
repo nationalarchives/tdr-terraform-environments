@@ -4,8 +4,9 @@ locals {
     service_name : "cloudwatch"
     service_source_account : data.aws_caller_identity.current.account_id
   }]
-  wiz_role_arns     = module.tdr_configuration.terraform_config[local.environment]["wiz_role_arns"]
-  aws_back_up_roles = local.environment == "prod" ? [local.aws_back_up_local_role] : []
+  wiz_role_arns                    = module.tdr_configuration.terraform_config[local.environment]["wiz_role_arns"]
+  aws_back_up_roles                = local.environment == "prod" ? [local.aws_back_up_local_role] : []
+  aggregate_processing_access_role = local.environment == "prod" ? [] : [module.aggregate_processing_lambda[0].lambda_role_arn]
 }
 
 module "s3_external_kms_key" {
@@ -78,7 +79,7 @@ module "s3_upload_kms_key" {
       module.file_format_v2.lambda_role_arn,
       module.checksum_v2.lambda_role_arn,
       module.aws_guard_duty_s3_malware_scan_role.role_arn
-    ], local.aws_sso_internal_bucket_access_roles, local.aws_back_up_roles)
+    ], local.aws_sso_internal_bucket_access_roles, local.aws_back_up_roles, local.aggregate_processing_access_role)
     ci_roles = [local.assume_role]
     service_details = [
       {
