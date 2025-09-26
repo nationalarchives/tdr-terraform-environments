@@ -204,12 +204,12 @@ module "aggregate_processing_lambda" {
     })
   }
   plaintext_env_vars = {
-    GRAPHQL_API_URL         = "${module.consignment_api.api_url}/graphql"
-    AUTH_URL                = local.keycloak_auth_url
-    AUTH_CLIENT_SECRET_PATH = local.keycloak_tdr_transfer_service_secret_name
-    BACKEND_CHECKS_ARN      = module.backend_checks_step_function.state_machine_arn
-    NOTIFICATIONS_TOPIC_ARN = module.notifications_topic.sns_arn
-    READ_AUTH_SECRET_PATH   = module.keycloak_ssm_parameters.params[local.keycloak_tdr_read_client_secret_name].name
+    GRAPHQL_API_URL                = "${module.consignment_api.api_url}/graphql"
+    AUTH_URL                       = local.keycloak_auth_url
+    AUTH_CLIENT_SECRET_PATH        = local.keycloak_tdr_transfer_service_secret_name
+    BACKEND_CHECKS_ARN             = module.backend_checks_step_function.state_machine_arn
+    NOTIFICATIONS_TOPIC_ARN        = module.notifications_topic.sns_arn
+    KEYCLOAK_READ_AUTH_SECRET_PATH = module.keycloak_ssm_parameters.params[local.keycloak_tdr_read_client_secret_name].name
   }
 }
 
