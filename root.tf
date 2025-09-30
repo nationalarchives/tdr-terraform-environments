@@ -765,6 +765,7 @@ module "inactive_keycloak_users_lambda" {
     REPORTING_CLIENT_SECRET_PATH  = local.keycloak_reporting_client_secret_name
     ENVIRONMENT                   = local.environment
     NOTIFICATIONS_TOPIC_ARN       = module.notifications_topic.sns_arn
+    DISABLE_USERS_DRY_RUN         = local.disable_users_dry_run
   }
 }
 
