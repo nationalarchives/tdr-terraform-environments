@@ -771,12 +771,12 @@ module "inactive_keycloak_users_lambda" {
 module "disable_inactive_judgment_users_scheduled_event" {
   source                  = "./da-terraform-modules/cloudwatch_events"
   rule_description        = "Scheduled event to disable inactive judgment Keycloak users"
-  schedule                = "rate(775 days)"
+  schedule                = "rate(30 days)"
   rule_name               = "disable-inactive-judgment-keycloak-users"
   lambda_event_target_arn = module.inactive_keycloak_users_lambda.lambda_arn
   input = jsonencode({
     userType             = "judgment_user"
-    inactivityPeriodDays = 180
+    inactivityPeriodDays = 770
   })
 }
 
