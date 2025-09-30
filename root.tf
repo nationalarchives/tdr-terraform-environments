@@ -776,7 +776,7 @@ module "disable_inactive_judgment_users_scheduled_event" {
   lambda_event_target_arn = module.inactive_keycloak_users_lambda.lambda_arn
   input = jsonencode({
     userType             = "judgment_user"
-    inactivityPeriodDays = 770
+    inactivityPeriodDays = 730
   })
 }
 
