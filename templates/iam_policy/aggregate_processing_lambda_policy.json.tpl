@@ -29,7 +29,10 @@
         "ssm:GetParameter"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:ssm:eu-west-2:${account_id}:parameter${auth_client_secret_path}"
+      "Resource": [
+        "arn:aws:ssm:eu-west-2:${account_id}:parameter${auth_client_secret_path}",
+        "arn:aws:ssm:eu-west-2:${account_id}:parameter${read_client_secret_path}"
+        ]
     },
     {
       "Effect": "Allow",

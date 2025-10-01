@@ -8,6 +8,8 @@ locals {
   alb_function_name                        = local.environment == "staging" ? "transfer-serv" : "transfer-service"
   aggregate_processing_function_name       = "tdr-aggregate-processing-${local.environment}"
   aggregate_processing_lambda_timeout_secs = 60
+
+  transfer_service_ecs_task_role_arn = local.environment == "prod" ? "" : module.transfer_service_task_role[0].role_arn
 }
 
 module "transfer_service_execution_role" {
@@ -197,6 +199,7 @@ module "aggregate_processing_lambda" {
       account_id               = var.tdr_account_number
       dirty_upload_bucket_name = local.upload_files_cloudfront_dirty_bucket_name
       auth_client_secret_path  = local.keycloak_tdr_transfer_service_secret_name
+      read_client_secret_path  = local.keycloak_tdr_read_client_secret_name
       sqs_queue_name           = local.aggregate_processing_function_name
       kms_arn                  = module.encryption_key.kms_key_arn
       backend_checks_arn       = module.backend_checks_step_function.state_machine_arn
@@ -209,7 +212,11 @@ module "aggregate_processing_lambda" {
     AUTH_CLIENT_SECRET_PATH        = local.keycloak_tdr_transfer_service_secret_name
     BACKEND_CHECKS_ARN             = module.backend_checks_step_function.state_machine_arn
     NOTIFICATIONS_TOPIC_ARN        = module.notifications_topic.sns_arn
-    KEYCLOAK_READ_AUTH_SECRET_PATH = module.keycloak_ssm_parameters.params[local.keycloak_tdr_read_client_secret_name].name
+    KEYCLOAK_READ_AUTH_SECRET_PATH = local.keycloak_tdr_read_client_secret_name
+  }
+  vpc_config = {
+    subnet_ids         = module.shared_vpc.private_backend_checks_subnets
+    security_group_ids = [module.outbound_only_security_group.security_group_id]
   }
 }
 
