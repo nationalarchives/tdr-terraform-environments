@@ -8,6 +8,8 @@ locals {
   alb_function_name                        = local.environment == "staging" ? "transfer-serv" : "transfer-service"
   aggregate_processing_function_name       = "tdr-aggregate-processing-${local.environment}"
   aggregate_processing_lambda_timeout_secs = 60
+
+  transfer_service_ecs_task_role_arn = local.environment == "prod" ? "" : module.transfer_service_task_role[0].role_arn
 }
 
 module "transfer_service_execution_role" {
