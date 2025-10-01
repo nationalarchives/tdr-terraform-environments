@@ -212,7 +212,11 @@ module "aggregate_processing_lambda" {
     AUTH_CLIENT_SECRET_PATH        = local.keycloak_tdr_transfer_service_secret_name
     BACKEND_CHECKS_ARN             = module.backend_checks_step_function.state_machine_arn
     NOTIFICATIONS_TOPIC_ARN        = module.notifications_topic.sns_arn
-    KEYCLOAK_READ_AUTH_SECRET_PATH = module.keycloak_ssm_parameters.params[local.keycloak_tdr_read_client_secret_name].name
+    KEYCLOAK_READ_AUTH_SECRET_PATH = local.keycloak_tdr_read_client_secret_name
+  }
+  vpc_config = {
+    subnet_ids         = module.shared_vpc.private_backend_checks_subnets
+    security_group_ids = [module.outbound_only_security_group.security_group_id]
   }
 }
 
