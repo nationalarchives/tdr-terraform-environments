@@ -284,17 +284,19 @@ module "encryption_key" {
 
 module "waf" {
   # a single WAF web acl and rules are used for all services to minimise AWS costs
-  source            = "./tdr-terraform-modules/waf"
-  project           = var.project
-  function          = "apps"
-  environment       = local.environment
-  common_tags       = local.common_tags
-  alb_target_groups = [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn]
-  trusted_ips       = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
-  blocked_ips       = local.ip_blocked_list
-  geo_match         = split(",", var.geo_match)
-  restricted_uri    = "admin"
-  log_destinations  = [module.waf_cloudwatch.log_group_arn]
+  source                       = "./tdr-terraform-modules/waf"
+  project                      = var.project
+  function                     = "apps"
+  environment                  = local.environment
+  common_tags                  = local.common_tags
+  alb_target_groups            = [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn]
+  trusted_ips                  = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
+  blocked_ips                  = local.ip_blocked_list
+  geo_match                    = split(",", var.geo_match)
+  restricted_uri               = "admin"
+  log_destinations             = [module.waf_cloudwatch.log_group_arn]
+  region_allowed_ips           = local.region_allowed_ips
+  region_allowed_country_codes = local.region_allowed_country_codes
 }
 
 module "backend_lambda_function_bucket" {
@@ -634,7 +636,7 @@ module "tdr_private_nacl" {
   vpc_id = module.shared_vpc.vpc_id
   ingress_rules = [
     { rule_no = 100, cidr_block = "0.0.0.0/0", action = "allow", from_port = 1024, to_port = 65535, egress = false },
-    { rule_no = 200, cidr_block = "0.0.0.0/0", action = "allow", from_port = 443, to_port = 443, egress = false },
+    { rule_no = 200, cidr_block = "0.0.0.0", action = "allow", from_port = 443, to_port = 443, egress = false },
     { rule_no = 100, cidr_block = "0.0.0.0/0", action = "allow", from_port = 443, to_port = 443, egress = true },
     { rule_no = 200, cidr_block = module.shared_vpc.vpc_cidr_block, action = "allow", from_port = 1024, to_port = 65535, egress = true }
   ]
