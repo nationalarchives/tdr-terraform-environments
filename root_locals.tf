@@ -67,10 +67,9 @@ locals {
 
   ip_blocked_list = module.tdr_configuration.terraform_config["ip_blocked_list"]
 
-  // Region-specific allow rule inputs (only set in prod) These are for MyNCSC scanning TDRD-975
-  region_allowed_ips_raw       = local.environment == "prod" ? "34.249.80.238/32,34.251.127.30/32" : ""
-  region_allowed_ips           = local.region_allowed_ips_raw == "" ? "" : join(",", [for ip in split(",", local.region_allowed_ips_raw) : trim(ip)])
-  region_allowed_country_codes = local.environment == "prod" ? ["GB", "IE"] : []
+  // Region-specific allow rule inputs (only set in intg currently) These are for MyNCSC scanning TDRD-975
+  region_allowed_ips_list      = local.environment == "intg" ? ["34.249.80.238/32", "34.251.127.30/32"] : []
+  region_allowed_country_codes = local.environment == "intg" ? ["GB", "IE"] : []
 
   ecr_account_number = local.environment == "sbox" ? data.aws_caller_identity.current.account_id : data.aws_ssm_parameter.mgmt_account_number.value
 

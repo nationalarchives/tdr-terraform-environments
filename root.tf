@@ -295,7 +295,7 @@ module "waf" {
   geo_match                    = split(",", var.geo_match)
   restricted_uri               = "admin"
   log_destinations             = [module.waf_cloudwatch.log_group_arn]
-  region_allowed_ips           = local.region_allowed_ips
+  region_allowed_ips           = local.region_allowed_ips_list
   region_allowed_country_codes = local.region_allowed_country_codes
 }
 
