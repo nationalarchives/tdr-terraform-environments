@@ -219,3 +219,73 @@ module "keycloak_rotate_notify_api_key_event" {
   rule_description           = "Notify to rotate API Key"
   event_variables            = { parameter_name = local.keycloak_govuk_notify_api_key_name, policy_type = "NoChangeNotification" }
 }
+
+# TDRD-1066 Expose Keycloak via endpoing via NLB
+resource "aws_lb_target_group" "keycloak_nlb_to_alb" {
+  name        = format("%s-%s-nlb-%s", var.project, "keycloak-new", local.environment)
+  target_type = "alb"
+  port        = 443
+  protocol    = "TCP"
+  vpc_id      = module.shared_vpc.vpc_id
+}
+
+# Needs to allow the consumers of the private link
+# Not sure how we can pass this in per environment
+# TODO get ayr subnets for the inbound cidr rules
+module "keycloak_nlb_to_alb_security_group" {
+  source             = "./tdr-terraform-modules/security_group"
+  description        = "Restrict access to the NLB including source addresses of the attached private link"
+  name               = "keycloak-nlb-load-balancer-security-group-new"
+  vpc_id             = module.shared_vpc.vpc_id
+  common_tags        = local.common_tags
+  ingress_cidr_rules = [{ port = 443, cidr_blocks = ["10.11.12.0/24"], description = "Allow inbound access from AYR", protocol = "-1" }]
+  egress_cidr_rules  = [{ port = 443, cidr_blocks = module.shared_vpc.public_subnet_ranges, description = "Allow outbound access to subnets", protocol = "-1" }]
+}
+
+# NLB
+resource "aws_lb" "keycloak_nlb_to_alb" {
+  name               = format("%s-%s-nlb-%s", var.project, "keycloak-new", local.environment)
+  internal           = true
+  load_balancer_type = "network"
+  security_groups    = [module.keycloak_nlb_to_alb_security_group.security_group_id]
+  subnets            = module.shared_vpc.public_subnets
+  tags               = local.common_tags
+  # TODO Logging bucket and enable logging
+}
+
+resource "aws_lb_target_group_attachment" "keycloak_nlb_to_alb" {
+  target_group_arn = aws_lb_target_group.keycloak_nlb_to_alb.arn
+  target_id        = module.keycloak_tdr_alb.alb_arn
+  port             = 443
+}
+
+resource "aws_lb_listener" "keycloak_nlb_to_alb" {
+  load_balancer_arn = aws_lb.keycloak_nlb_to_alb.arn
+  port              = "443"
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.keycloak_nlb_to_alb.id
+  }
+}
+
+# TODO Parameterise the allowed principals and dns names
+resource "aws_vpc_endpoint_service" "keycloak" {
+  acceptance_required        = false
+  network_load_balancer_arns = [aws_lb.keycloak_nlb_to_alb.arn]
+  allowed_principals         = ["arn:aws:iam::675407525008:root"]
+  private_dns_name           = "auth.tdr-integration.nationalarchives.gov.uk"
+  tags = {
+    Name = "keycloak-${local.environment}"
+  }
+}
+
+resource "aws_vpc_endpoint_service_private_dns_verification" "keycloak" {
+  service_id = aws_vpc_endpoint_service.keycloak.id
+}
+# ALB Rule update for health check
+
+# WAF Rule
+
+# DNS validation
