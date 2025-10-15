@@ -207,6 +207,7 @@ module "aggregate_processing_lambda" {
     })
   }
   plaintext_env_vars = {
+    ENVIRONMENT                    = local.environment
     GRAPHQL_API_URL                = "${module.consignment_api.api_url}/graphql"
     AUTH_URL                       = local.keycloak_auth_url
     AUTH_CLIENT_SECRET_PATH        = local.keycloak_tdr_transfer_service_secret_name
