@@ -67,6 +67,11 @@ locals {
 
   ip_blocked_list = module.tdr_configuration.terraform_config["ip_blocked_list"]
 
+  region_allowed_ips = module.global_parameters.regional_allowed_ips
+
+  region_allowed_ips_list      = local.environment == "prod" ? local.region_allowed_ips : []
+  region_allowed_country_codes = local.environment == "prod" ? ["IE"] : []
+
   ecr_account_number = local.environment == "sbox" ? data.aws_caller_identity.current.account_id : data.aws_ssm_parameter.mgmt_account_number.value
 
   user_session_timeout_mins = 120
