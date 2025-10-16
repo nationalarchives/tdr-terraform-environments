@@ -17,7 +17,8 @@
       "Action": [
         "s3:GetObject",
         "s3:GetObjectTagging",
-        "s3:ListBucket"
+        "s3:ListBucket",
+        "s3:PutObjectTagging"
       ],
       "Resource": [
         "arn:aws:s3:::${dirty_upload_bucket_name}",
