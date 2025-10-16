@@ -145,24 +145,25 @@ module "tdr_keycloak_ecs" {
 }
 
 module "keycloak_tdr_alb" {
-  source                = "./tdr-terraform-modules/alb"
-  project               = var.project
-  function              = "keycloak-new"
-  environment           = local.environment
-  alb_log_bucket        = module.alb_logs_s3.s3_bucket_id
-  alb_security_group_id = module.keycloak_alb_security_group.security_group_id
-  alb_target_group_port = 8080
-  health_check_port     = 9000
-  alb_target_type       = "ip"
-  certificate_arn       = module.keycloak_certificate.certificate_arn
-  health_check_matcher  = "200,303"
-  health_check_path     = "health"
-  http_listener         = false
-  public_subnets        = module.shared_vpc.public_subnets
-  vpc_id                = module.shared_vpc.vpc_id
-  common_tags           = local.common_tags
-  own_host_header_only  = true
-  host                  = "auth.${local.environment_domain}"
+  source                               = "./tdr-terraform-modules/alb"
+  project                              = var.project
+  function                             = "keycloak-new"
+  environment                          = local.environment
+  alb_log_bucket                       = module.alb_logs_s3.s3_bucket_id
+  alb_security_group_id                = module.keycloak_alb_security_group.security_group_id
+  alb_target_group_port                = 8080
+  health_check_port                    = 9000
+  alb_target_type                      = "ip"
+  certificate_arn                      = module.keycloak_certificate.certificate_arn
+  health_check_matcher                 = "200,303"
+  health_check_path                    = "health"
+  http_listener                        = false
+  public_subnets                       = module.shared_vpc.public_subnets
+  vpc_id                               = module.shared_vpc.vpc_id
+  common_tags                          = local.common_tags
+  own_host_header_only                 = true
+  allow_aws_elb_healthcheck_from_cidrs = module.shared_vpc.public_subnet_ranges
+  host                                 = "auth.${local.environment_domain}"
 }
 
 module "keycloak_database_instance" {
@@ -227,6 +228,13 @@ resource "aws_lb_target_group" "keycloak_nlb_to_alb" {
   port        = 443
   protocol    = "TCP"
   vpc_id      = module.shared_vpc.vpc_id
+
+  health_check {
+    enabled  = true
+    path     = "/"
+    protocol = "HTTPS"
+  }
+  tags = local.common_tags
 }
 
 # Needs to allow the consumers of the private link
@@ -270,12 +278,12 @@ resource "aws_lb_listener" "keycloak_nlb_to_alb" {
   }
 }
 
-# TODO Parameterise the allowed principals and dns names
+# TODO Parameterise the allowed principals 
 resource "aws_vpc_endpoint_service" "keycloak" {
   acceptance_required        = false
   network_load_balancer_arns = [aws_lb.keycloak_nlb_to_alb.arn]
   allowed_principals         = ["arn:aws:iam::675407525008:root"]
-  private_dns_name           = "auth.tdr-integration.nationalarchives.gov.uk"
+  private_dns_name           = "auth.${local.environment_domain}"
   tags = {
     Name = "keycloak-${local.environment}"
   }
@@ -284,8 +292,5 @@ resource "aws_vpc_endpoint_service" "keycloak" {
 resource "aws_vpc_endpoint_service_private_dns_verification" "keycloak" {
   service_id = aws_vpc_endpoint_service.keycloak.id
 }
-# ALB Rule update for health check
 
-# WAF Rule
 
-# DNS validation
