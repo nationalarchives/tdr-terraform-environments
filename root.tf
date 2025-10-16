@@ -284,17 +284,18 @@ module "encryption_key" {
 
 module "waf" {
   # a single WAF web acl and rules are used for all services to minimise AWS costs
-  source            = "./tdr-terraform-modules/waf"
-  project           = var.project
-  function          = "apps"
-  environment       = local.environment
-  common_tags       = local.common_tags
-  alb_target_groups = [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn]
-  trusted_ips       = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
-  blocked_ips       = local.ip_blocked_list
-  geo_match         = split(",", var.geo_match)
-  restricted_uri    = "admin"
-  log_destinations  = [module.waf_cloudwatch.log_group_arn]
+  source              = "./tdr-terraform-modules/waf"
+  project             = var.project
+  function            = "apps"
+  environment         = local.environment
+  common_tags         = local.common_tags
+  alb_target_groups   = [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn]
+  trusted_ips         = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
+  trusted_local_cidrs = module.shared_vpc.public_subnet_ranges
+  blocked_ips         = local.ip_blocked_list
+  geo_match           = split(",", var.geo_match)
+  restricted_uri      = "admin"
+  log_destinations    = [module.waf_cloudwatch.log_group_arn]
 }
 
 module "backend_lambda_function_bucket" {
