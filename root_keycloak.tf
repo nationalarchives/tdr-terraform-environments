@@ -237,27 +237,25 @@ resource "aws_lb_target_group" "keycloak_nlb_to_alb" {
   tags = local.common_tags
 }
 
-# Needs to allow the consumers of the private link
-# Not sure how we can pass this in per environment
-# TODO get ayr subnets for the inbound cidr rules
-module "keycloak_nlb_to_alb_security_group" {
-  source             = "./tdr-terraform-modules/security_group"
-  description        = "Restrict access to the NLB including source addresses of the attached private link"
-  name               = "keycloak-nlb-load-balancer-security-group-new"
-  vpc_id             = module.shared_vpc.vpc_id
-  common_tags        = local.common_tags
-  ingress_cidr_rules = [{ port = 443, cidr_blocks = ["10.11.12.0/24"], description = "Allow inbound access from AYR", protocol = "-1" }]
-  egress_cidr_rules  = [{ port = 443, cidr_blocks = module.shared_vpc.public_subnet_ranges, description = "Allow outbound access to subnets", protocol = "-1" }]
-}
+# module "keycloak_nlb_to_alb_security_group" {
+#   source             = "./tdr-terraform-modules/security_group"
+#   description        = "Restrict access to the NLB including source addresses of the attached private link"
+#   name               = "keycloak-nlb-load-balancer-security-group-new"
+#   vpc_id             = module.shared_vpc.vpc_id
+#   common_tags        = local.common_tags
+#   ingress_cidr_rules = [{ port = 443, cidr_blocks = ["10.20.0.0/16"], description = "Allow inbound HTTPS", protocol = "-1" }]
+#   egress_cidr_rules  = [{ port = 443, cidr_blocks = module.shared_vpc.public_subnet_ranges, description = "Allow outbound access to subnets", protocol = "-1" }]
+# }
 
 # NLB
 resource "aws_lb" "keycloak_nlb_to_alb" {
   name               = format("%s-%s-nlb-%s", var.project, "keycloak-new", local.environment)
   internal           = true
   load_balancer_type = "network"
-  security_groups    = [module.keycloak_nlb_to_alb_security_group.security_group_id]
-  subnets            = module.shared_vpc.public_subnets
-  tags               = local.common_tags
+  #security_groups    = [module.keycloak_nlb_to_alb_security_group.security_group_id]
+  subnets                                                      = module.shared_vpc.public_subnets
+  enforce_security_group_inbound_rules_on_private_link_traffic = "off"
+  tags                                                         = local.common_tags
   # TODO Logging bucket and enable logging
 }
 
@@ -278,11 +276,10 @@ resource "aws_lb_listener" "keycloak_nlb_to_alb" {
   }
 }
 
-# TODO Parameterise the allowed principals 
 resource "aws_vpc_endpoint_service" "keycloak" {
   acceptance_required        = false
   network_load_balancer_arns = [aws_lb.keycloak_nlb_to_alb.arn]
-  allowed_principals         = ["arn:aws:iam::675407525008:root"]
+  allowed_principals         = [local.ayr_terraform_deployer_roles["${local.environment}"]]
   private_dns_name           = "auth.${local.environment_domain}"
   tags = {
     Name = "keycloak-${local.environment}"

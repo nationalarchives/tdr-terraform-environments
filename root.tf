@@ -22,6 +22,11 @@ module "tdr_configuration" {
   project = "tdr"
 }
 
+module "ayr_configuration" {
+  source  = "./da-terraform-configurations"
+  project = "ayr"
+}
+
 module "aws_backup_configuration" {
   source  = "./da-terraform-configurations"
   project = "aws-backup"
