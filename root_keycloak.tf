@@ -237,26 +237,35 @@ resource "aws_lb_target_group" "keycloak_nlb_to_alb" {
   tags = local.common_tags
 }
 
-# module "keycloak_nlb_to_alb_security_group" {
-#   source             = "./tdr-terraform-modules/security_group"
-#   description        = "Restrict access to the NLB including source addresses of the attached private link"
-#   name               = "keycloak-nlb-load-balancer-security-group-new"
-#   vpc_id             = module.shared_vpc.vpc_id
-#   common_tags        = local.common_tags
-#   ingress_cidr_rules = [{ port = 443, cidr_blocks = ["10.20.0.0/16"], description = "Allow inbound HTTPS", protocol = "-1" }]
-#   egress_cidr_rules  = [{ port = 443, cidr_blocks = module.shared_vpc.public_subnet_ranges, description = "Allow outbound access to subnets", protocol = "-1" }]
-# }
+# An NLB cannot have a security group attached if was created without one.
+# Although this will be bypassed by the private link, use a non permissive SG here
+# in case it is needed in the future.  Destroying the NLB will fail once the private link service
+# and consumers are attached.
+module "keycloak_nlb_to_alb_security_group" {
+  source            = "./tdr-terraform-modules/security_group"
+  description       = "Restrict access to the NLB"
+  name              = "keycloak-nlb-load-balancer-security-group-new"
+  vpc_id            = module.shared_vpc.vpc_id
+  egress_cidr_rules = [{ port = 443, cidr_blocks = module.shared_vpc.public_subnet_ranges, description = "Allow outbound access to public subnets for ALB", protocol = "TCP" }]
+
+  common_tags = local.common_tags
+}
 
 # NLB
 resource "aws_lb" "keycloak_nlb_to_alb" {
-  name               = format("%s-%s-nlb-%s", var.project, "keycloak-new", local.environment)
-  internal           = true
-  load_balancer_type = "network"
-  #security_groups    = [module.keycloak_nlb_to_alb_security_group.security_group_id]
+  name                                                         = format("%s-%s-nlb-%s", var.project, "keycloak-new", local.environment)
+  internal                                                     = true
+  load_balancer_type                                           = "network"
+  security_groups                                              = [module.keycloak_nlb_to_alb_security_group.security_group_id]
   subnets                                                      = module.shared_vpc.public_subnets
   enforce_security_group_inbound_rules_on_private_link_traffic = "off"
   tags                                                         = local.common_tags
-  # TODO Logging bucket and enable logging
+  # TODO Fix this logging issue
+  #  access_logs {
+  #   bucket  = module.alb_logs_s3.s3_bucket_id
+  #   prefix  = format("%s-%s-nlb-%s", var.project, "keycloak-new", local.environment)
+  #   enabled = true
+  # }
 }
 
 resource "aws_lb_target_group_attachment" "keycloak_nlb_to_alb" {
@@ -286,8 +295,9 @@ resource "aws_vpc_endpoint_service" "keycloak" {
   }
 }
 
-resource "aws_vpc_endpoint_service_private_dns_verification" "keycloak" {
-  service_id = aws_vpc_endpoint_service.keycloak.id
-}
+# Is this for doing the validation after the TXT record is in place?
+# resource "aws_vpc_endpoint_service_private_dns_verification" "keycloak" {
+#   service_id = aws_vpc_endpoint_service.keycloak.id
+# }
 
 
