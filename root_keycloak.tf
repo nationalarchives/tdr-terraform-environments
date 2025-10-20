@@ -237,18 +237,13 @@ resource "aws_lb_target_group" "keycloak_nlb_to_alb" {
   tags = local.common_tags
 }
 
-# An NLB cannot have a security group attached if was created without one.
-# Although this will be bypassed by the private link, use a non permissive SG here
-# in case it is needed in the future.  Destroying the NLB will fail once the private link service
-# and consumers are attached.
 module "keycloak_nlb_to_alb_security_group" {
   source            = "./tdr-terraform-modules/security_group"
-  description       = "Restrict access to the NLB"
+  description       = "Restrict NLB traffic"
   name              = "keycloak-nlb-load-balancer-security-group-new"
   vpc_id            = module.shared_vpc.vpc_id
   egress_cidr_rules = [{ port = 443, cidr_blocks = module.shared_vpc.public_subnet_ranges, description = "Allow outbound access to public subnets for ALB", protocol = "TCP" }]
-
-  common_tags = local.common_tags
+  common_tags       = local.common_tags
 }
 
 # NLB
@@ -260,7 +255,7 @@ resource "aws_lb" "keycloak_nlb_to_alb" {
   subnets                                                      = module.shared_vpc.public_subnets
   enforce_security_group_inbound_rules_on_private_link_traffic = "off"
   tags                                                         = local.common_tags
-  # TODO Fix this logging issue
+  # TODO Fix this logging issue TDRD-1102
   #  access_logs {
   #   bucket  = module.alb_logs_s3.s3_bucket_id
   #   prefix  = format("%s-%s-nlb-%s", var.project, "keycloak-new", local.environment)
@@ -290,14 +285,23 @@ resource "aws_vpc_endpoint_service" "keycloak" {
   network_load_balancer_arns = [aws_lb.keycloak_nlb_to_alb.arn]
   allowed_principals         = [local.ayr_terraform_deployer_roles["${local.environment}"]]
   private_dns_name           = "auth.${local.environment_domain}"
-  tags = {
-    Name = "keycloak-${local.environment}"
-  }
+  tags = merge(
+    { Name = "keycloak-${local.environment}" },
+  tomap(local.common_tags))
 }
 
-# Is this for doing the validation after the TXT record is in place?
-# resource "aws_vpc_endpoint_service_private_dns_verification" "keycloak" {
-#   service_id = aws_vpc_endpoint_service.keycloak.id
-# }
+resource "aws_route53_record" "keycloak_private_link_dns_verification" {
+  zone_id = data.aws_route53_zone.tdr_dns_zone.id
+  name    = aws_vpc_endpoint_service.keycloak.private_dns_name
+  type    = "TXT"
+  ttl     = 1800
+  records = [
+    aws_vpc_endpoint_service.keycloak.private_dns_name_configuration[0].value
+  ]
+}
+
+resource "aws_vpc_endpoint_service_private_dns_verification" "keycloak" {
+  service_id = aws_vpc_endpoint_service.keycloak.id
+}
 
 
