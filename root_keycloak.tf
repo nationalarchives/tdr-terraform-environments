@@ -255,12 +255,8 @@ resource "aws_lb" "keycloak_nlb_to_alb" {
   subnets                                                      = module.shared_vpc.public_subnets
   enforce_security_group_inbound_rules_on_private_link_traffic = "off"
   tags                                                         = local.common_tags
-  # TODO Fix this logging issue TDRD-1102
-  #  access_logs {
-  #   bucket  = module.alb_logs_s3.s3_bucket_id
-  #   prefix  = format("%s-%s-nlb-%s", var.project, "keycloak-new", local.environment)
-  #   enabled = true
-  # }
+  # Logging not enabled as the listner is not TLS which is the only thing that logs
+  # https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-access-logs.html?icmpid=docs_console_unmapped
 }
 
 resource "aws_lb_target_group_attachment" "keycloak_nlb_to_alb" {
