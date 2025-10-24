@@ -7,7 +7,7 @@ locals {
   # Require abbreviated name for staging as ALB name cannot be more than 32 characters which is the case for staging
   alb_function_name                        = local.environment == "staging" ? "transfer-serv" : "transfer-service"
   aggregate_processing_function_name       = "tdr-aggregate-processing-${local.environment}"
-  aggregate_processing_lambda_timeout_secs = 60
+  aggregate_processing_lambda_timeout_secs = 900
 
   transfer_service_ecs_task_role_arn = local.environment == "prod" ? "" : module.transfer_service_task_role[0].role_arn
 }
@@ -234,5 +234,5 @@ module "aggregate_processing_sqs_queue" {
   })
   encryption_type    = "kms"
   kms_key_id         = module.encryption_key.kms_alias_arn
-  visibility_timeout = 6 * local.lambda_timeout
+  visibility_timeout = 6 * local.aggregate_processing_lambda_timeout_secs
 }
