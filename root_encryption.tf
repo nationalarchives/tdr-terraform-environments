@@ -19,10 +19,10 @@ module "s3_external_kms_key" {
       module.consignment_export_task_role.role.arn,
       local.dr2_copy_files_role,
     ], local.aws_sso_export_bucket_access_roles, local.standard_export_bucket_read_access_roles, local.judgment_export_bucket_read_access_roles)
-    ci_roles        = [local.assume_role]
-    service_details = local.s3_external_service_details
-    user_roles_decoupled = concat(local.wiz_role_arns, locals.aws_back_up_roles)
-    persistent_resource_roles_decoupled      = local.wiz_role_arns
+    ci_roles                            = [local.assume_role]
+    service_details                     = local.s3_external_service_details
+    user_roles_decoupled                = concat(local.wiz_role_arns, local.aws_back_up_roles)
+    persistent_resource_roles_decoupled = local.wiz_role_arns
   }
 }
 
