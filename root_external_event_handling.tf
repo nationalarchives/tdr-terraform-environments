@@ -1,12 +1,12 @@
 locals {
   //Apply only to INTG at the moment
-  event_handling_count                 = local.environment == "intg" ? 1 : 0
-  sqs_name                             = "tdr-external-event-handling-sqs-${local.environment}"
-  external_event_handler_function_name = "tdr-external-events-handler-${local.environment}"
-  dr2_ingest_topic_arn                 = module.dr2_configuration.terraform_config[local.environment]["notifications_sns_topic_arn"]
-  lambda_timeout                       = 60
-  allow_file_status_update             = local.environment == "intg" ? "true" : "false"
-  default_debug_mode                   = false
+  event_handling_count                        = local.environment == "intg" ? 1 : 0
+  sqs_name                                    = "tdr-external-event-handling-sqs-${local.environment}"
+  external_event_handler_function_name        = "tdr-external-events-handler-${local.environment}"
+  dr2_ingest_topic_arn                        = module.dr2_configuration.terraform_config[local.environment]["notifications_sns_topic_arn"]
+  external_event_handling_lambda_timeout_secs = 60
+  allow_file_status_update                    = local.environment == "intg" ? "true" : "false"
+  default_debug_mode                          = false
 }
 
 module "external_event_handling_sqs_queue" {
@@ -22,7 +22,7 @@ module "external_event_handling_sqs_queue" {
     dr2_ingest_topic_arn = local.dr2_ingest_topic_arn
   })
   encryption_type    = "sse"
-  visibility_timeout = 6 * local.lambda_timeout
+  visibility_timeout = 6 * local.external_event_handling_lambda_timeout_secs
 }
 
 resource "aws_sns_topic_subscription" "dr2_ingest" {
@@ -42,7 +42,7 @@ module "external_event_handler_lambda" {
     sqs_queue_arn         = "arn:aws:sqs:eu-west-2:${var.tdr_account_number}:${local.sqs_name}",
     ignore_enabled_status = false
   }]
-  timeout_seconds      = local.lambda_timeout
+  timeout_seconds      = local.external_event_handling_lambda_timeout_secs
   reserved_concurrency = 10
   memory_size          = 512
   runtime              = "java21"
