@@ -175,4 +175,11 @@ locals {
   rds_retention_period_days = local.environment == "prod" ? 30 : 7
 
   aws_logs_delivery_account_id = module.tdr_configuration.terraform_config["aws_logs_delivery_account_id"]
+
+  # AYR
+  ayr_terraform_deployer_roles = {
+    intg    = format("arn:aws:iam::%s:role/%s", module.ayr_configuration.account_numbers["non_prod"], "terraform-infrastructure-deployer")
+    staging = format("arn:aws:iam::%s:role/%s", module.ayr_configuration.account_numbers["non_prod"], "terraform-infrastructure-deployer")
+    prod    = format("arn:aws:iam::%s:role/%s", module.ayr_configuration.account_numbers["prod"], "terraform-infrastructure-deployer")
+  }
 }

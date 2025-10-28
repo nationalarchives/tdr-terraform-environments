@@ -22,6 +22,11 @@ module "tdr_configuration" {
   project = "tdr"
 }
 
+module "ayr_configuration" {
+  source  = "./da-terraform-configurations"
+  project = "ayr"
+}
+
 module "aws_backup_configuration" {
   source  = "./da-terraform-configurations"
   project = "aws-backup"
@@ -297,6 +302,7 @@ module "waf" {
   log_destinations             = [module.waf_cloudwatch.log_group_arn]
   region_allowed_ips           = local.region_allowed_ips_list
   region_allowed_country_codes = local.region_allowed_country_codes
+  trusted_local_cidrs          = module.shared_vpc.public_subnet_ranges
 }
 
 module "backend_lambda_function_bucket" {

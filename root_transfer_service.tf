@@ -195,15 +195,16 @@ module "aggregate_processing_lambda" {
   }]
   policies = {
     "TDRAggregateProcessingLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/aggregate_processing_lambda_policy.json.tpl", {
-      function_name            = local.aggregate_processing_function_name
-      account_id               = var.tdr_account_number
-      dirty_upload_bucket_name = local.upload_files_cloudfront_dirty_bucket_name
-      auth_client_secret_path  = local.keycloak_tdr_transfer_service_secret_name
-      read_client_secret_path  = local.keycloak_tdr_read_client_secret_name
-      sqs_queue_name           = local.aggregate_processing_function_name
-      kms_arn                  = module.encryption_key.kms_key_arn
-      backend_checks_arn       = module.backend_checks_step_function.state_machine_arn
-      notifications_topic_arn  = module.notifications_topic.sns_arn
+      function_name              = local.aggregate_processing_function_name
+      account_id                 = var.tdr_account_number
+      dirty_upload_bucket_name   = local.upload_files_cloudfront_dirty_bucket_name
+      draft_metadata_bucket_name = local.draft_metadata_s3_bucket_name
+      auth_client_secret_path    = local.keycloak_tdr_transfer_service_secret_name
+      read_client_secret_path    = local.keycloak_tdr_read_client_secret_name
+      sqs_queue_name             = local.aggregate_processing_function_name
+      kms_arn                    = module.encryption_key.kms_key_arn
+      backend_checks_arn         = module.backend_checks_step_function.state_machine_arn
+      notifications_topic_arn    = module.notifications_topic.sns_arn
     })
   }
   plaintext_env_vars = {
@@ -212,8 +213,10 @@ module "aggregate_processing_lambda" {
     AUTH_URL                       = local.keycloak_auth_url
     AUTH_CLIENT_SECRET_PATH        = local.keycloak_tdr_transfer_service_secret_name
     BACKEND_CHECKS_ARN             = module.backend_checks_step_function.state_machine_arn
+    METADATA_CHECKS_ARN            = module.draft_metadata_checks.step_function_arn
     NOTIFICATIONS_TOPIC_ARN        = module.notifications_topic.sns_arn
     KEYCLOAK_READ_AUTH_SECRET_PATH = local.keycloak_tdr_read_client_secret_name
+    DRAFT_METADATA_BUCKET_NAME     = local.draft_metadata_s3_bucket_name
   }
   vpc_config = {
     subnet_ids         = module.shared_vpc.private_backend_checks_subnets
