@@ -221,7 +221,7 @@ module "keycloak_rotate_notify_api_key_event" {
   event_variables            = { parameter_name = local.keycloak_govuk_notify_api_key_name, policy_type = "NoChangeNotification" }
 }
 
-# TDRD-1066 Expose Keycloak via endpoing via NLB
+# TDRD-1066 Expose Keycloak via endpoint via NLB
 resource "aws_lb_target_group" "keycloak_nlb_to_alb" {
   name        = format("%s-%s-nlb-%s", var.project, "keycloak-new", local.environment)
   target_type = "alb"
@@ -299,5 +299,3 @@ resource "aws_route53_record" "keycloak_private_link_dns_verification" {
 resource "aws_vpc_endpoint_service_private_dns_verification" "keycloak" {
   service_id = aws_vpc_endpoint_service.keycloak.id
 }
-
-
