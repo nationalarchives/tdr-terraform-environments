@@ -145,24 +145,25 @@ module "tdr_keycloak_ecs" {
 }
 
 module "keycloak_tdr_alb" {
-  source                = "./tdr-terraform-modules/alb"
-  project               = var.project
-  function              = "keycloak-new"
-  environment           = local.environment
-  alb_log_bucket        = module.alb_logs_s3.s3_bucket_id
-  alb_security_group_id = module.keycloak_alb_security_group.security_group_id
-  alb_target_group_port = 8080
-  health_check_port     = 9000
-  alb_target_type       = "ip"
-  certificate_arn       = module.keycloak_certificate.certificate_arn
-  health_check_matcher  = "200,303"
-  health_check_path     = "health"
-  http_listener         = false
-  public_subnets        = module.shared_vpc.public_subnets
-  vpc_id                = module.shared_vpc.vpc_id
-  common_tags           = local.common_tags
-  own_host_header_only  = true
-  host                  = "auth.${local.environment_domain}"
+  source                               = "./tdr-terraform-modules/alb"
+  project                              = var.project
+  function                             = "keycloak-new"
+  environment                          = local.environment
+  alb_log_bucket                       = module.alb_logs_s3.s3_bucket_id
+  alb_security_group_id                = module.keycloak_alb_security_group.security_group_id
+  alb_target_group_port                = 8080
+  health_check_port                    = 9000
+  alb_target_type                      = "ip"
+  certificate_arn                      = module.keycloak_certificate.certificate_arn
+  health_check_matcher                 = "200,303"
+  health_check_path                    = "health"
+  http_listener                        = false
+  public_subnets                       = module.shared_vpc.public_subnets
+  vpc_id                               = module.shared_vpc.vpc_id
+  common_tags                          = local.common_tags
+  own_host_header_only                 = true
+  allow_aws_elb_healthcheck_from_cidrs = module.shared_vpc.public_subnet_ranges
+  host                                 = "auth.${local.environment_domain}"
 }
 
 module "keycloak_database_instance" {
@@ -218,4 +219,83 @@ module "keycloak_rotate_notify_api_key_event" {
   rule_name                  = "keycloak-rotate-notify-api-key"
   rule_description           = "Notify to rotate API Key"
   event_variables            = { parameter_name = local.keycloak_govuk_notify_api_key_name, policy_type = "NoChangeNotification" }
+}
+
+# TDRD-1066 Expose Keycloak via endpoint via NLB
+resource "aws_lb_target_group" "keycloak_nlb_to_alb" {
+  name        = format("%s-%s-nlb-%s", var.project, "keycloak-new", local.environment)
+  target_type = "alb"
+  port        = 443
+  protocol    = "TCP"
+  vpc_id      = module.shared_vpc.vpc_id
+
+  health_check {
+    enabled  = true
+    path     = "/"
+    protocol = "HTTPS"
+  }
+  tags = local.common_tags
+}
+
+module "keycloak_nlb_to_alb_security_group" {
+  source            = "./tdr-terraform-modules/security_group"
+  description       = "Restrict NLB traffic"
+  name              = "keycloak-nlb-load-balancer-security-group-new"
+  vpc_id            = module.shared_vpc.vpc_id
+  egress_cidr_rules = [{ port = 443, cidr_blocks = module.shared_vpc.public_subnet_ranges, description = "Allow outbound access to public subnets for ALB", protocol = "TCP" }]
+  common_tags       = local.common_tags
+}
+
+# NLB
+resource "aws_lb" "keycloak_nlb_to_alb" {
+  name                                                         = format("%s-%s-nlb-%s", var.project, "keycloak-new", local.environment)
+  internal                                                     = true
+  load_balancer_type                                           = "network"
+  security_groups                                              = [module.keycloak_nlb_to_alb_security_group.security_group_id]
+  subnets                                                      = module.shared_vpc.public_subnets
+  enforce_security_group_inbound_rules_on_private_link_traffic = "off"
+  tags                                                         = local.common_tags
+  # Logging not enabled as the listner is not TLS which is the only thing that logs
+  # https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-access-logs.html?icmpid=docs_console_unmapped
+}
+
+resource "aws_lb_target_group_attachment" "keycloak_nlb_to_alb" {
+  target_group_arn = aws_lb_target_group.keycloak_nlb_to_alb.arn
+  target_id        = module.keycloak_tdr_alb.alb_arn
+  port             = 443
+}
+
+resource "aws_lb_listener" "keycloak_nlb_to_alb" {
+  load_balancer_arn = aws_lb.keycloak_nlb_to_alb.arn
+  port              = "443"
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.keycloak_nlb_to_alb.id
+  }
+}
+
+resource "aws_vpc_endpoint_service" "keycloak" {
+  acceptance_required        = false
+  network_load_balancer_arns = [aws_lb.keycloak_nlb_to_alb.arn]
+  allowed_principals         = [local.ayr_terraform_deployer_roles["${local.environment}"]]
+  private_dns_name           = "auth.${local.environment_domain}"
+  tags = merge(
+    { Name = "keycloak-${local.environment}" },
+  tomap(local.common_tags))
+}
+
+resource "aws_route53_record" "keycloak_private_link_dns_verification" {
+  zone_id = data.aws_route53_zone.tdr_dns_zone.id
+  name    = aws_vpc_endpoint_service.keycloak.private_dns_name
+  type    = "TXT"
+  ttl     = 1800
+  records = [
+    aws_vpc_endpoint_service.keycloak.private_dns_name_configuration[0].value
+  ]
+}
+
+resource "aws_vpc_endpoint_service_private_dns_verification" "keycloak" {
+  service_id = aws_vpc_endpoint_service.keycloak.id
 }
