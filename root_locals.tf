@@ -181,6 +181,5 @@ locals {
     intg    = format("arn:aws:iam::%s:role/%s", module.ayr_configuration.account_numbers["non_prod"], "terraform-infrastructure-deployer")
     staging = format("arn:aws:iam::%s:role/%s", module.ayr_configuration.account_numbers["non_prod"], "terraform-infrastructure-deployer")
     prod    = format("arn:aws:iam::%s:role/%s", module.ayr_configuration.account_numbers["prod"], "terraform-infrastructure-deployer")
-
   }
 }
