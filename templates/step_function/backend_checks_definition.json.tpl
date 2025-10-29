@@ -196,7 +196,7 @@
         },
         "ProcessorConfig": {
           "Mode": "DISTRIBUTED",
-          "ExecutionType": "EXPRESS"
+          "ExecutionType": "STANDARD"
         }
       },
       "MaxConcurrency": 40,
