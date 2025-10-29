@@ -204,6 +204,7 @@ module "aggregate_processing_lambda" {
       sqs_queue_name             = local.aggregate_processing_function_name
       kms_arn                    = module.encryption_key.kms_key_arn
       backend_checks_arn         = module.backend_checks_step_function.state_machine_arn
+      metadata_checks_arn        = module.draft_metadata_checks.step_function_arn
       notifications_topic_arn    = module.notifications_topic.sns_arn
     })
   }

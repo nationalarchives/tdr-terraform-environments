@@ -60,7 +60,8 @@
         "states:StartExecution"
       ],
       "Resource": [
-        "${backend_checks_arn}"
+        "${backend_checks_arn}",
+        "${metadata_checks_arn}"
       ]
     },
     {
