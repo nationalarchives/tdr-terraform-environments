@@ -955,3 +955,22 @@ module "ecs_task_stopped_event" {
   rule_name                            = "ecs-task-state-stopped"
   rule_description                     = "Log to cloudwatch when ECS task state is STOPPED"
 }
+
+# Route53 Resolver logging for the VPC - TDRD-1090
+module "route53_resolver_logs" {
+  source            = "./tdr-terraform-modules/cloudwatch_logs"
+  common_tags       = local.common_tags
+  name              = "aws-route53-resolver-logs-${local.environment}"
+  retention_in_days = 30
+}
+
+resource "aws_route53_resolver_query_log_config" "route53_query_logging" {
+  name            = format("route53-resolver-logging-%s", local.environment)
+  destination_arn = module.route53_resolver_logs.log_group_arn
+  tags            = local.common_tags
+}
+
+resource "aws_route53_resolver_query_log_config_association" "route53_query_logging" {
+  resolver_query_log_config_id = aws_route53_resolver_query_log_config.route53_query_logging.id
+  resource_id                  = module.shared_vpc.vpc_id
+}
