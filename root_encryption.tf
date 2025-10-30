@@ -57,7 +57,7 @@ module "s3_internal_kms_key" {
       module.frontend.task_role_arn,
       module.draft_metadata_checks.step_function_role_arn,
       module.aws_guard_duty_s3_malware_scan_role.role_arn
-    ], local.aws_sso_internal_bucket_access_roles, local.e2e_testing_role_arns, local.aws_back_up_roles)
+    ], local.aws_sso_internal_bucket_access_roles, local.e2e_testing_role_arns)
     ci_roles = [local.assume_role]
     service_details = [
       {
@@ -65,7 +65,8 @@ module "s3_internal_kms_key" {
         service_source_account : data.aws_caller_identity.current.account_id
       }
     ]
-    wiz_roles = local.wiz_role_arns
+    user_roles_decoupled                = concat(local.wiz_role_arns, local.aws_back_up_roles)
+    persistent_resource_roles_decoupled = local.wiz_role_arns
   }
 }
 
