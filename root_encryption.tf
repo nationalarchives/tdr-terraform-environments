@@ -57,7 +57,7 @@ module "s3_internal_kms_key" {
       module.frontend.task_role_arn,
       module.draft_metadata_checks.step_function_role_arn,
       module.aws_guard_duty_s3_malware_scan_role.role_arn
-    ], local.aws_sso_internal_bucket_access_roles, local.e2e_testing_role_arns)
+    ], local.aws_sso_internal_bucket_access_roles, local.e2e_testing_role_arns, local.aggregate_processing_access_role)
     ci_roles = [local.assume_role]
     service_details = [
       {
