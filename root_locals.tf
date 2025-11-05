@@ -11,7 +11,7 @@ locals {
 
   environment_full_name = local.environment_full_name_map[local.environment]
 
-  aws_backup_local_role_name = module.aws_backup_configuration.terraform_config["local_account_backup_role_name"]
+  aws_backup_local_role_name = module.tdr_configuration.terraform_config.prod["local_account_backup_role_name"]
   aws_back_up_service_role   = local.environment == "prod" ? module.aws_backup_configuration.terraform_config["aws_service_backup_role"] : ""
   aws_back_up_local_role     = local.environment == "prod" ? "arn:aws:iam::${var.tdr_account_number}:role/${local.aws_backup_local_role_name}" : ""
   aws_back_up_tags           = local.environment == "prod" ? module.tdr_configuration.terraform_config["aws_backup_daily_short_term_retain_tag"] : null
@@ -66,6 +66,11 @@ locals {
   ip_allowlist = concat(local.developer_ip_list, local.trusted_ip_list)
 
   ip_blocked_list = module.tdr_configuration.terraform_config["ip_blocked_list"]
+
+  region_allowed_ips = module.global_parameters.regional_allowed_ips
+
+  region_allowed_ips_list      = local.environment == "prod" ? local.region_allowed_ips : []
+  region_allowed_country_codes = local.environment == "prod" ? ["IE"] : []
 
   ecr_account_number = local.environment == "sbox" ? data.aws_caller_identity.current.account_id : data.aws_ssm_parameter.mgmt_account_number.value
 
@@ -157,7 +162,7 @@ locals {
   //feature access blocks
   block_shared_keycloak_pages    = local.environment == "intg" ? false : true
   block_skip_metadata_review     = false
-  block_judgment_press_summaries = local.environment == "prod" ? true : false
+  block_judgment_press_summaries = false
 
   disable_users_dry_run         = false
   draft_metadata_s3_bucket_name = "${var.project}-draft-metadata-${local.environment}"
@@ -170,4 +175,11 @@ locals {
   rds_retention_period_days = local.environment == "prod" ? 30 : 7
 
   aws_logs_delivery_account_id = module.tdr_configuration.terraform_config["aws_logs_delivery_account_id"]
+
+  # AYR
+  ayr_terraform_deployer_roles = {
+    intg    = format("arn:aws:iam::%s:role/%s", module.ayr_configuration.account_numbers["non_prod"], "terraform-infrastructure-deployer")
+    staging = format("arn:aws:iam::%s:role/%s", module.ayr_configuration.account_numbers["non_prod"], "terraform-infrastructure-deployer")
+    prod    = format("arn:aws:iam::%s:role/%s", module.ayr_configuration.account_numbers["prod"], "terraform-infrastructure-deployer")
+  }
 }

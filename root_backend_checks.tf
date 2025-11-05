@@ -133,7 +133,7 @@ module "file_format_v2" {
   function_name        = local.file_format_v2_function_name
   handler              = "uk.gov.nationalarchives.fileformat.Lambda::process"
   reserved_concurrency = -1
-  timeout_seconds      = 300
+  timeout_seconds      = 900
   storage_size         = 2560
   memory_size          = 2560
   policies = {
@@ -163,7 +163,7 @@ module "checksum_v2" {
   function_name        = local.checksum_v2_function_name
   handler              = "uk.gov.nationalarchives.checksum.Lambda::process"
   reserved_concurrency = -1
-  timeout_seconds      = 300
+  timeout_seconds      = 900
   storage_size         = 2560
   memory_size          = 2560
   policies = {
@@ -254,7 +254,7 @@ module "yara_av_v2" {
   function_name        = local.yara_av_v2_function_name
   handler              = "matcher.matcher_lambda_handler"
   reserved_concurrency = -1
-  timeout_seconds      = 300
+  timeout_seconds      = 900
   storage_size         = 2560
   memory_size          = 2560
   policies = {

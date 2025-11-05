@@ -26,6 +26,16 @@
       ]
     },
     {
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${draft_metadata_bucket_name}",
+        "arn:aws:s3:::${draft_metadata_bucket_name}/*"
+      ]
+    },
+    {
       "Action": [
         "ssm:GetParameter"
       ],
@@ -50,7 +60,8 @@
         "states:StartExecution"
       ],
       "Resource": [
-        "${backend_checks_arn}"
+        "${backend_checks_arn}",
+        "${metadata_checks_arn}"
       ]
     },
     {

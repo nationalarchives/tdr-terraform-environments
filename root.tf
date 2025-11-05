@@ -22,6 +22,11 @@ module "tdr_configuration" {
   project = "tdr"
 }
 
+module "ayr_configuration" {
+  source  = "./da-terraform-configurations"
+  project = "ayr"
+}
+
 module "aws_backup_configuration" {
   source  = "./da-terraform-configurations"
   project = "aws-backup"
@@ -284,17 +289,20 @@ module "encryption_key" {
 
 module "waf" {
   # a single WAF web acl and rules are used for all services to minimise AWS costs
-  source            = "./tdr-terraform-modules/waf"
-  project           = var.project
-  function          = "apps"
-  environment       = local.environment
-  common_tags       = local.common_tags
-  alb_target_groups = [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn]
-  trusted_ips       = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
-  blocked_ips       = local.ip_blocked_list
-  geo_match         = split(",", var.geo_match)
-  restricted_uri    = "admin"
-  log_destinations  = [module.waf_cloudwatch.log_group_arn]
+  source                       = "./tdr-terraform-modules/waf"
+  project                      = var.project
+  function                     = "apps"
+  environment                  = local.environment
+  common_tags                  = local.common_tags
+  alb_target_groups            = [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn]
+  trusted_ips                  = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
+  blocked_ips                  = local.ip_blocked_list
+  geo_match                    = split(",", var.geo_match)
+  restricted_uri               = "admin"
+  log_destinations             = [module.waf_cloudwatch.log_group_arn]
+  region_allowed_ips           = local.region_allowed_ips_list
+  region_allowed_country_codes = local.region_allowed_country_codes
+  trusted_local_cidrs          = module.shared_vpc.public_subnet_ranges
 }
 
 module "backend_lambda_function_bucket" {
@@ -946,4 +954,23 @@ module "ecs_task_stopped_event" {
   log_group_ecs_task_events_target_arn = module.ecs_task_events_log_group.log_group_arn
   rule_name                            = "ecs-task-state-stopped"
   rule_description                     = "Log to cloudwatch when ECS task state is STOPPED"
+}
+
+# Route53 Resolver logging for the VPC - TDRD-1090
+module "route53_resolver_logs" {
+  source            = "./tdr-terraform-modules/cloudwatch_logs"
+  common_tags       = local.common_tags
+  name              = "aws-route53-resolver-logs-${local.environment}"
+  retention_in_days = 30
+}
+
+resource "aws_route53_resolver_query_log_config" "route53_query_logging" {
+  name            = format("route53-resolver-logging-%s", local.environment)
+  destination_arn = module.route53_resolver_logs.log_group_arn
+  tags            = local.common_tags
+}
+
+resource "aws_route53_resolver_query_log_config_association" "route53_query_logging" {
+  resolver_query_log_config_id = aws_route53_resolver_query_log_config.route53_query_logging.id
+  resource_id                  = module.shared_vpc.vpc_id
 }
