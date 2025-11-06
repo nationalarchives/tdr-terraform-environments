@@ -752,6 +752,9 @@ module "inactive_keycloak_users_lambda" {
   handler         = "uk.gov.nationalarchives.keycloak.users.InactiveKeycloakUsersLambda::handleRequest"
   runtime         = local.runtime_java_21
   timeout_seconds = 240
+  lambda_invoke_permissions = {
+    "events.amazonaws.com" = module.disable_inactive_judgment_users_scheduled_event.event_arn
+  }
   policies = {
     "TDRInactiveKeycloakUsersLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/inactive_keycloak_users_lambda.json.tpl", {
       function_name                 = local.inactive_keycloak_users_function_name
