@@ -980,3 +980,18 @@ resource "aws_route53_resolver_query_log_config_association" "route53_query_logg
   resolver_query_log_config_id = aws_route53_resolver_query_log_config.route53_query_logging.id
   resource_id                  = module.shared_vpc.vpc_id
 }
+
+# TDRD-1137
+module "r53_firewall" {
+  source           = "./tdr-terraform-modules/r53_firewall"
+  environment_name = local.environment
+  whitelist_domains = [
+    "*.amazonaws.com.",
+    "*.nationalarchives.gov.uk.",
+    "*.slack.com.",
+    "api.notifications.service.gov.uk"
+  ]
+  vpc_id     = module.shared_vpc.vpc_id
+  alert_only = true
+  tags       = local.common_tags
+}
