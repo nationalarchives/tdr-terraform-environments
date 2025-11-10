@@ -983,7 +983,7 @@ resource "aws_route53_resolver_query_log_config_association" "route53_query_logg
 
 # TDRD-1137
 module "r53_firewall" {
-  source           = "./tdr-terraform-modules/r53_firewall"
+  source           = "./tdr-terraform-modules/route53_firewall"
   environment_name = local.environment
   whitelist_domains = [
     "*.amazonaws.com.",
