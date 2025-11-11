@@ -69,12 +69,12 @@
         "name": "READ_AUTH_SECRET"
       },
       {
-        name = "WIZ_API_CLIENT_ID"
-        valueFrom = "${wiz_sensor_service_account_arn}:WIZ_API_CLIENT_ID::"
+        "name": "WIZ_API_CLIENT_ID",
+        "valueFrom": "${wiz_sensor_service_account_arn}:WIZ_API_CLIENT_ID::"
       },
       {
-        name = "WIZ_API_CLIENT_SECRET"
-        valueFrom = "${wiz_sensor_service_account_arn}:WIZ_API_CLIENT_SECRET::"
+        "name": "WIZ_API_CLIENT_SECRET",
+        "valueFrom": "${wiz_sensor_service_account_arn}:WIZ_API_CLIENT_SECRET::"
       }      
     ],
     "environment": [
