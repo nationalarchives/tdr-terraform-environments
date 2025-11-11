@@ -39,6 +39,8 @@ data "template_file" "app" {
     draft_metadata_s3_bucket_name        = var.draft_metadata_s3_bucket_name
     notification_sns_topic_arn           = var.notification_sns_topic_arn
     file_checks_total_timeout_in_seconds = 480
+    wiz_registry_credentials_arn         = aws_secretsmanager_secret.wiz_registry_credentials.arn
+    wiz_sensor_service_account_arn       = aws_secretsmanager_secret.wiz_sensor_service_account.arn
   }
 }
 
@@ -106,6 +108,39 @@ resource "aws_iam_role" "frontend_ecs_task" {
       { "Name" = "api-ecs-task-iam-role-${var.environment}" }
     )
   )
+}
+
+resource "aws_secretsmanager_secret" "wiz_registry_credentials" {
+  name = "wiz-registry-credentials-${var.environment}"
+}
+
+resource "aws_secretsmanager_secret" "wiz_sensor_service_account" {
+  name = "wiz-sensor-service-account-${var.environment}"
+}
+
+data "aws_iam_policy_document" "wiz_secrets_access_policy" {
+  version = "2012-10-17"
+
+  statement {
+    effect  = "Allow"
+    actions = ["secretsmanager:GetSecretValue"]
+
+    resources = [
+      aws_secretsmanager_secret.wiz_registry_credentials.arn,
+      aws_secretsmanager_secret.wiz_sensor_service_account.arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "wiz_secrets_access_policy" {
+  name   = "wiz-secrets-access-policy"
+  policy = data.aws_iam_policy_document.wiz_secrets_access_policy.json
+}
+
+
+resource "aws_iam_role_policy_attachment" "wiz_secrets_access" {
+  role = aws_iam_role.frontend_ecs_execution.name
+  policy_arn = aws_iam_policy.wiz_secrets_access_policy.arn
 }
 
 data "aws_iam_policy_document" "ecs_assume_role" {
