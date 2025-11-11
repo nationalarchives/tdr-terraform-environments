@@ -16,7 +16,7 @@
             "containerPath": "/host-store",
             "readOnly": false
         }
-    ]
+    ],
     "volumesFrom": [],
     "systemControls": []
   },

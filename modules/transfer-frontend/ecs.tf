@@ -55,7 +55,6 @@ resource "aws_ecs_task_definition" "frontend_task" {
   task_role_arn            = aws_iam_role.frontend_ecs_task.arn
   volume {
     name = "sensor-host-store"
-    host = {}
   }
   
   tags = merge(
