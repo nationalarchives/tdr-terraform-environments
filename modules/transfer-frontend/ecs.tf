@@ -53,7 +53,11 @@ resource "aws_ecs_task_definition" "frontend_task" {
   memory                   = local.memory
   container_definitions    = data.template_file.app.rendered
   task_role_arn            = aws_iam_role.frontend_ecs_task.arn
-
+  volume {
+    name = "sensor-host-store"
+    host = {}
+  }
+  
   tags = merge(
     var.common_tags,
     tomap(
@@ -203,6 +207,11 @@ resource "aws_iam_policy" "frontend_kms_key_use" {
 
 resource "aws_iam_role_policy_attachment" "frontend_ecs_task_kms_key_use" {
   role       = aws_iam_role.frontend_ecs_task.name
+  policy_arn = aws_iam_policy.frontend_kms_key_use.arn
+}
+
+resource "aws_iam_role_policy_attachment" "frontend_ecs_execution_kms_key_use" {
+  role       = aws_iam_role.frontend_ecs_execution.name
   policy_arn = aws_iam_policy.frontend_kms_key_use.arn
 }
 

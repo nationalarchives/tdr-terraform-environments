@@ -10,7 +10,13 @@
     "essential": false,
     "environment": [],
     "environmentFiles": [],
-    "mountPoints": [],
+    "mountPoints": [
+        {
+            "sourceVolume": "sensor-host-store",
+            "containerPath": "/host-store",
+            "readOnly": false
+        }
+    ]
     "volumesFrom": [],
     "systemControls": []
   },
@@ -25,7 +31,13 @@
       "--config=/etc/ecs/custom-config.yml"
     ],
     "environment": [],
-    "mountPoints": [],
+    "mountPoints": [
+        {
+            "sourceVolume": "sensor-host-store",
+            "containerPath": "/host-store",
+            "readOnly": false
+        }
+    ],
     "volumesFrom": [],
     "logConfiguration": {
       "logDriver": "awslogs",
