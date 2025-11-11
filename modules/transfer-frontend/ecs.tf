@@ -112,10 +112,36 @@ resource "aws_iam_role" "frontend_ecs_task" {
 
 resource "aws_secretsmanager_secret" "wiz_registry_credentials" {
   name = "wiz-registry-credentials-${var.environment}"
+  kms_key_id = var.encryption_kms_key_arn
+}
+
+resource "aws_secretsmanager_secret_version" "wiz_registry_credentials_values" {
+  secret_id     = aws_secretsmanager_secret.wiz_registry_credentials.id
+  secret_string = jsonencode({
+    "username" : "placeholder",
+    "password" : "placeholder"
+  })
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
 }
 
 resource "aws_secretsmanager_secret" "wiz_sensor_service_account" {
   name = "wiz-sensor-service-account-${var.environment}"
+  kms_key_id = var.encryption_kms_key_arn
+}
+
+resource "aws_secretsmanager_secret_version" "wiz_sensor_service_account_values" {
+  secret_id     = aws_secretsmanager_secret.wiz_sensor_service_account.id
+  secret_string = jsonencode({
+    "WIZ_API_CLIENT_ID" : "placeholder",
+    "WIZ_API_CLIENT_SECRET" : "placeholder"
+  })
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
 }
 
 data "aws_iam_policy_document" "wiz_secrets_access_policy" {
@@ -186,7 +212,7 @@ data "aws_iam_policy_document" "frontend_kms_key_use" {
       "kms:Decrypt",
       "kms:GenerateDataKey"
     ]
-    resources = [var.notifications_topic_kms_key_arn]
+    resources = [var.encryption_kms_key_arn]
   }
 }
 
