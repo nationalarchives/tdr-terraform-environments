@@ -989,7 +989,7 @@ module "r53_firewall" {
     "*.amazonaws.com.",
     "*.nationalarchives.gov.uk.",
     "*.slack.com.",
-    "api.notifications.service.gov.uk"
+    "api.notifications.service.gov.uk."
   ]
   vpc_id     = module.shared_vpc.vpc_id
   alert_only = true
