@@ -55,7 +55,10 @@
     "entryPoint": [
       "/opt/wiz/sensor/wiz-sensor",
       "daemon",
-      "--"
+      "--",
+      "bash",
+      "-c",
+      "tdr-transfer-frontend-*/bin/tdr-transfer-frontend -Dplay.http.secret.key=$PLAY_SECRET_KEY -Dconfig.resource=application.$ENVIRONMENT.conf -Dplay.cache.redis.host=$REDIS_HOST -Dauth.secret=$AUTH_SECRET"
     ],
     "volumesFrom": [
       {
