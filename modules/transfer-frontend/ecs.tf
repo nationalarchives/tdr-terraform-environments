@@ -111,7 +111,7 @@ resource "aws_iam_role" "frontend_ecs_task" {
 }
 
 resource "aws_secretsmanager_secret" "wiz_registry_credentials" {
-  name = "wiz-registry-credentials-${var.environment}"
+  name = "wiz-registry-creds-${var.environment}"
   kms_key_id = var.encryption_kms_key_arn
 }
 
@@ -128,7 +128,7 @@ resource "aws_secretsmanager_secret_version" "wiz_registry_credentials_values" {
 }
 
 resource "aws_secretsmanager_secret" "wiz_sensor_service_account" {
-  name = "wiz-sensor-service-account-${var.environment}"
+  name = "wiz-sensor-service-acct-${var.environment}"
   kms_key_id = var.encryption_kms_key_arn
 }
 
