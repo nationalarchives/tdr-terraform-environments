@@ -31,13 +31,6 @@
       "--config=/etc/ecs/custom-config.yml"
     ],
     "environment": [],
-    "mountPoints": [
-        {
-            "sourceVolume": "sensor-host-store",
-            "containerPath": "/host-store",
-            "readOnly": false
-        }
-    ],
     "volumesFrom": [],
     "logConfiguration": {
       "logDriver": "awslogs",
@@ -56,7 +49,7 @@
       "/opt/wiz/sensor/wiz-sensor",
       "daemon",
       "--",
-      "bash",
+      "/usr/bin/sh",
       "-c",
       "tdr-transfer-frontend-*/bin/tdr-transfer-frontend -Dplay.http.secret.key=$PLAY_SECRET_KEY -Dconfig.resource=application.$ENVIRONMENT.conf -Dplay.cache.redis.host=$REDIS_HOST -Dauth.secret=$AUTH_SECRET"
     ],
@@ -144,6 +137,13 @@
       {
         "name": "BLOCK_JUDGMENT_PRESS_SUMMARIES",
         "value": "${block_judgment_press_summaries}"
+      }
+    ],
+    "mountPoints": [
+      {
+        "sourceVolume": "sensor-host-store",
+        "containerPath": "/host-store",
+        "readOnly": false
       }
     ],
     "dependsOn": [
