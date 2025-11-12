@@ -273,6 +273,8 @@ module "frontend_alb" {
   vpc_id               = module.shared_vpc.vpc_id
   common_tags          = local.common_tags
   http_listener        = false
+  own_host_header_only = true
+  host                 = local.environment_domain
 }
 
 module "encryption_key" {
