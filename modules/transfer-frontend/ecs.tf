@@ -171,7 +171,6 @@ resource "aws_iam_policy" "wiz_secrets_access_policy" {
   policy = data.aws_iam_policy_document.wiz_secrets_access_policy.json
 }
 
-
 resource "aws_iam_role_policy_attachment" "wiz_secrets_access" {
   count      = var.enable_wiz_sensor ? 1 : 0
   role       = aws_iam_role.frontend_ecs_execution.name
