@@ -2,10 +2,8 @@ locals {
   app_port                            = 9000
   cpu                                 = var.environment == "intg" ? "512" : "1024"
   memory                              = var.environment == "intg" ? "1024" : "2048"
-  base_task_definition_template       = "frontend.json.tpl"
-  wiz_sensor_task_definition_template = "frontend_with_wiz_sensor.json.tpl"
-  task_definition_template            = var.enable_wiz_sensor ? local.wiz_sensor_task_definition_template : local.base_task_definition_template
 }
+
 resource "aws_ecs_cluster" "frontend_ecs" {
   name = "frontend_${var.environment}"
 
@@ -19,34 +17,6 @@ resource "aws_ecs_cluster" "frontend_ecs" {
 
 data "aws_caller_identity" "current" {}
 
-data "template_file" "app" {
-  template = file("modules/transfer-frontend/templates/${local.task_definition_template}")
-
-  vars = {
-    collector_image                      = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/aws-otel-collector:${var.environment}"
-    app_image                            = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/transfer-frontend:${var.environment}"
-    app_port                             = local.app_port
-    app_environment                      = var.environment
-    aws_region                           = var.region
-    client_secret_path                   = var.client_secret_path
-    read_client_secret_path              = var.read_client_secret_path
-    export_api_url                       = var.export_api_url
-    backend_checks_api_url               = var.backend_checks_api_url
-    alb_ip_a                             = var.public_subnet_ranges[0]
-    alb_ip_b                             = var.public_subnet_ranges[1]
-    auth_url                             = var.auth_url
-    otel_service_name                    = var.otel_service_name
-    block_skip_metadata_review           = var.block_skip_metadata_review
-    block_judgment_press_summaries       = var.block_judgment_press_summaries
-    draft_metadata_validator_api_url     = var.draft_metadata_validator_api_url
-    draft_metadata_s3_bucket_name        = var.draft_metadata_s3_bucket_name
-    notification_sns_topic_arn           = var.notification_sns_topic_arn
-    file_checks_total_timeout_in_seconds = 480
-    wiz_registry_credentials_arn         = aws_secretsmanager_secret.wiz_registry_credentials.arn
-    wiz_sensor_service_account_arn       = aws_secretsmanager_secret.wiz_sensor_service_account.arn
-  }
-}
-
 resource "aws_ecs_task_definition" "frontend_task" {
   family                   = "${var.app_name}-${var.environment}"
   execution_role_arn       = aws_iam_role.frontend_ecs_execution.arn
@@ -54,7 +24,7 @@ resource "aws_ecs_task_definition" "frontend_task" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = local.cpu
   memory                   = local.memory
-  container_definitions    = data.template_file.app.rendered
+  container_definitions    = jsonencode(local.all_containers)
   task_role_arn            = aws_iam_role.frontend_ecs_task.arn
   dynamic "volume" {
     for_each = var.enable_wiz_sensor ? [1] : []
