@@ -1,10 +1,10 @@
 locals {
-  app_port = 9000
-  cpu      = var.environment == "intg" ? "512" : "1024"
-  memory   = var.environment == "intg" ? "1024" : "2048"
-  base_task_definition_template = "frontend.json.tpl"
+  app_port                            = 9000
+  cpu                                 = var.environment == "intg" ? "512" : "1024"
+  memory                              = var.environment == "intg" ? "1024" : "2048"
+  base_task_definition_template       = "frontend.json.tpl"
   wiz_sensor_task_definition_template = "frontend_with_wiz_sensor.json.tpl"
-  task_definition_template = var.enable_wiz_sensor ? local.wiz_sensor_task_definition_template : local.base_task_definition_template
+  task_definition_template            = var.enable_wiz_sensor ? local.wiz_sensor_task_definition_template : local.base_task_definition_template
 }
 resource "aws_ecs_cluster" "frontend_ecs" {
   name = "frontend_${var.environment}"
@@ -56,10 +56,12 @@ resource "aws_ecs_task_definition" "frontend_task" {
   memory                   = local.memory
   container_definitions    = data.template_file.app.rendered
   task_role_arn            = aws_iam_role.frontend_ecs_task.arn
-  volume {
-    name = "sensor-host-store"
+  dynamic "volume" {
+    for_each = var.enable_wiz_sensor ? [1] : []
+    content {
+      name = "sensor-host-store"
+    }
   }
-  
   tags = merge(
     var.common_tags,
     tomap(
@@ -117,12 +119,12 @@ resource "aws_iam_role" "frontend_ecs_task" {
 }
 
 resource "aws_secretsmanager_secret" "wiz_registry_credentials" {
-  name = "wiz-registry-creds-${var.environment}"
+  name       = "wiz-registry-creds-${var.environment}"
   kms_key_id = var.encryption_kms_key_arn
 }
 
 resource "aws_secretsmanager_secret_version" "wiz_registry_credentials_values" {
-  secret_id     = aws_secretsmanager_secret.wiz_registry_credentials.id
+  secret_id = aws_secretsmanager_secret.wiz_registry_credentials.id
   secret_string = jsonencode({
     "username" : "placeholder",
     "password" : "placeholder"
@@ -134,12 +136,12 @@ resource "aws_secretsmanager_secret_version" "wiz_registry_credentials_values" {
 }
 
 resource "aws_secretsmanager_secret" "wiz_sensor_service_account" {
-  name = "wiz-sensor-service-acct-${var.environment}"
+  name       = "wiz-sensor-service-acct-${var.environment}"
   kms_key_id = var.encryption_kms_key_arn
 }
 
 resource "aws_secretsmanager_secret_version" "wiz_sensor_service_account_values" {
-  secret_id     = aws_secretsmanager_secret.wiz_sensor_service_account.id
+  secret_id = aws_secretsmanager_secret.wiz_sensor_service_account.id
   secret_string = jsonencode({
     "WIZ_API_CLIENT_ID" : "placeholder",
     "WIZ_API_CLIENT_SECRET" : "placeholder"
@@ -171,8 +173,8 @@ resource "aws_iam_policy" "wiz_secrets_access_policy" {
 
 
 resource "aws_iam_role_policy_attachment" "wiz_secrets_access" {
-  count = var.enable_wiz_sensor ? 1 : 0
-  role = aws_iam_role.frontend_ecs_execution.name
+  count      = var.enable_wiz_sensor ? 1 : 0
+  role       = aws_iam_role.frontend_ecs_execution.name
   policy_arn = aws_iam_policy.wiz_secrets_access_policy.arn
 }
 
