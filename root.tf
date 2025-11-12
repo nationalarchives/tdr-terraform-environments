@@ -985,7 +985,7 @@ resource "aws_route53_resolver_query_log_config_association" "route53_query_logg
 module "r53_firewall" {
   source            = "./tdr-terraform-modules/route53_firewall"
   environment_name  = local.environment
-  whitelist_domains = module.tdr_configuration.terraform_config["r53_firewall_whitelist_domains"]
+  whitelist_domains = module.global_parameters.r53_firewall_whitelist_domains
   vpc_id            = module.shared_vpc.vpc_id
   alert_only        = true
   tags              = local.common_tags
