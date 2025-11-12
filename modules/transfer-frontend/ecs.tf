@@ -167,7 +167,7 @@ data "aws_iam_policy_document" "wiz_secrets_access_policy" {
 }
 
 resource "aws_iam_policy" "wiz_secrets_access_policy" {
-  name   = "wiz-secrets-access-policy"
+  name   = "wiz-secrets-access-policy-${var.environment}"
   policy = data.aws_iam_policy_document.wiz_secrets_access_policy.json
 }
 
