@@ -111,6 +111,7 @@ module "frontend" {
   notification_sns_topic_arn       = module.notifications_topic.sns_arn
   encryption_kms_key_arn           = module.encryption_key.kms_key_arn
   aws_guardduty_ecr_arn            = local.aws_guardduty_ecr_arn
+  enable_wiz_sensor                = local.enable_wiz_sensor
 }
 
 module "alb_logs_s3" {

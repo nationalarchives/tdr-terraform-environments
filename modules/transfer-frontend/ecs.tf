@@ -2,6 +2,9 @@ locals {
   app_port = 9000
   cpu      = var.environment == "intg" ? "512" : "1024"
   memory   = var.environment == "intg" ? "1024" : "2048"
+  base_task_definition_template = "frontend.json.tpl"
+  wiz_sensor_task_definition_template = "frontend_with_wiz_sensor.json.tpl"
+  task_definition_template = var.enable_wiz_sensor ? local.wiz_sensor_task_definition_template : local.base_task_definition_template
 }
 resource "aws_ecs_cluster" "frontend_ecs" {
   name = "frontend_${var.environment}"
@@ -17,7 +20,7 @@ resource "aws_ecs_cluster" "frontend_ecs" {
 data "aws_caller_identity" "current" {}
 
 data "template_file" "app" {
-  template = file("modules/transfer-frontend/templates/frontend.json.tpl")
+  template = file("modules/transfer-frontend/templates/${local.task_definition_template}")
 
   vars = {
     collector_image                      = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/aws-otel-collector:${var.environment}"
@@ -168,6 +171,7 @@ resource "aws_iam_policy" "wiz_secrets_access_policy" {
 
 
 resource "aws_iam_role_policy_attachment" "wiz_secrets_access" {
+  count = var.enable_wiz_sensor ? 1 : 0
   role = aws_iam_role.frontend_ecs_execution.name
   policy_arn = aws_iam_policy.wiz_secrets_access_policy.arn
 }
@@ -210,6 +214,7 @@ resource "aws_iam_role_policy_attachment" "frontend_ecs_task_kms_key_use" {
 }
 
 resource "aws_iam_role_policy_attachment" "frontend_ecs_execution_kms_key_use" {
+  count      = var.enable_wiz_sensor ? 1 : 0
   role       = aws_iam_role.frontend_ecs_execution.name
   policy_arn = aws_iam_policy.frontend_kms_key_use.arn
 }

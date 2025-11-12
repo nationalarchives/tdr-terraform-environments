@@ -1,5 +1,26 @@
 [
   {
+    "name": "wiz-sensor",
+    "image": "wizio.azurecr.io/sensor-serverless:v1",
+    "repositoryCredentials": {
+      "credentialsParameter": "${wiz_registry_credentials_arn}"
+    },
+    "cpu": 0,
+    "portMappings": [],
+    "essential": false,
+    "environment": [],
+    "environmentFiles": [],
+    "mountPoints": [
+        {
+            "sourceVolume": "sensor-host-store",
+            "containerPath": "/host-store",
+            "readOnly": false
+        }
+    ],
+    "volumesFrom": [],
+    "systemControls": []
+  },
+  {
     "name": "aws-otel-collector",
     "image": "${collector_image}",
     "cpu": 256,
@@ -10,7 +31,6 @@
       "--config=/etc/ecs/custom-config.yml"
     ],
     "environment": [],
-    "mountPoints": [],
     "volumesFrom": [],
     "logConfiguration": {
       "logDriver": "awslogs",
@@ -25,6 +45,20 @@
     "name": "frontend",
     "image": "${app_image}",
     "cpu": 0,
+    "entryPoint": [
+      "/opt/wiz/sensor/wiz-sensor",
+      "daemon",
+      "--",
+      "/bin/sh",
+      "-c",
+      "tdr-transfer-frontend-*/bin/tdr-transfer-frontend -Dplay.http.secret.key=$PLAY_SECRET_KEY -Dconfig.resource=application.$ENVIRONMENT.conf -Dplay.cache.redis.host=$REDIS_HOST -Dauth.secret=$AUTH_SECRET"
+    ],
+    "volumesFrom": [
+      {
+        "sourceContainer": "wiz-sensor",
+        "readOnly": false
+      }
+    ],    
     "secrets": [
       {
         "valueFrom": "/${app_environment}/frontend/play_secret",
@@ -41,7 +75,15 @@
       {
         "valueFrom": "${read_client_secret_path}",
         "name": "READ_AUTH_SECRET"
-      }
+      },
+      {
+        "name": "WIZ_API_CLIENT_ID",
+        "valueFrom": "${wiz_sensor_service_account_arn}:WIZ_API_CLIENT_ID::"
+      },
+      {
+        "name": "WIZ_API_CLIENT_SECRET",
+        "valueFrom": "${wiz_sensor_service_account_arn}:WIZ_API_CLIENT_SECRET::"
+      }      
     ],
     "environment": [
       {
@@ -97,6 +139,24 @@
         "value": "${block_judgment_press_summaries}"
       }
     ],
+    "mountPoints": [
+      {
+        "sourceVolume": "sensor-host-store",
+        "containerPath": "/host-store",
+        "readOnly": false
+      }
+    ],
+    "dependsOn": [
+      {
+        "containerName": "wiz-sensor",
+        "condition": "COMPLETE"
+      }
+    ],
+    "linuxParameters": {
+      "capabilities": {
+        "add": ["SYS_PTRACE"]
+      }
+    },
     "networkMode": "awsvpc",
     "logConfiguration": {
       "logDriver": "awslogs",
@@ -109,9 +169,9 @@
     },
     "portMappings": [
       {
-      "containerPort": 9000,
-      "hostPort": 9000
-    }
+        "containerPort": 9000,
+        "hostPort": 9000
+      }
     ]
   }
 ]

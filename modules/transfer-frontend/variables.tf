@@ -62,3 +62,5 @@ variable "notification_sns_topic_arn" {}
 variable "encryption_kms_key_arn" {}
 
 variable "aws_guardduty_ecr_arn" {}
+
+variable "enable_wiz_sensor" {}
