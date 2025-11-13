@@ -207,4 +207,6 @@ locals {
       )
     ]
   }
+
+  enable_wiz_sensor = true
 }
