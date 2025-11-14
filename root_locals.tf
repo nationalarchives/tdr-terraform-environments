@@ -183,5 +183,5 @@ locals {
     prod    = format("arn:aws:iam::%s:role/%s", module.ayr_configuration.account_numbers["prod"], "terraform-infrastructure-deployer")
   }
 
-  enable_wiz_sensor = true
+  enable_wiz_sensor = local.environment == "prod" ? false : true
 }
