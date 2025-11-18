@@ -274,6 +274,8 @@ module "frontend_alb" {
   vpc_id               = module.shared_vpc.vpc_id
   common_tags          = local.common_tags
   http_listener        = false
+  own_host_header_only = true
+  host                 = local.environment_domain
 }
 
 module "encryption_key" {
@@ -977,4 +979,14 @@ resource "aws_route53_resolver_query_log_config" "route53_query_logging" {
 resource "aws_route53_resolver_query_log_config_association" "route53_query_logging" {
   resolver_query_log_config_id = aws_route53_resolver_query_log_config.route53_query_logging.id
   resource_id                  = module.shared_vpc.vpc_id
+}
+
+# TDRD-1137
+module "r53_firewall" {
+  source            = "./tdr-terraform-modules/route53_firewall"
+  environment_name  = local.environment
+  whitelist_domains = module.global_parameters.r53_firewall_whitelist_domains
+  vpc_id            = module.shared_vpc.vpc_id
+  alert_only        = true
+  tags              = local.common_tags
 }

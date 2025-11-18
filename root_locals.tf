@@ -208,5 +208,5 @@ locals {
     ]
   }
 
-  enable_wiz_sensor = true
+  enable_wiz_sensor = local.environment == "prod" ? false : true
 }
