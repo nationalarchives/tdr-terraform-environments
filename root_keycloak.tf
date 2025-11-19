@@ -279,7 +279,7 @@ resource "aws_lb_listener" "keycloak_nlb_to_alb" {
 resource "aws_vpc_endpoint_service" "keycloak" {
   acceptance_required        = false
   network_load_balancer_arns = [aws_lb.keycloak_nlb_to_alb.arn]
-  allowed_principals         = [local.ayr_terraform_deployer_roles["${local.environment}"]]
+  allowed_principals         = local.ayr_terraform_deployer_roles["${local.environment}"]
   private_dns_name           = "auth.${local.environment_domain}"
   tags = merge(
     { Name = "keycloak-${local.environment}" },
