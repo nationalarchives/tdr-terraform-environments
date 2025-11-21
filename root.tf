@@ -157,7 +157,6 @@ module "upload_file_cloudfront_dirty_s3" {
   cors_urls                    = local.upload_cors_urls
   bucket_policy                = "cloudfront_origin"
   abort_incomplete_uploads     = true
-  cloudfront_oai               = module.cloudfront_upload.cloudfront_oai_iam_arn
   cloudfront_distribution_arns = [module.cloudfront_upload.cloudfront_arn]
   lifecycle_rules              = local.dirty_bucket_lifecycle_rules
   aws_backup_local_role_arn    = local.aws_back_up_local_role
@@ -182,7 +181,6 @@ module "cloudfront_upload" {
   alias_domain_name                   = local.upload_domain
   certificate_arn                     = module.cloudfront_certificate.certificate_arn
   api_gateway_url                     = module.signed_cookies_api.api_url
-  sse_kms_enabled                     = local.upload_dirty_bucket_key_enabled
 }
 
 module "cloudfront_upload_dns" {
