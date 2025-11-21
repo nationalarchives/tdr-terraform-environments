@@ -706,19 +706,6 @@ module "bastion_role" {
   policy_attachments = {}
 }
 
-module "s3_vpc_endpoint" {
-  source       = "./tdr-terraform-modules/endpoint"
-  common_tags  = local.common_tags
-  service_name = "com.amazonaws.${local.region}.s3"
-  vpc_id       = module.shared_vpc.vpc_id
-  policy = templatefile("${path.module}/templates/endpoint_policies/s3_org_only_access_plus_starport.tpl",
-    {
-      vpc_id = module.shared_vpc.vpc_id,
-      org_id = data.aws_organizations_organization.tna.id,
-      region = data.aws_region.current.region
-  })
-}
-
 module "create_keycloak_users_api_lambda" {
   source                           = "./tdr-terraform-modules/lambda"
   common_tags                      = local.common_tags

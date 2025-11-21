@@ -50,7 +50,3 @@ data "aws_ssm_parameter" "slack_e2e_success_workflow" {
 }
 
 data "github_ip_ranges" "actions_ranges" {}
-
-data "aws_organizations_organization" "tna" {}
-
-data "aws_region" "current" {}
