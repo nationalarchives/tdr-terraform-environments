@@ -146,6 +146,14 @@ locals {
       {
         name  = "BLOCK_JUDGMENT_PRESS_SUMMARIES"
         value = tostring(var.block_judgment_press_summaries)
+      },
+      {
+        "name"  = "S3_ACL_HEADER_VALUE",
+        "value" = var.s3_acl_header_value
+      },
+      {
+        "name"  = "S3_IF_NONE_MATCH_HEADER_VALUE",
+        "value" = var.s3_if_none_match_header_value
       }
     ]
 

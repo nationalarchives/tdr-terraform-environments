@@ -77,6 +77,14 @@
       {
         "name": "AGGREGATE_PROCESSING_QUEUE_URL",
         "value": "${aggregate_processing_queue_url}"
+      },
+      {
+        "name": "S3_ACL_HEADER_VALUE",
+        "value": "${s3_acl_header_value}"
+      },
+      {
+        "name": "S3_IF_NONE_MATCH_HEADER_VALUE",
+        "value": "${s3_if_none_match_header_value}"
       }
     ],
     "logConfiguration": {

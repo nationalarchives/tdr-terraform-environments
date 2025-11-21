@@ -64,3 +64,7 @@ variable "encryption_kms_key_arn" {}
 variable "aws_guardduty_ecr_arn" {}
 
 variable "enable_wiz_sensor" {}
+
+variable "s3_acl_header_value" {}
+
+variable "s3_if_none_match_header_value" {}
