@@ -150,21 +150,20 @@ module "upload_bucket_quarantine" {
 }
 
 module "upload_file_cloudfront_dirty_s3" {
-  source                        = "./tdr-terraform-modules/s3"
-  project                       = var.project
-  function                      = "upload-files-cloudfront-dirty"
-  bucket_key_enabled            = local.upload_dirty_bucket_key_enabled
-  kms_key_id                    = local.upload_dirty_s3_encryption_key_arn
-  common_tags                   = local.common_tags
-  cors_urls                     = local.upload_cors_urls
-  bucket_policy                 = "cloudfront_origin"
-  abort_incomplete_uploads      = true
-  cloudfront_oai                = module.cloudfront_upload.cloudfront_oai_iam_arn
-  cloudfront_distribution_arns  = [module.cloudfront_upload.cloudfront_arn]
-  lifecycle_rules               = local.dirty_bucket_lifecycle_rules
-  aws_backup_local_role_arn     = local.aws_back_up_local_role
-  s3_bucket_additional_tags     = local.aws_back_up_tags
-  bucket_owner_object_ownership = true
+  source                       = "./tdr-terraform-modules/s3"
+  project                      = var.project
+  function                     = "upload-files-cloudfront-dirty"
+  bucket_key_enabled           = local.upload_dirty_bucket_key_enabled
+  kms_key_id                   = local.upload_dirty_s3_encryption_key_arn
+  common_tags                  = local.common_tags
+  cors_urls                    = local.upload_cors_urls
+  bucket_policy                = "cloudfront_origin"
+  abort_incomplete_uploads     = true
+  cloudfront_oai               = module.cloudfront_upload.cloudfront_oai_iam_arn
+  cloudfront_distribution_arns = [module.cloudfront_upload.cloudfront_arn]
+  lifecycle_rules              = local.dirty_bucket_lifecycle_rules
+  aws_backup_local_role_arn    = local.aws_back_up_local_role
+  s3_bucket_additional_tags    = local.aws_back_up_tags
 }
 
 module "upload_file_cloudfront_logs" {
@@ -705,24 +704,6 @@ module "bastion_role" {
   common_tags        = local.common_tags
   name               = "BastionEC2Role${title(local.environment)}"
   policy_attachments = {}
-}
-
-module "s3_vpc_endpoint" {
-  source       = "./tdr-terraform-modules/endpoint"
-  common_tags  = local.common_tags
-  service_name = "com.amazonaws.${local.region}.s3"
-  vpc_id       = module.shared_vpc.vpc_id
-  policy = templatefile("${path.module}/templates/endpoint_policies/s3_endpoint_policy.json.tpl",
-    {
-      environment            = local.environment
-      upload_bucket_name     = module.upload_bucket.s3_bucket_name,
-      quarantine_bucket_name = module.upload_bucket_quarantine.s3_bucket_name,
-      antivirus_role         = module.yara_av_v2.lambda_role_arn,
-      export_task_role       = module.consignment_export_task_role.role.arn,
-      export_bucket_name     = module.export_bucket.s3_bucket_name,
-      account_id             = data.aws_caller_identity.current.account_id
-    }
-  )
 }
 
 module "create_keycloak_users_api_lambda" {
