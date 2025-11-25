@@ -152,7 +152,7 @@ resource "aws_vpc_endpoint" "s3_endpoint" {
 }
 
 resource "aws_vpc_endpoint_policy" "s3_endpoint" {
-  vpc_endpoint_id = aws_vpc.main.id
+  vpc_endpoint_id = aws_vpc_endpoint.s3_endpoint.id
   policy = templatefile("./templates/endpoint_policies/s3_org_only_access_plus_starport.tpl",
     {
       vpc_id = aws_vpc.main.id
