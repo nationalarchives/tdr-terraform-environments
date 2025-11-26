@@ -166,6 +166,8 @@ module "transfer_service_ecs_task" {
       user_read_client_secret             = local.keycloak_tdr_read_client_secret_name
       user_read_client_id                 = local.keycloak_user_read_client_id
       aggregate_processing_queue_url      = module.aggregate_processing_sqs_queue[0].sqs_queue_url
+      s3_acl_header_value                 = module.s3_put_request_header_acl_ssm_parameter.params[local.s3_put_request_header_acl_parameter].value
+      s3_if_none_match_header_value       = module.s3_put_request_header_if_none_match_ssm_parameter.params[local.s3_put_request_header_if_none_match_parameter].value
   })
   container_name               = "transfer-service"
   cpu                          = 512

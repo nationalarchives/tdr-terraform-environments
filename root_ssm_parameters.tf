@@ -60,3 +60,30 @@ module "transfers_slack_channel_ssm_parameter" {
   tags = merge(local.common_tags, local.manual_input_tag)
 }
 
+module "s3_put_request_header_acl_ssm_parameter" {
+  source = "./da-terraform-modules/ssm_parameter"
+  parameters = [
+    {
+      name         = local.s3_put_request_header_acl_parameter,
+      description  = "S3 put request 'ACL' header value"
+      type         = "String"
+      value        = "bucket-owner-full-control"
+      ignore_value = true
+    }
+  ]
+  tags = merge(local.common_tags)
+}
+
+module "s3_put_request_header_if_none_match_ssm_parameter" {
+  source = "./da-terraform-modules/ssm_parameter"
+  parameters = [
+    {
+      name         = local.s3_put_request_header_if_none_match_parameter,
+      description  = "S3 put request 'If-None-Match' header value"
+      type         = "String"
+      value        = "*"
+      ignore_value = true
+    }
+  ]
+  tags = merge(local.common_tags)
+}

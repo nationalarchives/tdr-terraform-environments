@@ -112,6 +112,8 @@ module "frontend" {
   encryption_kms_key_arn           = module.encryption_key.kms_key_arn
   aws_guardduty_ecr_arn            = local.aws_guardduty_ecr_arn
   enable_wiz_sensor                = local.enable_wiz_sensor
+  s3_acl_header_value              = module.s3_put_request_header_acl_ssm_parameter.params[local.s3_put_request_header_acl_parameter].value
+  s3_if_none_match_header_value    = module.s3_put_request_header_if_none_match_ssm_parameter.params[local.s3_put_request_header_if_none_match_parameter].value
 }
 
 module "alb_logs_s3" {
@@ -161,6 +163,7 @@ module "upload_file_cloudfront_dirty_s3" {
   lifecycle_rules              = local.dirty_bucket_lifecycle_rules
   aws_backup_local_role_arn    = local.aws_back_up_local_role
   s3_bucket_additional_tags    = local.aws_back_up_tags
+  bucket_owner_object_ownership = true
 }
 
 module "upload_file_cloudfront_logs" {
