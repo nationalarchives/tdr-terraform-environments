@@ -2,15 +2,15 @@
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "S3AccessWithinOrgOnly",
+      "Sid": "S3AccessWithinOrganisationOnly",
       "Effect": "Allow",
       "Principal": "*",
       "Action": "s3:*",
       "Resource": "*",
       "Condition": {
         "StringEquals": {
-          "aws:PrincipalOrgID": "${org_id}",
-          "aws:ResourceOrgID": "${org_id}"
+          "aws:PrincipalOrgID": "${organisation_id}",
+          "aws:ResourceOrgID": "${organisation_id}"
         }
       }
     },

@@ -155,9 +155,9 @@ resource "aws_vpc_endpoint_policy" "s3_endpoint" {
   vpc_endpoint_id = aws_vpc_endpoint.s3_endpoint.id
   policy = templatefile("./templates/endpoint_policies/s3_org_only_access_plus_starport.tpl",
     {
-      vpc_id = aws_vpc.main.id
-      org_id = data.aws_organizations_organization.tna.id,
-      region = data.aws_region.current.region
+      vpc_id          = aws_vpc.main.id
+      organisation_id = data.aws_organizations_organization.tna.id,
+      region          = data.aws_region.current.region
   })
 }
 
