@@ -175,7 +175,7 @@ locals {
 
     linuxParameters = var.enable_wiz_sensor ? {
       capabilities = {
-        add = ["SYS_PTRACE"]
+        add  = ["SYS_PTRACE"]
         drop = []
       }
     } : {}
@@ -197,7 +197,7 @@ locals {
         protocol      = "tcp"
       }
     ]
-    essential    = true
+    essential      = true
     systemControls = []
   }
 
