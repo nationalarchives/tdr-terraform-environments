@@ -19,6 +19,7 @@ locals {
           "awslogs-stream-prefix" = "ecs"
         }
       }
+      systemControls = []
     }
   ]
 
@@ -175,6 +176,7 @@ locals {
     linuxParameters = var.enable_wiz_sensor ? {
       capabilities = {
         add = ["SYS_PTRACE"]
+        drop = []
       }
     } : {}
 
@@ -192,8 +194,11 @@ locals {
       {
         containerPort = 9000
         hostPort      = 9000
+        protocol      = "tcp"
       }
     ]
+    essential    = true
+    systemControls = []
   }
 
   all_containers = concat(

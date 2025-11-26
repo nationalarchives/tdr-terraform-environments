@@ -30,6 +30,8 @@ resource "aws_ecs_task_definition" "frontend_task" {
     for_each = var.enable_wiz_sensor ? [1] : []
     content {
       name = "sensor-host-store"
+      configure_at_launch = false
+      host_path = null
     }
   }
   tags = merge(
