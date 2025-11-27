@@ -4,6 +4,7 @@ data "aws_availability_zones" "available" {
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 data "aws_partition" "current" {}
+data "aws_organizations_organization" "tna" {}
 
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
@@ -134,4 +135,34 @@ resource "aws_route_table_association" "private" {
   count          = var.az_count
   subnet_id      = aws_subnet.private.*.id[count.index]
   route_table_id = aws_route_table.private.*.id[count.index]
+}
+
+# Create an S3 gateway endpoint and update the route table to use it
+# Attach a policy that allows access only from within the org and to the starport ECR buckets
+resource "aws_vpc_endpoint" "s3_endpoint" {
+  vpc_id       = aws_vpc.main.id
+  service_name = "com.amazonaws.${data.aws_region.current.region}.s3"
+
+  tags = merge(
+    var.common_tags,
+    tomap(
+      { "Name" = "com.amazonaws.${data.aws_region.current.region}.s3" }
+    )
+  )
+}
+
+resource "aws_vpc_endpoint_policy" "s3_endpoint" {
+  vpc_endpoint_id = aws_vpc_endpoint.s3_endpoint.id
+  policy = templatefile("./templates/endpoint_policies/s3_org_only_access_plus_starport.tpl",
+    {
+      vpc_id          = aws_vpc.main.id
+      organisation_id = data.aws_organizations_organization.tna.id,
+      region          = data.aws_region.current.region
+  })
+}
+
+resource "aws_vpc_endpoint_route_table_association" "s3_endpoint_private" {
+  count           = 2
+  route_table_id  = aws_route_table.private.*.id[count.index]
+  vpc_endpoint_id = aws_vpc_endpoint.s3_endpoint.id
 }
