@@ -212,4 +212,6 @@ locals {
 
   s3_put_request_header_acl_parameter           = "/${local.environment}/s3_put_request/header/acl"
   s3_put_request_header_if_none_match_parameter = "/${local.environment}/s3_put_request/header/if_none_match"
+
+  waf_alb_target_groups = local.environment == "prod" ? [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn] : [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn, module.transfer_service_tdr_alb[0].alb_arn]
 }

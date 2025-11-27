@@ -300,7 +300,7 @@ module "waf" {
   function                     = "apps"
   environment                  = local.environment
   common_tags                  = local.common_tags
-  alb_target_groups            = [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn, module.transfer_service_tdr_alb[0].alb_arn]
+  alb_target_groups            = local.waf_alb_target_groups
   trusted_ips                  = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
   blocked_ips                  = local.ip_blocked_list
   geo_match                    = split(",", var.geo_match)
