@@ -974,6 +974,6 @@ module "r53_firewall" {
   environment_name  = local.environment
   whitelist_domains = module.global_parameters.r53_firewall_whitelist_domains
   vpc_id            = module.shared_vpc.vpc_id
-  alert_only        = true
+  alert_only        = local.environment == "prod"
   tags              = local.common_tags
 }
