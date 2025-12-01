@@ -208,7 +208,7 @@ locals {
     ]
   }
 
-  enable_wiz_sensor = local.environment == "prod" ? false : true
+  enable_wiz_sensor = false
 
   s3_put_request_header_acl_parameter           = "/${local.environment}/s3_put_request/header/acl"
   s3_put_request_header_if_none_match_parameter = "/${local.environment}/s3_put_request/header/if_none_match"
