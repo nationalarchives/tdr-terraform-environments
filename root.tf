@@ -298,7 +298,7 @@ module "waf" {
   function                     = "apps"
   environment                  = local.environment
   common_tags                  = local.common_tags
-  alb_target_groups            = [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn]
+  alb_target_groups            = local.waf_alb_target_groups
   trusted_ips                  = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
   blocked_ips                  = local.ip_blocked_list
   geo_match                    = split(",", var.geo_match)
@@ -705,24 +705,6 @@ module "bastion_role" {
   policy_attachments = {}
 }
 
-module "s3_vpc_endpoint" {
-  source       = "./tdr-terraform-modules/endpoint"
-  common_tags  = local.common_tags
-  service_name = "com.amazonaws.${local.region}.s3"
-  vpc_id       = module.shared_vpc.vpc_id
-  policy = templatefile("${path.module}/templates/endpoint_policies/s3_endpoint_policy.json.tpl",
-    {
-      environment            = local.environment
-      upload_bucket_name     = module.upload_bucket.s3_bucket_name,
-      quarantine_bucket_name = module.upload_bucket_quarantine.s3_bucket_name,
-      antivirus_role         = module.yara_av_v2.lambda_role_arn,
-      export_task_role       = module.consignment_export_task_role.role.arn,
-      export_bucket_name     = module.export_bucket.s3_bucket_name,
-      account_id             = data.aws_caller_identity.current.account_id
-    }
-  )
-}
-
 module "create_keycloak_users_api_lambda" {
   source                           = "./tdr-terraform-modules/lambda"
   common_tags                      = local.common_tags
@@ -792,8 +774,10 @@ module "disable_inactive_judgment_users_scheduled_event" {
   rule_name               = "disable-inactive-judgment-keycloak-users"
   lambda_event_target_arn = module.inactive_keycloak_users_lambda.lambda_arn
   input = jsonencode({
-    userType             = "judgment_user"
-    inactivityPeriodDays = 730
+    detail = {
+      userType             = "judgment_user"
+      inactivityPeriodDays = 730
+    }
   })
 }
 
@@ -988,6 +972,6 @@ module "r53_firewall" {
   environment_name  = local.environment
   whitelist_domains = module.global_parameters.r53_firewall_whitelist_domains
   vpc_id            = module.shared_vpc.vpc_id
-  alert_only        = true
+  alert_only        = local.environment == "prod"
   tags              = local.common_tags
 }
