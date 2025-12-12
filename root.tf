@@ -975,3 +975,11 @@ module "r53_firewall" {
   alert_only        = false
   tags              = local.common_tags
 }
+
+# TDRD-960 imported iam_group module from defunct tdr-aws-accounts
+module "iam_group" {
+  source            = "./tdr-terraform-modules/iam_group"
+  aws_account_level = true
+  environment       = local.environment
+}
+
