@@ -1,5 +1,6 @@
 locals {
   e2e_testing_role_arns = local.environment == "prod" ? [] : [module.tdr_configuration.terraform_config[local.environment]["e2e_testing_role_arn"]]
+  e2e_testing_role_arn  = local.environment == "prod" ? "" : module.tdr_configuration.terraform_config[local.environment]["e2e_testing_role_arn"]
   s3_external_service_details = [{
     service_name : "cloudwatch"
     service_source_account : data.aws_caller_identity.current.account_id
