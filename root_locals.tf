@@ -142,7 +142,7 @@ locals {
 
   dr2_copy_files_role = module.dr2_configuration.terraform_config[local.environment]["tdr_importer_role"]
 
-  standard_export_bucket_read_access_roles = [local.tre_export_role_arn, local.talend_export_role_arn]
+  standard_export_bucket_read_access_roles = [local.tre_export_role_arn, local.talend_export_role_arn, local.e2e_testing_role_arns]
   judgment_export_bucket_read_access_roles = [local.tre_export_role_arn]
 
   // s3 internal bucket encryption
