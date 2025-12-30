@@ -11,6 +11,8 @@ resource "aws_elasticache_replication_group" "redis_replication_group" {
   security_group_ids         = aws_security_group.redis.*.id
   subnet_group_name          = aws_elasticache_subnet_group.redis_subnet_group.name
   apply_immediately          = true
+  transit_encryption_enabled = true
+  transit_encryption_mode    = var.transit_encryption_mode
 }
 
 resource "aws_elasticache_subnet_group" "redis_subnet_group" {
