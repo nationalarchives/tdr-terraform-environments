@@ -226,24 +226,15 @@ module "statuses" {
     "TDRStatusesLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/allow_iam_db_auth.json.tpl", {
       function_name  = local.statuses_function_name,
       account_id     = data.aws_caller_identity.current.account_id,
-      resource_id    = module.consignment_api_database.resource_id
-      user_name      = local.consignment_user_name
       bucket_name    = module.backend_lambda_function_bucket.s3_bucket_name
-      parameter_name = local.url_path
     })
   }
   role_name = "TDRStatusesLambdaRole${title(local.environment)}"
   runtime   = local.runtime_java_11
-  plaintext_env_vars = {
-    USER_NAME    = local.consignment_user_name
-    URL_PATH     = local.url_path
-    USE_IAM_AUTH = true
-    S3_ENDPOINT  = local.s3_endpoint
-  }
   vpc_config = [
     {
       subnet_ids         = module.shared_vpc.private_subnets
-      security_group_ids = [module.outbound_with_db_security_group.security_group_id]
+      security_group_ids = [module.outbound_only_security_group.security_group_id]
     }
   ]
 }
