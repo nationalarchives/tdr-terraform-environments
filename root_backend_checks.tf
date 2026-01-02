@@ -224,9 +224,9 @@ module "statuses" {
   timeout_seconds      = 30
   policies = {
     "TDRStatusesLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/allow_iam_db_auth.json.tpl", {
-      function_name  = local.statuses_function_name,
-      account_id     = data.aws_caller_identity.current.account_id,
-      bucket_name    = module.backend_lambda_function_bucket.s3_bucket_name
+      function_name = local.statuses_function_name,
+      account_id    = data.aws_caller_identity.current.account_id,
+      bucket_name   = module.backend_lambda_function_bucket.s3_bucket_name
     })
   }
   role_name = "TDRStatusesLambdaRole${title(local.environment)}"
