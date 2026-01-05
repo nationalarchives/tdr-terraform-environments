@@ -223,7 +223,7 @@ module "statuses" {
   reserved_concurrency = -1
   timeout_seconds      = 30
   policies = {
-    "TDRStatusesLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/allow_iam_db_auth.json.tpl", {
+    "TDRStatusesLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_statuses_policy.json.tpl", {
       function_name = local.statuses_function_name,
       account_id    = data.aws_caller_identity.current.account_id,
       bucket_name   = module.backend_lambda_function_bucket.s3_bucket_name
@@ -231,6 +231,9 @@ module "statuses" {
   }
   role_name = "TDRStatusesLambdaRole${title(local.environment)}"
   runtime   = local.runtime_java_11
+  plaintext_env_vars = {
+    S3_ENDPOINT = local.s3_endpoint
+  }
   vpc_config = [
     {
       subnet_ids         = module.shared_vpc.private_subnets
