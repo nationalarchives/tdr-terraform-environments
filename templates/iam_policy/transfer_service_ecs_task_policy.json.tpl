@@ -11,6 +11,7 @@
       ]
     },
     {
+      "Sid": "S3GetObjectPermission",
       "Effect": "Allow",
       "Action": [
         "s3:GetObject",
@@ -22,6 +23,7 @@
       ]
     },
     {
+      "Sid": "KMSKeyDecryptPermission",
       "Effect": "Allow",
       "Action": [
         "kms:Decrypt",
