@@ -10,6 +10,7 @@ locals {
   aggregate_processing_lambda_timeout_secs = 900
 
   transfer_service_ecs_task_role_arn = local.environment == "prod" ? "" : module.transfer_service_task_role[0].role_arn
+  tdr_transfer_errors_s3_bucket_name = "tdr-transfer-errors-${local.environment}"
 }
 
 module "transfer_service_execution_role" {
@@ -57,7 +58,11 @@ module "transfer_service_task_policy" {
   name   = "TDRTransferServiceECSTaskPolicy${title(local.environment)}"
   tags   = local.common_tags
   policy_string = templatefile(
-  "${path.module}/templates/iam_policy/transfer_service_ecs_task_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, environment = local.environment })
+    "${path.module}/templates/iam_policy/transfer_service_ecs_task_policy.json.tpl", {
+      account_id                         = data.aws_caller_identity.current.account_id, environment = local.environment,
+      tdr_transfer_errors_s3_bucket_name = local.tdr_transfer_errors_s3_bucket_name,
+      kms_arn                            = module.s3_internal_kms_key.kms_key_arn
+  })
 }
 
 module "transfer_service_certificate" {
@@ -241,4 +246,12 @@ module "aggregate_processing_sqs_queue" {
   encryption_type    = "kms"
   kms_key_id         = module.encryption_key.kms_alias_arn
   visibility_timeout = 6 * local.aggregate_processing_lambda_timeout_secs
+}
+
+module "tdr_transfer_errors_s3_bucket" {
+  count       = local.transfer_service_count
+  source      = "./da-terraform-modules/s3"
+  bucket_name = local.tdr_transfer_errors_s3_bucket_name
+  common_tags = local.common_tags
+  kms_key_arn = module.s3_internal_kms_key.kms_key_arn
 }
