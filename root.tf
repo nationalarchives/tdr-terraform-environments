@@ -977,4 +977,17 @@ module "r53_firewall" {
   tags              = local.common_tags
 }
 
+module "athena_metadata_checks_s3" {
+  source      = "./da-terraform-modules/s3"
+  bucket_name = local.athena_metadata_checks_database_name
+  kms_key_arn = module.s3_internal_kms_key.kms_key_arn
+  common_tags = local.common_tags
+ }
 
+module "athena_reporting-results_s3" {
+  source      = "./tdr-terraform-modules/s3"
+  project     = var.project
+  function    = "athena-shared-reporting-results"
+  common_tags = local.common_tags
+  kms_key_arn = module.s3_internal_kms_key.kms_key_arn
+}
