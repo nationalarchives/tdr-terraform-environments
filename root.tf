@@ -289,8 +289,23 @@ module "encryption_key" {
   transfer_service_ecs_task_role_arn = local.transfer_service_ecs_task_role_arn
 }
 
+module "simple_waf_dev" {
+  count = local.environment == "intg" ? 1 : 0
+  source = "./tdr-terraform-modules/waf_simple"
+  project                      = var.project
+  function                     = "public-facing"
+  environment                  = local.environment
+  common_tags                  = local.common_tags
+  whitelist_ips                = concat(
+    local.ip_allowlist,
+    module.shared_vpc.public_subnet_ranges)
+    
+  associated_resources         = []
+}
+
 module "waf" {
   # a single WAF web acl and rules are used for all services to minimise AWS costs
+  #count = local.environment == "dev" ? 1 : 0
   source                       = "./tdr-terraform-modules/waf"
   project                      = var.project
   function                     = "apps"
