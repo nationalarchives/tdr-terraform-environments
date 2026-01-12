@@ -170,6 +170,9 @@ locals {
   flat_format_bucket_name          = "tdr-export-${local.environment}"
   flat_format_judgment_bucket_name = "tdr-export-judgment-${local.environment}"
 
+  athena_results_bucket_name = "tdr-athena-results-${local.environment}"
+  athena_data_bucket_name    = "tdr-athena-data-${local.environment}"
+
   aws_guardduty_ecr_arn = module.tdr_configuration.terraform_config["aws_guardduty_ecr_arn"]
 
   rds_retention_period_days = local.environment == "prod" ? 30 : 7
