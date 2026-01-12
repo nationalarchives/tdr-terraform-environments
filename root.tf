@@ -290,28 +290,29 @@ module "encryption_key" {
 }
 
 module "simple_waf_dev" {
-  count = local.environment == "intg" ? 1 : 0
-  source = "./tdr-terraform-modules/waf_simple"
-  project                      = var.project
-  function                     = "public-facing"
-  environment                  = local.environment
-  common_tags                  = local.common_tags
-  whitelist_ips                = concat(
+  count       = local.environment == "intg" ? 1 : 0
+  source      = "./tdr-terraform-modules/waf_simple"
+  project     = var.project
+  function    = "public-facing"
+  environment = local.environment
+  common_tags = local.common_tags
+  whitelist_ips = concat(
     local.ip_allowlist,
-    module.shared_vpc.public_subnet_ranges)
-    
-  associated_resources         = []
+    tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]),
+    module.shared_vpc.public_subnet_ranges,
+    local.region_allowed_ips,
+  )
+  associated_resources = local.waf_alb_target_groups
 }
 
 module "waf" {
   # a single WAF web acl and rules are used for all services to minimise AWS costs
-  #count = local.environment == "dev" ? 1 : 0
   source                       = "./tdr-terraform-modules/waf"
   project                      = var.project
   function                     = "apps"
   environment                  = local.environment
   common_tags                  = local.common_tags
-  alb_target_groups            = local.waf_alb_target_groups
+  alb_target_groups            = local.environment == "intg" ? [] : local.waf_alb_target_groups
   trusted_ips                  = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
   blocked_ips                  = local.ip_blocked_list
   geo_match                    = split(",", var.geo_match)
