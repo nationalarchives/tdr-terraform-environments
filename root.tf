@@ -88,6 +88,7 @@ module "frontend" {
   environment                      = local.environment
   environment_full_name            = local.environment_full_name_map[local.environment]
   common_tags                      = local.common_tags
+  #ip_allowlist                     = ["0.0.0.0/0"]
   ip_allowlist                     = local.environment == "intg" ? local.ip_allowlist : ["0.0.0.0/0"]
   region                           = local.region
   vpc_id                           = module.shared_vpc.vpc_id
@@ -289,11 +290,12 @@ module "encryption_key" {
   transfer_service_ecs_task_role_arn = local.transfer_service_ecs_task_role_arn
 }
 
+# TDRD-1091 Simple whitelist only WAR onlu for dev
 module "simple_waf_dev" {
   count       = local.environment == "intg" ? 1 : 0
   source      = "./tdr-terraform-modules/waf_simple"
   project     = var.project
-  function    = "public-facing"
+  function    = "appsv2"
   environment = local.environment
   common_tags = local.common_tags
   whitelist_ips = concat(
@@ -302,7 +304,9 @@ module "simple_waf_dev" {
     module.shared_vpc.public_subnet_ranges,
     local.region_allowed_ips,
   )
-  associated_resources = local.waf_alb_target_groups
+  #associated_resources = local.waf_alb_target_groups
+  associated_resources = []
+
 }
 
 module "waf" {
@@ -312,7 +316,8 @@ module "waf" {
   function                     = "apps"
   environment                  = local.environment
   common_tags                  = local.common_tags
-  alb_target_groups            = local.environment == "intg" ? [] : local.waf_alb_target_groups
+  #alb_target_groups            = local.environment == "intg" ? [] : local.waf_alb_target_groups
+  alb_target_groups            = local.waf_alb_target_groups
   trusted_ips                  = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
   blocked_ips                  = local.ip_blocked_list
   geo_match                    = split(",", var.geo_match)
