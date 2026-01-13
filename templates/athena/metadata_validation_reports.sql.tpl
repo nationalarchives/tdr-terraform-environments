@@ -1,5 +1,6 @@
 CREATE EXTERNAL TABLE IF NOT EXISTS metadata_validation_reports (
   consignmentId string,
+  s3VersionId string,
   fileError string,
   `date` string,
   validationErrors ARRAY<STRUCT<
