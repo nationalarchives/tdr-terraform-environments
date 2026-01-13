@@ -76,7 +76,6 @@ module "consignment_api" {
   da_reference_generator_url     = local.da_reference_generator_url
   da_reference_generator_limit   = local.da_reference_generator_limit
   aws_guardduty_ecr_arn          = local.aws_guardduty_ecr_arn
-  akka_licence_key_name          = local.akka_licence_key_name
 }
 
 module "frontend" {
@@ -550,8 +549,7 @@ module "flat_format_export_bucket_judgment" {
     read_access_roles     = [local.dr2_copy_files_role]
     aws_backup_local_role = local.aws_back_up_local_role
   })
-  lifecycle_rules                = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
-  s3_data_bucket_additional_tags = local.aws_back_up_tags
+ 
 }
 
 module "external_sns_notifications_topic" {
@@ -977,17 +975,4 @@ module "r53_firewall" {
   tags              = local.common_tags
 }
 
-module "athena_metadata_checks_s3" {
-  source      = "./da-terraform-modules/s3"
-  bucket_name = local.athena_metadata_checks_database_name
-  kms_key_arn = module.s3_internal_kms_key.kms_key_arn
-  common_tags = local.common_tags
- }
 
-module "athena_reporting-results_s3" {
-  source      = "./tdr-terraform-modules/s3"
-  project     = var.project
-  function    = "athena-shared-reporting-results"
-  common_tags = local.common_tags
-  kms_key_arn = module.s3_internal_kms_key.kms_key_arn
-}

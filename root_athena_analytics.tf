@@ -1,30 +1,26 @@
-module "athena_results_bucket" {
+module "athena_metadata_checks_s3" {
   source      = "./da-terraform-modules/s3"
-  bucket_name = local.athena_results_bucket_name
-  kms_key_arn = module.s3_external_kms_key.kms_key_arn
+  bucket_name = local.athena_metadata_checks_database_name
+  kms_key_arn = module.s3_internal_kms_key.kms_key_arn
   common_tags = local.common_tags
-  lifecycle_rules = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
 }
 
-module "athena_data_bucket" {
+module "athena_reporting-results_s3" {
   source      = "./da-terraform-modules/s3"
-  bucket_name = local.athena_data_bucket_name
-  kms_key_arn = module.s3_external_kms_key.kms_key_arn
+  bucket_name = local.athena_results_bucket_name
   common_tags = local.common_tags
-  bucket_policy = templatefile("${path.module}/templates/s3/allow_read_access.json.tpl", {
-    bucket_name           = local.athena_data_bucket_name
-    read_access_roles     = []  # Add roles as needed
-    aws_backup_local_role = local.aws_back_up_local_role
-  })
-  lifecycle_rules = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
-  s3_data_bucket_additional_tags = local.aws_back_up_tags
+  kms_key_arn = module.s3_internal_kms_key.kms_key_arn
 }
 
 module "athena_reporting_analytics" {
   source = "./da-terraform-modules/athena"
   name   = "tdr-reporting-analytics"
   result_bucket_name = local.athena_results_bucket_name
-  create_table_queries = {}
+  create_table_queries = {
+    metadata_validation_reports = templatefile("${path.module}/templates/athena/metadata_validation_reports.sql.tpl", {
+      bucket_name = local.athena_metadata_checks_database_name
+    })
+  }
   common_tags = local.common_tags
-  kms_key_arn = module.s3_external_kms_key.kms_key_arn
+  kms_key_arn = module.s3_internal.kms_key.kms_key_arn
 }
