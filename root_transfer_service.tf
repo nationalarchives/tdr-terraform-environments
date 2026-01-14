@@ -1,7 +1,7 @@
 locals {
   // Apply to intg /staging environments only initially
   transfer_service_count = local.environment == "prod" ? 0 : 1
-  ip_allow_list          = local.environment == "intg" ? local.ip_allowlist : ["0.0.0.0/0"]
+  ip_allow_list          = ["0.0.0.0/0"]
   domain                 = "nationalarchives.gov.uk"
   sub_domain             = "transfer-service"
   # Require abbreviated name for staging as ALB name cannot be more than 32 characters which is the case for staging
