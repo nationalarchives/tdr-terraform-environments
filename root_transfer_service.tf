@@ -225,6 +225,7 @@ module "aggregate_processing_lambda" {
     NOTIFICATIONS_TOPIC_ARN        = module.notifications_topic.sns_arn
     KEYCLOAK_READ_AUTH_SECRET_PATH = local.keycloak_tdr_read_client_secret_name
     DRAFT_METADATA_BUCKET_NAME     = local.draft_metadata_s3_bucket_name
+    TRANSFER_ERROR_BUCKET_NAME     = local.tdr_transfer_errors_s3_bucket_name
   }
   vpc_config = {
     subnet_ids         = module.shared_vpc.private_backend_checks_subnets
