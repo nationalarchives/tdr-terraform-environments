@@ -291,12 +291,14 @@ module "encryption_key" {
 
 # TDRD-1091 Simple whitelist only for dev
 module "simple_waf_intg" {
-  count       = local.environment == "intg" ? 1 : 0
-  source      = "./tdr-terraform-modules/waf_simple"
-  project     = var.project
-  function    = "public-facing"
-  environment = local.environment
-  common_tags = local.common_tags
+  count                        = local.environment == "intg" ? 1 : 0
+  source                       = "./tdr-terraform-modules/waf_simple"
+  project                      = var.project
+  function                     = "public-facing"
+  environment                  = local.environment
+  common_tags                  = local.common_tags
+  rate_limit                   = 7000
+  rate_limit_evaluation_window = 600
   whitelist_ips = concat(
     local.ip_allowlist,
     tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]),
