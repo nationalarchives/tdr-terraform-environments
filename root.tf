@@ -103,7 +103,7 @@ module "frontend" {
   public_subnet_ranges             = module.shared_vpc.public_subnet_ranges
   otel_service_name                = "frontend-${local.environment}"
   block_skip_metadata_review       = local.block_skip_metadata_review
-   draft_metadata_validator_api_url = module.draft_metadata_api_gateway.api_url
+  draft_metadata_validator_api_url = module.draft_metadata_api_gateway.api_url
   draft_metadata_s3_kms_keys       = jsonencode([module.s3_internal_kms_key.kms_key_arn])
   draft_metadata_s3_bucket_name    = local.draft_metadata_s3_bucket_name
   notification_sns_topic_arn       = module.notifications_topic.sns_arn
