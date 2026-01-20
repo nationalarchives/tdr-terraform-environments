@@ -145,10 +145,6 @@ locals {
         value = tostring(var.block_skip_metadata_review)
       },
       {
-        name  = "BLOCK_JUDGMENT_PRESS_SUMMARIES"
-        value = tostring(var.block_judgment_press_summaries)
-      },
-      {
         "name"  = "S3_ACL_HEADER_VALUE",
         "value" = var.s3_acl_header_value
       },
