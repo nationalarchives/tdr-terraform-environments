@@ -299,6 +299,7 @@ module "simple_waf_intg" {
   common_tags                  = local.common_tags
   rate_limit                   = 7000
   rate_limit_evaluation_window = 600
+  blacklist_ips                = length(local.ip_blocked_list) > 0 ? split(",", local.ip_blocked_list) : []
   whitelist_ips = concat(
     local.ip_allowlist,
     tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]),
