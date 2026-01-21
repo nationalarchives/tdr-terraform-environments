@@ -23,4 +23,6 @@ module "athena_reporting_analytics" {
   }
   common_tags = local.common_tags
   kms_key_arn = module.s3_internal_kms_key.kms_key_arn
+
+  depends_on = [module.athena_reporting_results_s3]
 }
