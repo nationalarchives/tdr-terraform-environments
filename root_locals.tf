@@ -167,6 +167,9 @@ locals {
   flat_format_bucket_name          = "tdr-export-${local.environment}"
   flat_format_judgment_bucket_name = "tdr-export-judgment-${local.environment}"
 
+  athena_results_bucket_name = "tdr-athena-results-${local.environment}"
+  athena_data_bucket_name    = "tdr-athena-data-${local.environment}"
+
   aws_guardduty_ecr_arn = module.tdr_configuration.terraform_config["aws_guardduty_ecr_arn"]
 
   rds_retention_period_days = local.environment == "prod" ? 30 : 7
@@ -211,4 +214,6 @@ locals {
   s3_put_request_header_if_none_match_parameter = "/${local.environment}/s3_put_request/header/if_none_match"
 
   waf_alb_target_groups = local.environment == "prod" ? [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn] : [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn, module.transfer_service_tdr_alb[0].alb_arn]
+
+  athena_metadata_checks_database_name = "athena-tdr-metadata-checks-${local.environment}"
 }
