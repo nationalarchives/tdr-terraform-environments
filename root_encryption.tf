@@ -20,7 +20,7 @@ module "s3_external_kms_key" {
       module.consignment_export_task_role.role.arn,
       local.dr2_copy_files_role,
     ], local.aws_sso_export_bucket_access_roles, local.standard_export_bucket_read_access_roles, local.judgment_export_bucket_read_access_roles)
-    ci_roles                            = [local.assume_role]
+    ci_roles                            = [local.terraform_role]
     service_details                     = local.s3_external_service_details
     user_roles_decoupled                = concat(local.wiz_role_arns, local.aws_back_up_roles)
     persistent_resource_roles_decoupled = local.wiz_role_arns
@@ -33,7 +33,7 @@ module "sns_external_kms_key" {
   tags     = local.common_tags
   default_policy_variables = {
     user_roles = [module.consignment_export_task_role.role.arn]
-    ci_roles   = [local.assume_role]
+    ci_roles   = [local.terraform_role]
     service_details = [
       {
         service_name : "sns"
@@ -58,8 +58,8 @@ module "s3_internal_kms_key" {
       module.frontend.task_role_arn,
       module.draft_metadata_checks.step_function_role_arn,
       module.aws_guard_duty_s3_malware_scan_role.role_arn
-    ], local.aws_sso_internal_bucket_access_roles, local.e2e_testing_role_arns, local.aggregate_processing_access_role, local.assume_role)
-    ci_roles = [local.assume_role]
+    ], local.aws_sso_internal_bucket_access_roles, local.e2e_testing_role_arns, local.aggregate_processing_access_role, local.terraform_role)
+    ci_roles = [local.terraform_role]
     service_details = [
       {
         service_name : "cloudwatch"
@@ -83,7 +83,7 @@ module "s3_upload_kms_key" {
       module.checksum_v2.lambda_role_arn,
       module.aws_guard_duty_s3_malware_scan_role.role_arn
     ], local.aws_sso_internal_bucket_access_roles, local.aws_back_up_roles, local.aggregate_processing_access_role, local.e2e_testing_role_arns)
-    ci_roles = [local.assume_role]
+    ci_roles = [local.terraform_role]
     service_details = [
       {
         service_name : "cloudwatch"
