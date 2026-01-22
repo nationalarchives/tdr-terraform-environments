@@ -1,7 +1,7 @@
 locals {
   environment = terraform.workspace
 
-  assume_role = "arn:aws:iam::${var.tdr_account_number}:role/TDRTerraformRole${title(local.environment)}"
+  terraform_role = "arn:aws:iam::${var.tdr_account_number}:role/TDRTerraformRole${title(local.environment)}"
 
   environment_full_name_map = {
     "intg"    = "integration",
