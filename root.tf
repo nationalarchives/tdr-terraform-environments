@@ -289,10 +289,11 @@ module "encryption_key" {
   transfer_service_ecs_task_role_arn = local.transfer_service_ecs_task_role_arn
 }
 
-# TDRD-1091 Simple whitelist only for dev
+# TDRD-1091 WAF for non production environments
+
 module "simple_waf_intg" {
   count                        = local.environment == "intg" ? 1 : 0
-  source                       = "./tdr-terraform-modules/waf_simple"
+  source                       = "./tdr-terraform-modules/waf_intg"
   project                      = var.project
   function                     = "public-facing"
   environment                  = local.environment
