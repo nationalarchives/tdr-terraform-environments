@@ -290,10 +290,9 @@ module "encryption_key" {
 }
 
 # TDRD-1091 WAF for non production environments
-
-module "simple_waf_intg" {
-  count                        = local.environment == "intg" ? 1 : 0
-  source                       = "./tdr-terraform-modules/waf_intg"
+module "waf_intg" {
+  count                        = local.environment == "intg" || local.environment == "dev" ? 1 : 0
+  source                       = "./tdr-terraform-modules/waf_non_prod"
   project                      = var.project
   function                     = "public-facing"
   environment                  = local.environment
