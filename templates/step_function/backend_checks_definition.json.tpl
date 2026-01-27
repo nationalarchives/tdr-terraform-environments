@@ -20,6 +20,14 @@
           "BackoffRate": 2
         }
       ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Process failed notification"
+        }
+      ],
       "Next": "In Progress Status API Update"
     },
     "In Progress Status API Update": {
@@ -302,6 +310,64 @@
         }
       ],
       "End": true
+    },
+    "Process failed notification": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "Message": {
+          "consignmentId.$": "$$.Execution.Input.consignmentId",
+          "success": false,
+          "environment": "${environment}",
+          "failureCause.$": "$.Cause"
+        },
+        "TopicArn": "${sns_topic}"
+      },
+      "Next": "Prepare Client Side Checks Status Parameters"
+    },
+    "Prepare Client Side Checks Status Parameters": {
+      "Type": "Pass",
+      "ResultPath": "$.statusUpdate",
+      "Parameters": {
+        "query": "mutation updateConsignmentStatus($updateConsignmentStatusInput: ConsignmentStatusInput!) { updateConsignmentStatus(updateConsignmentStatusInput: $updateConsignmentStatusInput) }",
+        "variables": {
+          "updateConsignmentStatusInput": {
+            "consignmentId.$": "$.consignmentId",
+            "statusType": "ClientSideChecks",
+            "statusValue": "Failed"
+          }
+        }
+      },
+      "Next": "Update Client Side Checks Status"
+    },
+    "Update Client Side Checks Status": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::http:invoke",
+      "Parameters": {
+        "ApiEndpoint": "${consignment_api_url}/graphql",
+        "Method": "POST",
+        "Authentication": {
+          "ConnectionArn": "${consignment_api_connection_arn}"
+        },
+        "Headers": {
+          "Content-Type": "application/json"
+        },
+        "RequestBody.$": "$.statusUpdate"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Events.ConnectionResource.ConcurrentModification"
+          ],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "End": true
+    },
+    "Fail State": {
+      "Type": "Fail"
     }
   }
 }
