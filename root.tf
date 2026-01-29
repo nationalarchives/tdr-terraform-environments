@@ -317,7 +317,8 @@ module "wafv2" {
   function    = "public-facing"
   environment = local.environment
   common_tags = local.common_tags
-  rate_limit  = 7000
+  rate_limit  = 14000
+  log_retention_period = 90
   allowlist_ips = concat(
     local.ip_allowlist,
     tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]),
@@ -328,7 +329,6 @@ module "wafv2" {
   dont_rate_control_ips = module.shared_vpc.public_subnet_ranges
   associated_resources  = local.waf_alb_target_groups
 }
-
 
 module "waf" {
   # a single WAF web acl and rules are used for all services to minimise AWS costs
