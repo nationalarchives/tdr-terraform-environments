@@ -47,6 +47,14 @@
           "BackoffRate": 2
         }
       ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Process failed notification"
+        }
+      ],
       "ResultPath": null,
       "Next": "Map"
     },
@@ -249,6 +257,14 @@
           "BackoffRate": 2
         }
       ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Process failed notification"
+        }
+      ],
       "Next": "Redacted files"
     },
     "Redacted files": {
@@ -266,6 +282,14 @@
           "IntervalSeconds": 2,
           "MaxAttempts": 6,
           "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Process failed notification"
         }
       ],
       "Next": "Generate Statuses",
@@ -288,6 +312,14 @@
           "BackoffRate": 2
         }
       ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Process failed notification"
+        }
+      ],
       "Next": "Update API",
       "ResultPath": null
     },
@@ -307,6 +339,14 @@
           "IntervalSeconds": 2,
           "MaxAttempts": 6,
           "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Process failed notification"
         }
       ],
       "End": true
@@ -364,7 +404,7 @@
           "BackoffRate": 2
         }
       ],
-      "End": true
+      "Next": "Fail State"
     },
     "Fail State": {
       "Type": "Fail"
