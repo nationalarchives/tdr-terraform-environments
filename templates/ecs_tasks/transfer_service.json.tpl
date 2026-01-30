@@ -30,6 +30,10 @@
          "name": "METADATA_UPLOAD_BUCKET_NAME",
          "value": "${metadata_upload_bucket_name}"
        },
+      {
+        "name": "TRANSFER_ERROR_BUCKET_NAME",
+        "value": "${transfer_error_bucket_name}"
+      },
        {
          "name": "CONSIGNMENT_API_URL",
          "value": "${consignment_api_url}/graphql"
