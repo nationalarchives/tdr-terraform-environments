@@ -89,6 +89,10 @@
       {
         "name": "S3_IF_NONE_MATCH_HEADER_VALUE",
         "value": "${s3_if_none_match_header_value}"
+      },
+      {
+        "name": "BLOCK_API_DOCUMENTATION",
+        "value": "${block_api_documentation}"
       }
     ],
     "logConfiguration": {
