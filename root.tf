@@ -292,15 +292,15 @@ module "encryption_key" {
 
 # TDRD-1091 WAF for non production environments
 module "waf_non_prod" {
-  count                        = local.environment == "intg" || local.environment == "dev" ? 1 : 0
-  source                       = "./tdr-terraform-modules/waf_non_prod"
-  project                      = var.project
-  function                     = "public-facing"
-  environment                  = local.environment
-  common_tags                  = local.common_tags
-  rate_limit                   = 7000
-  rate_limit_evaluation_window = 600
-  blocklist_ips                = length(local.ip_blocked_list) > 0 ? split(",", local.ip_blocked_list) : []
+  count                     = local.environment == "intg" || local.environment == "dev" ? 1 : 0
+  source                    = "./tdr-terraform-modules/waf_non_prod"
+  project                   = var.project
+  function                  = "public-facing"
+  environment               = local.environment
+  common_tags               = local.common_tags
+  rate_limit                = 14000
+  log_retention_period_days = 90
+  blocklist_ips             = length(local.ip_blocked_list) > 0 ? split(",", local.ip_blocked_list) : []
   allowlist_ips = concat(
     local.ip_allowlist,
     tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]),
@@ -310,6 +310,26 @@ module "waf_non_prod" {
   associated_resources = local.waf_alb_target_groups
 }
 
+module "waf_prod" {
+  count                     = local.environment == "staging" ? 1 : 0
+  source                    = "./tdr-terraform-modules/waf_prod"
+  project                   = var.project
+  function                  = "public-facing"
+  environment               = local.environment
+  common_tags               = local.common_tags
+  rate_limit                = 14000
+  log_retention_period_days = 90
+  blocklist_ips             = length(local.ip_blocked_list) > 0 ? split(",", local.ip_blocked_list) : []
+  allowlist_ips = concat(
+    local.ip_allowlist,
+    tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]),
+    local.region_allowed_ips,
+    module.shared_vpc.public_subnet_ranges
+  )
+  dont_rate_control_ips = module.shared_vpc.public_subnet_ranges
+  associated_resources  = local.waf_alb_target_groups
+}
+
 module "waf" {
   # a single WAF web acl and rules are used for all services to minimise AWS costs
   source                       = "./tdr-terraform-modules/waf"
@@ -317,7 +337,7 @@ module "waf" {
   function                     = "apps"
   environment                  = local.environment
   common_tags                  = local.common_tags
-  alb_target_groups            = local.environment == "intg" || local.environment == "dev" ? [] : local.waf_alb_target_groups
+  alb_target_groups            = local.environment == "prod" ? local.waf_alb_target_groups : []
   trusted_ips                  = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
   blocked_ips                  = local.ip_blocked_list
   geo_match                    = split(",", var.geo_match)
