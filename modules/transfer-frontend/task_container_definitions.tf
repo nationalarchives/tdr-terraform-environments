@@ -145,6 +145,10 @@ locals {
         value = tostring(var.block_skip_metadata_review)
       },
       {
+        name  = "BLOCK_LEGAL_STATUS"
+        value = tostring(var.block_legal_status)
+      },
+      {
         "name"  = "S3_ACL_HEADER_VALUE",
         "value" = var.s3_acl_header_value
       },

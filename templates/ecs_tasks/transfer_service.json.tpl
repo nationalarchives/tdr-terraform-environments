@@ -30,6 +30,10 @@
          "name": "METADATA_UPLOAD_BUCKET_NAME",
          "value": "${metadata_upload_bucket_name}"
        },
+      {
+        "name": "TRANSFER_ERROR_BUCKET_NAME",
+        "value": "${transfer_error_bucket_name}"
+      },
        {
          "name": "CONSIGNMENT_API_URL",
          "value": "${consignment_api_url}/graphql"
@@ -85,6 +89,10 @@
       {
         "name": "S3_IF_NONE_MATCH_HEADER_VALUE",
         "value": "${s3_if_none_match_header_value}"
+      },
+      {
+        "name": "BLOCK_API_DOCUMENTATION",
+        "value": "${block_api_documentation}"
       }
     ],
     "logConfiguration": {

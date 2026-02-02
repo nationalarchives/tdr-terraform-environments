@@ -49,6 +49,8 @@ variable "public_subnet_ranges" {
 
 variable "block_skip_metadata_review" {}
 
+variable "block_legal_status" {}
+
 variable "draft_metadata_validator_api_url" {}
 
 variable "draft_metadata_s3_kms_keys" {}
@@ -69,5 +71,5 @@ variable "s3_if_none_match_header_value" {}
 
 variable "transit_encryption_mode" {
   description = "Set to preferred(default) or required.  Must be set to preferred and applied before required (if wanted)"
-  default     = "preferred"
+  default     = "required"
 }
