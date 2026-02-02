@@ -71,7 +71,7 @@ variable "s3_if_none_match_header_value" {}
 
 variable "transit_encryption_mode" {
   description = "Set to preferred(default) or required.  Must be set to preferred and applied before required (if wanted)"
-  default     = "preferred"
+  default     = "required"
 }
 
 variable "metadata" {
