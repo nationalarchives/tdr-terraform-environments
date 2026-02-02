@@ -45,11 +45,11 @@
       {
         "name": "DOWNLOAD_BATCH_DELAY_MS",
         "value": "${download_batch_delay_ms}"
-      },
+      }%{ if metadata != "" },
       {
         "name": "METADATA",
         "value": "${metadata}"
-      }
+      }%{ endif }
     ],
     "mountPoints": [
       {

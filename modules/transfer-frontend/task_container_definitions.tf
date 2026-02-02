@@ -95,7 +95,7 @@ locals {
       }
     ] : [])
 
-    environment = [
+    environment = concat([
       {
         name  = "ENVIRONMENT"
         value = var.environment
@@ -155,12 +155,13 @@ locals {
       {
         "name"  = "S3_IF_NONE_MATCH_HEADER_VALUE",
         "value" = var.s3_if_none_match_header_value
-      },
+      }
+      ], var.metadata != "" ? [
       {
         "name"  = "METADATA",
         "value" = var.metadata
       }
-    ]
+    ] : [])
 
     mountPoints = var.enable_wiz_sensor ? [
       {
