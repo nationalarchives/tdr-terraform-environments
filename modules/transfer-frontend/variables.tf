@@ -73,3 +73,9 @@ variable "transit_encryption_mode" {
   description = "Set to preferred(default) or required.  Must be set to preferred and applied before required (if wanted)"
   default     = "preferred"
 }
+
+variable "metadata" {
+  description = "metadata value from environment variable"
+  type        = string
+}
+

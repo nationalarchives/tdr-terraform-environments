@@ -45,6 +45,10 @@
       {
         "name": "DOWNLOAD_BATCH_DELAY_MS",
         "value": "${download_batch_delay_ms}"
+      },
+      {
+        "name": "METADATA",
+        "value": "${metadata}"
       }
     ],
     "mountPoints": [

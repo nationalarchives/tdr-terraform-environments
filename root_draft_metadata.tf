@@ -51,7 +51,7 @@ module "draft_metadata_checks_lambda" {
     AUTH_URL           = local.keycloak_auth_url
     CLIENT_SECRET_PATH = local.keycloak_tdr_draft_metadata_client_secret_name
     BUCKET_NAME        = local.draft_metadata_s3_bucket_name
-    ENVIRONMENT        = local.environment
+    METADATA           = local.metadata
   }
 }
 
