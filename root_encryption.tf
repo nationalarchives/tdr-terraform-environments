@@ -8,6 +8,7 @@ locals {
   wiz_role_arns                    = module.tdr_configuration.terraform_config[local.environment]["wiz_role_arns"]
   aws_back_up_roles                = local.environment == "prod" ? [local.aws_back_up_local_role] : []
   aggregate_processing_access_role = local.environment == "prod" ? [] : [module.aggregate_processing_lambda[0].lambda_role_arn]
+  transfer_service_ecs_task_role   = local.environment == "prod" ? [] : [module.transfer_service_task_role[0].role_arn]
 }
 
 module "s3_external_kms_key" {
@@ -58,7 +59,7 @@ module "s3_internal_kms_key" {
       module.frontend.task_role_arn,
       module.draft_metadata_checks.step_function_role_arn,
       module.aws_guard_duty_s3_malware_scan_role.role_arn
-    ], local.aws_sso_internal_bucket_access_roles, local.e2e_testing_role_arns, local.aggregate_processing_access_role)
+    ], local.aws_sso_internal_bucket_access_roles, local.e2e_testing_role_arns, local.aggregate_processing_access_role, local.transfer_service_ecs_task_role)
     ci_roles = [local.terraform_role]
     service_details = [
       {
