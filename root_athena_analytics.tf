@@ -44,6 +44,6 @@ data "aws_iam_policy_document" "athena_analytics_policy_document" {
 
 module "athena_analytics_policy" {
   source        = "./da-terraform-modules/iam_policy"
-  name          = "TDRAthenaAnalyticsPolicy${title(local.environment)}"
+  name          = "AWSSSO_TDRAthenaAnalyticsPolicy"
   policy_string = data.aws_iam_policy_document.athena_analytics_policy_document.json
 }
