@@ -113,7 +113,7 @@ module "frontend" {
   enable_wiz_sensor                = local.enable_wiz_sensor
   s3_acl_header_value              = module.s3_put_request_header_acl_ssm_parameter.params[local.s3_put_request_header_acl_parameter].value
   s3_if_none_match_header_value    = module.s3_put_request_header_if_none_match_ssm_parameter.params[local.s3_put_request_header_if_none_match_parameter].value
-  metadata                         = local.metadata
+  metadata_version_overide         = local.metadata_version_overide
 }
 
 module "alb_logs_s3" {

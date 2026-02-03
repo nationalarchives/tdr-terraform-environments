@@ -53,7 +53,7 @@ module "draft_metadata_checks_lambda" {
       CLIENT_SECRET_PATH = local.keycloak_tdr_draft_metadata_client_secret_name
       BUCKET_NAME        = local.draft_metadata_s3_bucket_name
     },
-    local.metadata != "" ? { METADATA = local.metadata } : {}
+    local.metadata_version_overide != "" ? { METADATA_VERSION_OVERRIDE = local.metadata_version_overide } : {}
   )
 }
 

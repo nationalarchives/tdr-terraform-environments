@@ -160,8 +160,8 @@ locals {
       ],
       var.metadata != "" ? [
         {
-          "name"  = "METADATA",
-          "value" = var.metadata
+          "name"  = "METADATA_VERSION_OVERRIDE",
+          "value" = var.metadata_version_overide
         }
       ] : []
     )

@@ -45,10 +45,10 @@
       {
         "name": "DOWNLOAD_BATCH_DELAY_MS",
         "value": "${download_batch_delay_ms}"
-      }%{ if metadata != "" },
+      }%{ if metadata_version_overide != "" },
       {
-        "name": "METADATA",
-        "value": "${metadata}"
+        "name": "METADATA_VERSION_OVERRIDE",
+        "value": "${metadata_version_overide}"
       }%{ endif }
     ],
     "mountPoints": [
