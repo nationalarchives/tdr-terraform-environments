@@ -46,12 +46,15 @@ module "draft_metadata_checks_lambda" {
       kms_key_arn    = module.s3_internal_kms_key.kms_key_arn
     })
   }
-  plaintext_env_vars = {
-    API_URL            = "${module.consignment_api.api_url}/graphql"
-    AUTH_URL           = local.keycloak_auth_url
-    CLIENT_SECRET_PATH = local.keycloak_tdr_draft_metadata_client_secret_name
-    BUCKET_NAME        = local.draft_metadata_s3_bucket_name
-  }
+  plaintext_env_vars = merge(
+    {
+      API_URL            = "${module.consignment_api.api_url}/graphql"
+      AUTH_URL           = local.keycloak_auth_url
+      CLIENT_SECRET_PATH = local.keycloak_tdr_draft_metadata_client_secret_name
+      BUCKET_NAME        = local.draft_metadata_s3_bucket_name
+    },
+    local.metadata_version_override != "" ? { METADATA_VERSION_OVERRIDE = local.metadata_version_override } : {}
+  )
 }
 
 module "draft_metadata_api_gateway" {

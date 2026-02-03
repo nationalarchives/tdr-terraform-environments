@@ -95,68 +95,76 @@ locals {
       }
     ] : [])
 
-    environment = [
-      {
-        name  = "ENVIRONMENT"
-        value = var.environment
-      },
-      {
-        name  = "EXPORT_API_URL"
-        value = var.export_api_url
-      },
-      {
-        name  = "BACKEND_CHECKS_BASE_URL"
-        value = var.backend_checks_api_url
-      },
-      {
-        name  = "ALB_IP_A"
-        value = var.public_subnet_ranges[0]
-      },
-      {
-        name  = "ALB_IP_B"
-        value = var.public_subnet_ranges[1]
-      },
-      {
-        name  = "AUTH_URL"
-        value = var.auth_url
-      },
-      {
-        name  = "OTEL_SERVICE_NAME"
-        value = var.otel_service_name
-      },
-      {
-        name  = "DRAFT_METADATA_VALIDATOR_API_URL"
-        value = var.draft_metadata_validator_api_url
-      },
-      {
-        name  = "DRAFT_METADATA_S3_BUCKET_NAME"
-        value = var.draft_metadata_s3_bucket_name
-      },
-      {
-        name  = "NOTIFICATION_SNS_TOPIC_ARN"
-        value = var.notification_sns_topic_arn
-      },
-      {
-        name  = "FILE_CHECKS_TOTAL_TIMEOUT_IN_SECONDS"
-        value = "480"
-      },
-      {
-        name  = "BLOCK_SKIP_METADATA_REVIEW"
-        value = tostring(var.block_skip_metadata_review)
-      },
-      {
-        name  = "BLOCK_LEGAL_STATUS"
-        value = tostring(var.block_legal_status)
-      },
-      {
-        "name"  = "S3_ACL_HEADER_VALUE",
-        "value" = var.s3_acl_header_value
-      },
-      {
-        "name"  = "S3_IF_NONE_MATCH_HEADER_VALUE",
-        "value" = var.s3_if_none_match_header_value
-      }
-    ]
+    environment = concat(
+      [
+        {
+          name  = "ENVIRONMENT"
+          value = var.environment
+        },
+        {
+          name  = "EXPORT_API_URL"
+          value = var.export_api_url
+        },
+        {
+          name  = "BACKEND_CHECKS_BASE_URL"
+          value = var.backend_checks_api_url
+        },
+        {
+          name  = "ALB_IP_A"
+          value = var.public_subnet_ranges[0]
+        },
+        {
+          name  = "ALB_IP_B"
+          value = var.public_subnet_ranges[1]
+        },
+        {
+          name  = "AUTH_URL"
+          value = var.auth_url
+        },
+        {
+          name  = "OTEL_SERVICE_NAME"
+          value = var.otel_service_name
+        },
+        {
+          name  = "DRAFT_METADATA_VALIDATOR_API_URL"
+          value = var.draft_metadata_validator_api_url
+        },
+        {
+          name  = "DRAFT_METADATA_S3_BUCKET_NAME"
+          value = var.draft_metadata_s3_bucket_name
+        },
+        {
+          name  = "NOTIFICATION_SNS_TOPIC_ARN"
+          value = var.notification_sns_topic_arn
+        },
+        {
+          name  = "FILE_CHECKS_TOTAL_TIMEOUT_IN_SECONDS"
+          value = "480"
+        },
+        {
+          name  = "BLOCK_SKIP_METADATA_REVIEW"
+          value = tostring(var.block_skip_metadata_review)
+        },
+        {
+          name  = "BLOCK_LEGAL_STATUS"
+          value = tostring(var.block_legal_status)
+        },
+        {
+          "name"  = "S3_ACL_HEADER_VALUE",
+          "value" = var.s3_acl_header_value
+        },
+        {
+          "name"  = "S3_IF_NONE_MATCH_HEADER_VALUE",
+          "value" = var.s3_if_none_match_header_value
+        }
+      ],
+      var.metadata_version_override != "" ? [
+        {
+          "name"  = "METADATA_VERSION_OVERRIDE",
+          "value" = var.metadata_version_override
+        }
+      ] : []
+    )
 
     mountPoints = var.enable_wiz_sensor ? [
       {
