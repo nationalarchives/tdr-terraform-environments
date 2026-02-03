@@ -75,7 +75,7 @@ variable "transit_encryption_mode" {
 }
 
 variable "metadata_version_override" {
-  description = "metadata value from environment variable"
+  description = "metadata schema version override. File name prefix"
   type        = string
 }
 
