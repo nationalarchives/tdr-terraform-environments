@@ -89,7 +89,7 @@ module "consignment_export_ecs_task" {
       region                     = local.region
       download_files_batch_size  = 40
       download_batch_delay_ms    = 10
-      metadata_version_overide   = local.metadata_version_overide
+      metadata_version_override   = local.metadata_version_override
   })
   container_name   = "consignmentexport"
   cpu              = local.environment == "intg" ? 1024 : 2048

@@ -74,7 +74,7 @@ variable "transit_encryption_mode" {
   default     = "required"
 }
 
-variable "metadata_version_overide" {
+variable "metadata_version_override" {
   description = "metadata value from environment variable"
   type        = string
 }
