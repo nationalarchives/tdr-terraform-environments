@@ -158,7 +158,7 @@ locals {
           "value" = var.s3_if_none_match_header_value
         }
       ],
-      var.metadata != "" ? [
+      var.metadata_version_override != "" ? [
         {
           "name"  = "METADATA_VERSION_OVERRIDE",
           "value" = var.metadata_version_override
