@@ -663,6 +663,7 @@ module "notification_lambda" {
     subnet_ids         = module.shared_vpc.private_subnets
     security_group_ids = [module.outbound_only_security_group.security_group_id]
   }
+  depends_on = [module.keycloak_ssm_parameters]
 }
 
 module "tdr_public_nacl" {
