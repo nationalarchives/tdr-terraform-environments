@@ -6,12 +6,12 @@ locals {
 }
 
 data "aws_ssm_parameter" "aws_sso_admin_role" {
-  name = "/${local.environment}/admin_role"
+  name       = "/${local.environment}/admin_role"
   depends_on = [module.aws_sso_export_roles_ssm_parameters]
 }
 
 data "aws_ssm_parameter" "aws_sso_export_role" {
-  name = "/${local.environment}/export_role"
+  name       = "/${local.environment}/export_role"
   depends_on = [module.aws_sso_export_roles_ssm_parameters]
 }
 
