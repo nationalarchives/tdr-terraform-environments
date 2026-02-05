@@ -26,24 +26,3 @@ module "athena_reporting_analytics" {
 
   depends_on = [module.athena_reporting_results_s3]
 }
-
-data "aws_iam_policy_document" "athena_analytics_policy_document" {
-  statement {
-    actions = [
-      "athena:StartQueryExecution",
-      "athena:StopQueryExecution",
-      "athena:GetQueryExecution",
-      "athena:GetQueryResults",
-      "athena:GetWorkGroup"
-    ]
-    resources = [
-      module.athena_reporting_analytics.workgroup_arn
-    ]
-  }
-}
-
-module "athena_analytics_policy" {
-  source        = "./da-terraform-modules/iam_policy"
-  name          = "AWSSSO_TDRAthenaAnalyticsPolicy"
-  policy_string = data.aws_iam_policy_document.athena_analytics_policy_document.json
-}
