@@ -93,6 +93,10 @@
       {
         "name": "BLOCK_API_DOCUMENTATION",
         "value": "${block_api_documentation}"
+      },
+      {
+        "name": "BLOCK_LOAD_ENDPOINTS",
+        "value": "${block_load_endpoints}"
       }
     ],
     "logConfiguration": {
