@@ -13,6 +13,7 @@ locals {
   tdr_transfer_errors_s3_bucket_name = "tdr-transfer-errors-${local.environment}"
   block_api_documentation            = local.environment == "intg" || local.environment == "dev" ? false : true
   block_service_endpoints            = local.environment == "prod" ? true : false
+  block_tdr_custom_tags              = local.environment == "prod" ? true : false
 }
 
 module "transfer_service_execution_role" {
@@ -178,6 +179,7 @@ module "transfer_service_ecs_task" {
       s3_if_none_match_header_value       = module.s3_put_request_header_if_none_match_ssm_parameter.params[local.s3_put_request_header_if_none_match_parameter].value
       block_api_documentation             = local.block_api_documentation
       block_service_endpoints             = local.block_service_endpoints
+      block_tdr_custom_tags               = local.block_tdr_custom_tags
   })
   container_name               = "transfer-service"
   cpu                          = 512

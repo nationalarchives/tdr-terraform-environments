@@ -97,6 +97,10 @@
       {
         "name": "BLOCK_SERVICE_ENDPOINTS",
         "value": "${block_service_endpoints}"
+      },
+      {
+        "name": "BLOCK_TDR_CUSTOM_TAGS",
+        "value": "${block_tdr_custom_tags}"
       }
     ],
     "logConfiguration": {
