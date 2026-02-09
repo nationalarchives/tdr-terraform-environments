@@ -113,6 +113,7 @@ module "frontend" {
   enable_wiz_sensor                = local.enable_wiz_sensor
   s3_acl_header_value              = module.s3_put_request_header_acl_ssm_parameter.params[local.s3_put_request_header_acl_parameter].value
   s3_if_none_match_header_value    = module.s3_put_request_header_if_none_match_ssm_parameter.params[local.s3_put_request_header_if_none_match_parameter].value
+  metadata_version_override        = local.metadata_version_override
 }
 
 module "alb_logs_s3" {
@@ -659,7 +660,7 @@ module "notification_lambda" {
   da_event_bus_arn               = local.da_event_bus_arn
   da_event_bus_kms_key_arn       = local.da_event_bus_kms_key
   notifications_vpc_config = {
-    subnet_ids         = module.shared_vpc.private_subnets
+    subnet_ids         = module.shared_vpc.private_backend_checks_subnets
     security_group_ids = [module.outbound_only_security_group.security_group_id]
   }
 }

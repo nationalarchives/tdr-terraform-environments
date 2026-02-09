@@ -89,7 +89,7 @@ module "file_upload_data" {
   }
   vpc_config = [
     {
-      subnet_ids         = module.shared_vpc.private_subnets
+      subnet_ids         = module.shared_vpc.private_backend_checks_subnets
       security_group_ids = [module.outbound_only_security_group.security_group_id]
     }
   ]
@@ -121,7 +121,7 @@ module "api_update_v2" {
   }
   vpc_config = [
     {
-      subnet_ids         = module.shared_vpc.private_subnets
+      subnet_ids         = module.shared_vpc.private_backend_checks_subnets
       security_group_ids = [module.outbound_only_security_group.security_group_id]
     }
   ]
@@ -151,7 +151,7 @@ module "file_format_v2" {
   }
   vpc_config = [
     {
-      subnet_ids         = module.shared_vpc.private_subnets
+      subnet_ids         = module.shared_vpc.private_backend_checks_subnets
       security_group_ids = [module.outbound_only_security_group.security_group_id]
     }
   ]
@@ -182,7 +182,7 @@ module "checksum_v2" {
   }
   vpc_config = [
     {
-      subnet_ids         = module.shared_vpc.private_subnets
+      subnet_ids         = module.shared_vpc.private_backend_checks_subnets
       security_group_ids = [module.outbound_only_security_group.security_group_id]
     }
   ]
@@ -206,7 +206,7 @@ module "redacted_files" {
   runtime   = local.runtime_java_11
   vpc_config = [
     {
-      subnet_ids         = module.shared_vpc.private_subnets
+      subnet_ids         = module.shared_vpc.private_backend_checks_subnets
       security_group_ids = [module.outbound_only_security_group.security_group_id]
     }
   ]
@@ -236,7 +236,7 @@ module "statuses" {
   }
   vpc_config = [
     {
-      subnet_ids         = module.shared_vpc.private_subnets
+      subnet_ids         = module.shared_vpc.private_backend_checks_subnets
       security_group_ids = [module.outbound_only_security_group.security_group_id]
     }
   ]
@@ -271,7 +271,7 @@ module "yara_av_v2" {
   }
   vpc_config = [
     {
-      subnet_ids         = module.shared_vpc.private_subnets
+      subnet_ids         = module.shared_vpc.private_backend_checks_subnets
       security_group_ids = [module.outbound_only_security_group.security_group_id]
     }
   ]
@@ -298,7 +298,7 @@ module "backend_checks_results" {
   }
   vpc_config = [
     {
-      subnet_ids         = module.shared_vpc.private_subnets
+      subnet_ids         = module.shared_vpc.private_backend_checks_subnets
       security_group_ids = [module.outbound_only_security_group.security_group_id]
     }
   ]

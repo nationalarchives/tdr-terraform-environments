@@ -219,16 +219,18 @@ module "aggregate_processing_lambda" {
     })
   }
   plaintext_env_vars = {
-    ENVIRONMENT                    = local.environment
-    GRAPHQL_API_URL                = "${module.consignment_api.api_url}/graphql"
-    AUTH_URL                       = local.keycloak_auth_url
-    AUTH_CLIENT_SECRET_PATH        = local.keycloak_tdr_transfer_service_secret_name
-    BACKEND_CHECKS_ARN             = module.backend_checks_step_function.state_machine_arn
-    METADATA_CHECKS_ARN            = module.draft_metadata_checks.step_function_arn
-    NOTIFICATIONS_TOPIC_ARN        = module.notifications_topic.sns_arn
-    KEYCLOAK_READ_AUTH_SECRET_PATH = local.keycloak_tdr_read_client_secret_name
-    DRAFT_METADATA_BUCKET_NAME     = local.draft_metadata_s3_bucket_name
-    TRANSFER_ERROR_BUCKET_NAME     = local.tdr_transfer_errors_s3_bucket_name
+    ENVIRONMENT                     = local.environment
+    GRAPHQL_API_URL                 = "${module.consignment_api.api_url}/graphql"
+    AUTH_URL                        = local.keycloak_auth_url
+    AUTH_CLIENT_SECRET_PATH         = local.keycloak_tdr_transfer_service_secret_name
+    BACKEND_CHECKS_ARN              = module.backend_checks_step_function.state_machine_arn
+    METADATA_CHECKS_ARN             = module.draft_metadata_checks.step_function_arn
+    NOTIFICATIONS_TOPIC_ARN         = module.notifications_topic.sns_arn
+    KEYCLOAK_READ_AUTH_SECRET_PATH  = local.keycloak_tdr_read_client_secret_name
+    DRAFT_METADATA_BUCKET_NAME      = local.draft_metadata_s3_bucket_name
+    TRANSFER_ERROR_BUCKET_NAME      = local.tdr_transfer_errors_s3_bucket_name
+    MALWARE_SCAN_TAG_KEY            = local.scan_complete_tag_key
+    MALWARE_SCAN_THREAT_FOUND_VALUE = local.scan_complete_threat_found_value
   }
   vpc_config = {
     subnet_ids         = module.shared_vpc.private_backend_checks_subnets
