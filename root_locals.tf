@@ -218,5 +218,5 @@ locals {
 
   athena_metadata_checks_database_name = "athena-tdr-metadata-checks-${local.environment}"
 
-  metadata_version_override = ""
+  metadata_version_override = local.environment == "prod" ? "" : "note-"
 }

@@ -660,7 +660,7 @@ module "notification_lambda" {
   da_event_bus_arn               = local.da_event_bus_arn
   da_event_bus_kms_key_arn       = local.da_event_bus_kms_key
   notifications_vpc_config = {
-    subnet_ids         = module.shared_vpc.private_subnets
+    subnet_ids         = module.shared_vpc.private_backend_checks_subnets
     security_group_ids = [module.outbound_only_security_group.security_group_id]
   }
 }
