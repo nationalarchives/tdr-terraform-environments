@@ -959,6 +959,7 @@ module "consignment_api_database" {
   backup_retention_period = local.rds_retention_period_days
   apply_immediately       = true
   aws_backup_tag          = local.aws_back_up_tags
+  allocated_storage       = local.database_allocated_storage
 }
 
 module "waf_cloudwatch" {
