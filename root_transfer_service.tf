@@ -243,7 +243,6 @@ module "aggregate_processing_lambda" {
 }
 
 module "aggregate_processing_sqs_queue" {
-  count      = local.transfer_service_count
   source     = "./da-terraform-modules/sqs"
   tags       = local.common_tags
   queue_name = local.aggregate_processing_function_name
