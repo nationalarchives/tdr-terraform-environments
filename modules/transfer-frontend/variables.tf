@@ -14,7 +14,15 @@ variable "environment" {}
 
 variable "environment_full_name" {}
 
-variable "private_subnets" {}
+variable "private_subnets_ecs" {
+  description = "Subnets to deploy ECS in"
+  type        = list(string)
+}
+
+variable "private_subnets_redis" {
+  description = "Subnets to deploy Redis/Elasticache in"
+  type        = list(string)
+}
 
 variable "public_subnets" {}
 
