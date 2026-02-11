@@ -93,7 +93,7 @@ module "frontend" {
   vpc_id                           = module.shared_vpc.vpc_id
   public_subnets                   = module.shared_vpc.public_subnets
   private_subnets_ecs              = module.shared_vpc.private_subnets
-  private_subnets_redis            = module.shared_vpc.private_subnets
+  private_subnets_elasticache      = module.shared_vpc.private_subnets
   dns_zone_name_trimmed            = local.dns_zone_name_trimmed
   auth_url                         = local.keycloak_auth_url
   client_secret_path               = module.keycloak_ssm_parameters.params[local.keycloak_tdr_client_secret_name].name

@@ -19,8 +19,8 @@ variable "private_subnets_ecs" {
   type        = list(string)
 }
 
-variable "private_subnets_redis" {
-  description = "Subnets to deploy Redis/Elasticache in"
+variable "private_subnets_elasticache" {
+  description = "Subnets to deploy Elasticache in"
   type        = list(string)
 }
 
