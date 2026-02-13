@@ -301,7 +301,7 @@ module "waf_non_prod" {
   environment               = local.environment
   common_tags               = local.common_tags
   rate_limit                = 14000
-  log_retention_period_days = 90
+  log_retention_period_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].waf
   blocklist_ips             = length(local.ip_blocked_list) > 0 ? split(",", local.ip_blocked_list) : []
   allowlist_ips = concat(
     local.ip_allowlist,
@@ -320,7 +320,7 @@ module "waf_prod" {
   environment               = local.environment
   common_tags               = local.common_tags
   rate_limit                = 14000
-  log_retention_period_days = 90
+  log_retention_period_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].waf
   blocklist_ips             = length(local.ip_blocked_list) > 0 ? split(",", local.ip_blocked_list) : []
   allowlist_ips = concat(
     local.ip_allowlist,
@@ -960,7 +960,7 @@ module "iam_security_audit_user_group" {
 module "ecs_task_events_log_group" {
   source            = "./tdr-terraform-modules/cloudwatch_logs"
   name              = "/aws/events/ecs-task-events-${local.environment}"
-  retention_in_days = 30
+  retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].ecs_tasks
   common_tags       = local.common_tags
 }
 
@@ -977,7 +977,7 @@ module "route53_resolver_logs" {
   source            = "./tdr-terraform-modules/cloudwatch_logs"
   common_tags       = local.common_tags
   name              = "aws-route53-resolver-logs-${local.environment}"
-  retention_in_days = 30
+  retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].r53_resolver
 }
 
 resource "aws_route53_resolver_query_log_config" "route53_query_logging" {
@@ -1000,5 +1000,3 @@ module "r53_firewall" {
   alert_only        = false
   tags              = local.common_tags
 }
-
-
