@@ -312,7 +312,7 @@ module "waf_non_prod" {
 }
 
 module "waf_prod" {
-  count                     = local.environment == "staging" ? 1 : 0
+  count                     = local.environment == "staging" || local.environment == "prod" ? 1 : 0
   source                    = "./tdr-terraform-modules/waf_prod"
   project                   = var.project
   function                  = "public-facing"
@@ -338,7 +338,7 @@ module "waf" {
   function                     = "apps"
   environment                  = local.environment
   common_tags                  = local.common_tags
-  alb_target_groups            = local.environment == "prod" ? local.waf_alb_target_groups : []
+  alb_target_groups            = []
   trusted_ips                  = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
   blocked_ips                  = local.ip_blocked_list
   geo_match                    = split(",", var.geo_match)
