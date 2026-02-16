@@ -29,24 +29,8 @@ resource "random_uuid" "slack_bot_token" {}
 
 data "aws_canonical_user_id" "canonical_user" {}
 
-data "aws_ssm_parameter" "slack_success_workflow" {
-  name = "/mgmt/slack_success_workflow"
-}
-
-data "aws_ssm_parameter" "slack_failure_workflow" {
-  name = "/mgmt/slack_failure_workflow"
-}
-
 data "aws_ssm_parameter" "workflow_pat" {
   name = "/mgmt/workflow_pat"
-}
-
-data "aws_ssm_parameter" "slack_e2e_failure_workflow" {
-  name = "/mgmt/slack_e2e_failure_workflow"
-}
-
-data "aws_ssm_parameter" "slack_e2e_success_workflow" {
-  name = "/mgmt/slack_e2e_success_workflow"
 }
 
 data "github_ip_ranges" "actions_ranges" {}

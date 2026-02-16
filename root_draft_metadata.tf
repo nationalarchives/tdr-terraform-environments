@@ -109,6 +109,7 @@ module "draft_metadata_bucket" {
 data "aws_ssm_parameter" "draft_metadata_keycloak_secret" {
   name            = local.keycloak_tdr_draft_metadata_client_secret_name
   with_decryption = true
+  depends_on      = [module.keycloak_ssm_parameters]
 }
 
 resource "aws_cloudwatch_event_connection" "consignment_api_connection" {
