@@ -942,6 +942,12 @@ module "api_database_security_group" {
   ]
 }
 
+# Delete these after import
+import {
+  to = module.consignment_api_database.aws_cloudwatch_log_group.database_log_group
+  id = format("/aws/rds/instance/%s/postgresql", "consignmentapi-aphnqn985t")
+}
+
 module "consignment_api_database" {
   source                  = "./tdr-terraform-modules/rds_instance"
   instance_class          = local.environment == "staging" ? "db.t3.large" : "db.t3.medium"
