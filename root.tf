@@ -351,6 +351,7 @@ module "create_db_users_lambda" {
   db_secrets_arn          = module.consignment_api_database.database_master_user_secret_arn
   kms_key_arn             = module.encryption_key.kms_key_arn
   database_security_group = module.api_database_security_group.security_group_id
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
   lambda_name             = "create-db-users"
   database_name           = "consignmentapi"
 }
@@ -366,6 +367,7 @@ module "create_bastion_user_lambda" {
   db_secrets_arn          = module.consignment_api_database.database_master_user_secret_arn
   kms_key_arn             = module.encryption_key.kms_key_arn
   database_security_group = module.api_database_security_group.security_group_id
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
   lambda_name             = "create-bastion-user"
   database_name           = "bastion"
 }
@@ -377,6 +379,7 @@ module "service_unavailable_lambda" {
   lambda_service_unavailable = true
   vpc_id                     = module.shared_vpc.vpc_id
   private_subnet_ids         = module.shared_vpc.private_backend_checks_subnets
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "api_gateway_account" {
@@ -443,7 +446,7 @@ module "export_authoriser_lambda" {
   private_subnet_ids       = module.shared_vpc.private_backend_checks_subnets
   vpc_id                   = module.shared_vpc.vpc_id
   efs_security_group_id    = module.export_efs.security_group_id
-
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "signed_cookies_lambda" {
@@ -462,6 +465,7 @@ module "signed_cookies_lambda" {
   vpc_id                    = module.shared_vpc.vpc_id
   environment_full          = local.environment_full_name
   user_session_timeout_mins = local.user_session_timeout_mins
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "export_status_update_lambda" {
@@ -476,6 +480,7 @@ module "export_status_update_lambda" {
   environment_full                  = local.environment_full_name
   api_url                           = "${module.consignment_api.api_url}/graphql"
   backend_checks_client_secret_path = local.keycloak_backend_checks_secret_name
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "reporting_lambda" {
@@ -495,6 +500,8 @@ module "reporting_lambda" {
   kms_key_arn                      = module.encryption_key.kms_key_arn
   private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
   vpc_id                           = module.shared_vpc.vpc_id
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
+
 }
 
 
@@ -646,6 +653,7 @@ module "notification_lambda" {
     subnet_ids         = module.shared_vpc.private_backend_checks_subnets
     security_group_ids = [module.outbound_only_security_group.security_group_id]
   }
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "tdr_public_nacl" {
@@ -739,6 +747,7 @@ module "create_keycloak_users_api_lambda" {
   lambda_create_keycloak_user_api  = true
   private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
   keycloak_user_management_api_arn = module.create_keycloak_users_api.api_arn
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "create_keycloak_users_s3_lambda" {
@@ -752,6 +761,7 @@ module "create_keycloak_users_s3_lambda" {
   lambda_create_keycloak_user_s3 = true
   private_subnet_ids             = module.shared_vpc.private_backend_checks_subnets
   s3_bucket_arn                  = module.create_bulk_users_bucket.s3_bucket_arn
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "inactive_keycloak_users_lambda" {
@@ -761,6 +771,8 @@ module "inactive_keycloak_users_lambda" {
   handler         = "uk.gov.nationalarchives.keycloak.users.InactiveKeycloakUsersLambda::handleRequest"
   runtime         = local.runtime_java_21
   timeout_seconds = 240
+  log_retention   = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
+
   lambda_invoke_permissions = {
     "events.amazonaws.com" = module.disable_inactive_judgment_users_scheduled_event.event_arn
   }
@@ -836,6 +848,7 @@ module "rotate_keycloak_secrets_lambda" {
   api_connection_auth_type          = aws_cloudwatch_event_connection.consignment_api_connection.authorization_type
   api_connection_name               = aws_cloudwatch_event_connection.consignment_api_connection.name
   api_connection_secret_arn         = aws_cloudwatch_event_connection.consignment_api_connection.secret_arn
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "periodic_rotate_keycloak_secrets_event" {
