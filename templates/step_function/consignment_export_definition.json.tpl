@@ -42,6 +42,14 @@
                       "Name": "consignmentexport",
                       "Environment": [
                         {
+                          "Name": "EXPORT_RERUN",
+                          "Value.$": "$.exportRerun"
+                        },
+                        {
+                          "Name": "BAGIT_RERUN",
+                          "Value.$": "$.bagitRerun"
+                        },
+                        {
                           "Name": "CONSIGNMENT_ID",
                           "Value.$": "$.consignmentId"
                         },
@@ -105,6 +113,14 @@
                     {
                       "Name": "consignmentexport",
                       "Environment": [
+                        {
+                          "Name": "EXPORT_RERUN",
+                          "Value.$": "$.exportRerun"
+                        },
+                        {
+                          "Name": "BAGIT_RERUN",
+                          "Value.$": "$.bagitRerun"
+                        },
                         {
                           "Name": "CONSIGNMENT_ID",
                           "Value.$": "$.consignmentId"
