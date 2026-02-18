@@ -213,6 +213,7 @@ module "aggregate_processing_lambda" {
       account_id                 = var.tdr_account_number
       dirty_upload_bucket_name   = local.upload_files_cloudfront_dirty_bucket_name
       draft_metadata_bucket_name = local.draft_metadata_s3_bucket_name
+      transfer_error_bucket_name = local.tdr_transfer_errors_s3_bucket_name
       auth_client_secret_path    = local.keycloak_tdr_transfer_service_secret_name
       read_client_secret_path    = local.keycloak_tdr_read_client_secret_name
       sqs_queue_name             = local.aggregate_processing_function_name
