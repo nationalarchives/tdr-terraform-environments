@@ -52,7 +52,7 @@ resource "aws_ecs_service" "frontend_service" {
 
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]
-    subnets          = var.private_subnets
+    subnets          = var.private_subnets_ecs
     assign_public_ip = false
   }
 
