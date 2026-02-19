@@ -9,11 +9,11 @@
           "Next": "Add Default Rerun Parameters",
           "Or": [
             {
-              "Variable": "$.rerunBagit",
+              "Variable": "$.rerunBagitOnly",
               "IsPresent": false
             },
             {
-              "Variable": "$.rerunExport",
+              "Variable": "$.rerunExportOnly",
               "IsPresent": false
             }
           ]
@@ -26,23 +26,23 @@
       "Choices": [
         {
           "Next": "Add Rerun Export Default",
-          "Variable": "$.rerunBagit",
+          "Variable": "$.rerunBagitOnly",
           "IsPresent": true
         },
         {
           "Next": "Add Rerun Bagit Default",
-          "Variable": "$.rerunExport",
+          "Variable": "$.rerunExportOnly",
           "IsPresent": true
         },
         {
           "Next": "Add Both Rerun Defaults",
           "And": [
             {
-              "Variable": "$.rerunBagit",
+              "Variable": "$.rerunBagitOnly",
               "IsPresent": false
             },
             {
-              "Variable": "$.rerunExport",
+              "Variable": "$.rerunExportOnly",
               "IsPresent": false
             }
           ]
@@ -53,8 +53,8 @@
       "Type": "Pass",
       "Next": "Parallel",
       "Parameters": {
-        "rerunExport": "false",
-        "rerunBagit.$": "$.rerunBagit",
+        "rerunExportOnly": "false",
+        "rerunBagitOnly.$": "$.rerunBagitOnly",
         "consignmentId.$": "$.consignmentId"
       }
     },
@@ -62,8 +62,8 @@
       "Type": "Pass",
       "Next": "Parallel",
       "Parameters": {
-        "rerunBagit": "false",
-        "rerunExport.$": "$.rerunExport",
+        "rerunBagitOnly": "false",
+        "rerunExportOnly.$": "$.rerunExportOnly",
         "consignmentId.$": "$.consignmentId"
       }
     },
@@ -71,8 +71,8 @@
       "Type": "Pass",
       "Next": "Parallel",
       "Parameters": {
-        "rerunBagit": "false",
-        "rerunExport": "false",
+        "rerunBagitOnly": "false",
+        "rerunExportOnly": "false",
         "consignmentId.$": "$.consignmentId"
       }
     },
@@ -116,12 +116,12 @@
                       "Name": "consignmentexport",
                       "Environment": [
                         {
-                          "Name": "RERUN_EXPORT",
-                          "Value.$": "$.rerunExport"
+                          "Name": "RERUN_EXPORT_ONLY",
+                          "Value.$": "$.rerunExportOnly"
                         },
                         {
-                          "Name": "RERUN_BAGIT",
-                          "Value.$": "$.rerunBagit"
+                          "Name": "RERUN_BAGIT_ONLY",
+                          "Value.$": "$.rerunBagitOnly"
                         },
                         {
                           "Name": "CONSIGNMENT_ID",
@@ -188,12 +188,12 @@
                       "Name": "consignmentexport",
                       "Environment": [
                         {
-                          "Name": "RERUN_EXPORT",
-                          "Value.$": "$.rerunExport"
+                          "Name": "RERUN_EXPORT_ONLY",
+                          "Value.$": "$.rerunExportOnly"
                         },
                         {
-                          "Name": "RERUN_BAGIT",
-                          "Value.$": "$.rerunBagit"
+                          "Name": "RERUN_BAGIT_ONLY",
+                          "Value.$": "$.rerunBagitOnly"
                         },
                         {
                           "Name": "CONSIGNMENT_ID",
