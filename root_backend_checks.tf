@@ -60,12 +60,13 @@ module "outbound_only_security_group" {
 }
 
 module "file_upload_data" {
-  source               = "./tdr-terraform-modules/generic_lambda"
-  tags                 = local.common_tags
-  function_name        = local.file_upload_data_function_name
-  handler              = "lambda_handler.handler"
-  reserved_concurrency = -1
-  timeout_seconds      = 60
+  source                           = "./tdr-terraform-modules/generic_lambda"
+  tags                             = local.common_tags
+  function_name                    = local.file_upload_data_function_name
+  handler                          = "lambda_handler.handler"
+  reserved_concurrency             = -1
+  timeout_seconds                  = 60
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
   policies = {
     "TDRFileUploadDataLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_policy.json.tpl", {
       function_name              = local.file_upload_data_function_name,
@@ -96,12 +97,13 @@ module "file_upload_data" {
 }
 
 module "api_update_v2" {
-  source               = "./tdr-terraform-modules/generic_lambda"
-  tags                 = local.common_tags
-  function_name        = local.api_update_v2_function_name
-  handler              = "uk.gov.nationalarchives.api.update.Lambda::update"
-  reserved_concurrency = -1
-  timeout_seconds      = 600
+  source                           = "./tdr-terraform-modules/generic_lambda"
+  tags                             = local.common_tags
+  function_name                    = local.api_update_v2_function_name
+  handler                          = "uk.gov.nationalarchives.api.update.Lambda::update"
+  reserved_concurrency             = -1
+  timeout_seconds                  = 600
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
   policies = {
     "TDRAPIUpdateV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_policy.json.tpl", {
       function_name  = local.api_update_v2_function_name,
@@ -128,14 +130,15 @@ module "api_update_v2" {
 }
 
 module "file_format_v2" {
-  source               = "./tdr-terraform-modules/generic_lambda"
-  tags                 = local.common_tags
-  function_name        = local.file_format_v2_function_name
-  handler              = "uk.gov.nationalarchives.fileformat.Lambda::process"
-  reserved_concurrency = -1
-  timeout_seconds      = 900
-  storage_size         = 2560
-  memory_size          = 2560
+  source                           = "./tdr-terraform-modules/generic_lambda"
+  tags                             = local.common_tags
+  function_name                    = local.file_format_v2_function_name
+  handler                          = "uk.gov.nationalarchives.fileformat.Lambda::process"
+  reserved_concurrency             = -1
+  timeout_seconds                  = 900
+  storage_size                     = 2560
+  memory_size                      = 2560
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
   policies = {
     "TDRFileFormatV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_only_policy.json.tpl", {
       function_name   = local.file_format_v2_function_name,
@@ -158,14 +161,15 @@ module "file_format_v2" {
 }
 
 module "checksum_v2" {
-  source               = "./tdr-terraform-modules/generic_lambda"
-  tags                 = local.common_tags
-  function_name        = local.checksum_v2_function_name
-  handler              = "uk.gov.nationalarchives.checksum.Lambda::process"
-  reserved_concurrency = -1
-  timeout_seconds      = 900
-  storage_size         = 2560
-  memory_size          = 2560
+  source                           = "./tdr-terraform-modules/generic_lambda"
+  tags                             = local.common_tags
+  function_name                    = local.checksum_v2_function_name
+  handler                          = "uk.gov.nationalarchives.checksum.Lambda::process"
+  reserved_concurrency             = -1
+  timeout_seconds                  = 900
+  storage_size                     = 2560
+  memory_size                      = 2560
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
   policies = {
     "TDRChecksumV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_only_policy.json.tpl", {
       function_name   = local.checksum_v2_function_name,
@@ -189,12 +193,13 @@ module "checksum_v2" {
 }
 
 module "redacted_files" {
-  source               = "./tdr-terraform-modules/generic_lambda"
-  tags                 = local.common_tags
-  function_name        = local.redacted_files_function_name
-  handler              = "uk.gov.nationalarchives.Lambda::run"
-  reserved_concurrency = -1
-  timeout_seconds      = 30
+  source                           = "./tdr-terraform-modules/generic_lambda"
+  tags                             = local.common_tags
+  function_name                    = local.redacted_files_function_name
+  handler                          = "uk.gov.nationalarchives.Lambda::run"
+  reserved_concurrency             = -1
+  timeout_seconds                  = 30
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
   policies = {
     "TDRRedactedFilesLambda${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_backend_checks_policy.json.tpl", {
       function_name = local.redacted_files_function_name
@@ -216,12 +221,13 @@ module "redacted_files" {
 }
 
 module "statuses" {
-  source               = "./tdr-terraform-modules/generic_lambda"
-  tags                 = local.common_tags
-  function_name        = local.statuses_function_name
-  handler              = "uk.gov.nationalarchives.Lambda::run"
-  reserved_concurrency = -1
-  timeout_seconds      = 30
+  source                           = "./tdr-terraform-modules/generic_lambda"
+  tags                             = local.common_tags
+  function_name                    = local.statuses_function_name
+  handler                          = "uk.gov.nationalarchives.Lambda::run"
+  reserved_concurrency             = -1
+  timeout_seconds                  = 30
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
   policies = {
     "TDRStatusesLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_statuses_policy.json.tpl", {
       function_name = local.statuses_function_name,
@@ -243,14 +249,15 @@ module "statuses" {
 }
 
 module "yara_av_v2" {
-  source               = "./tdr-terraform-modules/generic_lambda"
-  tags                 = local.common_tags
-  function_name        = local.yara_av_v2_function_name
-  handler              = "matcher.matcher_lambda_handler"
-  reserved_concurrency = -1
-  timeout_seconds      = 900
-  storage_size         = 2560
-  memory_size          = 2560
+  source                           = "./tdr-terraform-modules/generic_lambda"
+  tags                             = local.common_tags
+  function_name                    = local.yara_av_v2_function_name
+  handler                          = "matcher.matcher_lambda_handler"
+  reserved_concurrency             = -1
+  timeout_seconds                  = 900
+  storage_size                     = 2560
+  memory_size                      = 2560
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
   policies = {
     "TDRYaraAVV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_av_policy.json.tpl", {
       function_name     = local.yara_av_v2_function_name,
@@ -278,11 +285,12 @@ module "yara_av_v2" {
 }
 
 module "backend_checks_results" {
-  source               = "./tdr-terraform-modules/generic_lambda"
-  tags                 = local.common_tags
-  function_name        = local.backend_checks_results_function_name
-  handler              = "lambda_handler.lambda_handler"
-  reserved_concurrency = -1
+  source                           = "./tdr-terraform-modules/generic_lambda"
+  tags                             = local.common_tags
+  function_name                    = local.backend_checks_results_function_name
+  handler                          = "lambda_handler.lambda_handler"
+  reserved_concurrency             = -1
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
   policies = {
     "TDRBackendChecksResultsLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_backend_checks_policy.json.tpl", {
       function_name = local.backend_checks_results_function_name,
