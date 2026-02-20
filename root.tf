@@ -302,7 +302,7 @@ module "waf_non_prod" {
   common_tags               = local.common_tags
   rate_limit                = 14000
   log_retention_period_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].waf
-  blocklist_ips             = length(local.ip_blocked_list) > 0 ? split(",", local.ip_blocked_list) : []
+  blocklist_ips             = local.ip_blocked_list
   allowlist_ips = concat(
     local.ip_allowlist,
     tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]),
@@ -321,7 +321,7 @@ module "waf_prod" {
   common_tags               = local.common_tags
   rate_limit                = 14000
   log_retention_period_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].waf
-  blocklist_ips             = length(local.ip_blocked_list) > 0 ? split(",", local.ip_blocked_list) : []
+  blocklist_ips             = local.ip_blocked_list
   allowlist_ips = concat(
     local.ip_allowlist,
     tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]),
