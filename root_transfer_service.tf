@@ -195,7 +195,7 @@ module "transfer_service_ecs_task" {
 }
 
 module "aggregate_processing_lambda" {
-  count           = local.transfer_service_count
+  count           = 1
   source          = "./da-terraform-modules/lambda"
   function_name   = local.aggregate_processing_function_name
   tags            = local.common_tags
