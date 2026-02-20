@@ -958,12 +958,6 @@ module "consignment_api_database" {
   allocated_storage       = local.database_allocated_storage
 }
 
-module "waf_cloudwatch" {
-  source      = "./tdr-terraform-modules/cloudwatch_logs"
-  common_tags = local.common_tags
-  name        = "aws-waf-logs-${local.environment}"
-}
-
 module "iam_security_audit_user_group" {
   source         = "./tdr-terraform-modules/iam"
   security_audit = local.security_audit
