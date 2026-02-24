@@ -9,13 +9,7 @@ locals {
   aws_back_up_roles                = local.environment == "prod" ? [local.aws_back_up_local_role] : []
   aggregate_processing_access_role = local.environment == "prod" ? [] : [module.aggregate_processing_lambda[0].lambda_role_arn]
   transfer_service_ecs_task_role   = local.environment == "prod" ? [] : [module.transfer_service_task_role[0].role_arn]
-  athena_reporting_sso_role        = local.environment == "prod" ? tolist(data.aws_iam_roles.athena_reporting_sso[0].arns) : []
-}
-
-data "aws_iam_roles" "athena_reporting_sso" {
-  count       = local.environment == "prod" ? 1 : 0
-  name_regex  = "AWSReservedSSO_TDR-Reporting_.*"
-  path_prefix = "/aws-reserved/sso.amazonaws.com/"
+  athena_reporting_sso_role        = local.environment == "prod" ? ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_TDR-Reporting_bd0a19cbec20a9a8"] : []
 }
 
 module "s3_external_kms_key" {
