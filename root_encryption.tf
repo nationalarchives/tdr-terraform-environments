@@ -9,6 +9,7 @@ locals {
   aws_back_up_roles                = local.environment == "prod" ? [local.aws_back_up_local_role] : []
   aggregate_processing_access_role = local.environment == "prod" ? [] : [module.aggregate_processing_lambda[0].lambda_role_arn]
   transfer_service_ecs_task_role   = local.environment == "prod" ? [] : [module.transfer_service_task_role[0].role_arn]
+  athena_reporting_sso_role        = local.environment == "prod" ? ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_TDR-Reporting_bd0a19cbec20a9a8"] : []
 }
 
 module "s3_external_kms_key" {
@@ -67,10 +68,7 @@ module "s3_internal_kms_key" {
         service_source_account : data.aws_caller_identity.current.account_id
       }
     ]
-    sso_wildcard_roles = local.environment == "prod" ? [
-      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/*/AWSReservedSSO_TDR-Reporting_*"
-    ] : []
-    user_roles_decoupled                = concat(local.wiz_role_arns, local.aws_back_up_roles)
+    user_roles_decoupled                = concat(local.wiz_role_arns, local.aws_back_up_roles, local.athena_reporting_sso_role)
     persistent_resource_roles_decoupled = local.wiz_role_arns
   }
 }
