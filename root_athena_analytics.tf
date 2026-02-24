@@ -45,7 +45,9 @@ data "aws_iam_policy_document" "athena_analytics_policy_document" {
       "athena:StartQueryExecution",
       "athena:StopQueryExecution",
       "athena:GetQueryExecution",
-      "athena:GetQueryResults"
+      "athena:GetQueryResults",
+      "athena:ListQueryExecutions",
+      "athena:ListNamedQueries"
     ]
     resources = [
       module.athena_reporting_analytics.workgroup_arn
@@ -55,7 +57,8 @@ data "aws_iam_policy_document" "athena_analytics_policy_document" {
   statement {
     actions = [
       "s3:GetObject",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
     ]
     resources = [
       module.athena_metadata_checks_s3.s3_bucket_arn,
@@ -68,7 +71,8 @@ data "aws_iam_policy_document" "athena_analytics_policy_document" {
       "s3:GetObject",
       "s3:PutObject",
       "s3:ListBucket",
-      "s3:DeleteObject"
+      "s3:DeleteObject",
+      "s3:GetBucketLocation"
     ]
     resources = [
       module.athena_reporting_results_s3.s3_bucket_arn,
