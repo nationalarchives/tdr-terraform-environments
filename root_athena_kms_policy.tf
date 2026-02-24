@@ -1,6 +1,12 @@
 # This file adds KMS key policy statements to allow SSO Athena Analytics roles to access encrypted S3 buckets
 # Wildcards are used because SSO role names have auto-generated suffixes
 
+# Get the current KMS key policy
+data "aws_kms_key" "s3_internal" {
+  count  = local.environment == "prod" ? 1 : 0
+  key_id = module.s3_internal_kms_key.kms_key_arn
+}
+
 data "aws_iam_policy_document" "athena_sso_kms_statement" {
   count = local.environment == "prod" ? 1 : 0
 
@@ -28,12 +34,12 @@ data "aws_iam_policy_document" "athena_sso_kms_statement" {
   }
 }
 
-# Merge the athena SSO statement with the default KMS policy
+# Merge the athena SSO statement with the existing KMS policy
 data "aws_iam_policy_document" "s3_internal_kms_key_with_athena" {
   count = local.environment == "prod" ? 1 : 0
 
   source_policy_documents = [
-    module.s3_internal_kms_key.kms_key_policy_json,
+    data.aws_kms_key.s3_internal[0].policy,
     data.aws_iam_policy_document.athena_sso_kms_statement[0].json
   ]
 }
@@ -41,7 +47,7 @@ data "aws_iam_policy_document" "s3_internal_kms_key_with_athena" {
 # Update the KMS key policy to include the athena SSO access
 resource "aws_kms_key_policy" "s3_internal_kms_key_athena_policy" {
   count  = local.environment == "prod" ? 1 : 0
-  key_id = module.s3_internal_kms_key.kms_key_id
+  key_id = data.aws_kms_key.s3_internal[0].id
   policy = data.aws_iam_policy_document.s3_internal_kms_key_with_athena[0].json
 }
 
