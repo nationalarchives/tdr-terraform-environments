@@ -33,7 +33,9 @@ data "aws_iam_policy_document" "athena_analytics_policy_document" {
       "athena:GetWorkGroup",
       "athena:ListWorkGroups",
       "athena:GetDataCatalog",
-      "athena:ListDataCatalogs"
+      "athena:ListDataCatalogs",
+      "athena:BatchGetNamedQuery",
+      "athena:BatchGetQueryExecution"
     ]
     resources = [
       "*"
