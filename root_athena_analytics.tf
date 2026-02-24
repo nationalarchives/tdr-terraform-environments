@@ -98,6 +98,8 @@ data "aws_iam_policy_document" "athena_analytics_policy_document" {
       "glue:GetDatabase",
       "glue:GetDatabases",
       "glue:GetTable",
+      "glue:GetTables",
+      "glue:CreateTable",
       "glue:GetPartitions",
       "glue:GetPartition",
       "glue:BatchGetPartition"
