@@ -67,6 +67,9 @@ module "s3_internal_kms_key" {
         service_source_account : data.aws_caller_identity.current.account_id
       }
     ]
+    sso_wildcard_roles = local.environment == "prod" ? [
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/*/AWSReservedSSO_TDR-Reporting_*"
+    ] : []
     user_roles_decoupled                = concat(local.wiz_role_arns, local.aws_back_up_roles)
     persistent_resource_roles_decoupled = local.wiz_role_arns
   }
