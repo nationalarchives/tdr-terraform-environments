@@ -3,6 +3,7 @@
 locals {
   aws_sso_export_bucket_access_roles   = local.environment == "prod" ? [] : [data.aws_ssm_parameter.aws_sso_admin_role.value, data.aws_ssm_parameter.aws_sso_export_role.value]
   aws_sso_internal_bucket_access_roles = local.environment == "prod" ? [] : [data.aws_ssm_parameter.aws_sso_admin_role.value]
+  aws_sso_athena_analytics_role        = local.environment == "prod" ? [data.aws_ssm_parameter.aws_sso_athena_analytics_role.value] : []
 }
 
 data "aws_ssm_parameter" "aws_sso_admin_role" {
@@ -11,6 +12,10 @@ data "aws_ssm_parameter" "aws_sso_admin_role" {
 
 data "aws_ssm_parameter" "aws_sso_export_role" {
   name = "/${local.environment}/export_role"
+}
+
+data "aws_ssm_parameter" "aws_sso_athena_analytics_role" {
+  name = "/${local.environment}/athena_analytics_role"
 }
 
 module "aws_sso_export_roles_ssm_parameters" {
@@ -31,6 +36,12 @@ module "aws_sso_export_roles_ssm_parameters" {
     {
       name        = "/${local.environment}/export_role",
       description = "AWS SSO export role. Value to be added manually"
+      type        = "SecureString"
+      value       = "placeholder"
+    },
+    {
+      name        = "/${local.environment}/athena_analytics_role",
+      description = "AWS SSO athena analytics role. Value to be added manually"
       type        = "SecureString"
       value       = "placeholder"
     }
