@@ -49,7 +49,9 @@ data "aws_iam_policy_document" "athena_analytics_policy_document" {
       "athena:GetQueryExecution",
       "athena:GetQueryResults",
       "athena:ListQueryExecutions",
-      "athena:ListNamedQueries"
+      "athena:ListNamedQueries",
+      "athena:CreateNamedQuery",
+      "athena:DeleteNamedQuery"
     ]
     resources = [
       module.athena_reporting_analytics.workgroup_arn
