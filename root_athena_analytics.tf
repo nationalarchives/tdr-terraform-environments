@@ -30,11 +30,22 @@ module "athena_reporting_analytics" {
 data "aws_iam_policy_document" "athena_analytics_policy_document" {
   statement {
     actions = [
+      "athena:GetWorkGroup",
+      "athena:ListWorkGroups",
+      "athena:GetDataCatalog",
+      "athena:ListDataCatalogs"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+
+  statement {
+    actions = [
       "athena:StartQueryExecution",
       "athena:StopQueryExecution",
       "athena:GetQueryExecution",
-      "athena:GetQueryResults",
-      "athena:GetWorkGroup"
+      "athena:GetQueryResults"
     ]
     resources = [
       module.athena_reporting_analytics.workgroup_arn
@@ -75,6 +86,21 @@ data "aws_iam_policy_document" "athena_analytics_policy_document" {
     ]
     resources = [
       module.s3_internal_kms_key.kms_key_arn
+    ]
+  }
+
+  statement {
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTable",
+      "glue:GetPartitions",
+      "glue:GetPartition",
+      "glue:BatchGetPartition"
+    ]
+    resources = [
+      "arn:aws:glue:*:*:catalog",
+      "arn:aws:glue:*:*:database/*",
+      "arn:aws:glue:*:*:table/*/*"
     ]
   }
 }
