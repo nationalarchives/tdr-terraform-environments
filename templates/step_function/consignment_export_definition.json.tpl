@@ -1,7 +1,81 @@
 {
   "Comment": "A state machine to run two Fargate tasks. One to create a bagit export and one to create a flattened export",
-  "StartAt": "Parallel",
+  "StartAt": "Rerun Parameters Present",
   "States": {
+    "Rerun Parameters Present": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Next": "Add Default Rerun Parameters",
+          "Or": [
+            {
+              "Variable": "$.rerunBagitOnly",
+              "IsPresent": false
+            },
+            {
+              "Variable": "$.rerunExportOnly",
+              "IsPresent": false
+            }
+          ]
+        }
+      ],
+      "Default": "Parallel"
+    },
+    "Add Default Rerun Parameters": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Next": "Add Rerun Export Default",
+          "Variable": "$.rerunBagitOnly",
+          "IsPresent": true
+        },
+        {
+          "Next": "Add Rerun Bagit Default",
+          "Variable": "$.rerunExportOnly",
+          "IsPresent": true
+        },
+        {
+          "Next": "Add Both Rerun Defaults",
+          "And": [
+            {
+              "Variable": "$.rerunBagitOnly",
+              "IsPresent": false
+            },
+            {
+              "Variable": "$.rerunExportOnly",
+              "IsPresent": false
+            }
+          ]
+        }
+      ]
+    },
+    "Add Rerun Export Default": {
+      "Type": "Pass",
+      "Next": "Parallel",
+      "Parameters": {
+        "rerunExportOnly": "false",
+        "rerunBagitOnly.$": "$.rerunBagitOnly",
+        "consignmentId.$": "$.consignmentId"
+      }
+    },
+    "Add Rerun Bagit Default": {
+      "Type": "Pass",
+      "Next": "Parallel",
+      "Parameters": {
+        "rerunBagitOnly": "false",
+        "rerunExportOnly.$": "$.rerunExportOnly",
+        "consignmentId.$": "$.consignmentId"
+      }
+    },
+    "Add Both Rerun Defaults": {
+      "Type": "Pass",
+      "Next": "Parallel",
+      "Parameters": {
+        "rerunBagitOnly": "false",
+        "rerunExportOnly": "false",
+        "consignmentId.$": "$.consignmentId"
+      }
+    },
     "Parallel": {
       "Type": "Parallel",
       "Next": "Task complete notification",
@@ -41,6 +115,14 @@
                     {
                       "Name": "consignmentexport",
                       "Environment": [
+                        {
+                          "Name": "RERUN_EXPORT_ONLY",
+                          "Value.$": "$.rerunExportOnly"
+                        },
+                        {
+                          "Name": "RERUN_BAGIT_ONLY",
+                          "Value.$": "$.rerunBagitOnly"
+                        },
                         {
                           "Name": "CONSIGNMENT_ID",
                           "Value.$": "$.consignmentId"
@@ -105,6 +187,14 @@
                     {
                       "Name": "consignmentexport",
                       "Environment": [
+                        {
+                          "Name": "RERUN_EXPORT_ONLY",
+                          "Value.$": "$.rerunExportOnly"
+                        },
+                        {
+                          "Name": "RERUN_BAGIT_ONLY",
+                          "Value.$": "$.rerunBagitOnly"
+                        },
                         {
                           "Name": "CONSIGNMENT_ID",
                           "Value.$": "$.consignmentId"

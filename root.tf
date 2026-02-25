@@ -44,7 +44,7 @@ module "database_migrations" {
   source          = "./modules/database-migrations"
   environment     = local.environment
   vpc_id          = module.shared_vpc.vpc_id
-  private_subnets = module.shared_vpc.private_subnets
+  private_subnets = module.shared_vpc.private_backend_checks_subnets
   common_tags     = local.common_tags
   db_url          = module.consignment_api_database.database_url
   db_instance_id  = module.consignment_api_database.resource_id
@@ -92,7 +92,8 @@ module "frontend" {
   region                           = local.region
   vpc_id                           = module.shared_vpc.vpc_id
   public_subnets                   = module.shared_vpc.public_subnets
-  private_subnets                  = module.shared_vpc.private_subnets
+  private_subnets_ecs              = module.shared_vpc.private_subnets
+  private_subnets_elasticache      = module.shared_vpc.private_subnets
   dns_zone_name_trimmed            = local.dns_zone_name_trimmed
   auth_url                         = local.keycloak_auth_url
   client_secret_path               = module.keycloak_ssm_parameters.params[local.keycloak_tdr_client_secret_name].name
@@ -300,8 +301,8 @@ module "waf_non_prod" {
   environment               = local.environment
   common_tags               = local.common_tags
   rate_limit                = 14000
-  log_retention_period_days = 90
-  blocklist_ips             = length(local.ip_blocked_list) > 0 ? split(",", local.ip_blocked_list) : []
+  log_retention_period_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].waf
+  blocklist_ips             = local.ip_blocked_list
   allowlist_ips = concat(
     local.ip_allowlist,
     tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]),
@@ -312,15 +313,15 @@ module "waf_non_prod" {
 }
 
 module "waf_prod" {
-  count                     = local.environment == "staging" ? 1 : 0
+  count                     = local.environment == "staging" || local.environment == "prod" ? 1 : 0
   source                    = "./tdr-terraform-modules/waf_prod"
   project                   = var.project
   function                  = "public-facing"
   environment               = local.environment
   common_tags               = local.common_tags
   rate_limit                = 14000
-  log_retention_period_days = 90
-  blocklist_ips             = length(local.ip_blocked_list) > 0 ? split(",", local.ip_blocked_list) : []
+  log_retention_period_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].waf
+  blocklist_ips             = local.ip_blocked_list
   allowlist_ips = concat(
     local.ip_allowlist,
     tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]),
@@ -329,24 +330,6 @@ module "waf_prod" {
   )
   dont_rate_control_ips = module.shared_vpc.public_subnet_ranges
   associated_resources  = local.waf_alb_target_groups
-}
-
-module "waf" {
-  # a single WAF web acl and rules are used for all services to minimise AWS costs
-  source                       = "./tdr-terraform-modules/waf"
-  project                      = var.project
-  function                     = "apps"
-  environment                  = local.environment
-  common_tags                  = local.common_tags
-  alb_target_groups            = local.environment == "prod" ? local.waf_alb_target_groups : []
-  trusted_ips                  = concat(local.ip_allowlist, tolist(["${module.shared_vpc.nat_gateway_public_ips[0]}/32", "${module.shared_vpc.nat_gateway_public_ips[1]}/32"]))
-  blocked_ips                  = local.ip_blocked_list
-  geo_match                    = split(",", var.geo_match)
-  restricted_uri               = "admin"
-  log_destinations             = [module.waf_cloudwatch.log_group_arn]
-  region_allowed_ips           = local.region_allowed_ips_list
-  region_allowed_country_codes = local.region_allowed_country_codes
-  trusted_local_cidrs          = module.shared_vpc.public_subnet_ranges
 }
 
 module "backend_lambda_function_bucket" {
@@ -358,42 +341,45 @@ module "backend_lambda_function_bucket" {
 }
 
 module "create_db_users_lambda" {
-  source                  = "./tdr-terraform-modules/lambda"
-  project                 = var.project
-  common_tags             = local.common_tags
-  lambda_create_db_users  = true
-  vpc_id                  = module.shared_vpc.vpc_id
-  private_subnet_ids      = module.shared_vpc.private_backend_checks_subnets
-  db_url                  = module.consignment_api_database.database_url
-  db_secrets_arn          = module.consignment_api_database.database_master_user_secret_arn
-  kms_key_arn             = module.encryption_key.kms_key_arn
-  database_security_group = module.api_database_security_group.security_group_id
-  lambda_name             = "create-db-users"
-  database_name           = "consignmentapi"
+  source                           = "./tdr-terraform-modules/lambda"
+  project                          = var.project
+  common_tags                      = local.common_tags
+  lambda_create_db_users           = true
+  vpc_id                           = module.shared_vpc.vpc_id
+  private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
+  db_url                           = module.consignment_api_database.database_url
+  db_secrets_arn                   = module.consignment_api_database.database_master_user_secret_arn
+  kms_key_arn                      = module.encryption_key.kms_key_arn
+  database_security_group          = module.api_database_security_group.security_group_id
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
+  lambda_name                      = "create-db-users"
+  database_name                    = "consignmentapi"
 }
 
 module "create_bastion_user_lambda" {
-  source                  = "./tdr-terraform-modules/lambda"
-  project                 = var.project
-  common_tags             = local.common_tags
-  lambda_create_db_users  = true
-  vpc_id                  = module.shared_vpc.vpc_id
-  private_subnet_ids      = module.shared_vpc.private_backend_checks_subnets
-  db_url                  = module.consignment_api_database.database_url
-  db_secrets_arn          = module.consignment_api_database.database_master_user_secret_arn
-  kms_key_arn             = module.encryption_key.kms_key_arn
-  database_security_group = module.api_database_security_group.security_group_id
-  lambda_name             = "create-bastion-user"
-  database_name           = "bastion"
+  source                           = "./tdr-terraform-modules/lambda"
+  project                          = var.project
+  common_tags                      = local.common_tags
+  lambda_create_db_users           = true
+  vpc_id                           = module.shared_vpc.vpc_id
+  private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
+  db_url                           = module.consignment_api_database.database_url
+  db_secrets_arn                   = module.consignment_api_database.database_master_user_secret_arn
+  kms_key_arn                      = module.encryption_key.kms_key_arn
+  database_security_group          = module.api_database_security_group.security_group_id
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
+  lambda_name                      = "create-bastion-user"
+  database_name                    = "bastion"
 }
 
 module "service_unavailable_lambda" {
-  source                     = "./tdr-terraform-modules/lambda"
-  project                    = var.project
-  common_tags                = local.common_tags
-  lambda_service_unavailable = true
-  vpc_id                     = module.shared_vpc.vpc_id
-  private_subnet_ids         = module.shared_vpc.private_backend_checks_subnets
+  source                           = "./tdr-terraform-modules/lambda"
+  project                          = var.project
+  common_tags                      = local.common_tags
+  lambda_service_unavailable       = true
+  vpc_id                           = module.shared_vpc.vpc_id
+  private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "api_gateway_account" {
@@ -447,38 +433,39 @@ module "signed_cookies_api" {
 }
 
 module "export_authoriser_lambda" {
-  source                   = "./tdr-terraform-modules/lambda"
-  common_tags              = local.common_tags
-  project                  = "tdr"
-  lambda_export_authoriser = true
-  timeout_seconds          = 10
-  api_url                  = module.consignment_api.api_url
-  api_gateway_arn          = module.export_api.api_arn
-  backend_checks_api_arn   = module.backend_checks_api.api_arn
-  draft_metadata_api_arn   = module.draft_metadata_api_gateway.api_execution_arn
-  kms_key_arn              = module.encryption_key.kms_key_arn
-  private_subnet_ids       = module.shared_vpc.private_backend_checks_subnets
-  vpc_id                   = module.shared_vpc.vpc_id
-  efs_security_group_id    = module.export_efs.security_group_id
-
+  source                           = "./tdr-terraform-modules/lambda"
+  common_tags                      = local.common_tags
+  project                          = "tdr"
+  lambda_export_authoriser         = true
+  timeout_seconds                  = 10
+  api_url                          = module.consignment_api.api_url
+  api_gateway_arn                  = module.export_api.api_arn
+  backend_checks_api_arn           = module.backend_checks_api.api_arn
+  draft_metadata_api_arn           = module.draft_metadata_api_gateway.api_execution_arn
+  kms_key_arn                      = module.encryption_key.kms_key_arn
+  private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
+  vpc_id                           = module.shared_vpc.vpc_id
+  efs_security_group_id            = module.export_efs.security_group_id
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "signed_cookies_lambda" {
-  source                    = "./tdr-terraform-modules/lambda"
-  common_tags               = local.common_tags
-  project                   = "tdr"
-  lambda_signed_cookies     = true
-  upload_domain             = local.upload_domain
-  auth_url                  = local.keycloak_auth_url
-  frontend_url              = module.frontend.frontend_url
-  cloudfront_key_pair_id    = module.cloudfront_upload.cloudfront_key_pair_id
-  timeout_seconds           = 60
-  api_gateway_arn           = module.signed_cookies_api.api_arn
-  kms_key_arn               = module.encryption_key.kms_key_arn
-  private_subnet_ids        = module.shared_vpc.private_backend_checks_subnets
-  vpc_id                    = module.shared_vpc.vpc_id
-  environment_full          = local.environment_full_name
-  user_session_timeout_mins = local.user_session_timeout_mins
+  source                           = "./tdr-terraform-modules/lambda"
+  common_tags                      = local.common_tags
+  project                          = "tdr"
+  lambda_signed_cookies            = true
+  upload_domain                    = local.upload_domain
+  auth_url                         = local.keycloak_auth_url
+  frontend_url                     = module.frontend.frontend_url
+  cloudfront_key_pair_id           = module.cloudfront_upload.cloudfront_key_pair_id
+  timeout_seconds                  = 60
+  api_gateway_arn                  = module.signed_cookies_api.api_arn
+  kms_key_arn                      = module.encryption_key.kms_key_arn
+  private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
+  vpc_id                           = module.shared_vpc.vpc_id
+  environment_full                 = local.environment_full_name
+  user_session_timeout_mins        = local.user_session_timeout_mins
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "export_status_update_lambda" {
@@ -493,6 +480,7 @@ module "export_status_update_lambda" {
   environment_full                  = local.environment_full_name
   api_url                           = "${module.consignment_api.api_url}/graphql"
   backend_checks_client_secret_path = local.keycloak_backend_checks_secret_name
+  cloudwatch_log_retention_in_days  = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "reporting_lambda" {
@@ -512,6 +500,7 @@ module "reporting_lambda" {
   kms_key_arn                      = module.encryption_key.kms_key_arn
   private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
   vpc_id                           = module.shared_vpc.vpc_id
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 
@@ -660,10 +649,11 @@ module "notification_lambda" {
   da_event_bus_arn               = local.da_event_bus_arn
   da_event_bus_kms_key_arn       = local.da_event_bus_kms_key
   notifications_vpc_config = {
-    subnet_ids         = module.shared_vpc.private_subnets
+    subnet_ids         = module.shared_vpc.private_backend_checks_subnets
     security_group_ids = [module.outbound_only_security_group.security_group_id]
   }
   depends_on = [module.keycloak_ssm_parameters]
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "tdr_public_nacl" {
@@ -757,19 +747,21 @@ module "create_keycloak_users_api_lambda" {
   lambda_create_keycloak_user_api  = true
   private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
   keycloak_user_management_api_arn = module.create_keycloak_users_api.api_arn
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "create_keycloak_users_s3_lambda" {
-  source                         = "./tdr-terraform-modules/lambda"
-  common_tags                    = local.common_tags
-  project                        = var.project
-  user_admin_client_secret_path  = local.keycloak_user_admin_client_secret_name
-  kms_key_arn                    = module.encryption_key.kms_key_arn
-  auth_url                       = local.keycloak_auth_url
-  vpc_id                         = module.shared_vpc.vpc_id
-  lambda_create_keycloak_user_s3 = true
-  private_subnet_ids             = module.shared_vpc.private_backend_checks_subnets
-  s3_bucket_arn                  = module.create_bulk_users_bucket.s3_bucket_arn
+  source                           = "./tdr-terraform-modules/lambda"
+  common_tags                      = local.common_tags
+  project                          = var.project
+  user_admin_client_secret_path    = local.keycloak_user_admin_client_secret_name
+  kms_key_arn                      = module.encryption_key.kms_key_arn
+  auth_url                         = local.keycloak_auth_url
+  vpc_id                           = module.shared_vpc.vpc_id
+  lambda_create_keycloak_user_s3   = true
+  private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
+  s3_bucket_arn                    = module.create_bulk_users_bucket.s3_bucket_arn
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "inactive_keycloak_users_lambda" {
@@ -779,6 +771,8 @@ module "inactive_keycloak_users_lambda" {
   handler         = "uk.gov.nationalarchives.keycloak.users.InactiveKeycloakUsersLambda::handleRequest"
   runtime         = local.runtime_java_21
   timeout_seconds = 240
+  log_retention   = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
+
   lambda_invoke_permissions = {
     "events.amazonaws.com" = module.disable_inactive_judgment_users_scheduled_event.event_arn
   }
@@ -823,11 +817,12 @@ module "disable_inactive_judgment_users_scheduled_event" {
 }
 
 module "create_keycloak_users_api" {
-  source        = "./tdr-terraform-modules/apigatewayv2"
-  body_template = templatefile("${path.module}/templates/api_gateway/create_keycloak_users.json.tpl", { region = local.region, lambda_arn = module.create_keycloak_users_api_lambda.create_keycloak_users_api_lambda_arn, auth_url = local.keycloak_auth_url })
-  environment   = local.environment
-  api_name      = "CreateKeycloakUsersApi"
-  common_tags   = local.common_tags
+  source                           = "./tdr-terraform-modules/apigatewayv2"
+  body_template                    = templatefile("${path.module}/templates/api_gateway/create_keycloak_users.json.tpl", { region = local.region, lambda_arn = module.create_keycloak_users_api_lambda.create_keycloak_users_api_lambda_arn, auth_url = local.keycloak_auth_url })
+  environment                      = local.environment
+  api_name                         = "CreateKeycloakUsersApi"
+  common_tags                      = local.common_tags
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].api_gateway
 }
 
 module "create_bulk_users_bucket" {
@@ -854,6 +849,7 @@ module "rotate_keycloak_secrets_lambda" {
   api_connection_auth_type          = aws_cloudwatch_event_connection.consignment_api_connection.authorization_type
   api_connection_name               = aws_cloudwatch_event_connection.consignment_api_connection.name
   api_connection_secret_arn         = aws_cloudwatch_event_connection.consignment_api_connection.secret_arn
+  cloudwatch_log_retention_in_days  = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "periodic_rotate_keycloak_secrets_event" {
@@ -960,12 +956,7 @@ module "consignment_api_database" {
   backup_retention_period = local.rds_retention_period_days
   apply_immediately       = true
   aws_backup_tag          = local.aws_back_up_tags
-}
-
-module "waf_cloudwatch" {
-  source      = "./tdr-terraform-modules/cloudwatch_logs"
-  common_tags = local.common_tags
-  name        = "aws-waf-logs-${local.environment}"
+  allocated_storage       = local.database_allocated_storage
 }
 
 module "iam_security_audit_user_group" {
@@ -977,7 +968,7 @@ module "iam_security_audit_user_group" {
 module "ecs_task_events_log_group" {
   source            = "./tdr-terraform-modules/cloudwatch_logs"
   name              = "/aws/events/ecs-task-events-${local.environment}"
-  retention_in_days = 30
+  retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].ecs_tasks
   common_tags       = local.common_tags
 }
 
@@ -994,7 +985,7 @@ module "route53_resolver_logs" {
   source            = "./tdr-terraform-modules/cloudwatch_logs"
   common_tags       = local.common_tags
   name              = "aws-route53-resolver-logs-${local.environment}"
-  retention_in_days = 30
+  retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].r53_resolver
 }
 
 resource "aws_route53_resolver_query_log_config" "route53_query_logging" {
@@ -1017,5 +1008,3 @@ module "r53_firewall" {
   alert_only        = false
   tags              = local.common_tags
 }
-
-

@@ -29,6 +29,8 @@ locals {
 
   database_availability_zone = "eu-west-2a"
 
+  database_allocated_storage = local.environment == "staging" ? 70 : 60
+
   database_ca_cert_identifier = "rds-ca-rsa2048-g1"
 
   external_notifications_topic = "tdr-external-notifications-${local.environment}"
@@ -160,7 +162,7 @@ locals {
   //feature access blocks
   block_shared_keycloak_pages = local.environment == "intg" ? false : true
   block_skip_metadata_review  = false
-  block_legal_status          = local.environment == "prod" ? true : false
+  block_legal_status          = false
 
   disable_users_dry_run         = false
   draft_metadata_s3_bucket_name = "${var.project}-draft-metadata-${local.environment}"

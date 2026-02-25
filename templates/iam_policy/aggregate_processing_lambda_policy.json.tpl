@@ -33,7 +33,9 @@
       ],
       "Resource": [
         "arn:aws:s3:::${draft_metadata_bucket_name}",
-        "arn:aws:s3:::${draft_metadata_bucket_name}/*"
+        "arn:aws:s3:::${draft_metadata_bucket_name}/*",
+        "arn:aws:s3:::${transfer_error_bucket_name}",
+        "arn:aws:s3:::${transfer_error_bucket_name}/*"
       ]
     },
     {
