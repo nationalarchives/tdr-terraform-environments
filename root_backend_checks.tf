@@ -167,7 +167,7 @@ module "checksum_v2" {
   handler                          = "uk.gov.nationalarchives.checksum.Lambda::process"
   reserved_concurrency             = -1
   timeout_seconds                  = 900
-  storage_size                     = 2560
+  storage_size                     = 5120
   memory_size                      = 2560
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
   policies = {
