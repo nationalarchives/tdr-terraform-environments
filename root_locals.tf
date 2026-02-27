@@ -7,6 +7,7 @@ locals {
     "intg"    = "integration",
     "staging" = "staging",
     "prod"    = "production"
+    "dev"     = "development"
   }
 
   environment_full_name = local.environment_full_name_map[local.environment]
@@ -138,9 +139,9 @@ locals {
   tre_environment     = local.environment == "intg" ? "int" : local.environment
   tre_export_role_arn = module.tre_configuration.terraform_config[local.tre_environment]["s3_export_bucket_reader_arn"]
 
-  talend_export_role_arn = module.talend_configuration.terraform_config[local.environment]["remote_engine_instance_profile_role"]
+  talend_export_role_arn = module.talend_configuration.terraform_config[local.environment == "dev" ? "intg" : local.environment]["remote_engine_instance_profile_role"]
 
-  dr2_copy_files_role = module.dr2_configuration.terraform_config[local.environment]["tdr_importer_role"]
+  dr2_copy_files_role = module.dr2_configuration.terraform_config[local.environment == "dev" ? "intg" : local.environment]["tdr_importer_role"]
 
   standard_export_bucket_read_access_roles = compact(concat([local.tre_export_role_arn, local.talend_export_role_arn], [local.e2e_testing_role_arn]))
   judgment_export_bucket_read_access_roles = [local.tre_export_role_arn]
@@ -181,6 +182,14 @@ locals {
 
   # AYR
   ayr_terraform_deployer_roles = {
+    dev = [
+      format(
+        "arn:aws:iam::%s:role/%s",
+        module.ayr_configuration.account_numbers["non_prod"],
+        "terraform-application-deployer"
+      )
+    ]
+
     intg = [
       format(
         "arn:aws:iam::%s:role/%s",

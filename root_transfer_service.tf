@@ -152,6 +152,7 @@ module "transfer_service_ecs_task" {
   alb_target_group_arn = module.transfer_service_tdr_alb[0].alb_target_group_arn
   cluster_name         = "transferservice_${local.environment}"
   common_tags          = local.common_tags
+  desired_count        = local.environment == "dev" ? 0 : 1
   container_definition = templatefile(
     "${path.module}/templates/ecs_tasks/transfer_service.json.tpl", {
       app_image                           = "${local.ecr_account_number}.dkr.ecr.eu-west-2.amazonaws.com/transfer-service:${local.environment}"
