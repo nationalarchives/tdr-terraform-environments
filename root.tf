@@ -93,7 +93,7 @@ module "frontend" {
   vpc_id                           = module.shared_vpc.vpc_id
   public_subnets                   = module.shared_vpc.public_subnets
   private_subnets_ecs              = local.environment == "intg" ? module.shared_vpc.private_backend_checks_subnets : module.shared_vpc.private_subnets
-  private_subnets_elasticache      = module.shared_vpc.private_subnets
+  private_subnets_elasticache      = local.environment == "intg" ? module.shared_vpc.private_backend_checks_subnets : module.shared_vpc.private_subnets
   dns_zone_name_trimmed            = local.dns_zone_name_trimmed
   auth_url                         = local.keycloak_auth_url
   client_secret_path               = module.keycloak_ssm_parameters.params[local.keycloak_tdr_client_secret_name].name
@@ -115,6 +115,7 @@ module "frontend" {
   s3_acl_header_value              = module.s3_put_request_header_acl_ssm_parameter.params[local.s3_put_request_header_acl_parameter].value
   s3_if_none_match_header_value    = module.s3_put_request_header_if_none_match_ssm_parameter.params[local.s3_put_request_header_if_none_match_parameter].value
   metadata_version_override        = local.metadata_version_override
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda.ecs_tasks
 }
 
 module "alb_logs_s3" {
