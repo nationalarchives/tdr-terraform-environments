@@ -108,6 +108,7 @@ module "tdr_keycloak_ecs" {
   alb_target_group_arn = module.keycloak_tdr_alb.alb_target_group_arn
   cluster_name         = "keycloak_${local.environment}"
   common_tags          = local.common_tags
+  desired_count        = local.environment == "dev" ? 0 : 1
   container_definition = templatefile("${path.module}/templates/ecs_tasks/keycloak.json.tpl", {
     app_image                         = "${local.ecr_account_number}.dkr.ecr.eu-west-2.amazonaws.com/auth-server:${local.environment}"
     app_port                          = 8080
@@ -168,6 +169,7 @@ module "keycloak_tdr_alb" {
 
 module "keycloak_database_instance" {
   source                  = "./tdr-terraform-modules/rds_instance"
+  instance_class          = local.environment == "dev" ? "db.t3.micro" : "db.t3.medium"
   admin_username          = "keycloak_admin"
   availability_zone       = local.database_availability_zone
   common_tags             = local.common_tags
@@ -213,12 +215,14 @@ module "keycloak_route53" {
 }
 
 module "keycloak_rotate_notify_api_key_event" {
-  source                     = "./tdr-terraform-modules/cloudwatch_events"
-  event_pattern              = "ssm_parameter_policy_action"
-  sns_topic_event_target_arn = toset([module.notifications_topic.sns_arn])
-  rule_name                  = "keycloak-rotate-notify-api-key"
-  rule_description           = "Notify to rotate API Key"
-  event_variables            = { parameter_name = local.keycloak_govuk_notify_api_key_name, policy_type = "NoChangeNotification" }
+  source        = "./tdr-terraform-modules/cloudwatch_events"
+  event_pattern = "ssm_parameter_policy_action"
+  event_target_arns = {
+    "sns_target" = module.notifications_topic.sns_arn
+  }
+  rule_name        = "keycloak-rotate-notify-api-key"
+  rule_description = "Notify to rotate API Key"
+  event_variables  = { parameter_name = local.keycloak_govuk_notify_api_key_name, policy_type = "NoChangeNotification" }
 }
 
 # TDRD-1066 Expose Keycloak via endpoint via NLB

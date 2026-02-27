@@ -48,7 +48,9 @@ module "aws_guard_duty_s3_malware_scan_threat_found_event" {
     bucket_names       = local.malware_scan_bucket_enabled_names
     scan_result_status = local.scan_complete_threat_found_value
   })
-  sns_topic_event_target_arn = module.notifications_topic.sns_arn
-  rule_name                  = "guard-duty-s3-malware-threat-found"
-  rule_description           = "Notify threat found Guard Duty S3 malware scan"
+  event_target_arns = {
+    "disable_inactive_judgment_users_target" = module.inactive_keycloak_users_lambda.lambda_arn
+  }
+  rule_name        = "guard-duty-s3-malware-threat-found"
+  rule_description = "Notify threat found Guard Duty S3 malware scan"
 }
