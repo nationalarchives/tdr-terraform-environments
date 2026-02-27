@@ -590,7 +590,7 @@ module "external_sns_notifications_topic" {
   kms_key_arn = module.sns_external_kms_key.kms_key_arn
   sns_policy = templatefile("${path.module}/templates/sns/external_notifications_policy.json.tpl", {
     export_role        = module.consignment_export_task_role.role.arn
-    dr2_account_number = module.dr2_configuration.account_numbers[local.environment == "dev" ? "intg": local.environment]
+    dr2_account_number = module.dr2_configuration.account_numbers[local.environment == "dev" ? "intg" : local.environment]
     region             = "eu-west-2"
     account_id         = data.aws_caller_identity.current.account_id
     topic_name         = local.external_notifications_topic
@@ -853,10 +853,10 @@ module "rotate_keycloak_secrets_lambda" {
 }
 
 module "periodic_rotate_keycloak_secrets_event" {
-  source                  = "./tdr-terraform-modules/cloudwatch_events"
-  schedule                = "rate(7 days)"
-  rule_name               = "rotate-keycloak-secrets"
-  event_target_arns       = { for idx, arn in module.rotate_keycloak_secrets_lambda.rotate_keycloak_secrets_lambda_arn:
+  source    = "./tdr-terraform-modules/cloudwatch_events"
+  schedule  = "rate(7 days)"
+  rule_name = "rotate-keycloak-secrets"
+  event_target_arns = { for idx, arn in module.rotate_keycloak_secrets_lambda.rotate_keycloak_secrets_lambda_arn :
     "lambda_target_${idx}" => arn
   }
 }
@@ -975,13 +975,13 @@ module "ecs_task_events_log_group" {
 }
 
 module "ecs_task_stopped_event" {
-  source                               = "./tdr-terraform-modules/cloudwatch_events"
-  event_pattern                        = "ecs_task_stopped"
-  event_target_arns                    = {
+  source        = "./tdr-terraform-modules/cloudwatch_events"
+  event_pattern = "ecs_task_stopped"
+  event_target_arns = {
     "ecs_task_target" = module.ecs_task_events_log_group.log_group_arn
   }
-  rule_name                            = "ecs-task-state-stopped"
-  rule_description                     = "Log to cloudwatch when ECS task state is STOPPED"
+  rule_name        = "ecs-task-state-stopped"
+  rule_description = "Log to cloudwatch when ECS task state is STOPPED"
 }
 
 # Route53 Resolver logging for the VPC - TDRD-1090

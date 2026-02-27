@@ -3,7 +3,7 @@ locals {
   event_handling_count                        = local.environment == "intg" ? 1 : 0
   sqs_name                                    = "tdr-external-event-handling-sqs-${local.environment}"
   external_event_handler_function_name        = "tdr-external-events-handler-${local.environment}"
-  dr2_ingest_topic_arn = try(module.dr2_configuration.terraform_config[local.environment]["notifications_sns_topic_arn"], null)
+  dr2_ingest_topic_arn                        = try(module.dr2_configuration.terraform_config[local.environment]["notifications_sns_topic_arn"], null)
   external_event_handling_lambda_timeout_secs = 60
   allow_file_status_update                    = local.environment == "intg" ? "true" : "false"
   default_debug_mode                          = false
@@ -26,7 +26,7 @@ module "external_event_handling_sqs_queue" {
 }
 
 resource "aws_sns_topic_subscription" "dr2_ingest" {
-  count = local.dr2_ingest_topic_arn != null ? 1 : 0
+  count                = local.dr2_ingest_topic_arn != null ? 1 : 0
   endpoint             = "arn:aws:sqs:eu-west-2:${var.tdr_account_number}:${local.sqs_name}"
   protocol             = "sqs"
   topic_arn            = local.dr2_ingest_topic_arn

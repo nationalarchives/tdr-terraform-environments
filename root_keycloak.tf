@@ -215,14 +215,14 @@ module "keycloak_route53" {
 }
 
 module "keycloak_rotate_notify_api_key_event" {
-  source                     = "./tdr-terraform-modules/cloudwatch_events"
-  event_pattern              = "ssm_parameter_policy_action"
-  event_target_arns          = {
+  source        = "./tdr-terraform-modules/cloudwatch_events"
+  event_pattern = "ssm_parameter_policy_action"
+  event_target_arns = {
     "sns_target" = module.notifications_topic.sns_arn
   }
-  rule_name                  = "keycloak-rotate-notify-api-key"
-  rule_description           = "Notify to rotate API Key"
-  event_variables            = { parameter_name = local.keycloak_govuk_notify_api_key_name, policy_type = "NoChangeNotification" }
+  rule_name        = "keycloak-rotate-notify-api-key"
+  rule_description = "Notify to rotate API Key"
+  event_variables  = { parameter_name = local.keycloak_govuk_notify_api_key_name, policy_type = "NoChangeNotification" }
 }
 
 # TDRD-1066 Expose Keycloak via endpoint via NLB
