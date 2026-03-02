@@ -137,6 +137,7 @@ module "upload_bucket" {
   lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
   aws_backup_local_role_arn = local.aws_back_up_local_role
   s3_bucket_additional_tags = local.aws_back_up_tags
+  enable_request_metrics    = local.environment == "prod"
 }
 
 module "upload_bucket_quarantine" {
@@ -149,6 +150,7 @@ module "upload_bucket_quarantine" {
   lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
   aws_backup_local_role_arn = local.aws_back_up_local_role
   s3_bucket_additional_tags = local.aws_back_up_tags
+  enable_request_metrics    = local.environment == "prod"
 }
 
 module "upload_file_cloudfront_dirty_s3" {
@@ -166,6 +168,7 @@ module "upload_file_cloudfront_dirty_s3" {
   aws_backup_local_role_arn     = local.aws_back_up_local_role
   s3_bucket_additional_tags     = local.aws_back_up_tags
   bucket_owner_object_ownership = true
+  enable_request_metrics        = local.environment == "prod"
 }
 
 module "upload_file_cloudfront_logs" {
@@ -610,6 +613,7 @@ module "export_bucket" {
   s3_bucket_additional_tags = local.aws_back_up_tags
   aws_backup_local_role_arn = local.aws_back_up_local_role
   lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  enable_request_metrics    = local.environment == "prod"
 }
 
 module "export_bucket_judgment" {
@@ -624,6 +628,7 @@ module "export_bucket_judgment" {
   lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
   s3_bucket_additional_tags = local.aws_back_up_tags
   aws_backup_local_role_arn = local.aws_back_up_local_role
+  enable_request_metrics    = local.environment == "prod"
 }
 
 module "notifications_topic" {
