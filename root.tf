@@ -571,7 +571,7 @@ module "flat_format_export_bucket" {
   })
   lifecycle_rules                = local.environment == "prod" ? [] : local.export_bucket_lifecycle_rules
   s3_data_bucket_additional_tags = local.aws_back_up_tags
-  enable_request_metrics         = local.environment == "prod"
+  enable_request_metrics_all     = local.environment == "prod"
 }
 
 module "flat_format_export_bucket_judgment" {
@@ -586,7 +586,7 @@ module "flat_format_export_bucket_judgment" {
   })
   lifecycle_rules                = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
   s3_data_bucket_additional_tags = local.aws_back_up_tags
-  enable_request_metrics         = local.environment == "prod"
+  enable_request_metrics_all     = local.environment == "prod"
 }
 
 module "external_sns_notifications_topic" {
