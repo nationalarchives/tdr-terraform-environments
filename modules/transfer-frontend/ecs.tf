@@ -276,7 +276,7 @@ data "aws_iam_policy_document" "frontend_ecs_execution" {
         var.aws_guardduty_ecr_arn
       ],
       var.enable_otel ? [
-        "${aws_cloudwatch_log_group.aws-otel-collector.arn}:*",
+        "${aws_cloudwatch_log_group.aws-otel-collector[0].arn}:*",
         "arn:aws:ecr:eu-west-2:${data.aws_ssm_parameter.mgmt_account_number.value}:repository/aws-otel-collector",
         "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/ecs/application/metrics:log-stream:otel-stream-*"
       ] : []
