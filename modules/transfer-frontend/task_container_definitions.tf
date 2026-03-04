@@ -1,5 +1,5 @@
 locals {
-  base_containers = [
+  base_containers = var.enable_otel ? [
     {
       name         = "aws-otel-collector"
       image        = "${data.aws_ssm_parameter.mgmt_account_number.value}.dkr.ecr.eu-west-2.amazonaws.com/aws-otel-collector:${var.environment}"
@@ -21,7 +21,7 @@ locals {
       }
       systemControls = []
     }
-  ]
+  ] : []
 
   wiz_containers = var.enable_wiz_sensor ? [
     {
@@ -162,6 +162,12 @@ locals {
         {
           "name"  = "METADATA_VERSION_OVERRIDE",
           "value" = var.metadata_version_override
+        }
+      ] : [],
+        var.enable_otel ? [
+        {
+          "name"  = "JAVA_TOOL_OPTIONS",
+          "value" = "-javaagent:/opt/aws-opentelemetry-agent.jar"
         }
       ] : []
     )
