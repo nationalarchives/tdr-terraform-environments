@@ -127,29 +127,29 @@ module "alb_logs_s3" {
 }
 
 module "upload_bucket" {
-  source                    = "./tdr-terraform-modules/s3"
-  project                   = var.project
-  function                  = "upload-files"
-  bucket_key_enabled        = local.internal_bucket_key_enabled
-  kms_key_id                = local.internal_s3_encryption_key_arn
-  common_tags               = local.common_tags
-  lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
-  aws_backup_local_role_arn = local.aws_back_up_local_role
-  s3_bucket_additional_tags = local.aws_back_up_tags
-  enable_request_metrics    = local.environment == "prod"
+  source                     = "./tdr-terraform-modules/s3"
+  project                    = var.project
+  function                   = "upload-files"
+  bucket_key_enabled         = local.internal_bucket_key_enabled
+  kms_key_id                 = local.internal_s3_encryption_key_arn
+  common_tags                = local.common_tags
+  lifecycle_rules            = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  aws_backup_local_role_arn  = local.aws_back_up_local_role
+  s3_bucket_additional_tags  = local.aws_back_up_tags
+  enable_request_metrics_all = local.environment == "prod"
 }
 
 module "upload_bucket_quarantine" {
-  source                    = "./tdr-terraform-modules/s3"
-  project                   = var.project
-  function                  = "upload-files-quarantine"
-  bucket_key_enabled        = local.internal_bucket_key_enabled
-  kms_key_id                = local.internal_s3_encryption_key_arn
-  common_tags               = local.common_tags
-  lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
-  aws_backup_local_role_arn = local.aws_back_up_local_role
-  s3_bucket_additional_tags = local.aws_back_up_tags
-  enable_request_metrics    = local.environment == "prod"
+  source                     = "./tdr-terraform-modules/s3"
+  project                    = var.project
+  function                   = "upload-files-quarantine"
+  bucket_key_enabled         = local.internal_bucket_key_enabled
+  kms_key_id                 = local.internal_s3_encryption_key_arn
+  common_tags                = local.common_tags
+  lifecycle_rules            = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  aws_backup_local_role_arn  = local.aws_back_up_local_role
+  s3_bucket_additional_tags  = local.aws_back_up_tags
+  enable_request_metrics_all = local.environment == "prod"
 }
 
 module "upload_file_cloudfront_dirty_s3" {
@@ -167,7 +167,7 @@ module "upload_file_cloudfront_dirty_s3" {
   aws_backup_local_role_arn     = local.aws_back_up_local_role
   s3_bucket_additional_tags     = local.aws_back_up_tags
   bucket_owner_object_ownership = true
-  enable_request_metrics        = local.environment == "prod"
+  enable_request_metrics_all    = local.environment == "prod"
 }
 
 module "upload_file_cloudfront_logs" {
@@ -603,33 +603,33 @@ module "external_sns_notifications_topic" {
 }
 
 module "export_bucket" {
-  source                    = "./tdr-terraform-modules/s3"
-  project                   = var.project
-  function                  = "consignment-export"
-  common_tags               = local.common_tags
-  kms_key_id                = module.s3_external_kms_key.kms_key_arn
-  bucket_key_enabled        = true
-  read_access_role_arns     = local.standard_export_bucket_read_access_roles
-  bucket_policy             = "export_bucket"
-  s3_bucket_additional_tags = local.aws_back_up_tags
-  aws_backup_local_role_arn = local.aws_back_up_local_role
-  lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
-  enable_request_metrics    = local.environment == "prod"
+  source                     = "./tdr-terraform-modules/s3"
+  project                    = var.project
+  function                   = "consignment-export"
+  common_tags                = local.common_tags
+  kms_key_id                 = module.s3_external_kms_key.kms_key_arn
+  bucket_key_enabled         = true
+  read_access_role_arns      = local.standard_export_bucket_read_access_roles
+  bucket_policy              = "export_bucket"
+  s3_bucket_additional_tags  = local.aws_back_up_tags
+  aws_backup_local_role_arn  = local.aws_back_up_local_role
+  lifecycle_rules            = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  enable_request_metrics_all = local.environment == "prod"
 }
 
 module "export_bucket_judgment" {
-  source                    = "./tdr-terraform-modules/s3"
-  project                   = var.project
-  function                  = "consignment-export-judgment"
-  common_tags               = local.common_tags
-  kms_key_id                = module.s3_external_kms_key.kms_key_arn
-  bucket_key_enabled        = true
-  read_access_role_arns     = local.judgment_export_bucket_read_access_roles
-  bucket_policy             = "export_bucket"
-  lifecycle_rules           = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
-  s3_bucket_additional_tags = local.aws_back_up_tags
-  aws_backup_local_role_arn = local.aws_back_up_local_role
-  enable_request_metrics    = local.environment == "prod"
+  source                     = "./tdr-terraform-modules/s3"
+  project                    = var.project
+  function                   = "consignment-export-judgment"
+  common_tags                = local.common_tags
+  kms_key_id                 = module.s3_external_kms_key.kms_key_arn
+  bucket_key_enabled         = true
+  read_access_role_arns      = local.judgment_export_bucket_read_access_roles
+  bucket_policy              = "export_bucket"
+  lifecycle_rules            = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  s3_bucket_additional_tags  = local.aws_back_up_tags
+  aws_backup_local_role_arn  = local.aws_back_up_local_role
+  enable_request_metrics_all = local.environment == "prod"
 }
 
 module "notifications_topic" {
