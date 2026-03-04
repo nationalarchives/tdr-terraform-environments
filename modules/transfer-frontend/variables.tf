@@ -94,5 +94,5 @@ variable "cloudwatch_log_retention_in_days" {
 
 variable "enable_otel" {
   description = "Whether to turn on open telemetry logging for the service"
-  default = false
+  default     = false
 }

@@ -164,7 +164,7 @@ locals {
           "value" = var.metadata_version_override
         }
       ] : [],
-        var.enable_otel ? [
+      var.enable_otel ? [
         {
           "name"  = "JAVA_TOOL_OPTIONS",
           "value" = "-javaagent:/opt/aws-opentelemetry-agent.jar"
