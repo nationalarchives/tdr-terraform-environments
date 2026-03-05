@@ -70,7 +70,7 @@ module "transfer_service_task_policy" {
 }
 
 module "transfer_service_certificate" {
-  count       = local.transfer_service_count
+  count       = 1
   source      = "./da-terraform-modules/certificatemanager"
   project     = var.project
   function    = "transfer-service"
