@@ -134,7 +134,7 @@ module "transfer_service_ecs_security_group" {
 }
 
 module "transfer_service_alb_security_group" {
-  count       = local.transfer_service_count
+  count       = 1
   source      = "./tdr-terraform-modules/security_group"
   description = "Controls access to the Transfer Service load balancer"
   name        = "transfer-service-load-balancer-security-group"
