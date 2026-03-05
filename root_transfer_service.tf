@@ -70,7 +70,7 @@ module "transfer_service_task_policy" {
 }
 
 module "transfer_service_certificate" {
-  count       = local.transfer_service_count
+  count       = 1
   source      = "./da-terraform-modules/certificatemanager"
   project     = var.project
   function    = "transfer-service"
@@ -121,7 +121,7 @@ module "transfer_service_cloudwatch" {
 }
 
 module "transfer_service_ecs_security_group" {
-  count       = local.transfer_service_count
+  count       = 1
   source      = "./tdr-terraform-modules/security_group"
   description = "Controls access within TDR network for the Transfer Service ECS Task"
   name        = "tdr-transfer-service-ecs-security-group"
@@ -134,7 +134,7 @@ module "transfer_service_ecs_security_group" {
 }
 
 module "transfer_service_alb_security_group" {
-  count       = local.transfer_service_count
+  count       = 1
   source      = "./tdr-terraform-modules/security_group"
   description = "Controls access to the Transfer Service load balancer"
   name        = "transfer-service-load-balancer-security-group"
@@ -263,9 +263,10 @@ module "aggregate_processing_sqs_queue" {
 }
 
 module "tdr_transfer_errors_s3_bucket" {
-  count       = 1
-  source      = "./da-terraform-modules/s3"
-  bucket_name = local.tdr_transfer_errors_s3_bucket_name
-  common_tags = local.common_tags
-  kms_key_arn = module.s3_internal_kms_key.kms_key_arn
+  count                      = 1
+  source                     = "./da-terraform-modules/s3"
+  bucket_name                = local.tdr_transfer_errors_s3_bucket_name
+  common_tags                = local.common_tags
+  kms_key_arn                = module.s3_internal_kms_key.kms_key_arn
+  enable_request_metrics_all = local.environment == "prod"
 }
