@@ -344,3 +344,34 @@ module "backend_checks_step_function" {
     state_machine_arn           = module.backend_checks_step_function.state_machine_arn
   })
 }
+
+module "file_checks" {
+  source                           = "./tdr-terraform-modules/generic_lambda"
+  tags                             = local.common_tags
+  function_name                    = local.file_checks_function_name
+  handler                          = "uk.gov.nationalarchives.Lambda::process"
+  reserved_concurrency             = -1
+  timeout_seconds                  = 900
+  storage_size                     = 2560
+  memory_size                      = 2560
+  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
+  policies = {
+    "TDRFileChecksLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_file_checks_policy.json.tpl", {
+      function_name     = local.file_checks_function_name,
+      account_id        = data.aws_caller_identity.current.account_id,
+      dirty_bucket      = module.upload_file_cloudfront_dirty_s3.s3_bucket_name
+      upload_bucket     = module.upload_bucket.s3_bucket_name
+      quarantine_bucket = module.upload_bucket_quarantine.s3_bucket_name
+      decryption_keys   = jsonencode([module.s3_upload_kms_key.kms_key_arn])
+      encryption_keys   = jsonencode([module.s3_internal_kms_key.kms_key_arn])
+    })
+  }
+  role_name = "TDRFileChecksLambdaRole${title(local.environment)}"
+  runtime   = local.runtime_java_21
+  vpc_config = [
+    {
+      subnet_ids         = module.shared_vpc.private_backend_checks_subnets
+      security_group_ids = [module.outbound_only_security_group.security_group_id]
+    }
+  ]
+}
