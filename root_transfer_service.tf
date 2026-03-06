@@ -93,7 +93,7 @@ module "transfer_service_route53" {
 }
 
 module "transfer_service_tdr_alb" {
-  count                 = local.transfer_service_count
+  count                 = 1
   source                = "./tdr-terraform-modules/alb"
   project               = var.project
   function              = local.alb_function_name
