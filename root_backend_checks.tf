@@ -346,10 +346,10 @@ module "backend_checks_step_function" {
 }
 
 module "file_checks" {
-  source                           = "./tdr-terraform-modules/generic_lambda"
+  source                           = "./da-terraform-modules/lambda"
   tags                             = local.common_tags
   function_name                    = local.file_checks_function_name
-  handler                          = "uk.gov.nationalarchives.Lambda::process"
+  handler                          = "uk.gov.nationalarchives.filechecks.Lambda::process"
   reserved_concurrency             = -1
   timeout_seconds                  = 900
   storage_size                     = 2560
