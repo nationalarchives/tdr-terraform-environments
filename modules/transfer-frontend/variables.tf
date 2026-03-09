@@ -90,3 +90,18 @@ variable "cloudwatch_log_retention_in_days" {
   default     = 30
 }
 
+variable "enable_otel" {
+  description = "Whether to turn on open telemetry logging for the service"
+  default     = false
+}
+
+variable "elasticache_engine" {
+  description = "redis or valkey"
+  type        = string
+}
+
+variable "elasticache_engine_version" {
+  description = "Engine version number"
+  type        = number
+}
+

@@ -10,6 +10,7 @@ resource "aws_cloudwatch_log_stream" "tdr_application_log_stream" {
 }
 
 resource "aws_cloudwatch_log_group" "aws-otel-collector" {
+  count             = var.enable_otel ? 1 : 0
   name              = "/ecs/aws-otel-collector-${var.environment}"
   retention_in_days = var.cloudwatch_log_retention_in_days
 }

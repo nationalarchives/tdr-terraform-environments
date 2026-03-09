@@ -121,7 +121,7 @@ module "transfer_service_cloudwatch" {
 }
 
 module "transfer_service_ecs_security_group" {
-  count       = local.transfer_service_count
+  count       = 1
   source      = "./tdr-terraform-modules/security_group"
   description = "Controls access within TDR network for the Transfer Service ECS Task"
   name        = "tdr-transfer-service-ecs-security-group"
