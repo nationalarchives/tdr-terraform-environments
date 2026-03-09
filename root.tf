@@ -117,6 +117,8 @@ module "frontend" {
   metadata_version_override        = local.metadata_version_override
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].ecs_tasks
   enable_otel                      = local.environment == "intg"
+  elasticache_engine               = local.environment == "intg" ? "valkey" : "redis"
+  elasticache_engine_version       = local.environment == "intg" ? "8.2" : "7.1"
 }
 
 module "alb_logs_s3" {
