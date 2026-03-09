@@ -123,6 +123,7 @@ locals {
   redacted_files_function_name          = "${var.project}-redacted-files-${local.environment}"
   statuses_function_name                = "${var.project}-statuses-${local.environment}"
   inactive_keycloak_users_function_name = "${var.project}-inactive-keycloak-users-${local.environment}"
+  file_checks_function_name             = "${var.project}-file-checks-${local.environment}"
 
   runtime_python_3_13 = "python3.13"
   runtime_java_11     = "java11"
