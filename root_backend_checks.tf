@@ -243,7 +243,7 @@ module "statuses" {
     CLIENT_ID          = local.keycloak_backend-checks_client_id
     CLIENT_SECRET_PATH = local.keycloak_backend_checks_secret_name
     S3_ENDPOINT        = local.s3_endpoint
-    SNS_TOPIC          = module.notifications_topic
+    SNS_TOPIC          = module.notifications_topic.sns_arn
     ENVIRONMENT        = local.environment
   }
 
