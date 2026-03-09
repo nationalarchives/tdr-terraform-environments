@@ -367,7 +367,7 @@ module "file_checks" {
   }
   runtime = local.runtime_java_21
   vpc_config = {
-    subnet_ids         = [module.shared_vpc.private_backend_checks_subnets]
+    subnet_ids         = module.shared_vpc.private_backend_checks_subnets
     security_group_ids = [module.outbound_only_security_group.security_group_id]
   }
 }
