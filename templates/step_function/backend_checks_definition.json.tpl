@@ -352,6 +352,20 @@
       "End": true
     },
     "Process failed notification": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "Message": {
+          "consignmentId.$": "$$.Execution.Input.consignmentId",
+          "success": false,
+          "environment": "${environment}",
+          "failureCause.$": "$.Cause"
+        },
+        "TopicArn": "${sns_topic}"
+      },
+      "Next": "Prepare Client Side Checks Status Parameters"
+    },
+    "Prepare Client Side Checks Status Parameters": {
       "Type": "Pass",
       "ResultPath": "$.statusUpdate",
       "Parameters": {
