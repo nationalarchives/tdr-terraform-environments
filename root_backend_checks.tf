@@ -238,8 +238,15 @@ module "statuses" {
   role_name = "TDRStatusesLambdaRole${title(local.environment)}"
   runtime   = local.runtime_java_11
   plaintext_env_vars = {
-    S3_ENDPOINT = local.s3_endpoint
+    API_URL            = "${module.consignment_api.api_url}/graphql"
+    AUTH_URL           = local.keycloak_auth_url
+    CLIENT_ID          = local.keycloak_backend-checks_client_id
+    CLIENT_SECRET_PATH = local.keycloak_backend_checks_secret_name
+    S3_ENDPOINT        = local.s3_endpoint
+    SNS_TOPIC          = module.notifications_topic.sns_arn
+    ENVIRONMENT        = local.environment
   }
+
   vpc_config = [
     {
       subnet_ids         = module.shared_vpc.private_backend_checks_subnets
