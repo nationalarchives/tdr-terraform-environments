@@ -7,6 +7,7 @@ locals {
     "intg"    = "integration",
     "staging" = "staging",
     "prod"    = "production"
+    "dev"     = "development"
   }
 
   environment_full_name = local.environment_full_name_map[local.environment]
@@ -28,6 +29,8 @@ locals {
   database_availability_zones = ["eu-west-2a", "eu-west-2b"]
 
   database_availability_zone = "eu-west-2a"
+
+  database_allocated_storage = local.environment == "staging" ? 70 : 60
 
   database_ca_cert_identifier = "rds-ca-rsa2048-g1"
 
@@ -120,6 +123,7 @@ locals {
   redacted_files_function_name          = "${var.project}-redacted-files-${local.environment}"
   statuses_function_name                = "${var.project}-statuses-${local.environment}"
   inactive_keycloak_users_function_name = "${var.project}-inactive-keycloak-users-${local.environment}"
+  file_checks_function_name             = "${var.project}-file-checks-${local.environment}"
 
   runtime_python_3_13 = "python3.13"
   runtime_java_11     = "java11"
@@ -136,9 +140,9 @@ locals {
   tre_environment     = local.environment == "intg" ? "int" : local.environment
   tre_export_role_arn = module.tre_configuration.terraform_config[local.tre_environment]["s3_export_bucket_reader_arn"]
 
-  talend_export_role_arn = module.talend_configuration.terraform_config[local.environment]["remote_engine_instance_profile_role"]
+  talend_export_role_arn = module.talend_configuration.terraform_config[local.environment == "dev" ? "intg" : local.environment]["remote_engine_instance_profile_role"]
 
-  dr2_copy_files_role = module.dr2_configuration.terraform_config[local.environment]["tdr_importer_role"]
+  dr2_copy_files_role = module.dr2_configuration.terraform_config[local.environment == "dev" ? "intg" : local.environment]["tdr_importer_role"]
 
   standard_export_bucket_read_access_roles = compact(concat([local.tre_export_role_arn, local.talend_export_role_arn], [local.e2e_testing_role_arn]))
   judgment_export_bucket_read_access_roles = [local.tre_export_role_arn]
@@ -178,6 +182,14 @@ locals {
 
   # AYR
   ayr_terraform_deployer_roles = {
+    dev = [
+      format(
+        "arn:aws:iam::%s:role/%s",
+        module.ayr_configuration.account_numbers["non_prod"],
+        "terraform-application-deployer"
+      )
+    ]
+
     intg = [
       format(
         "arn:aws:iam::%s:role/%s",
@@ -216,4 +228,6 @@ locals {
   waf_alb_target_groups = local.environment == "prod" ? [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn] : [module.keycloak_tdr_alb.alb_arn, module.consignment_api_alb.alb_arn, module.frontend_alb.alb_arn, module.transfer_service_tdr_alb[0].alb_arn]
 
   athena_metadata_checks_database_name = "athena-tdr-metadata-checks-${local.environment}"
+
+  metadata_version_override = ""
 }

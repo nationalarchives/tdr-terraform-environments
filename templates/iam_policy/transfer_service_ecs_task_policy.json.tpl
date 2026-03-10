@@ -15,7 +15,8 @@
       "Effect": "Allow",
       "Action": [
         "s3:GetObject",
-        "s3:GetObjectTagging"
+        "s3:GetObjectTagging",
+        "s3:ListBucket"
       ],
       "Resource": [
         "arn:aws:s3:::${tdr_transfer_errors_s3_bucket_name}",

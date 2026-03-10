@@ -11,6 +11,10 @@ locals {
 
   transfer_service_ecs_task_role_arn = local.environment == "prod" ? "" : module.transfer_service_task_role[0].role_arn
   tdr_transfer_errors_s3_bucket_name = "tdr-transfer-errors-${local.environment}"
+  block_api_documentation            = local.environment == "intg" || local.environment == "dev" ? false : true
+  block_service_endpoints            = local.environment == "prod" ? true : false
+  block_tdr_custom_tags              = local.environment == "prod" ? true : false
+  max_individual_file_size_mb        = 2000
 }
 
 module "transfer_service_execution_role" {
@@ -66,7 +70,7 @@ module "transfer_service_task_policy" {
 }
 
 module "transfer_service_certificate" {
-  count       = local.transfer_service_count
+  count       = 1
   source      = "./da-terraform-modules/certificatemanager"
   project     = var.project
   function    = "transfer-service"
@@ -117,7 +121,7 @@ module "transfer_service_cloudwatch" {
 }
 
 module "transfer_service_ecs_security_group" {
-  count       = local.transfer_service_count
+  count       = 1
   source      = "./tdr-terraform-modules/security_group"
   description = "Controls access within TDR network for the Transfer Service ECS Task"
   name        = "tdr-transfer-service-ecs-security-group"
@@ -130,7 +134,7 @@ module "transfer_service_ecs_security_group" {
 }
 
 module "transfer_service_alb_security_group" {
-  count       = local.transfer_service_count
+  count       = 1
   source      = "./tdr-terraform-modules/security_group"
   description = "Controls access to the Transfer Service load balancer"
   name        = "transfer-service-load-balancer-security-group"
@@ -148,6 +152,7 @@ module "transfer_service_ecs_task" {
   alb_target_group_arn = module.transfer_service_tdr_alb[0].alb_target_group_arn
   cluster_name         = "transferservice_${local.environment}"
   common_tags          = local.common_tags
+  desired_count        = local.environment == "dev" ? 0 : 1
   container_definition = templatefile(
     "${path.module}/templates/ecs_tasks/transfer_service.json.tpl", {
       app_image                           = "${local.ecr_account_number}.dkr.ecr.eu-west-2.amazonaws.com/transfer-service:${local.environment}"
@@ -158,11 +163,12 @@ module "transfer_service_ecs_task" {
       records_upload_bucket_name          = module.upload_file_cloudfront_dirty_s3.s3_bucket_name
       metadata_upload_bucket_arn          = module.upload_file_cloudfront_dirty_s3.s3_bucket_arn
       metadata_upload_bucket_name         = module.upload_file_cloudfront_dirty_s3.s3_bucket_name
+      transfer_error_bucket_name          = local.tdr_transfer_errors_s3_bucket_name
       auth_url                            = local.keycloak_auth_url
       consignment_api_url                 = module.consignment_api.api_url
       transfer_service_api_port           = "8080"
       max_number_records                  = 3000
-      max_individual_file_size_mb         = 2000
+      max_individual_file_size_mb         = local.max_individual_file_size_mb
       max_transfer_size_mb                = 5000
       transfer_service_client_secret_path = local.keycloak_tdr_transfer_service_secret_name
       throttle_amount                     = 50
@@ -173,6 +179,9 @@ module "transfer_service_ecs_task" {
       aggregate_processing_queue_url      = module.aggregate_processing_sqs_queue[0].sqs_queue_url
       s3_acl_header_value                 = module.s3_put_request_header_acl_ssm_parameter.params[local.s3_put_request_header_acl_parameter].value
       s3_if_none_match_header_value       = module.s3_put_request_header_if_none_match_ssm_parameter.params[local.s3_put_request_header_if_none_match_parameter].value
+      block_api_documentation             = local.block_api_documentation
+      block_service_endpoints             = local.block_service_endpoints
+      block_tdr_custom_tags               = local.block_tdr_custom_tags
   })
   container_name               = "transfer-service"
   cpu                          = 512
@@ -188,7 +197,7 @@ module "transfer_service_ecs_task" {
 }
 
 module "aggregate_processing_lambda" {
-  count           = local.transfer_service_count
+  count           = 1
   source          = "./da-terraform-modules/lambda"
   function_name   = local.aggregate_processing_function_name
   tags            = local.common_tags
@@ -206,6 +215,7 @@ module "aggregate_processing_lambda" {
       account_id                 = var.tdr_account_number
       dirty_upload_bucket_name   = local.upload_files_cloudfront_dirty_bucket_name
       draft_metadata_bucket_name = local.draft_metadata_s3_bucket_name
+      transfer_error_bucket_name = local.tdr_transfer_errors_s3_bucket_name
       auth_client_secret_path    = local.keycloak_tdr_transfer_service_secret_name
       read_client_secret_path    = local.keycloak_tdr_read_client_secret_name
       sqs_queue_name             = local.aggregate_processing_function_name
@@ -216,16 +226,19 @@ module "aggregate_processing_lambda" {
     })
   }
   plaintext_env_vars = {
-    ENVIRONMENT                    = local.environment
-    GRAPHQL_API_URL                = "${module.consignment_api.api_url}/graphql"
-    AUTH_URL                       = local.keycloak_auth_url
-    AUTH_CLIENT_SECRET_PATH        = local.keycloak_tdr_transfer_service_secret_name
-    BACKEND_CHECKS_ARN             = module.backend_checks_step_function.state_machine_arn
-    METADATA_CHECKS_ARN            = module.draft_metadata_checks.step_function_arn
-    NOTIFICATIONS_TOPIC_ARN        = module.notifications_topic.sns_arn
-    KEYCLOAK_READ_AUTH_SECRET_PATH = local.keycloak_tdr_read_client_secret_name
-    DRAFT_METADATA_BUCKET_NAME     = local.draft_metadata_s3_bucket_name
-    TRANSFER_ERROR_BUCKET_NAME     = local.tdr_transfer_errors_s3_bucket_name
+    ENVIRONMENT                     = local.environment
+    GRAPHQL_API_URL                 = "${module.consignment_api.api_url}/graphql"
+    AUTH_URL                        = local.keycloak_auth_url
+    AUTH_CLIENT_SECRET_PATH         = local.keycloak_tdr_transfer_service_secret_name
+    BACKEND_CHECKS_ARN              = module.backend_checks_step_function.state_machine_arn
+    METADATA_CHECKS_ARN             = module.draft_metadata_checks.step_function_arn
+    NOTIFICATIONS_TOPIC_ARN         = module.notifications_topic.sns_arn
+    KEYCLOAK_READ_AUTH_SECRET_PATH  = local.keycloak_tdr_read_client_secret_name
+    DRAFT_METADATA_BUCKET_NAME      = local.draft_metadata_s3_bucket_name
+    TRANSFER_ERROR_BUCKET_NAME      = local.tdr_transfer_errors_s3_bucket_name
+    MALWARE_SCAN_TAG_KEY            = local.scan_complete_tag_key
+    MALWARE_SCAN_THREAT_FOUND_VALUE = local.scan_complete_threat_found_value
+    MAX_INDIVIDUAL_FILE_SIZE_MB     = local.max_individual_file_size_mb
   }
   vpc_config = {
     subnet_ids         = module.shared_vpc.private_backend_checks_subnets
@@ -234,7 +247,7 @@ module "aggregate_processing_lambda" {
 }
 
 module "aggregate_processing_sqs_queue" {
-  count      = local.transfer_service_count
+  count      = 1
   source     = "./da-terraform-modules/sqs"
   tags       = local.common_tags
   queue_name = local.aggregate_processing_function_name
@@ -250,9 +263,10 @@ module "aggregate_processing_sqs_queue" {
 }
 
 module "tdr_transfer_errors_s3_bucket" {
-  count       = local.transfer_service_count
-  source      = "./da-terraform-modules/s3"
-  bucket_name = local.tdr_transfer_errors_s3_bucket_name
-  common_tags = local.common_tags
-  kms_key_arn = module.s3_internal_kms_key.kms_key_arn
+  count                      = 1
+  source                     = "./da-terraform-modules/s3"
+  bucket_name                = local.tdr_transfer_errors_s3_bucket_name
+  common_tags                = local.common_tags
+  kms_key_arn                = module.s3_internal_kms_key.kms_key_arn
+  enable_request_metrics_all = local.environment == "prod"
 }

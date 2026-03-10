@@ -14,7 +14,15 @@ variable "environment" {}
 
 variable "environment_full_name" {}
 
-variable "private_subnets" {}
+variable "private_subnets_ecs" {
+  description = "Subnets to deploy ECS in"
+  type        = list(string)
+}
+
+variable "private_subnets_elasticache" {
+  description = "Subnets to deploy Elasticache in"
+  type        = list(string)
+}
 
 variable "public_subnets" {}
 
@@ -69,5 +77,31 @@ variable "s3_if_none_match_header_value" {}
 
 variable "transit_encryption_mode" {
   description = "Set to preferred(default) or required.  Must be set to preferred and applied before required (if wanted)"
-  default     = "preferred"
+  default     = "required"
 }
+
+variable "metadata_version_override" {
+  description = "metadata schema version override. File name prefix"
+  type        = string
+}
+
+variable "cloudwatch_log_retention_in_days" {
+  description = "Cloudwatch log retention period in days (0, 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1096, 1827, 2192, 2557, 2922, 3288, 3653)"
+  default     = 30
+}
+
+variable "enable_otel" {
+  description = "Whether to turn on open telemetry logging for the service"
+  default     = false
+}
+
+variable "elasticache_engine" {
+  description = "redis or valkey"
+  type        = string
+}
+
+variable "elasticache_engine_version" {
+  description = "Engine version number"
+  type        = number
+}
+

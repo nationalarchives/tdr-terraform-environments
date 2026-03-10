@@ -46,13 +46,13 @@ resource "aws_ecs_service" "frontend_service" {
   name                              = "${var.app_name}_service_${var.environment}"
   cluster                           = aws_ecs_cluster.frontend_ecs.id
   task_definition                   = aws_ecs_task_definition.frontend_task.arn
-  desired_count                     = 1
+  desired_count                     = var.environment == "dev" ? 0 : 1
   launch_type                       = "FARGATE"
   health_check_grace_period_seconds = "360"
 
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]
-    subnets          = var.private_subnets
+    subnets          = var.private_subnets_ecs
     assign_public_ip = false
   }
 
@@ -268,15 +268,19 @@ data "aws_iam_policy_document" "frontend_ecs_execution" {
       "ecr:BatchGetImage",
       "ecr:GetDownloadUrlForLayer"
     ]
-    resources = [
-      "${aws_cloudwatch_log_group.frontend_log_group.arn}:*",
-      "arn:aws:ecr:eu-west-2:${data.aws_ssm_parameter.mgmt_account_number.value}:repository/transfer-frontend",
-      "${aws_cloudwatch_log_group.aws-otel-collector.arn}:*",
-      "arn:aws:ecr:eu-west-2:${data.aws_ssm_parameter.mgmt_account_number.value}:repository/aws-otel-collector",
-      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/ecs/application/metrics:log-stream:otel-stream-*",
-      "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/events/ecs-task-events-${var.environment}:*",
-      var.aws_guardduty_ecr_arn
-    ]
+    resources = concat(
+      [
+        "${aws_cloudwatch_log_group.frontend_log_group.arn}:*",
+        "arn:aws:ecr:eu-west-2:${data.aws_ssm_parameter.mgmt_account_number.value}:repository/transfer-frontend",
+        "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/events/ecs-task-events-${var.environment}:*",
+        var.aws_guardduty_ecr_arn
+      ],
+      var.enable_otel ? [
+        "${aws_cloudwatch_log_group.aws-otel-collector[0].arn}:*",
+        "arn:aws:ecr:eu-west-2:${data.aws_ssm_parameter.mgmt_account_number.value}:repository/aws-otel-collector",
+        "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/ecs/application/metrics:log-stream:otel-stream-*"
+      ] : []
+    )
   }
   statement {
     actions   = ["ecr:GetAuthorizationToken"]

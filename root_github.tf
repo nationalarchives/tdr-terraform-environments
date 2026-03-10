@@ -101,7 +101,7 @@ module "run_keycloak_update_ecs" {
   environment      = local.environment
   execution_role   = module.run_update_keycloak_execution_role.role.arn
   memory           = 2048
-  private_subnets  = module.shared_vpc.private_subnets
+  private_subnets  = []
   security_groups  = [module.keycloak_ecs_security_group.security_group_id]
   task_family_name = "keycloak-update-${local.environment}"
   task_role        = null
