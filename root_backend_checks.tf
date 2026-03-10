@@ -335,7 +335,6 @@ module "backend_checks_step_function" {
     checksum_v2_lambda_arn         = module.checksum_v2.lambda_arn
     redacted_files_lambda_arn      = module.redacted_files.lambda_arn
     notification_lambda_arn        = module.notification_lambda.ecr_scan_notification_lambda_arn[0]
-    sns_topic                      = module.notifications_topic.sns_arn
     consignment_api_url            = module.consignment_api.api_url
     consignment_api_connection_arn = aws_cloudwatch_event_connection.consignment_api_connection.arn
   })

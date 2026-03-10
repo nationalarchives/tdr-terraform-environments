@@ -352,35 +352,21 @@
       "End": true
     },
     "Process failed notification": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::sns:publish",
-      "Parameters": {
-        "Message": {
-          "consignmentId.$": "$$.Execution.Input.consignmentId",
-          "success": false,
-          "environment": "${environment}",
-          "failureCause.$": "$.Cause"
-        },
-        "TopicArn": "${sns_topic}"
-      },
-      "Next": "Prepare Client Side Checks Status Parameters"
-    },
-    "Prepare Client Side Checks Status Parameters": {
       "Type": "Pass",
       "ResultPath": "$.statusUpdate",
       "Parameters": {
         "query": "mutation updateConsignmentStatus($updateConsignmentStatusInput: ConsignmentStatusInput!) { updateConsignmentStatus(updateConsignmentStatusInput: $updateConsignmentStatusInput) }",
         "variables": {
           "updateConsignmentStatusInput": {
-            "consignmentId.$": "$.consignmentId",
-            "statusType": "ClientSideChecks",
+            "consignmentId.$": "$$.Execution.Input.consignmentId",
+            "statusType": "ClientChecks",
             "statusValue": "Failed"
           }
         }
       },
-      "Next": "Update Client Side Checks Status"
+      "Next": "Update Client Checks Status"
     },
-    "Update Client Side Checks Status": {
+    "Update Client Checks Status": {
       "Type": "Task",
       "Resource": "arn:aws:states:::http:invoke",
       "Parameters": {
