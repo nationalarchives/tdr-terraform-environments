@@ -25,10 +25,19 @@
           "ErrorEquals": [
             "States.ALL"
           ],
-          "Next": "Process failed notification"
+          "Next": "Get Files Failed",
+          "ResultPath": "$.error"
         }
       ],
       "Next": "In Progress Status API Update"
+    },
+    "Get Files Failed": {
+      "Type": "Pass",
+      "Parameters": {
+        "Cause.$": "$.error.Cause",
+        "backEndChecksProcess": "Get Files"
+      },
+      "Next": "Process failed notification"
     },
     "In Progress Status API Update": {
       "Type": "Task",
@@ -52,11 +61,20 @@
           "ErrorEquals": [
             "States.ALL"
           ],
-          "Next": "Process failed notification"
+          "Next": "In Progress Status API Update Failed",
+          "ResultPath": "$.error"
         }
       ],
       "ResultPath": null,
       "Next": "Map"
+    },
+    "In Progress Status API Update Failed": {
+      "Type": "Pass",
+      "Parameters": {
+        "Cause.$": "$.error.Cause",
+        "backEndChecksProcess": "In Progress Status API Update"
+      },
+      "Next": "Process failed notification"
     },
     "Map": {
       "Type": "Map",
@@ -262,10 +280,19 @@
           "ErrorEquals": [
             "States.ALL"
           ],
-          "Next": "Process failed notification"
+          "Next": "Process Map Results Failed",
+          "ResultPath": "$.error"
         }
       ],
       "Next": "Redacted files"
+    },
+    "Process Map Results Failed": {
+      "Type": "Pass",
+      "Parameters": {
+        "Cause.$": "$.error.Cause",
+        "backEndChecksProcess": "Process Map Results"
+      },
+      "Next": "Process failed notification"
     },
     "Redacted files": {
       "Type": "Task",
@@ -289,11 +316,20 @@
           "ErrorEquals": [
             "States.ALL"
           ],
-          "Next": "Process failed notification"
+          "Next": "Redacted Files Failed",
+          "ResultPath": "$.error"
         }
       ],
       "Next": "Generate Statuses",
       "ResultPath": null
+    },
+    "Redacted Files Failed": {
+      "Type": "Pass",
+      "Parameters": {
+        "Cause.$": "$.error.Cause",
+        "backEndChecksProcess": "Redacted files"
+      },
+      "Next": "Process failed notification"
     },
     "Generate Statuses": {
       "Type": "Task",
@@ -317,11 +353,20 @@
           "ErrorEquals": [
             "States.ALL"
           ],
-          "Next": "Process failed notification"
+          "Next": "Generate Statuses Failed",
+          "ResultPath": "$.error"
         }
       ],
       "Next": "Update API",
       "ResultPath": null
+    },
+    "Generate Statuses Failed": {
+      "Type": "Pass",
+      "Parameters": {
+        "Cause.$": "$.error.Cause",
+        "backEndChecksProcess": "Generate Statuses"
+      },
+      "Next": "Process failed notification"
     },
     "Update API": {
       "Type": "Task",
@@ -346,10 +391,19 @@
           "ErrorEquals": [
             "States.ALL"
           ],
-          "Next": "Process failed notification"
+          "Next": "Update API Failed",
+          "ResultPath": "$.error"
         }
       ],
       "End": true
+    },
+    "Update API Failed": {
+      "Type": "Pass",
+      "Parameters": {
+        "Cause.$": "$.error.Cause",
+        "backEndChecksProcess": "Update API"
+      },
+      "Next": "Process failed notification"
     },
     "Process failed notification": {
       "Type": "Task",
@@ -359,7 +413,8 @@
           "consignmentId.$": "$$.Execution.Input.consignmentId",
           "success": false,
           "environment": "${environment}",
-          "failureCause.$": "$.Cause"
+          "failureCause.$": "$.Cause",
+          "backEndChecksProcess.$": "$.backEndChecksProcess"
         },
         "TopicArn": "${sns_topic}"
       },
