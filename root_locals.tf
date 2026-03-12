@@ -123,6 +123,7 @@ locals {
   redacted_files_function_name          = "${var.project}-redacted-files-${local.environment}"
   statuses_function_name                = "${var.project}-statuses-${local.environment}"
   inactive_keycloak_users_function_name = "${var.project}-inactive-keycloak-users-${local.environment}"
+  file_checks_function_name             = "${var.project}-file-checks-${local.environment}"
 
   runtime_python_3_13 = "python3.13"
   runtime_java_11     = "java11"
@@ -163,7 +164,6 @@ locals {
   //feature access blocks
   block_shared_keycloak_pages = local.environment == "intg" ? false : true
   block_skip_metadata_review  = false
-  block_legal_status          = false
 
   disable_users_dry_run         = false
   draft_metadata_s3_bucket_name = "${var.project}-draft-metadata-${local.environment}"

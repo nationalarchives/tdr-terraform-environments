@@ -57,8 +57,6 @@ variable "public_subnet_ranges" {
 
 variable "block_skip_metadata_review" {}
 
-variable "block_legal_status" {}
-
 variable "draft_metadata_validator_api_url" {}
 
 variable "draft_metadata_s3_kms_keys" {}
@@ -96,3 +94,14 @@ variable "enable_otel" {
   description = "Whether to turn on open telemetry logging for the service"
   default     = false
 }
+
+variable "elasticache_engine" {
+  description = "redis or valkey"
+  type        = string
+}
+
+variable "elasticache_engine_version" {
+  description = "Engine version number"
+  type        = number
+}
+

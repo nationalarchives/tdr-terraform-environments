@@ -104,7 +104,6 @@ module "frontend" {
   public_subnet_ranges             = module.shared_vpc.public_subnet_ranges
   otel_service_name                = "frontend-${local.environment}"
   block_skip_metadata_review       = local.block_skip_metadata_review
-  block_legal_status               = local.block_legal_status
   draft_metadata_validator_api_url = module.draft_metadata_api_gateway.api_url
   draft_metadata_s3_kms_keys       = jsonencode([module.s3_internal_kms_key.kms_key_arn])
   draft_metadata_s3_bucket_name    = local.draft_metadata_s3_bucket_name
@@ -117,6 +116,8 @@ module "frontend" {
   metadata_version_override        = local.metadata_version_override
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].ecs_tasks
   enable_otel                      = local.environment == "intg"
+  elasticache_engine               = local.environment == "intg" ? "valkey" : "redis"
+  elasticache_engine_version       = local.environment == "intg" ? "8.2" : "7.1"
 }
 
 module "alb_logs_s3" {
