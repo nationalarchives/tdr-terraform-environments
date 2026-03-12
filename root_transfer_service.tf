@@ -118,7 +118,7 @@ module "transfer_service_cloudwatch" {
   source            = "./tdr-terraform-modules/cloudwatch_logs"
   common_tags       = local.common_tags
   name              = "/ecs/transfer-service-${local.environment}"
-  retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].ecs_tasks
+  retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention[local.environment].ecs_tasks
 }
 
 module "transfer_service_ecs_security_group" {
