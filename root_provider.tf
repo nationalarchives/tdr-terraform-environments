@@ -19,6 +19,16 @@ provider "aws" {
   }
 }
 
+provider "aws" {
+  region = "eu-west-2"
+  alias  = "alarm_deployer"
+
+  assume_role {
+    role_arn = local.terraform_role_alarm_deployer
+  }
+}
+
+
 provider "github" {
   owner = "nationalarchives"
 }
