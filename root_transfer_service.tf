@@ -81,7 +81,6 @@ module "transfer_service_certificate" {
 }
 
 module "transfer_service_route53" {
-  count              = 1
   source             = "./da-terraform-modules/route53"
   common_tags        = local.common_tags
   a_record_name      = "transfer-service"
