@@ -1,8 +1,7 @@
 # TDRD-1268
-# All the infrastructure alarms go here
 # Alarms must be created in the management account 
-# Naming convention for the alarm should be
-# <metrics_name space>-<why>-<resource_triggering_alert>
+# Naming convention for the alarm should be:
+# <metrics_name_space> <why> <resource_triggering_alert>
 
 # This assume that the resource contains an account identifier.  If not add one in the alarm name
 #
