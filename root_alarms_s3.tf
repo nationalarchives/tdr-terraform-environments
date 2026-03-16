@@ -2,9 +2,8 @@
 # Alarms must be created in the management account 
 # Naming convention for the alarm should be:
 # <metrics_name_space> <why> <resource_triggering_alert>
+# This assumes that the resource contains an account identifier.  If not add one in the alarm name
 
-# This assume that the resource contains an account identifier.  If not add one in the alarm name
-#
 # S3
 resource "aws_cloudwatch_metric_alarm" "tdr_alarms_s3_object_put_quarantine" {
   alarm_description = "This alarm fires when an object has been put into the bucket"
