@@ -81,7 +81,7 @@ module "transfer_service_certificate" {
 }
 
 module "transfer_service_route53" {
-  count              = local.transfer_service_count
+  count              = 1
   source             = "./da-terraform-modules/route53"
   common_tags        = local.common_tags
   a_record_name      = "transfer-service"
@@ -93,7 +93,7 @@ module "transfer_service_route53" {
 }
 
 module "transfer_service_tdr_alb" {
-  count                 = local.transfer_service_count
+  count                 = 1
   source                = "./tdr-terraform-modules/alb"
   project               = var.project
   function              = local.alb_function_name
@@ -114,10 +114,11 @@ module "transfer_service_tdr_alb" {
 }
 
 module "transfer_service_cloudwatch" {
-  count       = local.transfer_service_count
-  source      = "./tdr-terraform-modules/cloudwatch_logs"
-  common_tags = local.common_tags
-  name        = "/ecs/transfer-service-${local.environment}"
+  count             = local.transfer_service_count
+  source            = "./tdr-terraform-modules/cloudwatch_logs"
+  common_tags       = local.common_tags
+  name              = "/ecs/transfer-service-${local.environment}"
+  retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention[local.environment].ecs_tasks
 }
 
 module "transfer_service_ecs_security_group" {
@@ -205,6 +206,7 @@ module "aggregate_processing_lambda" {
   timeout_seconds = local.aggregate_processing_lambda_timeout_secs
   memory_size     = 512
   runtime         = "java21"
+  log_retention   = module.global_parameters.policy_cloudwatch_logs_retention[local.environment].lambda
   lambda_sqs_queue_mappings = [{
     sqs_queue_arn         = "arn:aws:sqs:eu-west-2:${var.tdr_account_number}:${local.aggregate_processing_function_name}",
     ignore_enabled_status = false
