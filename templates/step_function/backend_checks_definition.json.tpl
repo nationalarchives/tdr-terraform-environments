@@ -411,7 +411,6 @@
       "Parameters": {
         "Message": {
           "consignmentId.$": "$$.Execution.Input.consignmentId",
-          "success": false,
           "environment": "${environment}",
           "failureCause.$": "$.Cause",
           "backEndChecksProcess.$": "$.backEndChecksProcess"
