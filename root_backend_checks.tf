@@ -355,6 +355,11 @@ module "backend_checks_step_function" {
     notification_lambda_arn     = module.notification_lambda.ecr_scan_notification_lambda_arn[0],
     backend_checks_bucket_arn   = module.backend_lambda_function_bucket.s3_bucket_arn
     state_machine_arn           = module.backend_checks_step_function.state_machine_arn
+    sns_topic_arn               = module.notifications_topic.sns_arn
+    kms_key_arn                 = module.encryption_key.kms_key_arn
+    connection_arn              = aws_cloudwatch_event_connection.consignment_api_connection.arn
+    consignment_api_url         = module.consignment_api.api_url
+    account_id                  = data.aws_caller_identity.current.account_id
   })
 }
 
