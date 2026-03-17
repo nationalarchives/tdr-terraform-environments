@@ -152,7 +152,7 @@ module "upload_bucket_quarantine" {
   lifecycle_rules            = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
   aws_backup_local_role_arn  = local.aws_back_up_local_role
   s3_bucket_additional_tags  = local.aws_back_up_tags
-  enable_request_metrics_all = local.environment == "prod"
+  enable_request_metrics_all = true
 }
 
 module "upload_file_cloudfront_dirty_s3" {

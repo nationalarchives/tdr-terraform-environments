@@ -3,6 +3,8 @@ locals {
 
   terraform_role = "arn:aws:iam::${var.tdr_account_number}:role/TDRTerraformRole${title(local.environment)}"
 
+  terraform_role_alarm_deployer = "arn:aws:iam::${data.aws_ssm_parameter.mgmt_account_number.value}:role/TDRTerraformAlarmsDeployerRole"
+
   environment_full_name_map = {
     "intg"    = "integration",
     "staging" = "staging",
