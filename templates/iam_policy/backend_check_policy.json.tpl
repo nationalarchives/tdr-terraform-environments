@@ -64,7 +64,7 @@
     {
       "Effect": "Allow",
       "Action": "states:InvokeHTTPEndpoint",
-      "Resource": "${state_machine_arn}",
+      "Resource": "${step_function_arn}",
       "Condition": {
         "StringEquals": {
           "states:HTTPMethod": "POST"
