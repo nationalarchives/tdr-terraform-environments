@@ -291,16 +291,6 @@
         "Payload.$": "$",
         "FunctionName": "${api_update_v2_lambda_arn}"
       },
-      "Retry": [
-        {
-          "ErrorEquals": [
-            "States.ALL"
-          ],
-          "IntervalSeconds": 2,
-          "MaxAttempts": 6,
-          "BackoffRate": 2
-        }
-      ],
       "End": true
     }
   }
