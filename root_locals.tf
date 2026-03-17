@@ -12,7 +12,6 @@ locals {
     "dev"     = "development"
   }
 
-
   environment_full_name = local.environment_full_name_map[local.environment]
 
   aws_backup_local_role_name = module.tdr_configuration.terraform_config.prod["local_account_backup_role_name"]
