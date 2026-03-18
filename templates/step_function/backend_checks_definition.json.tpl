@@ -412,7 +412,7 @@
         "Message": {
           "consignmentId.$": "$$.Execution.Input.consignmentId",
           "environment": "${environment}",
-          "failureCause.$": "$.Cause",
+          "failureCause": "See step function execution for details",
           "backEndChecksProcess.$": "$.backEndChecksProcess"
         },
         "TopicArn": "${sns_topic}"
