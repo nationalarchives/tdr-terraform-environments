@@ -48,7 +48,37 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_lambda_failure" {
   evaluation_periods  = 1
   datapoints_to_alarm = 1
   threshold           = 1
-  comparison_operator = "GreaterThanThreshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  treat_missing_data  = "missing"
+
+  provider = aws.alarm_deployer
+}
+
+
+resource "aws_cloudwatch_metric_alarm" "tdr_alarms_lambda_throttles" {
+  for_each          = local.environment == "prod" ? toset(local.prod_buckets) : []
+  alarm_description = "This alarm detects a high number of throttled invocation requests. Throttling occurs when there is no concurrency available for scale up"
+  alarm_name        = format("AWS/Lambda Throttles on %s", each.key)
+
+  metric_query {
+    account_id  = data.aws_caller_identity.current.id
+    id          = "m1"
+    return_data = "true"
+
+    metric {
+      metric_name = "Throttles"
+      namespace   = "AWS/Lambda"
+      stat        = "Sum"
+      period      = 60
+      dimensions = {
+        FunctionName = each.key
+      }
+    }
+  }
+  evaluation_periods  = 5
+  datapoints_to_alarm = 5
+  threshold           = 1
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   treat_missing_data  = "missing"
 
   provider = aws.alarm_deployer
