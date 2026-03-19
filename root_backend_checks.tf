@@ -150,7 +150,8 @@ module "file_format_v2" {
   role_name = "TDRFileFormatV2LambdaRole${title(local.environment)}"
   runtime   = local.runtime_java_21
   plaintext_env_vars = {
-    S3_BUCKET = local.upload_files_cloudfront_dirty_bucket_name
+    S3_BUCKET           = local.upload_files_cloudfront_dirty_bucket_name
+    FILE_FORMAT_TIMEOUT = "14 minutes"
   }
   vpc_config = [
     {
