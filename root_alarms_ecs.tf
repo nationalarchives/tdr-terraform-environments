@@ -9,10 +9,10 @@ locals {
   prod_clusters_prefix = ["consignmentapi", "frontend_service", "keycloak"]
 }
 
-resource "aws_cloudwatch_metric_alarm" "tdr_alarms_ecs_cpuutilization" {
+resource "aws_cloudwatch_metric_alarm" "tdr_alarms_ecs_cpu_utilization" {
   for_each          = local.environment == "prod" ? toset(local.prod_clusters_prefix) : []
   alarm_description = "This alarm helps detect a high CPU utilization of the ECS service"
-  alarm_name        = format("AWS/ECS CPUUtilization on ServiceName=%s_service_%s ClusterName=%s_%s", each.key, local.environment, each.key, local.environment)
+  alarm_name        = format("AWS/ECS CPU Utilization on ServiceName=%s_service_%s ClusterName=%s_%s", each.key, local.environment, each.key, local.environment)
 
   metric_query {
     account_id  = data.aws_caller_identity.current.id
