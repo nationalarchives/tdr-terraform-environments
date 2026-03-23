@@ -150,7 +150,8 @@ module "file_format_v2" {
   role_name = "TDRFileFormatV2LambdaRole${title(local.environment)}"
   runtime   = local.runtime_java_21
   plaintext_env_vars = {
-    S3_BUCKET = local.upload_files_cloudfront_dirty_bucket_name
+    S3_BUCKET           = local.upload_files_cloudfront_dirty_bucket_name
+    FILE_FORMAT_TIMEOUT = "14 minutes"
   }
   vpc_config = [
     {
@@ -230,16 +231,26 @@ module "statuses" {
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
   policies = {
     "TDRStatusesLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_statuses_policy.json.tpl", {
-      function_name = local.statuses_function_name,
-      account_id    = data.aws_caller_identity.current.account_id,
-      bucket_name   = module.backend_lambda_function_bucket.s3_bucket_name
+      function_name      = local.statuses_function_name,
+      account_id         = data.aws_caller_identity.current.account_id,
+      bucket_name        = module.backend_lambda_function_bucket.s3_bucket_name,
+      client_secret_path = local.keycloak_backend_checks_secret_name,
+      sns_topic_arn      = module.notifications_topic.sns_arn,
+      kms_key_arn        = module.encryption_key.kms_key_arn
     })
   }
   role_name = "TDRStatusesLambdaRole${title(local.environment)}"
   runtime   = local.runtime_java_11
   plaintext_env_vars = {
-    S3_ENDPOINT = local.s3_endpoint
+    API_URL            = "${module.consignment_api.api_url}/graphql"
+    AUTH_URL           = local.keycloak_auth_url
+    CLIENT_ID          = local.keycloak_backend-checks_client_id
+    CLIENT_SECRET_PATH = local.keycloak_backend_checks_secret_name
+    S3_ENDPOINT        = local.s3_endpoint
+    SNS_TOPIC          = module.notifications_topic.sns_arn
+    ENVIRONMENT        = local.environment
   }
+
   vpc_config = [
     {
       subnet_ids         = module.shared_vpc.private_backend_checks_subnets
@@ -367,7 +378,7 @@ module "file_checks" {
   }
   runtime = local.runtime_java_21
   vpc_config = {
-    subnet_ids         = [module.shared_vpc.private_backend_checks_subnets]
+    subnet_ids         = module.shared_vpc.private_backend_checks_subnets
     security_group_ids = [module.outbound_only_security_group.security_group_id]
   }
 }
