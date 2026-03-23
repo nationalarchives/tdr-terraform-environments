@@ -43,6 +43,49 @@
         "xray:GetSamplingTargets"
       ],
       "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sns:Publish"
+      ],
+      "Resource": [
+        "${sns_topic_arn}"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
+      ],
+      "Resource": "${kms_key_arn}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "states:InvokeHTTPEndpoint",
+      "Resource": "${state_machine_arn}",
+      "Condition": {
+        "StringEquals": {
+          "states:HTTPMethod": "POST"
+        },
+        "StringLike": {
+          "states:HTTPEndpoint": "${consignment_api_url}/*"
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": "events:RetrieveConnectionCredentials",
+      "Resource": "${connection_arn}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+      ],
+      "Resource": "arn:aws:secretsmanager:eu-west-2:${account_id}:secret:events!connection/*"
     }
   ]
 }

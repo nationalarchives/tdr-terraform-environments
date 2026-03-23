@@ -20,7 +20,24 @@
           "BackoffRate": 2
         }
       ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Get Files Failed",
+          "ResultPath": "$.error"
+        }
+      ],
       "Next": "In Progress Status API Update"
+    },
+    "Get Files Failed": {
+      "Type": "Pass",
+      "Parameters": {
+        "Cause.$": "$.error.Cause",
+        "backEndChecksProcess": "Get Files"
+      },
+      "Next": "Process failed notification"
     },
     "In Progress Status API Update": {
       "Type": "Task",
@@ -39,8 +56,25 @@
           "BackoffRate": 2
         }
       ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "In Progress Status API Update Failed",
+          "ResultPath": "$.error"
+        }
+      ],
       "ResultPath": null,
       "Next": "Map"
+    },
+    "In Progress Status API Update Failed": {
+      "Type": "Pass",
+      "Parameters": {
+        "Cause.$": "$.error.Cause",
+        "backEndChecksProcess": "In Progress Status API Update"
+      },
+      "Next": "Process failed notification"
     },
     "Map": {
       "Type": "Map",
@@ -241,7 +275,24 @@
           "BackoffRate": 2
         }
       ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Process Map Results Failed",
+          "ResultPath": "$.error"
+        }
+      ],
       "Next": "Redacted files"
+    },
+    "Process Map Results Failed": {
+      "Type": "Pass",
+      "Parameters": {
+        "Cause.$": "$.error.Cause",
+        "backEndChecksProcess": "Process Map Results"
+      },
+      "Next": "Process failed notification"
     },
     "Redacted files": {
       "Type": "Task",
@@ -260,8 +311,25 @@
           "BackoffRate": 2
         }
       ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Redacted Files Failed",
+          "ResultPath": "$.error"
+        }
+      ],
       "Next": "Generate Statuses",
       "ResultPath": null
+    },
+    "Redacted Files Failed": {
+      "Type": "Pass",
+      "Parameters": {
+        "Cause.$": "$.error.Cause",
+        "backEndChecksProcess": "Redacted files"
+      },
+      "Next": "Process failed notification"
     },
     "Generate Statuses": {
       "Type": "Task",
@@ -280,8 +348,25 @@
           "BackoffRate": 2
         }
       ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Generate Statuses Failed",
+          "ResultPath": "$.error"
+        }
+      ],
       "Next": "Update API",
       "ResultPath": null
+    },
+    "Generate Statuses Failed": {
+      "Type": "Pass",
+      "Parameters": {
+        "Cause.$": "$.error.Cause",
+        "backEndChecksProcess": "Generate Statuses"
+      },
+      "Next": "Process failed notification"
     },
     "Update API": {
       "Type": "Task",
@@ -301,7 +386,82 @@
           "BackoffRate": 2
         }
       ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Update API Failed",
+          "ResultPath": "$.error"
+        }
+      ],
       "End": true
+    },
+    "Update API Failed": {
+      "Type": "Pass",
+      "Parameters": {
+        "Cause.$": "$.error.Cause",
+        "backEndChecksProcess": "Update API"
+      },
+      "Next": "Process failed notification"
+    },
+    "Process failed notification": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "Message": {
+          "consignmentId.$": "$$.Execution.Input.consignmentId",
+          "environment": "${environment}",
+          "failureCause": "See step function execution for details",
+          "backEndChecksProcess.$": "$.backEndChecksProcess"
+        },
+        "TopicArn": "${sns_topic}"
+      },
+      "Next": "Prepare Client Side Checks Status Parameters"
+    },
+    "Prepare Client Side Checks Status Parameters": {
+      "Type": "Pass",
+      "ResultPath": "$.statusUpdate",
+      "Parameters": {
+        "query": "mutation updateConsignmentStatus($updateConsignmentStatusInput: ConsignmentStatusInput!) { updateConsignmentStatus(updateConsignmentStatusInput: $updateConsignmentStatusInput) }",
+        "variables": {
+          "updateConsignmentStatusInput": {
+            "consignmentId.$": "$$.Execution.Input.consignmentId",
+            "statusType": "ClientChecks",
+            "statusValue": "Failed"
+          }
+        }
+      },
+      "Next": "Update Client Checks Status"
+    },
+    "Update Client Checks Status": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::http:invoke",
+      "Parameters": {
+        "ApiEndpoint": "${consignment_api_url}/graphql",
+        "Method": "POST",
+        "Authentication": {
+          "ConnectionArn": "${consignment_api_connection_arn}"
+        },
+        "Headers": {
+          "Content-Type": "application/json"
+        },
+        "RequestBody.$": "$.statusUpdate"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Events.ConnectionResource.ConcurrentModification"
+          ],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Fail State"
+    },
+    "Fail State": {
+      "Type": "Fail"
     }
   }
 }
