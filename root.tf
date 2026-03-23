@@ -821,7 +821,7 @@ module "disable_inactive_judgment_users_scheduled_event" {
   input = jsonencode({
     detail = {
       userType             = "judgment_user"
-      inactivityPeriodDays = 730
+      inactivityPeriodDays = 365
     }
   })
 }
