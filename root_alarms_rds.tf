@@ -80,40 +80,6 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_rds_ebs_byte_balance" {
   provider = aws.alarm_deployer
 }
 
-resource "aws_cloudwatch_metric_alarm" "tdr_alarms_rds_ebs_byte_balance" {
-  for_each = local.environment == "prod" ? toset(local.rds_instance_identifiers) : []
-
-  # Intent            : "This alarm is used to detect a low percentage of throughput credits remaining in the burst bucket. Low byte balance percentage can cause throughput bottleneck issues. This alarm is not recommended for Aurora PostgreSQL instances."
-  # Threshold Justification : "A throughput credit balance below 10% is considered to be poor and you should set the threshold accordingly. You can also set a lower threshold if your application can tolerate a lower throughput for the workload."
-
-  alarm_description = "This alarm helps to monitor a low percentage of throughput credits remaining. For troubleshooting, check [latency problems in RDS](https://repost.aws/knowledge-center/rds-latency-ebs-iops"
-
-  alarm_name = format("AWS/RDS EBSByteBalance%% Environment=%s, DBInstanceIdentifier=%s", local.environment, each.key)
-
-  metric_query {
-    account_id  = data.aws_caller_identity.current.id
-    id          = "m1"
-    return_data = "true"
-
-    metric {
-      metric_name = "EBSByteBalance%"
-      namespace   = "AWS/RDS"
-      stat        = "Average"
-      period      = 60
-      dimensions = {
-        DBInstanceIdentifier = each.key
-      }
-    }
-  }
-  evaluation_periods  = 3
-  datapoints_to_alarm = 3
-  threshold           = 10
-  comparison_operator = "LessThanThreshold"
-  treat_missing_data  = "missing"
-
-  provider = aws.alarm_deployer
-}
-
 resource "aws_cloudwatch_metric_alarm" "tdr_alarms_rds_ebsio_balance" {
   for_each = local.environment == "prod" ? toset(local.rds_instance_identifiers) : []
 
