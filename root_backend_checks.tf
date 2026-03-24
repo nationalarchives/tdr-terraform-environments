@@ -150,7 +150,8 @@ module "file_format_v2" {
   role_name = "TDRFileFormatV2LambdaRole${title(local.environment)}"
   runtime   = local.runtime_java_21
   plaintext_env_vars = {
-    S3_BUCKET = local.upload_files_cloudfront_dirty_bucket_name
+    S3_BUCKET           = local.upload_files_cloudfront_dirty_bucket_name
+    FILE_FORMAT_TIMEOUT = "14 minutes"
   }
   vpc_config = [
     {
@@ -230,9 +231,12 @@ module "statuses" {
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
   policies = {
     "TDRStatusesLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_statuses_policy.json.tpl", {
-      function_name = local.statuses_function_name,
-      account_id    = data.aws_caller_identity.current.account_id,
-      bucket_name   = module.backend_lambda_function_bucket.s3_bucket_name
+      function_name      = local.statuses_function_name,
+      account_id         = data.aws_caller_identity.current.account_id,
+      bucket_name        = module.backend_lambda_function_bucket.s3_bucket_name,
+      client_secret_path = local.keycloak_backend_checks_secret_name,
+      sns_topic_arn      = module.notifications_topic.sns_arn,
+      kms_key_arn        = module.encryption_key.kms_key_arn
     })
   }
   role_name = "TDRStatusesLambdaRole${title(local.environment)}"
@@ -325,16 +329,19 @@ module "backend_checks_step_function" {
   project            = var.project
   step_function_name = "BackendChecks"
   definition = templatefile("./templates/step_function/backend_checks_definition.json.tpl", {
-    environment                 = local.environment
-    backend_checks_results_arn  = module.backend_checks_results.lambda_arn
-    file_upload_data_lambda_arn = module.file_upload_data.lambda_arn
-    api_update_v2_lambda_arn    = module.api_update_v2.lambda_arn
-    yara_av_v2_lambda_arn       = module.yara_av_v2.lambda_arn
-    statuses_lambda_arn         = module.statuses.lambda_arn
-    file_format_v2_lambda_arn   = module.file_format_v2.lambda_arn
-    checksum_v2_lambda_arn      = module.checksum_v2.lambda_arn
-    redacted_files_lambda_arn   = module.redacted_files.lambda_arn
-    notification_lambda_arn     = module.notification_lambda.ecr_scan_notification_lambda_arn[0]
+    environment                    = local.environment
+    backend_checks_results_arn     = module.backend_checks_results.lambda_arn
+    file_upload_data_lambda_arn    = module.file_upload_data.lambda_arn
+    api_update_v2_lambda_arn       = module.api_update_v2.lambda_arn
+    yara_av_v2_lambda_arn          = module.yara_av_v2.lambda_arn
+    statuses_lambda_arn            = module.statuses.lambda_arn
+    file_format_v2_lambda_arn      = module.file_format_v2.lambda_arn
+    checksum_v2_lambda_arn         = module.checksum_v2.lambda_arn
+    redacted_files_lambda_arn      = module.redacted_files.lambda_arn
+    notification_lambda_arn        = module.notification_lambda.ecr_scan_notification_lambda_arn[0]
+    sns_topic                      = module.notifications_topic.sns_arn
+    consignment_api_url            = module.consignment_api.api_url
+    consignment_api_connection_arn = aws_cloudwatch_event_connection.consignment_api_connection.arn
   })
   environment = local.environment
   policy = templatefile("./templates/iam_policy/backend_check_policy.json.tpl", {
@@ -349,6 +356,11 @@ module "backend_checks_step_function" {
     notification_lambda_arn     = module.notification_lambda.ecr_scan_notification_lambda_arn[0],
     backend_checks_bucket_arn   = module.backend_lambda_function_bucket.s3_bucket_arn
     state_machine_arn           = module.backend_checks_step_function.state_machine_arn
+    sns_topic_arn               = module.notifications_topic.sns_arn
+    kms_key_arn                 = module.encryption_key.kms_key_arn
+    connection_arn              = aws_cloudwatch_event_connection.consignment_api_connection.arn
+    consignment_api_url         = module.consignment_api.api_url
+    account_id                  = data.aws_caller_identity.current.account_id
   })
 }
 
