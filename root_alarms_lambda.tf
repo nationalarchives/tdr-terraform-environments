@@ -6,7 +6,7 @@
 
 # Lambda - alert on any failure on a prod lambda
 locals {
-  prod_buckets = ["tdr-api-update-v2-prod",
+  prod_lambdas = ["tdr-api-update-v2-prod",
     "tdr-backend-checks-results-prod",
     "tdr-checksum-v2-prod",
     "tdr-database-migrations-prod",
@@ -26,7 +26,7 @@ locals {
 }
 
 resource "aws_cloudwatch_metric_alarm" "tdr_alarms_lambda_failure" {
-  for_each          = local.environment == "prod" ? toset(local.prod_buckets) : []
+  for_each          = local.environment == "prod" ? toset(local.prod_lambdas) : []
   alarm_description = "This alarm fires when a lambda fails"
   alarm_name        = format("AWS/Lambda Error on %s", each.key)
 
@@ -54,9 +54,8 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_lambda_failure" {
   provider = aws.alarm_deployer
 }
 
-
 resource "aws_cloudwatch_metric_alarm" "tdr_alarms_lambda_throttles" {
-  for_each          = local.environment == "prod" ? toset(local.prod_buckets) : []
+  for_each          = local.environment == "prod" ? toset(local.prod_lambdas) : []
   alarm_description = "This alarm detects a high number of throttled invocation requests. Throttling occurs when there is no concurrency available for scale up"
   alarm_name        = format("AWS/Lambda Throttles on %s", each.key)
 
