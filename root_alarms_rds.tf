@@ -46,7 +46,7 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_rds_cpu_utilization" {
   provider = aws.alarm_deployer
 }
 
-resource "aws_cloudwatch_metric_alarm" "ddt_alarms_rds_ebs_byte_balance" {
+resource "aws_cloudwatch_metric_alarm" "tdr_alarms_rds_ebs_byte_balance" {
   for_each = local.environment == "prod" ? toset(local.rds_instance_identifiers) : []
 
   # Intent            : "This alarm is used to detect a low percentage of throughput credits remaining in the burst bucket. Low byte balance percentage can cause throughput bottleneck issues. This alarm is not recommended for Aurora PostgreSQL instances."
@@ -122,7 +122,6 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_rds_ebsio_balance" {
 
   alarm_description = "This alarm helps to monitor low percentage of IOPS credits remaining. For troubleshooting, see [latency problems in RDS](https://repost.aws/knowledge-center/rds-latency-ebs-iops-bottleneck)."
 
-
   alarm_name = format("AWS/RDS EBSIOBalance%% Environment=%s, DBInstanceIdentifier=%s", local.environment, each.key)
 
   metric_query {
@@ -183,7 +182,6 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_rds_free_storage_space" {
 
   provider = aws.alarm_deployer
 }
-
 
 resource "aws_cloudwatch_metric_alarm" "tdr_alarms_rds_read_latency" {
   for_each = local.environment == "prod" ? toset(local.rds_instance_identifiers) : []
