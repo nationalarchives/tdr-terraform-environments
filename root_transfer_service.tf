@@ -1,6 +1,5 @@
 locals {
-  // Apply to intg /staging environments only initially
-  transfer_service_count = local.environment == "prod" ? 0 : 1
+  transfer_service_count = 1
   ip_allow_list          = ["0.0.0.0/0"]
   domain                 = "nationalarchives.gov.uk"
   sub_domain             = "transfer-service"
@@ -70,7 +69,7 @@ module "transfer_service_task_policy" {
 }
 
 module "transfer_service_certificate" {
-  count       = 1
+  count       = local.transfer_service_count
   source      = "./da-terraform-modules/certificatemanager"
   project     = var.project
   function    = "transfer-service"
@@ -81,7 +80,7 @@ module "transfer_service_certificate" {
 }
 
 module "transfer_service_route53" {
-  count              = 1
+  count              = local.transfer_service_count
   source             = "./da-terraform-modules/route53"
   common_tags        = local.common_tags
   a_record_name      = "transfer-service"
@@ -93,7 +92,7 @@ module "transfer_service_route53" {
 }
 
 module "transfer_service_tdr_alb" {
-  count                 = 1
+  count                 = local.transfer_service_count
   source                = "./tdr-terraform-modules/alb"
   project               = var.project
   function              = local.alb_function_name
@@ -122,7 +121,7 @@ module "transfer_service_cloudwatch" {
 }
 
 module "transfer_service_ecs_security_group" {
-  count       = 1
+  count       = local.transfer_service_count
   source      = "./tdr-terraform-modules/security_group"
   description = "Controls access within TDR network for the Transfer Service ECS Task"
   name        = "tdr-transfer-service-ecs-security-group"
@@ -135,7 +134,7 @@ module "transfer_service_ecs_security_group" {
 }
 
 module "transfer_service_alb_security_group" {
-  count       = 1
+  count       = local.transfer_service_count
   source      = "./tdr-terraform-modules/security_group"
   description = "Controls access to the Transfer Service load balancer"
   name        = "transfer-service-load-balancer-security-group"
@@ -198,7 +197,7 @@ module "transfer_service_ecs_task" {
 }
 
 module "aggregate_processing_lambda" {
-  count           = 1
+  count           = local.transfer_service_count
   source          = "./da-terraform-modules/lambda"
   function_name   = local.aggregate_processing_function_name
   tags            = local.common_tags
@@ -249,7 +248,7 @@ module "aggregate_processing_lambda" {
 }
 
 module "aggregate_processing_sqs_queue" {
-  count      = 1
+  count      = local.transfer_service_count
   source     = "./da-terraform-modules/sqs"
   tags       = local.common_tags
   queue_name = local.aggregate_processing_function_name
@@ -265,7 +264,7 @@ module "aggregate_processing_sqs_queue" {
 }
 
 module "tdr_transfer_errors_s3_bucket" {
-  count                      = 1
+  count                      = local.transfer_service_count
   source                     = "./da-terraform-modules/s3"
   bucket_name                = local.tdr_transfer_errors_s3_bucket_name
   common_tags                = local.common_tags
