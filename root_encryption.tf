@@ -8,7 +8,7 @@ locals {
   wiz_role_arns                    = module.tdr_configuration.terraform_config[local.environment]["wiz_role_arns"]
   aws_back_up_roles                = local.environment == "prod" ? [local.aws_back_up_local_role] : []
   aggregate_processing_access_role = local.environment == "prod" ? [] : [module.aggregate_processing_lambda[0].lambda_role_arn]
-  transfer_service_ecs_task_role   = local.environment == "prod" ? [] : [module.transfer_service_task_role[0].role_arn]
+  transfer_service_ecs_task_role   = [module.transfer_service_task_role[0].role_arn]
   athena_reporting_sso_role        = local.environment == "prod" ? tolist(data.aws_iam_roles.athena_reporting_sso[0].arns) : []
 }
 
