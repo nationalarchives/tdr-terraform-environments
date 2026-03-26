@@ -8,7 +8,7 @@ locals {
   aggregate_processing_function_name       = "tdr-aggregate-processing-${local.environment}"
   aggregate_processing_lambda_timeout_secs = 900
 
-  transfer_service_ecs_task_role_arn = local.environment == "prod" ? "" : module.transfer_service_task_role[0].role_arn
+  transfer_service_ecs_task_role_arn = module.transfer_service_task_role[0].role_arn
   tdr_transfer_errors_s3_bucket_name = "tdr-transfer-errors-${local.environment}"
   block_api_documentation            = local.environment == "intg" || local.environment == "dev" ? false : true
   block_service_endpoints            = local.environment == "prod" ? true : false
