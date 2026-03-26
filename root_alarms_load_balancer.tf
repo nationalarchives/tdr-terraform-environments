@@ -100,5 +100,3 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_elb_target_5xx_count" {
 
   provider = aws.alarm_deployer
 }
-
-
