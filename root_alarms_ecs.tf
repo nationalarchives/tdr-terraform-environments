@@ -6,7 +6,7 @@
 
 # ECS - alert on any high CPUUtilization
 locals {
-  prod_clusters_prefix = ["consignmentapi", "frontend_service", "keycloak"]
+  prod_clusters_prefix = ["consignmentapi", "frontend", "keycloak", "transferservice"]
 }
 
 resource "aws_cloudwatch_metric_alarm" "tdr_alarms_ecs_cpu_utilization" {
