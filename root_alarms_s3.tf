@@ -28,7 +28,7 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_s3_object_put_quarantine" {
   evaluation_periods  = 1
   datapoints_to_alarm = 1
   threshold           = 1
-  comparison_operator = "GreaterThanThreshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   treat_missing_data  = "missing"
 
   provider = aws.alarm_deployer
@@ -58,7 +58,7 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_s3_object_put_transfer_errors
   evaluation_periods  = 1
   datapoints_to_alarm = 1
   threshold           = 1
-  comparison_operator = "GreaterThanThreshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   treat_missing_data  = "missing"
 
   provider = aws.alarm_deployer
