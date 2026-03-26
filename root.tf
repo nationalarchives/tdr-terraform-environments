@@ -876,11 +876,12 @@ module "advanced_shield" {
   project = var.project
   resource_arns = merge(
     {
-      "route53"             = data.aws_route53_zone.tdr_dns_zone.arn,
-      "cloudfront"          = module.cloudfront_upload.cloudfront_arn,
-      "keycloak_alb"        = module.keycloak_tdr_alb.alb_arn,
-      "consignment_api_alb" = module.consignment_api_alb.alb_arn,
-      "frontend_alb"        = module.frontend_alb.alb_arn
+      "route53"              = data.aws_route53_zone.tdr_dns_zone.arn,
+      "cloudfront"           = module.cloudfront_upload.cloudfront_arn,
+      "keycloak_alb"         = module.keycloak_tdr_alb.alb_arn,
+      "consignment_api_alb"  = module.consignment_api_alb.alb_arn,
+      "frontend_alb"         = module.frontend_alb.alb_arn,
+      "transfer_service_alb" = module.transfer_service_tdr_alb[0].alb_arn
     },
     {
       for i, arn in module.shared_vpc.elastic_ip_arns : "elastic_ip_${i}" => arn
@@ -907,14 +908,14 @@ module "shield_response_s3_bucket" {
 
 module "shield_cloudwatch_rules" {
   for_each = {
-    route_53     = data.aws_route53_zone.tdr_dns_zone.arn,
-    cloudfront   = module.cloudfront_upload.cloudfront_arn,
-    keycloak_alb = module.keycloak_tdr_alb.alb_arn,
-    api_alb      = module.consignment_api_alb.alb_arn,
-    frontend_alb = module.frontend_alb.alb_arn,
-    elastic_ip_1 = module.shared_vpc.elastic_ip_arns[0
-    ],
-    elastic_ip_2 = module.shared_vpc.elastic_ip_arns[1]
+    route_53             = data.aws_route53_zone.tdr_dns_zone.arn,
+    cloudfront           = module.cloudfront_upload.cloudfront_arn,
+    keycloak_alb         = module.keycloak_tdr_alb.alb_arn,
+    api_alb              = module.consignment_api_alb.alb_arn,
+    frontend_alb         = module.frontend_alb.alb_arn,
+    transfer_service_alb = module.transfer_service_tdr_alb[0].alb_arn,
+    elastic_ip_1         = module.shared_vpc.elastic_ip_arns[0],
+    elastic_ip_2         = module.shared_vpc.elastic_ip_arns[1]
   }
   source              = "./tdr-terraform-modules/cloudwatch_alarms"
   environment         = local.environment
