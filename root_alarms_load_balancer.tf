@@ -9,7 +9,8 @@
 locals {
   load_balancers = [module.consignment_api_alb.alb_arn_suffix,
     module.frontend_alb.alb_arn_suffix,
-    module.keycloak_tdr_alb.alb_arn_suffix
+    module.keycloak_tdr_alb.alb_arn_suffix,
+    module.transfer_service_tdr_alb[0].alb_arn_suffix
   ]
 }
 
