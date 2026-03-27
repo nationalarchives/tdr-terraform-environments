@@ -51,7 +51,7 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_lambda_failure" {
   datapoints_to_alarm = 1
   threshold           = 1
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  treat_missing_data  = "missing"
+  treat_missing_data  = "notBreaching"
 
   provider = aws.alarm_deployer
 }
@@ -76,11 +76,12 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_lambda_throttles" {
       }
     }
   }
+
   evaluation_periods  = 5
   datapoints_to_alarm = 5
   threshold           = 1
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  treat_missing_data  = "missing"
+  treat_missing_data  = "notBreaching"
 
   provider = aws.alarm_deployer
 }

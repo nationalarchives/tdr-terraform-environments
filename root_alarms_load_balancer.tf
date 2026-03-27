@@ -15,7 +15,7 @@ locals {
 }
 
 resource "aws_cloudwatch_metric_alarm" "tdr_alarms_elb_4xx_count" {
-  for_each          = local.environment == "prod" ? toset(local.load_balancers) : []
+  for_each          = toset(local.load_balancers)
   alarm_description = "This alarm fires when an ELB (not the target) returns a high number of 4xx errors"
   alarm_name        = format("AWS/ApplicationELB High 4XX Count Environment=%s, LB=%s", local.environment, each.key)
 
@@ -34,9 +34,9 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_elb_4xx_count" {
       }
     }
   }
-  evaluation_periods  = 1
-  datapoints_to_alarm = 1
-  threshold           = 1
+  evaluation_periods  = 5
+  datapoints_to_alarm = 5
+  threshold           = 50
   comparison_operator = "GreaterThanThreshold"
   treat_missing_data  = "missing"
 
@@ -44,7 +44,7 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_elb_4xx_count" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "tdr_alarms_elb_target_4xx_count" {
-  for_each          = local.environment == "prod" ? toset(local.load_balancers) : []
+  for_each          = toset(local.load_balancers)
   alarm_description = "This alarm fires when an ELB target returns a high number of 4xx errors"
   alarm_name        = format("AWS/ApplicationELB High 4XX Count On Target Environment=%s, LB=%s", local.environment, each.key)
 
@@ -63,9 +63,9 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_elb_target_4xx_count" {
       }
     }
   }
-  evaluation_periods  = 1
-  datapoints_to_alarm = 1
-  threshold           = 1
+  evaluation_periods  = 5
+  datapoints_to_alarm = 5
+  threshold           = 50
   comparison_operator = "GreaterThanThreshold"
   treat_missing_data  = "missing"
 
@@ -73,7 +73,7 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_elb_target_4xx_count" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "tdr_alarms_elb_target_5xx_count" {
-  for_each          = local.environment == "prod" ? toset(local.load_balancers) : []
+  for_each          = toset(local.load_balancers)
   alarm_description = "This alarm fires when an ELB target returns a high number of 5xx errors"
   alarm_name        = format("AWS/ApplicationELB High 5XX Count On Target Environment=%s, LB=%s", local.environment, each.key)
 
@@ -92,9 +92,9 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_elb_target_5xx_count" {
       }
     }
   }
-  evaluation_periods  = 1
-  datapoints_to_alarm = 1
-  threshold           = 1
+  evaluation_periods  = 5
+  datapoints_to_alarm = 5
+  threshold           = 50
   comparison_operator = "GreaterThanThreshold"
   treat_missing_data  = "missing"
 
