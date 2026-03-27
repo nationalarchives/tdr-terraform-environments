@@ -6,7 +6,9 @@
 
 # Lambda - alert on any failure on a prod lambda
 locals {
-  prod_lambdas = ["tdr-api-update-v2-prod",
+  prod_lambdas = [
+    "tdr-aggregate-processing-prod",
+    "tdr-api-update-v2-prod",
     "tdr-backend-checks-results-prod",
     "tdr-checksum-v2-prod",
     "tdr-database-migrations-prod",
