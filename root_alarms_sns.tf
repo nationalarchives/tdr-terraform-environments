@@ -33,7 +33,7 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_sns_notifications_failed" {
   datapoints_to_alarm = 1
   threshold           = 1
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  treat_missing_data  = "missing"
+  treat_missing_data  = "notBreaching"
 
   provider = aws.alarm_deployer
 }
