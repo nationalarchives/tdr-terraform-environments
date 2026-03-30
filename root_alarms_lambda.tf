@@ -15,6 +15,7 @@ locals {
     "tdr-draft-metadata-checks-prod",
     "tdr-draft-metadata-persistence-prod",
     "tdr-export-api-authoriser-prod",
+    "tdr-file-checks-prod",
     "tdr-file-format-v2-prod",
     "tdr-file-upload-data-prod",
     "tdr-notifications-prod",
