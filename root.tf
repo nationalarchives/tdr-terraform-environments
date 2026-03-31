@@ -956,13 +956,13 @@ module "consignment_api_database" {
   source                  = "./tdr-terraform-modules/rds_instance"
   instance_class          = local.environment == "staging" ? "db.t3.large" : (local.environment == "dev" ? "db.t3.micro" : "db.t3.medium")
   admin_username          = "api_admin"
-  availability_zone       = local.environment == "intg" ? "eu-west-2b" : local.database_availability_zone
+  availability_zone       = local.environment == "prod" ? local.database_availability_zone : "eu-west-2b"
   common_tags             = local.common_tags
   database_name           = "consignmentapi"
   database_version        = "17.4"
   environment             = local.environment
   kms_key_id              = module.encryption_key.kms_key_arn
-  private_subnets         = local.environment == "intg" ? module.shared_vpc.private_backend_checks_subnets : module.shared_vpc.private_subnets
+  private_subnets         = local.environment == "prod" ? module.shared_vpc.private_subnets : module.shared_vpc.private_backend_checks_subnets
   security_group_ids      = [module.api_database_security_group.security_group_id]
   multi_az                = local.environment == "prod"
   ca_cert_identifier      = local.database_ca_cert_identifier
