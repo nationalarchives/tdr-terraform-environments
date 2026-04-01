@@ -31,8 +31,8 @@
       "Resource": [
         "arn:aws:s3:::${dirty_bucket}",
         "arn:aws:s3:::${dirty_bucket}/*",
-        "arn:aws:s3:::${metadata_bucket}",
-        "arn:aws:s3:::${metadata_bucket}/*"
+        "arn:aws:s3:::${draft_metadata_bucket}",
+        "arn:aws:s3:::${draft_metadata_bucket}/*"
       ]
     },
     {

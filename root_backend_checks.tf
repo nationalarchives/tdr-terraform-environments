@@ -375,14 +375,14 @@ module "file_checks" {
   memory_size          = 2560
   policies = {
     "TDRFileChecksLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_file_checks_policy.json.tpl", {
-      function_name     = local.file_checks_function_name,
-      account_id        = data.aws_caller_identity.current.account_id,
-      dirty_bucket      = module.upload_file_cloudfront_dirty_s3.s3_bucket_name
-      upload_bucket     = module.upload_bucket.s3_bucket_name
-      quarantine_bucket = module.upload_bucket_quarantine.s3_bucket_name
-      metadata_bucket   = local.draft_metadata_s3_bucket_name
-      decryption_keys   = jsonencode([module.s3_upload_kms_key.kms_key_arn])
-      encryption_keys   = jsonencode([module.s3_internal_kms_key.kms_key_arn])
+      function_name         = local.file_checks_function_name,
+      account_id            = data.aws_caller_identity.current.account_id,
+      dirty_bucket          = module.upload_file_cloudfront_dirty_s3.s3_bucket_name
+      upload_bucket         = module.upload_bucket.s3_bucket_name
+      quarantine_bucket     = module.upload_bucket_quarantine.s3_bucket_name
+      draft_metadata_bucket = local.draft_metadata_s3_bucket_name
+      decryption_keys       = jsonencode([module.s3_upload_kms_key.kms_key_arn])
+      encryption_keys       = jsonencode([module.s3_internal_kms_key.kms_key_arn])
     })
   }
   runtime = local.runtime_java_21
