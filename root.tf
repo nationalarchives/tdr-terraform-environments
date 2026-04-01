@@ -954,7 +954,7 @@ module "api_database_security_group" {
 
 module "consignment_api_database" {
   source                  = "./tdr-terraform-modules/rds_instance"
-  instance_class          = local.environment == "staging" ? "db.t3.large" : (local.environment == "dev" ? "db.t3.micro" : "db.t3.medium")
+  instance_class          = local.environment == "intg" ? "db.t3.medium" : (local.environment == "dev" ? "db.t3.micro" : "db.t3.large")
   admin_username          = "api_admin"
   availability_zone       = local.environment == "prod" ? local.database_availability_zone : "eu-west-2b"
   common_tags             = local.common_tags
