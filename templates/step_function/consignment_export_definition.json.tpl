@@ -78,7 +78,7 @@
     },
     "Parallel": {
       "Type": "Parallel",
-      "Next": "Task complete notification",
+      "Next": "PrepareGetConsignmentQuery",
       "Branches": [
         {
           "StartAt": "Run ECS export",
@@ -168,7 +168,7 @@
                     "ECS.AmazonECSException"
                   ],
                   "MaxAttempts": ${max_attempts}
-              }
+                }
               ],
               "Parameters": {
                 "LaunchType": "FARGATE",
@@ -237,6 +237,44 @@
       ],
       "OutputPath": "$.[1]"
     },
+    "PrepareGetConsignmentQuery": {
+      "Type": "Pass",
+      "ResultPath": "$.consignmentQuery",
+      "Parameters": {
+        "query": "query getConsignmentForMetadataReviewRequest($consignmentId: UUID!) { getConsignment(consignmentid: $consignmentId) { userid consignmentReference seriesName transferringBodyName totalClosedRecords totalFiles } }",
+        "variables": {
+          "consignmentId.$": "$$.Execution.Input.consignmentId"
+        }
+      },
+      "Next": "GetConsignmentDetails"
+    },
+    "GetConsignmentDetails": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::http:invoke",
+      "Parameters": {
+        "ApiEndpoint": "${consignment_api_url}/graphql",
+        "Method": "POST",
+        "Authentication": {
+          "ConnectionArn": "${consignment_api_connection_arn}"
+        },
+        "Headers": {
+          "Content-Type": "application/json"
+        },
+        "RequestBody.$": "$.consignmentQuery"
+      },
+      "ResultPath": "$.consignmentDetails",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Events.ConnectionResource.ConcurrentModification"
+          ],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Task complete notification"
+    },
     "Task complete notification": {
       "Type": "Task",
       "Resource": "arn:aws:states:::sns:publish",
@@ -245,7 +283,13 @@
           "consignmentId.$": "$$.Execution.Input.consignmentId",
           "success": true,
           "environment": "${environment}",
-          "successDetails.$": "$"
+          "successDetails.$": "$",
+          "userid.$": "$.consignmentDetails.ResponseBody.data.getConsignment.userid",
+          "consignmentReference.$": "$.consignmentDetails.ResponseBody.data.getConsignment.consignmentReference",
+          "seriesName.$": "$.consignmentDetails.ResponseBody.data.getConsignment.seriesName",
+          "transferringBodyName.$": "$.consignmentDetails.ResponseBody.data.getConsignment.transferringBodyName",
+          "totalClosedRecords.$": "$.consignmentDetails.ResponseBody.data.getConsignment.totalClosedRecords",
+          "totalFiles.$": "$.consignmentDetails.ResponseBody.data.getConsignment.totalFiles"
         },
         "TopicArn": "${sns_topic}"
       },
@@ -279,7 +323,7 @@
           "failureCause.$": "$.Cause"
         },
         "TopicArn": "${sns_topic}"
-    },
+      },
       "Next": "Export Status Update"
     },
     "Task timed out notification": {

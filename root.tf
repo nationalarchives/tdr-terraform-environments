@@ -528,24 +528,69 @@ module "export_efs" {
   vpc_id                       = module.shared_vpc.vpc_id
 }
 
+data "aws_ssm_parameter" "export_keycloak_secret" {
+  name            = local.keycloak_tdr_export_client_secret_name
+  with_decryption = true
+  depends_on      = [module.keycloak_ssm_parameters]
+}
+
+resource "aws_cloudwatch_event_connection" "consignment_api_export_connection" {
+  name               = "TDRConsignmentAPIExportConnection${title(local.environment)}"
+  authorization_type = "OAUTH_CLIENT_CREDENTIALS"
+
+  auth_parameters {
+    oauth {
+      client_parameters {
+        client_id     = local.keycloak_export_client_id
+        client_secret = data.aws_ssm_parameter.export_keycloak_secret.value
+      }
+
+      authorization_endpoint = "${local.keycloak_auth_url}/realms/tdr/protocol/openid-connect/token"
+      http_method            = "POST"
+
+      oauth_http_parameters {
+        body {
+          key             = "grant_type"
+          value           = "client_credentials"
+          is_value_secret = false
+        }
+      }
+    }
+  }
+}
+
+resource "aws_iam_policy" "export_api_invoke_policy" {
+  name = "TDRConsignmentAPIExportInvokePolicy${title(local.environment)}"
+
+  policy = templatefile("./templates/iam_policy/third_party_api_invocation_template.json.tpl", {
+    region            = local.region
+    account_number    = var.tdr_account_number
+    connection_arn    = aws_cloudwatch_event_connection.consignment_api_export_connection.arn
+    api_url           = module.consignment_api.api_url
+    step_function_arn = module.export_step_function.state_machine_arn
+  })
+}
+
 module "export_step_function" {
   source = "./tdr-terraform-modules/stepfunctions"
   tags   = local.common_tags
   definition = templatefile("./templates/step_function/consignment_export_definition.json.tpl", {
-    account_id                    = data.aws_caller_identity.current.account_id
-    environment                   = local.environment
-    security_groups               = jsonencode([module.consignment_export_ecs_security_group.security_group_id]),
-    subnet_ids                    = jsonencode(module.export_efs.private_subnets),
-    cluster_arn                   = module.consignment_export_ecs_task.cluster_arn,
-    task_arn                      = module.consignment_export_ecs_task.task_definition_arn,
-    task_name                     = "consignment-export",
-    sns_topic                     = module.notifications_topic.sns_arn,
-    platform_version              = "1.4.0"
-    max_attempts                  = 2,
-    export_output_bucket          = local.flat_format_bucket_name
-    export_output_judgment_bucket = local.flat_format_judgment_bucket_name
-    bagit_export_bucket           = module.export_bucket.s3_bucket_name
-    bagit_export_judgment_bucket  = module.export_bucket_judgment.s3_bucket_name
+    account_id                     = data.aws_caller_identity.current.account_id
+    environment                    = local.environment
+    security_groups                = jsonencode([module.consignment_export_ecs_security_group.security_group_id]),
+    subnet_ids                     = jsonencode(module.export_efs.private_subnets),
+    cluster_arn                    = module.consignment_export_ecs_task.cluster_arn,
+    task_arn                       = module.consignment_export_ecs_task.task_definition_arn,
+    task_name                      = "consignment-export",
+    sns_topic                      = module.notifications_topic.sns_arn,
+    platform_version               = "1.4.0"
+    max_attempts                   = 2,
+    export_output_bucket           = local.flat_format_bucket_name
+    export_output_judgment_bucket  = local.flat_format_judgment_bucket_name
+    bagit_export_bucket            = module.export_bucket.s3_bucket_name
+    bagit_export_judgment_bucket   = module.export_bucket_judgment.s3_bucket_name
+    consignment_api_url            = module.consignment_api.api_url
+    consignment_api_connection_arn = aws_cloudwatch_event_connection.consignment_api_export_connection.arn
   })
   step_function_name = "ConsignmentExport"
   environment        = local.environment
@@ -559,6 +604,11 @@ module "export_step_function" {
     sns_topic      = module.notifications_topic.sns_arn
     environment    = local.environment
   })
+}
+
+resource "aws_iam_role_policy_attachment" "export_api_invoke_policy" {
+  role       = module.export_step_function.step_function_role_name
+  policy_arn = aws_iam_policy.export_api_invoke_policy.arn
 }
 
 module "flat_format_export_bucket" {

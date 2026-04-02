@@ -86,6 +86,7 @@ locals {
   keycloak_backend_checks_secret_name            = "/${local.environment}/keycloak/backend_checks_client/secret"
   keycloak_tdr_client_secret_name                = "/${local.environment}/keycloak/client/secret"
   keycloak_tdr_draft_metadata_client_secret_name = "/${local.environment}/keycloak/draft_metadata_client/secret"
+  keycloak_tdr_export_client_secret_name         = "/${local.environment}/keycloak/export_client/secret"
   keycloak_tdr_read_client_secret_name           = "/${local.environment}/keycloak/user_read_client/secret"
   keycloak_tdr_transfer_service_secret_name      = "/${local.environment}/keycloak/transfer_service_client/secret"
   keycloak_user_password_name                    = "/${local.environment}/keycloak/password"
@@ -108,6 +109,7 @@ locals {
   keycloak_reporting_client_id      = "tdr-reporting"
   keycloak_backend-checks_client_id = "tdr-backend-checks"
   keycloak_draft-metadata_client_id = "tdr-draft-metadata"
+  keycloak_export_client_id         = "tdr-export-client"
   keycloak_user_read_client_id      = "tdr-user-read"
 
   //Used for allowing full access for Cloudfront logging. More information at https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html#AccessLogsBucketAndFileOwnership
