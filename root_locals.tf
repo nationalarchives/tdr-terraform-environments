@@ -32,7 +32,7 @@ locals {
 
   database_availability_zone = "eu-west-2a"
 
-  database_allocated_storage = local.environment == "staging" ? 70 : 60
+  database_allocated_storage = local.environment == "intg" ? 60 : 70
 
   database_ca_cert_identifier = "rds-ca-rsa2048-g1"
 
