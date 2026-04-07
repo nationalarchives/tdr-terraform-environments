@@ -956,33 +956,6 @@ module "shield_response_s3_bucket" {
   project     = var.project
 }
 
-module "shield_cloudwatch_rules" {
-  for_each = {
-    route_53             = data.aws_route53_zone.tdr_dns_zone.arn,
-    cloudfront           = module.cloudfront_upload.cloudfront_arn,
-    keycloak_alb         = module.keycloak_tdr_alb.alb_arn,
-    api_alb              = module.consignment_api_alb.alb_arn,
-    frontend_alb         = module.frontend_alb.alb_arn,
-    transfer_service_alb = module.transfer_service_tdr_alb[0].alb_arn,
-    elastic_ip_1         = module.shared_vpc.elastic_ip_arns[0],
-    elastic_ip_2         = module.shared_vpc.elastic_ip_arns[1]
-  }
-  source              = "./tdr-terraform-modules/cloudwatch_alarms"
-  environment         = local.environment
-  function            = "shield-metric-${each.key}"
-  metric_name         = "DDoSDetected"
-  project             = var.project
-  threshold           = 1
-  notification_topic  = module.notifications_topic.sns_arn
-  dimensions          = { "ResourceArn" = each.value }
-  statistic           = "Sum"
-  namespace           = "AWS/DDoSProtection"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  treat_missing_data  = "notBreaching"
-  datapoints_to_alarm = 1
-  evaluation_period   = 20
-}
-
 module "api_database_security_group" {
   source      = "./tdr-terraform-modules/security_group"
   common_tags = local.common_tags
