@@ -93,7 +93,7 @@ module "frontend" {
   vpc_id                           = module.shared_vpc.vpc_id
   public_subnets                   = module.shared_vpc.public_subnets
   private_subnets_ecs              = module.shared_vpc.private_backend_checks_subnets
-  private_subnets_elasticache      = local.environment == "prod" ? module.shared_vpc.private_subnets : module.shared_vpc.private_backend_checks_subnets
+  private_subnets_elasticache      = module.shared_vpc.private_backend_checks_subnets
   dns_zone_name_trimmed            = local.dns_zone_name_trimmed
   auth_url                         = local.keycloak_auth_url
   client_secret_path               = module.keycloak_ssm_parameters.params[local.keycloak_tdr_client_secret_name].name
@@ -116,8 +116,8 @@ module "frontend" {
   metadata_version_override        = local.metadata_version_override
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].ecs_tasks
   enable_otel                      = local.environment == "intg"
-  elasticache_engine               = local.environment == "prod" ? "redis" : "valkey"
-  elasticache_engine_version       = local.environment == "prod" ? "7.1" : "8.2"
+  elasticache_engine               = "valkey"
+  elasticache_engine_version       = "8.2"
 }
 
 module "alb_logs_s3" {
