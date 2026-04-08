@@ -177,7 +177,7 @@ module "keycloak_database_instance" {
   database_version        = "17.4"
   environment             = local.environment
   kms_key_id              = module.encryption_key.kms_key_arn
-  private_subnets         = local.environment == "prod" ? module.shared_vpc.private_subnets : module.shared_vpc.private_backend_checks_subnets
+  private_subnets         = module.shared_vpc.private_backend_checks_subnets
   security_group_ids      = [module.keycloak_database_security_group.security_group_id]
   multi_az                = local.environment == "prod"
   ca_cert_identifier      = local.database_ca_cert_identifier
