@@ -109,7 +109,7 @@ locals {
   keycloak_reporting_client_id      = "tdr-reporting"
   keycloak_backend-checks_client_id = "tdr-backend-checks"
   keycloak_draft-metadata_client_id = "tdr-draft-metadata"
-  keycloak_export_client_id         = "tdr-export-client"
+  keycloak_export_client_id         = "tdr-export"
   keycloak_user_read_client_id      = "tdr-user-read"
 
   //Used for allowing full access for Cloudfront logging. More information at https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html#AccessLogsBucketAndFileOwnership
