@@ -273,6 +273,20 @@
           "BackoffRate": 2
         }
       ],
+      "Next": "MergeConsignmentDetails"
+    },
+    "MergeConsignmentDetails": {
+      "Type": "Pass",
+      "Parameters": {
+        "userId.$": "$.userId",
+        "consignmentReference.$": "$.consignmentReference",
+        "transferringBodyName.$": "$.transferringBodyName",
+        "consignmentType.$": "$.consignmentType",
+        "exportBucket.$": "$.exportBucket",
+        "seriesName.$": "$.consignmentDetails.ResponseBody.data.getConsignment.seriesName",
+        "totalClosedRecords.$": "$.consignmentDetails.ResponseBody.data.getConsignment.totalClosedRecords",
+        "totalFiles.$": "$.consignmentDetails.ResponseBody.data.getConsignment.totalFiles"
+      },
       "Next": "Task complete notification"
     },
     "Task complete notification": {
@@ -286,10 +300,7 @@
           "successDetails.$": "$",
           "userid.$": "$.consignmentDetails.ResponseBody.data.getConsignment.userid",
           "consignmentReference.$": "$.consignmentDetails.ResponseBody.data.getConsignment.consignmentReference",
-          "seriesName.$": "$.consignmentDetails.ResponseBody.data.getConsignment.seriesName",
-          "transferringBodyName.$": "$.consignmentDetails.ResponseBody.data.getConsignment.transferringBodyName",
-          "totalClosedRecords.$": "$.consignmentDetails.ResponseBody.data.getConsignment.totalClosedRecords",
-          "totalFiles.$": "$.consignmentDetails.ResponseBody.data.getConsignment.totalFiles"
+          "transferringBodyName.$": "$.consignmentDetails.ResponseBody.data.getConsignment.transferringBodyName"
         },
         "TopicArn": "${sns_topic}"
       },
