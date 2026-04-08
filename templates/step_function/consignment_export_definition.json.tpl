@@ -297,10 +297,7 @@
           "consignmentId.$": "$$.Execution.Input.consignmentId",
           "success": true,
           "environment": "${environment}",
-          "successDetails.$": "$",
-          "userid.$": "$.consignmentDetails.ResponseBody.data.getConsignment.userid",
-          "consignmentReference.$": "$.consignmentDetails.ResponseBody.data.getConsignment.consignmentReference",
-          "transferringBodyName.$": "$.consignmentDetails.ResponseBody.data.getConsignment.transferringBodyName"
+          "successDetails.$": "$"
         },
         "TopicArn": "${sns_topic}"
       },
