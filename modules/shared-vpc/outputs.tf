@@ -10,10 +10,6 @@ output "public_subnet_ranges" {
   value = aws_subnet.public.*.cidr_block
 }
 
-output "private_subnets" {
-  value = aws_subnet.private.*.id
-}
-
 output "private_backend_checks_subnets" {
   value = aws_subnet.private_backend_checks.*.id
 }
