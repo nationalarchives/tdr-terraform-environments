@@ -61,7 +61,6 @@ module "consignment_api" {
   database_availability_zones    = local.database_availability_zones
   environment                    = local.environment
   environment_full_name          = local.environment_full_name_map[local.environment]
-  private_subnets                = module.shared_vpc.private_subnets
   backend_checks_subnets         = module.shared_vpc.private_backend_checks_subnets
   public_subnets                 = module.shared_vpc.public_subnets
   vpc_id                         = module.shared_vpc.vpc_id
@@ -691,7 +690,7 @@ module "tdr_private_nacl" {
     { rule_no = 100, cidr_block = "0.0.0.0/0", action = "allow", from_port = 443, to_port = 443, egress = true },
     { rule_no = 200, cidr_block = module.shared_vpc.vpc_cidr_block, action = "allow", from_port = 1024, to_port = 65535, egress = true }
   ]
-  subnet_ids  = flatten([module.shared_vpc.private_backend_checks_subnets, module.export_efs.private_subnets, module.shared_vpc.private_subnets])
+  subnet_ids  = flatten([module.shared_vpc.private_backend_checks_subnets, module.export_efs.private_subnets])
   common_tags = local.common_tags
 }
 

@@ -194,7 +194,7 @@ module "create_keycloak_db_users_lambda_new" {
   database_name           = "keycloak"
   lambda_name             = "create-keycloak-user"
   vpc_id                  = module.shared_vpc.vpc_id
-  private_subnet_ids      = module.shared_vpc.private_subnets
+  private_subnet_ids      = module.shared_vpc.private_backend_checks_subnets
   db_url                  = module.keycloak_database_instance.database_url
   db_secrets_arn          = module.keycloak_database_instance.database_master_user_secret_arn
   kms_key_arn             = module.encryption_key.kms_key_arn
