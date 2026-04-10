@@ -13,7 +13,6 @@ locals {
   block_api_documentation            = local.environment == "intg" || local.environment == "dev" ? false : true
   block_service_endpoints            = local.environment == "prod" ? true : false
   block_tdr_custom_tags              = local.environment == "prod" ? true : false
-  max_individual_file_size_mb        = 2000
 }
 
 module "transfer_service_execution_role" {
@@ -167,9 +166,9 @@ module "transfer_service_ecs_task" {
       auth_url                            = local.keycloak_auth_url
       consignment_api_url                 = module.consignment_api.api_url
       transfer_service_api_port           = "8080"
-      max_number_records                  = 3000
-      max_individual_file_size_mb         = local.max_individual_file_size_mb
-      max_transfer_size_mb                = 5000
+      max_number_records                  = local.capacity_limit_max_number_records
+      max_individual_file_size_mb         = local.capacity_limit_max_individual_file_size_mb
+      max_transfer_size_mb                = local.capacity_limit_max_transfer_size_mb
       transfer_service_client_secret_path = local.keycloak_tdr_transfer_service_secret_name
       throttle_amount                     = 50
       throttle_per_ms                     = 10
@@ -239,7 +238,7 @@ module "aggregate_processing_lambda" {
     TRANSFER_ERROR_BUCKET_NAME      = local.tdr_transfer_errors_s3_bucket_name
     MALWARE_SCAN_TAG_KEY            = local.scan_complete_tag_key
     MALWARE_SCAN_THREAT_FOUND_VALUE = local.scan_complete_threat_found_value
-    MAX_INDIVIDUAL_FILE_SIZE_MB     = local.max_individual_file_size_mb
+    MAX_INDIVIDUAL_FILE_SIZE_MB     = local.capacity_limit_max_individual_file_size_mb
   }
   vpc_config = {
     subnet_ids         = module.shared_vpc.private_backend_checks_subnets
