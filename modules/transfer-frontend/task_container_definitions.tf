@@ -156,7 +156,19 @@ locals {
         {
           "name"  = "S3_IF_NONE_MATCH_HEADER_VALUE",
           "value" = var.s3_if_none_match_header_value
-        }
+        },
+        {
+          "name" : "MAX_NUMBER_RECORDS",
+          "value" : tostring(var.capacity_limit_max_number_records)
+        },
+        {
+          "name" : "MAX_INDIVIDUAL_FILE_SIZE_MB",
+          "value" : tostring(var.capacity_limit_max_individual_file_size_mb)
+        },
+        {
+          "name" : "MAX_TRANSFER_SIZE_MB",
+          "value" : tostring(var.capacity_limit_max_transfer_size_mb)
+        },
       ],
       var.metadata_version_override != "" ? [
         {

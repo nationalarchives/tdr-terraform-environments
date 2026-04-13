@@ -1,4 +1,9 @@
 locals {
+  # TDR Capacity Limits
+  capacity_limit_max_individual_file_size_mb = 5000
+  capacity_limit_max_number_records          = 5000
+  capacity_limit_max_transfer_size_mb        = 5000
+
   environment = terraform.workspace
 
   terraform_role = "arn:aws:iam::${var.tdr_account_number}:role/TDRTerraformRole${title(local.environment)}"

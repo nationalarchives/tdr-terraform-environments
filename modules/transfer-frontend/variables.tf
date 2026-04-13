@@ -107,3 +107,18 @@ variable "elasticache_engine_version" {
   type        = number
 }
 
+variable "capacity_limit_max_number_records" {
+  description = "Maximum number of individual records per transfer"
+  type        = number
+}
+
+variable "capacity_limit_max_individual_file_size_mb" {
+  description = "Maximum size of individual file in MB"
+  type        = number
+}
+
+variable "capacity_limit_max_transfer_size_mb" {
+  description = "Maximum overall size of transfer in MB"
+  type        = number
+}
+

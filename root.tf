@@ -118,6 +118,10 @@ module "frontend" {
   enable_otel                      = local.environment == "intg"
   elasticache_engine               = "valkey"
   elasticache_engine_version       = "8.2"
+
+  capacity_limit_max_individual_file_size_mb = local.capacity_limit_max_individual_file_size_mb
+  capacity_limit_max_number_records          = local.capacity_limit_max_number_records
+  capacity_limit_max_transfer_size_mb        = local.capacity_limit_max_transfer_size_mb
 }
 
 module "alb_logs_s3" {
