@@ -36,7 +36,7 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_elb_4xx_count" {
   }
   evaluation_periods  = 5
   datapoints_to_alarm = 5
-  threshold           = 50
+  threshold           = 100
   comparison_operator = "GreaterThanThreshold"
   treat_missing_data  = "notBreaching"
 
