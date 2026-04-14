@@ -178,7 +178,7 @@ module "keycloak_database_instance" {
   database_version        = "17.4"
   environment             = local.environment
   kms_key_id              = module.encryption_key.kms_key_arn
-  private_subnets         = local.environment == "prod" ? module.shared_vpc.private_subnets : module.shared_vpc.private_backend_checks_subnets
+  private_subnets         = module.shared_vpc.private_backend_checks_subnets
   security_group_ids      = [module.keycloak_database_security_group.security_group_id]
   multi_az                = local.environment == "prod"
   ca_cert_identifier      = local.database_ca_cert_identifier
@@ -195,7 +195,7 @@ module "create_keycloak_db_users_lambda_new" {
   database_name           = "keycloak"
   lambda_name             = "create-keycloak-user"
   vpc_id                  = module.shared_vpc.vpc_id
-  private_subnet_ids      = module.shared_vpc.private_subnets
+  private_subnet_ids      = module.shared_vpc.private_backend_checks_subnets
   db_url                  = module.keycloak_database_instance.database_url
   db_secrets_arn          = module.keycloak_database_instance.database_master_user_secret_arn
   kms_key_arn             = module.encryption_key.kms_key_arn
