@@ -273,6 +273,12 @@
           "BackoffRate": 2
         }
       ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "Task complete notification"
+        }
+      ],
       "Next": "MergeConsignmentDetails"
     },
     "MergeConsignmentDetails": {
