@@ -117,8 +117,21 @@
                         "environment": "${environment}"
                       }
                     },
+                    "Catch": [
+                      {
+                        "ErrorEquals": [
+                          "States.ALL"
+                        ],
+                        "Next": "AV Notify Failed",
+                        "ResultPath": null
+                      }
+                    ],
                     "End": true,
                     "ResultPath": null
+                  },
+                  "AV Notify Failed": {
+                    "Type": "Pass",
+                    "End": true
                   }
                 }
               },
@@ -165,8 +178,21 @@
                         "environment": "${environment}"
                       }
                     },
+                    "Catch": [
+                      {
+                        "ErrorEquals": [
+                          "States.ALL"
+                        ],
+                        "Next": "File Format Notify Failed",
+                        "ResultPath": null
+                      }
+                    ],
                     "End": true,
                     "ResultPath": null
+                  },
+                  "File Format Notify Failed": {
+                    "Type": "Pass",
+                    "End": true
                   }
                 }
               },
@@ -213,8 +239,21 @@
                         "environment": "${environment}"
                       }
                     },
+                    "Catch": [
+                      {
+                        "ErrorEquals": [
+                          "States.ALL"
+                        ],
+                        "Next": "Checksum Notify Failed",
+                        "ResultPath": null
+                      }
+                    ],
                     "End": true,
                     "ResultPath": null
+                  },
+                  "Checksum Notify Failed": {
+                    "Type": "Pass",
+                    "End": true
                   }
                 }
               }
@@ -255,7 +294,24 @@
           "Bucket.$": "$.bucket",
           "Prefix.$": "$.key"
         }
-      }
+      },
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Map Failed",
+          "ResultPath": "$.error"
+        }
+      ]
+    },
+    "Map Failed": {
+      "Type": "Pass",
+      "Parameters": {
+        "Cause.$": "$.error.Cause",
+        "backEndChecksProcess": "Map"
+      },
+      "Next": "Process failed notification"
     },
     "Process Map Results": {
       "Type": "Task",

@@ -1,4 +1,9 @@
 locals {
+  # TDR Capacity Limits
+  capacity_limit_max_individual_file_size_mb = 5000
+  capacity_limit_max_number_records          = 5000
+  capacity_limit_max_transfer_size_mb        = 5000
+
   environment = terraform.workspace
 
   terraform_role = "arn:aws:iam::${var.tdr_account_number}:role/TDRTerraformRole${title(local.environment)}"
@@ -168,6 +173,7 @@ locals {
   //feature access blocks
   block_shared_keycloak_pages = local.environment == "intg" ? false : true
   block_skip_metadata_review  = false
+  block_metadata_review_v2    = local.environment == "prod" ? true : false
 
   disable_users_dry_run         = false
   draft_metadata_s3_bucket_name = "${var.project}-draft-metadata-${local.environment}"

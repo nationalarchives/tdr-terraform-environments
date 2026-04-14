@@ -103,6 +103,7 @@ module "frontend" {
   public_subnet_ranges             = module.shared_vpc.public_subnet_ranges
   otel_service_name                = "frontend-${local.environment}"
   block_skip_metadata_review       = local.block_skip_metadata_review
+  block_metadata_review_v2         = local.block_metadata_review_v2
   draft_metadata_validator_api_url = module.draft_metadata_api_gateway.api_url
   draft_metadata_s3_kms_keys       = jsonencode([module.s3_internal_kms_key.kms_key_arn])
   draft_metadata_s3_bucket_name    = local.draft_metadata_s3_bucket_name
@@ -117,6 +118,10 @@ module "frontend" {
   enable_otel                      = local.environment == "intg"
   elasticache_engine               = "valkey"
   elasticache_engine_version       = "8.2"
+
+  capacity_limit_max_individual_file_size_mb = local.capacity_limit_max_individual_file_size_mb
+  capacity_limit_max_number_records          = local.capacity_limit_max_number_records
+  capacity_limit_max_transfer_size_mb        = local.capacity_limit_max_transfer_size_mb
 }
 
 module "alb_logs_s3" {
