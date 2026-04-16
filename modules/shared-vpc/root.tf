@@ -95,6 +95,8 @@ resource "aws_route_table" "private" {
   )
 }
 
+# The old private subnet was deleted in TDRD-1221
+# What was "private-backend-checks" subnet is now the new "private-subnet"
 resource "aws_subnet" "private_backend_checks" {
   count             = 2
   cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 6, count.index + 4)
@@ -103,7 +105,7 @@ resource "aws_subnet" "private_backend_checks" {
   tags = merge(
     var.common_tags,
     tomap(
-      { "Name" = "tdr-backend-checks-private-subnet-${count.index}-${var.environment}" }
+      { "Name" = "tdr-private-subnet-${count.index}-${var.environment}" }
     )
   )
 }
