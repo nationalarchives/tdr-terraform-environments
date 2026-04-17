@@ -5,7 +5,7 @@
       "Sid": "AccessWithinOrganisationOnly",
       "Effect": "Allow",
       "Principal": "*",
-      "Action": "s3:*",
+      "Action": "ecr:*",
       "Resource": "*",
       "Condition": {
         "StringEquals": {

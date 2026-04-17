@@ -187,7 +187,7 @@ resource "aws_vpc_endpoint" "vpc_endpoints_ecr" {
 resource "aws_vpc_endpoint_policy" "vpc_endpoints_ecr_policy" {
   for_each        = aws_vpc_endpoint.vpc_endpoints_ecr
   vpc_endpoint_id = each.value.id
-  policy = templatefile("./templates/endpoint_policies/same_org.tpl",
+  policy = templatefile("./templates/endpoint_policies/ecr_same_org.tpl",
     {
       organisation_id = data.aws_organizations_organization.tna.id
   })
