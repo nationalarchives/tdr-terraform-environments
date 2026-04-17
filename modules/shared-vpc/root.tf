@@ -167,3 +167,18 @@ resource "aws_vpc_security_group_ingress_rule" "endpoint_security_group_tls_ingr
   ip_protocol       = "tcp"
   to_port           = 443
 }
+
+resource "aws_vpc_endpoint" "vpc_endpoints_ecr" {
+  for_each            = toset(["com.amazonaws.eu-west-2.ecr.dkr", "com.amazonaws.eu-west-2.ecr.api"])
+  vpc_id              = aws_vpc.main.id
+  service_name        = each.key
+  security_group_ids  = [aws_security_group.endpoint_security_group.id]
+  subnet_ids          = aws_subnet.private_backend_checks.*.id
+  private_dns_enabled = true
+  tags = merge(
+    var.common_tags,
+    tomap(
+      { "Name" = each.key }
+    )
+  )
+}
