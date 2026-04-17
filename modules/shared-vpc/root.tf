@@ -175,10 +175,20 @@ resource "aws_vpc_endpoint" "vpc_endpoints_ecr" {
   security_group_ids  = [aws_security_group.endpoint_security_group.id]
   subnet_ids          = aws_subnet.private_backend_checks.*.id
   private_dns_enabled = true
+  vpc_endpoint_type   = "Interface"
   tags = merge(
     var.common_tags,
     tomap(
       { "Name" = each.key }
     )
   )
+}
+
+resource "aws_vpc_endpoint_policy" "vpc_endpoints_ecr_policy" {
+  for_each        = aws_vpc_endpoint.vpc_endpoints_ecr
+  vpc_endpoint_id = each.value.id
+  policy = templatefile("./templates/endpoint_policies/same_org.tpl",
+    {
+      organisation_id = data.aws_organizations_organization.tna.id
+  })
 }
