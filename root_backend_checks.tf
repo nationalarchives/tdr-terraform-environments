@@ -31,23 +31,6 @@ module "backend_checks_api" {
   environment = local.environment
 }
 
-module "outbound_with_db_security_group" {
-  source      = "./tdr-terraform-modules/security_group"
-  description = "Outbound access on 443 and access to the database security group"
-  name        = "outbound_with_db_security_group"
-  vpc_id      = module.shared_vpc.vpc_id
-  common_tags = local.common_tags
-  egress_cidr_rules = [
-    { port = 443, cidr_blocks = ["0.0.0.0/0"], description = "Allow outbound access on port 443", protocol = "-1" }
-  ]
-  egress_security_group_rules = [
-    {
-      port        = 5432, security_group_id = module.api_database_security_group.security_group_id,
-      description = "Allow Postgres port from the backend checks", protocol = "-1"
-    }
-  ]
-}
-
 module "outbound_only_security_group" {
   source      = "./tdr-terraform-modules/security_group"
   description = "Outbound access on 443 only"
