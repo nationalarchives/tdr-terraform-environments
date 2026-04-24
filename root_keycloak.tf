@@ -1,3 +1,8 @@
+locals {
+  keycloak_host_name_debug         = false
+  keycloak_http_access_log_enabled = false
+}
+
 module "keycloak_cloudwatch" {
   source      = "./tdr-terraform-modules/cloudwatch_logs"
   common_tags = local.common_tags
@@ -132,6 +137,8 @@ module "tdr_keycloak_ecs" {
     sns_topic_arn                     = module.notifications_topic.sns_arn
     keycloak_host                     = "https://auth.${local.environment_domain}"
     block_shared_pages                = local.block_shared_keycloak_pages
+    host_name_debug                   = local.keycloak_host_name_debug
+    http_access_log_enabled           = local.keycloak_http_access_log_enabled
   })
   container_name               = "keycloak"
   cpu                          = local.environment == "intg" ? 2048 : 1024

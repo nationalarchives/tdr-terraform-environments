@@ -93,6 +93,14 @@
       {
         "name": "BLOCK_SHARED_PAGES",
         "value": "${block_shared_pages}"
+      },
+      {
+        "name": "HOST_NAME_DEBUG",
+        "value": "${host_name_debug}"
+      },
+      {
+        "name": "HTTP_ACCESS_LOG_ENABLED",
+        "value": "${http_access_log_enabled}"
       }
     ],
     "networkMode": "awsvpc",
