@@ -115,7 +115,7 @@ module "frontend" {
   s3_if_none_match_header_value    = module.s3_put_request_header_if_none_match_ssm_parameter.params[local.s3_put_request_header_if_none_match_parameter].value
   metadata_version_override        = local.metadata_version_override
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].ecs_tasks
-  enable_otel                      = local.environment == "intg"
+  enable_otel                      = false
   elasticache_engine               = "valkey"
   elasticache_engine_version       = "8.2"
 
