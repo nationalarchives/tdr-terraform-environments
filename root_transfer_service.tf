@@ -183,6 +183,8 @@ module "transfer_service_ecs_task" {
       block_api_documentation             = local.block_api_documentation
       block_service_endpoints             = local.block_service_endpoints
       block_tdr_custom_tags               = local.block_tdr_custom_tags
+      log_body                            = false
+      log_headers                         = false
   })
   container_name               = "transfer-service"
   cpu                          = 512

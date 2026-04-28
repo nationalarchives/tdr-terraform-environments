@@ -101,6 +101,14 @@
       {
         "name": "BLOCK_TDR_CUSTOM_TAGS",
         "value": "${block_tdr_custom_tags}"
+      },
+      {
+        "name": "LOG_HEADERS",
+        "value": "${log_headers}"
+      },
+      {
+        "name": "LOG_BODY",
+        "value": "${log_body}"
       }
     ],
     "logConfiguration": {
