@@ -7,6 +7,7 @@ locals {
   external_event_handling_lambda_timeout_secs = 60
   allow_file_status_update                    = local.environment == "intg" ? "true" : "false"
   default_debug_mode                          = false
+  sns_message_type_ingest_complete            = "preserve.digital.asset.ingest.complete"
 }
 
 module "external_event_handling_sqs_queue" {
@@ -31,6 +32,8 @@ resource "aws_sns_topic_subscription" "dr2_ingest" {
   protocol             = "sqs"
   topic_arn            = local.dr2_ingest_topic_arn
   raw_message_delivery = true
+  filter_policy        = templatefile("./templates/sns/dr2_ingest_filter_policy.json.tpl", { sns_message_type_ingest_complete = local.sns_message_type_ingest_complete })
+  filter_policy_scope  = "MessageBody"
 }
 
 module "external_event_handler_lambda" {
@@ -59,15 +62,16 @@ module "external_event_handler_lambda" {
     })
   }
   plaintext_env_vars = {
-    EXPORT_BUCKET            = local.flat_format_bucket_name,
-    JUDGMENT_EXPORT_BUCKET   = local.flat_format_judgment_bucket_name,
-    DR2_INGEST_TAG_KEY       = local.object_tag_dr2_ingest_key,
-    DR2_INGEST_TAG_VALUE     = local.object_tag_dr2_ingest_value_complete,
-    API_URL                  = "${module.consignment_api.api_url}/graphql",
-    AUTH_URL                 = local.keycloak_auth_url
-    CLIENT_ID                = local.keycloak_backend-checks_client_id
-    CLIENT_SECRET_PATH       = local.keycloak_backend_checks_secret_name
-    ALLOW_FILE_STATUS_UPDATE = local.allow_file_status_update
-    DEBUG_INCOMING_MESSAGE   = local.default_debug_mode
+    EXPORT_BUCKET                    = local.flat_format_bucket_name,
+    JUDGMENT_EXPORT_BUCKET           = local.flat_format_judgment_bucket_name,
+    DR2_INGEST_TAG_KEY               = local.object_tag_dr2_ingest_key,
+    DR2_INGEST_TAG_VALUE             = local.object_tag_dr2_ingest_value_complete,
+    API_URL                          = "${module.consignment_api.api_url}/graphql",
+    AUTH_URL                         = local.keycloak_auth_url
+    CLIENT_ID                        = local.keycloak_backend-checks_client_id
+    CLIENT_SECRET_PATH               = local.keycloak_backend_checks_secret_name
+    ALLOW_FILE_STATUS_UPDATE         = local.allow_file_status_update
+    DEBUG_INCOMING_MESSAGE           = local.default_debug_mode
+    SNS_MESSAGE_TYPE_INGEST_COMPLETE = local.sns_message_type_ingest_complete
   }
 }
