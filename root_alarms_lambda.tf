@@ -26,10 +26,14 @@ locals {
     "tdr-statuses-prod",
     "tdr-yara-av-v2-prod",
   ]
+  mgmt_lambdas = [
+    "tdr-notifications-mgmt",
+    "tdr-ecr-scan-mgmt"
+  ]
 }
 
 resource "aws_cloudwatch_metric_alarm" "tdr_alarms_lambda_failure" {
-  for_each          = local.environment == "prod" ? toset(local.prod_lambdas) : []
+  for_each          = local.environment == "prod" ? toset(concat(local.prod_lambdas, local.mgmt_lambdas)) : []
   alarm_description = "This alarm fires when a lambda fails"
   alarm_name        = format("AWS/Lambda Error on %s", each.key)
 
