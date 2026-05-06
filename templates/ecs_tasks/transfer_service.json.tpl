@@ -109,6 +109,10 @@
       {
         "name": "LOG_BODY",
         "value": "${log_body}"
+      },
+      {
+        "name": "IGNORE_SITE_NAME_BODIES",
+        "value": "${ignore_site_name_bodies}"
       }
     ],
     "logConfiguration": {
