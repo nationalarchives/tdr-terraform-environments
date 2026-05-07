@@ -15,6 +15,11 @@ locals {
   block_api_documentation = local.is_lower_environment ? false : true
   block_service_endpoints = local.environment == "prod" ? true : false
   block_tdr_custom_tags   = local.is_lower_environment ? false : true
+
+  # Temporary expedient to handle transferring bodies who do not wish the SharePoint site name to appear as part of the arrangement in the public catalogue
+  # Should be removed when proper UI solution implemented
+  # Contain list of transferring body codes as a comma separated string, for example: "TDR-BODY1,TDR-BODY2, ... etc ..."
+  ignore_site_name_bodies = ""
 }
 
 module "transfer_service_execution_role" {
@@ -185,6 +190,7 @@ module "transfer_service_ecs_task" {
       block_tdr_custom_tags               = local.block_tdr_custom_tags
       log_body                            = false
       log_headers                         = false
+      ignore_site_name_bodies             = local.ignore_site_name_bodies
   })
   container_name               = "transfer-service"
   cpu                          = 512
