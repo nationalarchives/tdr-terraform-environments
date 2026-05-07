@@ -1,0 +1,89 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "lambda:InvokeFunction"
+      ],
+      "Resource": [
+        "${api_update_v2_lambda_arn}",
+        "${backend_checks_results_arn}",
+        "${file_checks_lambda_arn}",
+        "${file_upload_data_lambda_arn}",
+        "${notification_lambda_arn}",
+        "${redacted_files_lambda_arn}",
+        "${statuses_lambda_arn}"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:GetObjectTagging",
+        "s3:ListBucket",
+        "s3:PutObject",
+        "s3:PutObjectTagging",
+        "states:StartExecution"
+      ],
+      "Resource": [
+        "${backend_checks_bucket_arn}/*",
+        "${backend_checks_bucket_arn}",
+        "${state_machine_arn}"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "xray:PutTraceSegments",
+        "xray:PutTelemetryRecords",
+        "xray:GetSamplingRules",
+        "xray:GetSamplingTargets"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sns:Publish"
+      ],
+      "Resource": [
+        "${sns_topic_arn}"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
+      ],
+      "Resource": "${kms_key_arn}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "states:InvokeHTTPEndpoint",
+      "Resource": "${state_machine_arn}",
+      "Condition": {
+        "StringEquals": {
+          "states:HTTPMethod": "POST"
+        },
+        "StringLike": {
+          "states:HTTPEndpoint": "${consignment_api_url}/*"
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": "events:RetrieveConnectionCredentials",
+      "Resource": "${connection_arn}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+      ],
+      "Resource": "arn:aws:secretsmanager:eu-west-2:${account_id}:secret:events!connection/*"
+    }
+  ]
+}

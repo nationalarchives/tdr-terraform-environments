@@ -140,6 +140,7 @@ locals {
 
   upload_files_cloudfront_dirty_bucket_name = "${var.project}-upload-files-cloudfront-dirty-${local.environment}"
   upload_files_quarantine_bucket_name       = "${var.project}-upload-files-quarantine-${local.environment}"
+  upload_files_bucket_name                  = "${var.project}-upload-files-${local.environment}"
 
   url_path              = "/${local.environment}/consignmentapi/instance/url"
   tmp_directory         = "/tmp"
