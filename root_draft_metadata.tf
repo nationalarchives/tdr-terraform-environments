@@ -35,7 +35,7 @@ module "draft_metadata_checks_lambda" {
   handler         = "uk.gov.nationalarchives.tdr.draftmetadatachecks.Lambda::handleRequest"
   runtime         = local.runtime_java_21
   tags            = local.common_tags
-  timeout_seconds = 240
+  timeout_seconds = 900
   memory_size     = 1024
   policies = {
     "TDRDraftMetadataValidationLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_checks_lambda.json.tpl", {
