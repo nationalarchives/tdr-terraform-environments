@@ -19,7 +19,8 @@ locals {
   # Temporary expedient to handle transferring bodies who do not wish the SharePoint site name to appear as part of the arrangement in the public catalogue
   # Should be removed when proper UI solution implemented
   # Contain list of transferring body codes as a comma separated string, for example: "TDR-BODY1,TDR-BODY2, ... etc ..."
-  ignore_site_name_bodies = ""
+  ignore_site_name_bodies           = ""
+  override_include_top_level_folder = true
 }
 
 module "transfer_service_execution_role" {
@@ -191,6 +192,7 @@ module "transfer_service_ecs_task" {
       log_body                            = false
       log_headers                         = false
       ignore_site_name_bodies             = local.ignore_site_name_bodies
+      override_include_top_level_folder   = local.override_include_top_level_folder
   })
   container_name               = "transfer-service"
   cpu                          = 512
