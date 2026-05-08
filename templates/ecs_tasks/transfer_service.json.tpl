@@ -113,6 +113,10 @@
       {
         "name": "IGNORE_SITE_NAME_BODIES",
         "value": "${ignore_site_name_bodies}"
+      },
+      {
+        "name": "OVERRIDE_INCLUDE_TOP_LEVEL_FOLDER",
+        "value": "${override_include_top_level_folder}"
       }
     ],
     "logConfiguration": {
