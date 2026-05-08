@@ -1,3 +1,7 @@
+locals {
+  backend_checks_step_function_name = local.enable_backend_checks_v2 ? "TDRBackendChecksV2" : "TDRBackendChecks"
+}
+
 module "backend_checks_api_policy" {
   source        = "./tdr-terraform-modules/iam_policy"
   name          = "TDRBackendChecksAPIPolicy${title(local.environment)}"
@@ -18,14 +22,12 @@ module "backend_checks_api_role" {
 module "backend_checks_api" {
   source = "./tdr-terraform-modules/apigateway"
   api_definition = templatefile("./templates/api_gateway/backend_checks.json.tpl", {
-    environment                         = local.environment
-    title                               = "Backend Checks API"
-    role_arn                            = module.backend_checks_api_role.role.arn
-    region                              = local.region
-    lambda_arn                          = module.export_authoriser_lambda.export_api_authoriser_arn
-    state_machine_arn                   = "arn:aws:states:${local.region}:${data.aws_caller_identity.current.account_id}:stateMachine:TDRBackendChecks${title(local.environment)}"
-    backend_checks_v2_state_machine_arn = "arn:aws:states:${local.region}:${data.aws_caller_identity.current.account_id}:stateMachine:TDRBackendChecksV2${title(local.environment)}"
-
+    environment       = local.environment
+    title             = "Backend Checks API"
+    role_arn          = module.backend_checks_api_role.role.arn
+    region            = local.region
+    lambda_arn        = module.export_authoriser_lambda.export_api_authoriser_arn
+    state_machine_arn = "arn:aws:states:${local.region}:${data.aws_caller_identity.current.account_id}:stateMachine:${local.backend_checks_step_function_name}${title(local.environment)}"
   })
   api_name    = "BackendChecks"
   common_tags = local.common_tags
