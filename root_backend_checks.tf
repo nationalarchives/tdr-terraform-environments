@@ -284,6 +284,7 @@ module "backend_checks_results" {
   function_name                    = local.backend_checks_results_function_name
   handler                          = "lambda_handler.lambda_handler"
   reserved_concurrency             = -1
+  timeout_seconds                  = 120
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
   policies = {
     "TDRBackendChecksResultsLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_backend_checks_policy.json.tpl", {
