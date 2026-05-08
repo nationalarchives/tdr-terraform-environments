@@ -95,7 +95,7 @@ module "consignment_export_ecs_task" {
   cpu              = local.environment == "intg" ? 1024 : 2048
   environment      = local.environment
   execution_role   = module.consignment_export_execution_role.role.arn
-  memory           = local.environment == "intg" ? 2048 : 4096
+  memory           = local.environment == "intg" ? 2048 : 6144
   private_subnets  = []
   security_groups  = [module.consignment_export_ecs_security_group.security_group_id]
   task_family_name = "consignment-export-${local.environment}"
