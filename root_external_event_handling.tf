@@ -1,6 +1,6 @@
 locals {
-  //Apply only to INTG at the moment
-  event_handling_count                        = local.environment == "intg" ? 1 : 0
+  //Apply only to INTG/STAGING
+  event_handling_count                        = local.environment == "prod" ? 0 : 1
   sqs_name                                    = "tdr-external-event-handling-sqs-${local.environment}"
   external_event_handler_function_name        = "tdr-external-events-handler-${local.environment}"
   dr2_ingest_topic_arn                        = try(module.dr2_configuration.terraform_config[local.environment]["notifications_sns_topic_arn"], null)
