@@ -1,5 +1,5 @@
 locals {
-  backend_checks_step_function_name = local.enable_backend_checks_v2 ? "TDRBackendChecksV2" : "TDRBackendChecks"
+  backend_checks_arn = local.enable_backend_checks_v2 ? module.backend_checks_v2_step_function.state_machine_arn : module.backend_checks_step_function.state_machine_arn
 }
 
 module "backend_checks_api_policy" {
@@ -27,7 +27,7 @@ module "backend_checks_api" {
     role_arn          = module.backend_checks_api_role.role.arn
     region            = local.region
     lambda_arn        = module.export_authoriser_lambda.export_api_authoriser_arn
-    state_machine_arn = "arn:aws:states:${local.region}:${data.aws_caller_identity.current.account_id}:stateMachine:${local.backend_checks_step_function_name}${title(local.environment)}"
+    state_machine_arn = local.backend_checks_arn
   })
   api_name    = "BackendChecks"
   common_tags = local.common_tags
