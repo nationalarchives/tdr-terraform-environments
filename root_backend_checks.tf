@@ -1,3 +1,7 @@
+locals {
+  backend_checks_step_function_name = local.enable_backend_checks_v2 ? "TDRBackendChecksV2" : "TDRBackendChecks"
+}
+
 module "backend_checks_api_policy" {
   source        = "./tdr-terraform-modules/iam_policy"
   name          = "TDRBackendChecksAPIPolicy${title(local.environment)}"
@@ -23,8 +27,7 @@ module "backend_checks_api" {
     role_arn          = module.backend_checks_api_role.role.arn
     region            = local.region
     lambda_arn        = module.export_authoriser_lambda.export_api_authoriser_arn
-    state_machine_arn = "arn:aws:states:${local.region}:${data.aws_caller_identity.current.account_id}:stateMachine:TDRBackendChecks${title(local.environment)}"
-
+    state_machine_arn = "arn:aws:states:${local.region}:${data.aws_caller_identity.current.account_id}:stateMachine:${local.backend_checks_step_function_name}${title(local.environment)}"
   })
   api_name    = "BackendChecks"
   common_tags = local.common_tags
@@ -64,12 +67,14 @@ module "file_upload_data" {
   role_name = "TDRFileUploadDataLambdaRole${title(local.environment)}"
   runtime   = local.runtime_python_3_13
   plaintext_env_vars = {
-    API_URL                    = "${module.consignment_api.api_url}/graphql"
-    AUTH_URL                   = local.keycloak_auth_url
-    CLIENT_ID                  = local.keycloak_backend-checks_client_id
-    CLIENT_SECRET_PATH         = local.keycloak_backend_checks_secret_name
-    BUCKET_NAME                = local.upload_files_cloudfront_dirty_bucket_name
-    BACKEND_CHECKS_BUCKET_NAME = module.backend_lambda_function_bucket.s3_bucket_name
+    API_URL                       = "${module.consignment_api.api_url}/graphql"
+    AUTH_URL                      = local.keycloak_auth_url
+    CLIENT_ID                     = local.keycloak_backend-checks_client_id
+    CLIENT_SECRET_PATH            = local.keycloak_backend_checks_secret_name
+    BUCKET_NAME                   = local.upload_files_cloudfront_dirty_bucket_name
+    QUARANTINE_BUCKET_NAME        = local.upload_files_quarantine_bucket_name
+    CLEAN_DESTINATION_BUCKET_NAME = local.upload_files_bucket_name
+    BACKEND_CHECKS_BUCKET_NAME    = module.backend_lambda_function_bucket.s3_bucket_name
   }
   vpc_config = [
     {
@@ -374,4 +379,41 @@ module "file_checks" {
     subnet_ids         = module.shared_vpc.private_backend_checks_subnets
     security_group_ids = [module.outbound_only_security_group.security_group_id]
   }
+}
+
+module "backend_checks_v2_step_function" {
+  source             = "./tdr-terraform-modules/stepfunctions"
+  tags               = local.common_tags
+  project            = var.project
+  step_function_name = "BackendChecksV2"
+  definition = templatefile("./templates/step_function/backend_checks_v2_definition.json.tpl", {
+    environment                    = local.environment
+    backend_checks_results_arn     = module.backend_checks_results.lambda_arn
+    file_checks_lambda_arn         = module.file_checks.lambda_arn
+    file_upload_data_lambda_arn    = module.file_upload_data.lambda_arn
+    api_update_v2_lambda_arn       = module.api_update_v2.lambda_arn
+    statuses_lambda_arn            = module.statuses.lambda_arn
+    redacted_files_lambda_arn      = module.redacted_files.lambda_arn
+    notification_lambda_arn        = module.notification_lambda.ecr_scan_notification_lambda_arn[0]
+    sns_topic                      = module.notifications_topic.sns_arn
+    consignment_api_url            = module.consignment_api.api_url
+    consignment_api_connection_arn = aws_cloudwatch_event_connection.consignment_api_connection.arn
+  })
+  environment = local.environment
+  policy = templatefile("./templates/iam_policy/backend_check_v2_policy.json.tpl", {
+    file_upload_data_lambda_arn = module.file_upload_data.lambda_arn
+    backend_checks_results_arn  = module.backend_checks_results.lambda_arn
+    statuses_lambda_arn         = module.statuses.lambda_arn
+    file_checks_lambda_arn      = module.file_checks.lambda_arn
+    redacted_files_lambda_arn   = module.redacted_files.lambda_arn
+    api_update_v2_lambda_arn    = module.api_update_v2.lambda_arn
+    notification_lambda_arn     = module.notification_lambda.ecr_scan_notification_lambda_arn[0],
+    backend_checks_bucket_arn   = module.backend_lambda_function_bucket.s3_bucket_arn
+    state_machine_arn           = module.backend_checks_v2_step_function.state_machine_arn
+    sns_topic_arn               = module.notifications_topic.sns_arn
+    kms_key_arn                 = module.encryption_key.kms_key_arn
+    connection_arn              = aws_cloudwatch_event_connection.consignment_api_connection.arn
+    consignment_api_url         = module.consignment_api.api_url
+    account_id                  = data.aws_caller_identity.current.account_id
+  })
 }

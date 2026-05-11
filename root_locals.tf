@@ -140,6 +140,7 @@ locals {
 
   upload_files_cloudfront_dirty_bucket_name = "${var.project}-upload-files-cloudfront-dirty-${local.environment}"
   upload_files_quarantine_bucket_name       = "${var.project}-upload-files-quarantine-${local.environment}"
+  upload_files_bucket_name                  = "${var.project}-upload-files-${local.environment}"
 
   url_path              = "/${local.environment}/consignmentapi/instance/url"
   tmp_directory         = "/tmp"
@@ -169,6 +170,8 @@ locals {
 
   da_reference_generator_url   = module.tdr_configuration.terraform_config["reference_generator_${local.environment}_url"]
   da_reference_generator_limit = module.tdr_configuration.terraform_config["reference_generator_limit"]
+
+  enable_backend_checks_v2 = local.environment == "prod" ? false : true
 
   //feature access blocks
   block_shared_keycloak_pages = local.environment == "intg" ? false : true
