@@ -14,33 +14,35 @@ locals {
   ]
 }
 
-resource "aws_cloudwatch_metric_alarm" "tdr_alarms_elb_4xx_count" {
-  for_each          = toset(local.load_balancers)
-  alarm_description = "This alarm fires when an ELB (not the target) returns a high number of 4xx errors"
-  alarm_name        = format("AWS/ApplicationELB High 4XX Count Environment=%s, LB=%s", local.environment, each.key)
+# Disabling due to noise.  Relying on DDOS WAF metric 
 
-  metric_query {
-    account_id  = data.aws_caller_identity.current.id
-    id          = "m1"
-    return_data = "true"
+# resource "aws_cloudwatch_metric_alarm" "tdr_alarms_elb_4xx_count" {
+#   for_each          = toset(local.load_balancers)
+#   alarm_description = "This alarm fires when an ELB (not the target) returns a high number of 4xx errors"
+#   alarm_name        = format("AWS/ApplicationELB High 4XX Count Environment=%s, LB=%s", local.environment, each.key)
 
-    metric {
-      metric_name = "HTTPCode_ELB_4XX_Count"
-      namespace   = "AWS/ApplicationELB"
-      stat        = "Sum"
-      period      = 60
-      dimensions = {
-        LoadBalancer = each.key
-      }
-    }
-  }
-  evaluation_periods  = 10
-  datapoints_to_alarm = 3
-  threshold           = 2000
-  comparison_operator = "GreaterThanThreshold"
-  treat_missing_data  = "notBreaching"
+#   metric_query {
+#     account_id  = data.aws_caller_identity.current.id
+#     id          = "m1"
+#     return_data = "true"
 
-  provider = aws.alarm_deployer
+#     metric {
+#       metric_name = "HTTPCode_ELB_4XX_Count"
+#       namespace   = "AWS/ApplicationELB"
+#       stat        = "Sum"
+#       period      = 60
+#       dimensions = {
+#         LoadBalancer = each.key
+#       }
+#     }
+#   }
+#   evaluation_periods  = 10
+#   datapoints_to_alarm = 3
+#   threshold           = 2000
+#   comparison_operator = "GreaterThanThreshold"
+#   treat_missing_data  = "notBreaching"
+
+#   provider = aws.alarm_deployer
 }
 
 resource "aws_cloudwatch_metric_alarm" "tdr_alarms_elb_target_4xx_count" {
