@@ -17,7 +17,7 @@ locals {
 resource "aws_cloudwatch_metric_alarm" "tdr_alarms_elb_4xx_count" {
   for_each          = toset(local.load_balancers)
   alarm_description = "This alarm fires when an ELB (not the target) returns a high number of 4xx errors"
-  alarm_name        = format("AWS/ApplicationELB High 4XX Count Environment=%s, LB=%s", local.environment, each.key)
+  alarm_name        = format("Muted: AWS/ApplicationELB High 4XX Count Environment=%s, LB=%s", local.environment, each.key)
 
   metric_query {
     account_id  = data.aws_caller_identity.current.id
@@ -36,7 +36,7 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_elb_4xx_count" {
   }
   evaluation_periods  = 10
   datapoints_to_alarm = 3
-  threshold           = 2000
+  threshold           = 200
   comparison_operator = "GreaterThanThreshold"
   treat_missing_data  = "notBreaching"
 
