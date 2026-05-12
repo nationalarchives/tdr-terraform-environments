@@ -1,11 +1,7 @@
-locals {
-  backend_checks_arn = local.enable_backend_checks_v2 ? module.backend_checks_v2_step_function.state_machine_arn : module.backend_checks_step_function.state_machine_arn
-}
-
 module "backend_checks_api_policy" {
   source        = "./tdr-terraform-modules/iam_policy"
   name          = "TDRBackendChecksAPIPolicy${title(local.environment)}"
-  policy_string = templatefile("./templates/iam_policy/api_gateway_state_machine_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, state_machine_arn = module.backend_checks_step_function.state_machine_arn })
+  policy_string = templatefile("./templates/iam_policy/api_gateway_state_machine_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, state_machine_arn = module.backend_checks_v2_step_function.state_machine_arn })
 }
 
 module "backend_checks_api_role" {
@@ -27,7 +23,7 @@ module "backend_checks_api" {
     role_arn          = module.backend_checks_api_role.role.arn
     region            = local.region
     lambda_arn        = module.export_authoriser_lambda.export_api_authoriser_arn
-    state_machine_arn = local.backend_checks_arn
+    state_machine_arn = module.backend_checks_v2_step_function.state_machine_arn
   })
   api_name    = "BackendChecks"
   common_tags = local.common_tags
@@ -117,69 +113,7 @@ module "api_update_v2" {
   ]
 }
 
-module "file_format_v2" {
-  source                           = "./tdr-terraform-modules/generic_lambda"
-  tags                             = local.common_tags
-  function_name                    = local.file_format_v2_function_name
-  handler                          = "uk.gov.nationalarchives.fileformat.Lambda::process"
-  reserved_concurrency             = -1
-  timeout_seconds                  = 900
-  storage_size                     = 2560
-  memory_size                      = 2560
-  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
-  policies = {
-    "TDRFileFormatV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_only_policy.json.tpl", {
-      function_name   = local.file_format_v2_function_name,
-      account_id      = data.aws_caller_identity.current.account_id,
-      bucket_name     = local.upload_files_cloudfront_dirty_bucket_name
-      decryption_keys = jsonencode([module.s3_upload_kms_key.kms_key_arn])
-    })
-  }
-  role_name = "TDRFileFormatV2LambdaRole${title(local.environment)}"
-  runtime   = local.runtime_java_21
-  plaintext_env_vars = {
-    S3_BUCKET           = local.upload_files_cloudfront_dirty_bucket_name
-    FILE_FORMAT_TIMEOUT = "14 minutes"
-  }
-  vpc_config = [
-    {
-      subnet_ids         = module.shared_vpc.private_backend_checks_subnets
-      security_group_ids = [module.outbound_only_security_group.security_group_id]
-    }
-  ]
-}
 
-module "checksum_v2" {
-  source                           = "./tdr-terraform-modules/generic_lambda"
-  tags                             = local.common_tags
-  function_name                    = local.checksum_v2_function_name
-  handler                          = "uk.gov.nationalarchives.checksum.Lambda::process"
-  reserved_concurrency             = -1
-  timeout_seconds                  = 900
-  storage_size                     = 5120
-  memory_size                      = 2560
-  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
-  policies = {
-    "TDRChecksumV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_s3_only_policy.json.tpl", {
-      function_name   = local.checksum_v2_function_name,
-      account_id      = data.aws_caller_identity.current.account_id,
-      bucket_name     = local.upload_files_cloudfront_dirty_bucket_name
-      decryption_keys = jsonencode([module.s3_upload_kms_key.kms_key_arn])
-    })
-  }
-  role_name = "TDRChecksumV2LambdaRole${title(local.environment)}"
-  runtime   = local.runtime_java_11
-  plaintext_env_vars = {
-    CHUNK_SIZE_IN_MB = 50
-    S3_BUCKET        = local.upload_files_cloudfront_dirty_bucket_name
-  }
-  vpc_config = [
-    {
-      subnet_ids         = module.shared_vpc.private_backend_checks_subnets
-      security_group_ids = [module.outbound_only_security_group.security_group_id]
-    }
-  ]
-}
 
 module "redacted_files" {
   source                           = "./tdr-terraform-modules/generic_lambda"
@@ -247,42 +181,6 @@ module "statuses" {
   ]
 }
 
-module "yara_av_v2" {
-  source                           = "./tdr-terraform-modules/generic_lambda"
-  tags                             = local.common_tags
-  function_name                    = local.yara_av_v2_function_name
-  handler                          = "matcher.matcher_lambda_handler"
-  reserved_concurrency             = -1
-  timeout_seconds                  = 900
-  storage_size                     = 2560
-  memory_size                      = 2560
-  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
-  policies = {
-    "TDRYaraAVV2LambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_av_policy.json.tpl", {
-      function_name     = local.yara_av_v2_function_name,
-      account_id        = data.aws_caller_identity.current.account_id,
-      dirty_bucket      = local.upload_files_cloudfront_dirty_bucket_name
-      clean_bucket      = module.upload_bucket.s3_bucket_name
-      quarantine_bucket = module.upload_bucket_quarantine.s3_bucket_name
-      metadata_bucket   = local.draft_metadata_s3_bucket_name
-      decryption_keys   = jsonencode([module.s3_upload_kms_key.kms_key_arn])
-      encryption_keys   = jsonencode([module.s3_internal_kms_key.kms_key_arn])
-    })
-  }
-  role_name = "TDRYaraAVV2LambdaRole${title(local.environment)}"
-  runtime   = local.runtime_python_3_13
-  plaintext_env_vars = {
-    ENVIRONMENT    = local.environment
-    ROOT_DIRECTORY = local.tmp_directory
-  }
-  vpc_config = [
-    {
-      subnet_ids         = module.shared_vpc.private_backend_checks_subnets
-      security_group_ids = [module.outbound_only_security_group.security_group_id]
-    }
-  ]
-}
-
 module "backend_checks_results" {
   source                           = "./tdr-terraform-modules/generic_lambda"
   tags                             = local.common_tags
@@ -310,47 +208,6 @@ module "backend_checks_results" {
       security_group_ids = [module.outbound_only_security_group.security_group_id]
     }
   ]
-}
-
-module "backend_checks_step_function" {
-  source             = "./tdr-terraform-modules/stepfunctions"
-  tags               = local.common_tags
-  project            = var.project
-  step_function_name = "BackendChecks"
-  definition = templatefile("./templates/step_function/backend_checks_definition.json.tpl", {
-    environment                    = local.environment
-    backend_checks_results_arn     = module.backend_checks_results.lambda_arn
-    file_upload_data_lambda_arn    = module.file_upload_data.lambda_arn
-    api_update_v2_lambda_arn       = module.api_update_v2.lambda_arn
-    yara_av_v2_lambda_arn          = module.yara_av_v2.lambda_arn
-    statuses_lambda_arn            = module.statuses.lambda_arn
-    file_format_v2_lambda_arn      = module.file_format_v2.lambda_arn
-    checksum_v2_lambda_arn         = module.checksum_v2.lambda_arn
-    redacted_files_lambda_arn      = module.redacted_files.lambda_arn
-    notification_lambda_arn        = module.notification_lambda.ecr_scan_notification_lambda_arn[0]
-    sns_topic                      = module.notifications_topic.sns_arn
-    consignment_api_url            = module.consignment_api.api_url
-    consignment_api_connection_arn = aws_cloudwatch_event_connection.consignment_api_connection.arn
-  })
-  environment = local.environment
-  policy = templatefile("./templates/iam_policy/backend_check_policy.json.tpl", {
-    file_upload_data_lambda_arn = module.file_upload_data.lambda_arn
-    backend_checks_results_arn  = module.backend_checks_results.lambda_arn
-    statuses_lambda_arn         = module.statuses.lambda_arn
-    yara_av_v2_lambda_arn       = module.yara_av_v2.lambda_arn
-    file_format_v2_lambda_arn   = module.file_format_v2.lambda_arn
-    checksum_v2_lambda_arn      = module.checksum_v2.lambda_arn
-    redacted_files_lambda_arn   = module.redacted_files.lambda_arn
-    api_update_v2_lambda_arn    = module.api_update_v2.lambda_arn
-    notification_lambda_arn     = module.notification_lambda.ecr_scan_notification_lambda_arn[0],
-    backend_checks_bucket_arn   = module.backend_lambda_function_bucket.s3_bucket_arn
-    state_machine_arn           = module.backend_checks_step_function.state_machine_arn
-    sns_topic_arn               = module.notifications_topic.sns_arn
-    kms_key_arn                 = module.encryption_key.kms_key_arn
-    connection_arn              = aws_cloudwatch_event_connection.consignment_api_connection.arn
-    consignment_api_url         = module.consignment_api.api_url
-    account_id                  = data.aws_caller_identity.current.account_id
-  })
 }
 
 module "file_checks" {

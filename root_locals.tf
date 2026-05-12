@@ -126,9 +126,6 @@ locals {
   file_upload_data_function_name        = "${var.project}-file-upload-data-${local.environment}"
   api_update_v2_function_name           = "${var.project}-api-update-v2-${local.environment}"
   backend_checks_results_function_name  = "${var.project}-backend-checks-results-${local.environment}"
-  yara_av_v2_function_name              = "${var.project}-yara-av-v2-${local.environment}"
-  file_format_v2_function_name          = "${var.project}-file-format-v2-${local.environment}"
-  checksum_v2_function_name             = "${var.project}-checksum-v2-${local.environment}"
   redacted_files_function_name          = "${var.project}-redacted-files-${local.environment}"
   statuses_function_name                = "${var.project}-statuses-${local.environment}"
   inactive_keycloak_users_function_name = "${var.project}-inactive-keycloak-users-${local.environment}"
@@ -170,8 +167,6 @@ locals {
 
   da_reference_generator_url   = module.tdr_configuration.terraform_config["reference_generator_${local.environment}_url"]
   da_reference_generator_limit = module.tdr_configuration.terraform_config["reference_generator_limit"]
-
-  enable_backend_checks_v2 = local.environment == "prod" ? false : true
 
   //feature access blocks
   block_shared_keycloak_pages = local.environment == "intg" ? false : true
