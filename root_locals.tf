@@ -61,14 +61,6 @@ locals {
 
   upload_cors_urls = local.environment == "intg" ? [module.frontend.frontend_url, local.local_dev_frontend_url, local.sharepoint_domain] : [module.frontend.frontend_url, local.sharepoint_domain]
 
-  file_check_lambda_timeouts_in_seconds = {
-    "antivirus"      = 180,
-    "api_update"     = 20,
-    "checksum"       = 180,
-    "download_files" = 180,
-    "file_format"    = 900
-  }
-
   developer_ip_list = split(",", module.global_parameters.developer_ips)
 
   trusted_ip_list = split(",", module.global_parameters.trusted_ips)
@@ -78,9 +70,6 @@ locals {
   ip_blocked_list = module.tdr_configuration.terraform_config["ip_blocked_list"]
 
   region_allowed_ips = module.global_parameters.regional_allowed_ips
-
-  region_allowed_ips_list      = local.environment == "prod" ? local.region_allowed_ips : []
-  region_allowed_country_codes = local.environment == "prod" ? ["IE"] : []
 
   ecr_account_number = local.environment == "sbox" ? data.aws_caller_identity.current.account_id : data.aws_ssm_parameter.mgmt_account_number.value
 
@@ -117,9 +106,6 @@ locals {
   keycloak_export_client_id         = "tdr-export"
   keycloak_user_read_client_id      = "tdr-user-read"
 
-  //Used for allowing full access for Cloudfront logging. More information at https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html#AccessLogsBucketAndFileOwnership
-  logs_delivery_canonical_user_id = "c4c1ede66af53448b93c283ce9448c4ba468c9432aa01d700d3878632f77d2d0"
-
   //Set to true to create security audit IAM user group
   security_audit = false
 
@@ -141,7 +127,6 @@ locals {
 
   url_path              = "/${local.environment}/consignmentapi/instance/url"
   tmp_directory         = "/tmp"
-  consignment_user_name = "consignment_api_user"
 
   //tre has used different naming conventions for its environment names
   tre_environment     = local.environment == "intg" ? "int" : local.environment
@@ -180,7 +165,6 @@ locals {
   flat_format_judgment_bucket_name = "tdr-export-judgment-${local.environment}"
 
   athena_results_bucket_name = "tdr-athena-results-${local.environment}"
-  athena_data_bucket_name    = "tdr-athena-data-${local.environment}"
 
   aws_guardduty_ecr_arn = module.tdr_configuration.terraform_config["aws_guardduty_ecr_arn"]
 
