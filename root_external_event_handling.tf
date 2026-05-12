@@ -5,7 +5,7 @@ locals {
   external_event_handler_function_name        = "tdr-external-events-handler-${local.environment}"
   dr2_ingest_topic_arn                        = try(module.dr2_configuration.terraform_config[local.environment]["notifications_sns_topic_arn"], null)
   external_event_handling_lambda_timeout_secs = 60
-  allow_file_status_update                    = local.environment == "intg" ? "true" : "false"
+  allow_file_status_update                    = local.environment == "prod" ? "false" : "true"
   default_debug_mode                          = false
   sns_message_type_ingest_complete            = "preserve.digital.asset.ingest.complete"
 }
