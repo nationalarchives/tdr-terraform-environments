@@ -125,8 +125,8 @@ locals {
   upload_files_quarantine_bucket_name       = "${var.project}-upload-files-quarantine-${local.environment}"
   upload_files_bucket_name                  = "${var.project}-upload-files-${local.environment}"
 
-  url_path              = "/${local.environment}/consignmentapi/instance/url"
-  tmp_directory         = "/tmp"
+  url_path      = "/${local.environment}/consignmentapi/instance/url"
+  tmp_directory = "/tmp"
 
   //tre has used different naming conventions for its environment names
   tre_environment     = local.environment == "intg" ? "int" : local.environment
