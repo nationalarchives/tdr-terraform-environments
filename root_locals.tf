@@ -243,4 +243,6 @@ locals {
   athena_metadata_checks_database_name = "athena-tdr-metadata-checks-${local.environment}"
 
   metadata_version_override = ""
+
+  block_mock_series_ingest = local.environment == "intg" ? false : true
 }
