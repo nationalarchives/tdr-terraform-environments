@@ -142,6 +142,10 @@
                         {
                           "Name": "TASK_TOKEN_ENV_VARIABLE",
                           "Value.$": "$$.Task.Token"
+                        },
+                        {
+                          "Name": "BLOCK_MOCK_SERIES_INGEST",
+                          "Value": "${block_mock_series_ingest}"
                         }
                       ]
                     }
