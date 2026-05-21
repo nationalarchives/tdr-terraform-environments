@@ -159,6 +159,22 @@ module "upload_bucket_quarantine" {
   enable_request_metrics_all = true
 }
 
+module "cloudfront_waf" {
+  count                     = local.environment == "intg" ? 1 : 0
+  source                    = "./tdr-terraform-modules/waf_cloudfront"
+  project                   = var.project
+  function                  = "cloudfront"
+  environment               = local.environment
+  common_tags               = local.common_tags
+  rate_limit                = 300
+  rate_limit_evaluation_window_secs = 300
+  log_retention_period_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].waf
+  blocklist_ips             = local.ip_blocked_list
+  providers = {
+    aws.useast1 = aws.useast1
+  }
+}
+
 module "upload_file_cloudfront_dirty_s3" {
   source                        = "./tdr-terraform-modules/s3"
   project                       = var.project
