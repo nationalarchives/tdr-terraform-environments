@@ -195,6 +195,7 @@ module "cloudfront_upload" {
   alias_domain_name                   = local.upload_domain
   certificate_arn                     = module.cloudfront_certificate.certificate_arn
   api_gateway_url                     = module.signed_cookies_api.api_url
+  waf_arn                             = local.environment == "intg" ? module.cloudfront_waf[0].aws_wafv2_web_acl.arn : null
 }
 
 module "cloudfront_upload_dns" {
