@@ -1,7 +1,7 @@
 locals {
   app_port = 9000
   cpu      = var.environment == "intg" ? "512" : "1024"
-  memory   = var.environment == "intg" ? "1024" : "2048"
+  memory   = var.environment == "intg" ? "1024" : var.environment == "staging" ? "4096" : "2048"
 }
 
 resource "aws_ecs_cluster" "frontend_ecs" {
