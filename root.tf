@@ -160,16 +160,19 @@ module "upload_bucket_quarantine" {
 }
 
 module "cloudfront_waf" {
-  count                     = local.environment == "intg" ? 1 : 0
-  source                    = "./tdr-terraform-modules/waf_cloudfront"
-  project                   = var.project
-  function                  = "cloudfront"
-  environment               = local.environment
-  common_tags               = local.common_tags
-  rate_limit                = 300
+  count                             = local.environment == "intg" ? 1 : 0
+  source                            = "./tdr-terraform-modules/waf_cloudfront_non_prod"
+  project                           = var.project
+  function                          = "cloudfront"
+  environment                       = local.environment
+  common_tags                       = local.common_tags
+  rate_limit                        = 300
   rate_limit_evaluation_window_secs = 300
-  log_retention_period_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].waf
-  blocklist_ips             = local.ip_blocked_list
+  log_retention_period_days         = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].waf
+  blocklist_ips                     = local.ip_blocked_list
+  allowlist_ips = concat(
+    local.ip_allowlist,
+  local.region_allowed_ips)
   providers = {
     aws.useast1 = aws.useast1
   }
