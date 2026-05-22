@@ -36,7 +36,7 @@ module "draft_metadata_checks_lambda" {
   runtime         = local.runtime_java_21
   tags            = local.common_tags
   timeout_seconds = 900
-  memory_size     = 1024
+  memory_size     = 2048
   policies = {
     "TDRDraftMetadataValidationLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/draft_metadata_checks_lambda.json.tpl", {
       account_id     = var.tdr_account_number
