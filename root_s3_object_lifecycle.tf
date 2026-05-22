@@ -61,4 +61,21 @@ locals {
         noncurrent_days = local.default_expiration_days
       }
   }]
+
+  background_clean_up_lifecycle_rules = [
+    {
+      id     = "background-clean-up"
+      status = local.export_bucket_policy_status
+      expiration = {
+        days = local.default_expiration_days
+      }
+      filter = {
+        tag = {
+
+        }
+      }
+      noncurrent_version_expiration = {
+        noncurrent_days = local.default_expiration_days
+      }
+  }]
 }
