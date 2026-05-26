@@ -160,7 +160,7 @@ module "upload_bucket_quarantine" {
 }
 
 module "cloudfront_waf_non_prod" {
-  count                             = local.environment == "intg" ? 1 : 0
+  count                             = local.environment == "intg" || local.environment == "dev" ? 1 : 0
   source                            = "./tdr-terraform-modules/waf_cloudfront_non_prod"
   project                           = var.project
   function                          = "cloudfront"
@@ -215,7 +215,7 @@ module "cloudfront_upload" {
   alias_domain_name                   = local.upload_domain
   certificate_arn                     = module.cloudfront_certificate.certificate_arn
   api_gateway_url                     = module.signed_cookies_api.api_url
-  waf_arn                             = local.environment == "intg" ? module.cloudfront_waf_non_prod[0].aws_wafv2_web_acl.arn : null
+  waf_arn                             = local.environment == "intg" || local.environment == "dev" ? module.cloudfront_waf_non_prod[0].aws_wafv2_web_acl.arn : null
 }
 
 module "cloudfront_upload_dns" {
