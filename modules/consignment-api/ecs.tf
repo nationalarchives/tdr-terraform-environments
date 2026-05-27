@@ -3,6 +3,18 @@ locals {
   ecr_account_number = var.environment == "sbox" ? data.aws_caller_identity.current.account_id : data.aws_ssm_parameter.mgmt_account_number.value
   cpu                = var.environment == "intg" ? "1024" : "2048"
   memory             = var.environment == "intg" ? "2048" : "6144"
+
+  app_container_definitions = templatefile("${path.module}/templates/consignment-api.json.tpl", {
+    app_image                    = "${local.ecr_account_number}.dkr.ecr.eu-west-2.amazonaws.com/consignment-api:${var.environment}"
+    app_port                     = local.app_port
+    app_environment              = var.environment
+    aws_region                   = var.region
+    url_path                     = "/${var.environment}/consignmentapi/instance/url"
+    auth_url                     = var.auth_url
+    frontend_url                 = var.frontend_url
+    da_reference_generator_url   = var.da_reference_generator_url
+    da_reference_generator_limit = var.da_reference_generator_limit
+  })
 }
 
 resource "aws_ecs_cluster" "consignment_api_ecs" {
@@ -16,22 +28,6 @@ resource "aws_ecs_cluster" "consignment_api_ecs" {
   )
 }
 
-data "template_file" "app" {
-  template = file("${path.module}/templates/consignment-api.json.tpl")
-
-  vars = {
-    app_image                    = "${local.ecr_account_number}.dkr.ecr.eu-west-2.amazonaws.com/consignment-api:${var.environment}"
-    app_port                     = local.app_port
-    app_environment              = var.environment
-    aws_region                   = var.region
-    url_path                     = "/${var.environment}/consignmentapi/instance/url"
-    auth_url                     = var.auth_url
-    frontend_url                 = var.frontend_url
-    da_reference_generator_url   = var.da_reference_generator_url
-    da_reference_generator_limit = var.da_reference_generator_limit
-  }
-}
-
 resource "aws_ecs_task_definition" "consignment_api_task" {
   family                   = "${var.app_name}-${var.environment}"
   execution_role_arn       = aws_iam_role.consignment_api_ecs_execution.arn
@@ -39,7 +35,7 @@ resource "aws_ecs_task_definition" "consignment_api_task" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = local.cpu
   memory                   = local.memory
-  container_definitions    = data.template_file.app.rendered
+  container_definitions    = local.app_container_definitions
   task_role_arn            = aws_iam_role.consignment_api_ecs_task.arn
 
   tags = merge(
