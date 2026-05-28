@@ -219,12 +219,14 @@ module "statuses" {
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
   policies = {
     "TDRStatusesLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_statuses_policy.json.tpl", {
-      function_name      = local.statuses_function_name,
-      account_id         = data.aws_caller_identity.current.account_id,
-      bucket_name        = module.backend_lambda_function_bucket.s3_bucket_name,
-      client_secret_path = local.keycloak_backend_checks_secret_name,
-      sns_topic_arn      = module.notifications_topic.sns_arn,
-      kms_key_arn        = module.encryption_key.kms_key_arn
+      function_name            = local.statuses_function_name,
+      account_id               = data.aws_caller_identity.current.account_id,
+      bucket_name              = module.backend_lambda_function_bucket.s3_bucket_name,
+      client_secret_path       = local.keycloak_backend_checks_secret_name,
+      sns_topic_arn            = module.notifications_topic.sns_arn,
+      kms_key_arn              = module.encryption_key.kms_key_arn,
+      clean_bucket_name        = module.upload_bucket.s3_bucket_name,
+      clean_bucket_kms_key_arn = module.s3_internal_kms_key.kms_key_arn
     })
   }
   role_name = "TDRStatusesLambdaRole${title(local.environment)}"
