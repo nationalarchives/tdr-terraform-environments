@@ -171,7 +171,7 @@ locals {
   da_reference_generator_url   = module.tdr_configuration.terraform_config["reference_generator_${local.environment}_url"]
   da_reference_generator_limit = module.tdr_configuration.terraform_config["reference_generator_limit"]
 
-  enable_backend_checks_v2 = local.environment == "prod" ? false : true
+  enable_backend_checks_v2 = true
 
   //feature access blocks
   block_shared_keycloak_pages = local.environment == "intg" ? false : true
