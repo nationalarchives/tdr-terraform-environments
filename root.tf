@@ -159,6 +159,26 @@ module "upload_bucket_quarantine" {
   enable_request_metrics_all = true
 }
 
+module "cloudfront_waf_non_prod" {
+  count                             = local.environment == "intg" || local.environment == "dev" ? 1 : 0
+  source                            = "./tdr-terraform-modules/waf_cloudfront_non_prod"
+  project                           = var.project
+  function                          = "cloudfront"
+  environment                       = local.environment
+  common_tags                       = local.common_tags
+  rate_limit                        = 10000
+  rate_limit_evaluation_window_secs = 300
+  log_retention_period_days         = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].waf
+  blocklist_ips                     = local.ip_blocked_list
+  allowlist_ips = concat(
+    local.ip_allowlist,
+    local.region_allowed_ips
+  )
+  providers = {
+    aws.useast1 = aws.useast1
+  }
+}
+
 module "upload_file_cloudfront_dirty_s3" {
   source                        = "./tdr-terraform-modules/s3"
   project                       = var.project
@@ -195,6 +215,7 @@ module "cloudfront_upload" {
   alias_domain_name                   = local.upload_domain
   certificate_arn                     = module.cloudfront_certificate.certificate_arn
   api_gateway_url                     = module.signed_cookies_api.api_url
+  waf_arn                             = local.environment == "intg" || local.environment == "dev" ? module.cloudfront_waf_non_prod[0].aws_wafv2_web_acl.arn : null
 }
 
 module "cloudfront_upload_dns" {
@@ -595,6 +616,7 @@ module "export_step_function" {
     bagit_export_judgment_bucket   = module.export_bucket_judgment.s3_bucket_name
     consignment_api_url            = module.consignment_api.api_url
     consignment_api_connection_arn = aws_cloudwatch_event_connection.consignment_api_export_connection.arn
+    block_mock_series_ingest       = local.block_mock_series_ingest
   })
   step_function_name = "ConsignmentExport"
   environment        = local.environment
@@ -625,7 +647,7 @@ module "flat_format_export_bucket" {
     read_access_roles     = [local.dr2_copy_files_role]
     aws_backup_local_role = local.aws_back_up_local_role
   })
-  lifecycle_rules                = local.environment == "prod" ? [] : local.export_bucket_lifecycle_rules
+  lifecycle_rules                = local.environment == "prod" ? [] : local.background_clean_up_lifecycle_rules
   s3_data_bucket_additional_tags = local.aws_back_up_tags
   enable_request_metrics_all     = local.environment == "prod"
 }

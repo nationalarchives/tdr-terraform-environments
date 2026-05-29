@@ -156,7 +156,7 @@ locals {
   //feature access blocks
   block_shared_keycloak_pages = local.environment == "intg" ? false : true
   block_skip_metadata_review  = false
-  block_metadata_review_v2    = local.environment == "prod" ? true : false
+  block_metadata_review_v2    = false
 
   disable_users_dry_run         = false
   draft_metadata_s3_bucket_name = "${var.project}-draft-metadata-${local.environment}"
@@ -222,4 +222,6 @@ locals {
   athena_metadata_checks_database_name = "athena-tdr-metadata-checks-${local.environment}"
 
   metadata_version_override = ""
+
+  block_mock_series_ingest = local.environment == "intg" ? false : true
 }

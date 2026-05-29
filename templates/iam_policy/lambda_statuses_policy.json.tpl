@@ -36,6 +36,16 @@
     {
       "Effect": "Allow",
       "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${clean_bucket_name}",
+        "arn:aws:s3:::${clean_bucket_name}/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
         "ssm:GetParameter"
       ],
       "Resource": [
@@ -58,6 +68,13 @@
         "kms:GenerateDataKey"
       ],
       "Resource": "${kms_key_arn}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt"
+      ],
+      "Resource": "${clean_bucket_kms_key_arn}"
     }
   ]
 }
