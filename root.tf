@@ -186,7 +186,7 @@ module "cloudfront_waf_prod" {
   function                          = "cloudfront"
   environment                       = local.environment
   common_tags                       = local.common_tags
-  rate_limit                        = 300
+  rate_limit                        = 10000
   rate_limit_evaluation_window_secs = 300
   log_retention_period_days         = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].waf
   blocklist_ips                     = local.ip_blocked_list
