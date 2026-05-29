@@ -232,7 +232,7 @@ module "aggregate_processing_lambda" {
       read_client_secret_path    = local.keycloak_tdr_read_client_secret_name
       sqs_queue_name             = local.aggregate_processing_function_name
       kms_arn                    = module.encryption_key.kms_key_arn
-      backend_checks_arn         = local.backend_checks_arn
+      backend_checks_arn         = module.backend_checks_v2_step_function.state_machine_arn
       metadata_checks_arn        = module.draft_metadata_checks.step_function_arn
       notifications_topic_arn    = module.notifications_topic.sns_arn
     })
@@ -242,7 +242,7 @@ module "aggregate_processing_lambda" {
     GRAPHQL_API_URL                 = "${module.consignment_api.api_url}/graphql"
     AUTH_URL                        = local.keycloak_auth_url
     AUTH_CLIENT_SECRET_PATH         = local.keycloak_tdr_transfer_service_secret_name
-    BACKEND_CHECKS_ARN              = local.backend_checks_arn
+    BACKEND_CHECKS_ARN              = module.backend_checks_v2_step_function.state_machine_arn
     METADATA_CHECKS_ARN             = module.draft_metadata_checks.step_function_arn
     NOTIFICATIONS_TOPIC_ARN         = module.notifications_topic.sns_arn
     KEYCLOAK_READ_AUTH_SECRET_PATH  = local.keycloak_tdr_read_client_secret_name

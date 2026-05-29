@@ -143,7 +143,6 @@ resource "aws_iam_policy" "draft_metadata_checks_policy" {
 
   policy = templatefile("./templates/iam_policy/metadata_checks_policy.json.tpl", {
     resources = jsonencode([
-      module.yara_av_v2.lambda_arn,
       module.draft_metadata_checks_lambda.lambda_arn,
       module.draft_metadata_persistence_lambda.lambda_arn
     ]),
