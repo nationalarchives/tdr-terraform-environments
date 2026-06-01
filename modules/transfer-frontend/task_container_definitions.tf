@@ -150,6 +150,10 @@ locals {
           value = tostring(var.block_metadata_review_v2)
         },
         {
+          name  = "BLOCK_FILE_CHECKS_FAILURE_V2",
+          value = tostring(var.block_file_checks_failure_v2)
+        },
+        {
           "name"  = "S3_ACL_HEADER_VALUE",
           "value" = var.s3_acl_header_value
         },
