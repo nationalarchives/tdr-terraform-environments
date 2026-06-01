@@ -103,7 +103,6 @@ module "frontend" {
   public_subnet_ranges             = module.shared_vpc.public_subnet_ranges
   otel_service_name                = "frontend-${local.environment}"
   block_skip_metadata_review       = local.block_skip_metadata_review
-  block_metadata_review_v2         = local.block_metadata_review_v2
   block_file_checks_failure_v2     = local.block_file_checks_failure_v2
   draft_metadata_validator_api_url = module.draft_metadata_api_gateway.api_url
   draft_metadata_s3_kms_keys       = jsonencode([module.s3_internal_kms_key.kms_key_arn])
@@ -180,6 +179,26 @@ module "cloudfront_waf_non_prod" {
   }
 }
 
+module "cloudfront_waf_prod" {
+  count                             = local.environment == "staging" ? 1 : 0
+  source                            = "./tdr-terraform-modules/waf_cloudfront_prod"
+  project                           = var.project
+  function                          = "cloudfront"
+  environment                       = local.environment
+  common_tags                       = local.common_tags
+  rate_limit                        = 10000
+  rate_limit_evaluation_window_secs = 300
+  log_retention_period_days         = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].waf
+  blocklist_ips                     = local.ip_blocked_list
+  allowlist_ips = concat(
+    local.ip_allowlist,
+    local.region_allowed_ips
+  )
+  providers = {
+    aws.useast1 = aws.useast1
+  }
+}
+
 module "upload_file_cloudfront_dirty_s3" {
   source                        = "./tdr-terraform-modules/s3"
   project                       = var.project
@@ -216,7 +235,7 @@ module "cloudfront_upload" {
   alias_domain_name                   = local.upload_domain
   certificate_arn                     = module.cloudfront_certificate.certificate_arn
   api_gateway_url                     = module.signed_cookies_api.api_url
-  waf_arn                             = local.environment == "intg" || local.environment == "dev" ? module.cloudfront_waf_non_prod[0].aws_wafv2_web_acl.arn : null
+  waf_arn                             = local.environment == "intg" || local.environment == "dev" ? module.cloudfront_waf_non_prod[0].aws_wafv2_web_acl.arn : (local.environment == "staging" ? module.cloudfront_waf_prod[0].aws_wafv2_web_acl.arn : null)
 }
 
 module "cloudfront_upload_dns" {

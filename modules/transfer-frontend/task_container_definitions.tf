@@ -146,10 +146,6 @@ locals {
           value = tostring(var.block_skip_metadata_review)
         },
         {
-          name  = "BLOCK_METADATA_REVIEW_V2"
-          value = tostring(var.block_metadata_review_v2)
-        },
-        {
           name  = "BLOCK_FILE_CHECKS_FAILURE_V2",
           value = tostring(var.block_file_checks_failure_v2)
         },
