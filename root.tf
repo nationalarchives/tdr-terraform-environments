@@ -496,7 +496,6 @@ module "export_authoriser_lambda" {
   kms_key_arn                      = module.encryption_key.kms_key_arn
   private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
   vpc_id                           = module.shared_vpc.vpc_id
-  efs_security_group_id            = module.export_efs.security_group_id
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
@@ -749,9 +748,6 @@ module "notification_lambda" {
   kms_export_bucket_key_arn      = module.s3_external_kms_key.kms_key_arn
   event_rule_arns                = []
   sns_topic_arns                 = [module.notifications_topic.sns_arn]
-  muted_scan_alerts              = module.global_parameters.muted_ecr_scan_alerts
-  judgment_export_s3_bucket_name = module.export_bucket_judgment.s3_bucket_name
-  standard_export_s3_bucket_name = module.export_bucket.s3_bucket_name
   da_event_bus_arn               = local.da_event_bus_arn
   da_event_bus_kms_key_arn       = local.da_event_bus_kms_key
   notifications_vpc_config = {
