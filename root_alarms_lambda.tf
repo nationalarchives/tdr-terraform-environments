@@ -10,21 +10,18 @@ locals {
     "tdr-aggregate-processing-prod",
     "tdr-api-update-v2-prod",
     "tdr-backend-checks-results-prod",
-    "tdr-checksum-v2-prod",
     "tdr-database-migrations-prod",
     "tdr-draft-metadata-checks-prod",
     "tdr-draft-metadata-persistence-prod",
     "tdr-export-api-authoriser-prod",
     "tdr-file-checks-prod",
-    "tdr-file-format-v2-prod",
     "tdr-file-upload-data-prod",
     "tdr-notifications-prod",
     "tdr-redacted-files-prod",
     "tdr-reporting-prod",
     "tdr-rotate-keycloak-secrets-prod",
     "tdr-signed-cookies-prod",
-    "tdr-statuses-prod",
-    "tdr-yara-av-v2-prod",
+    "tdr-statuses-prod"
   ]
   mgmt_lambdas = [
     "tdr-notifications-mgmt",
