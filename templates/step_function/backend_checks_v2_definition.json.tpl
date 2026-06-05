@@ -373,7 +373,8 @@
       "Retry": [
         {
           "ErrorEquals": [
-            "Events.ConnectionResource.ConcurrentModification"
+            "Events.ConnectionResource.ConcurrentModification",
+            "Events.ConnectionResource.AuthInProgress"
           ],
           "IntervalSeconds": 5,
           "MaxAttempts": 3,
