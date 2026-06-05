@@ -206,7 +206,6 @@ module "create_keycloak_db_users_lambda_new" {
   db_url                  = module.keycloak_database_instance.database_url
   db_secrets_arn          = module.keycloak_database_instance.database_master_user_secret_arn
   kms_key_arn             = module.encryption_key.kms_key_arn
-  keycloak_password       = module.keycloak_ssm_parameters.params[local.keycloak_user_password_name].value
   database_security_group = module.keycloak_database_security_group.security_group_id
 }
 
