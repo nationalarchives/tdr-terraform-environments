@@ -149,7 +149,7 @@ module "statuses" {
   function_name                    = local.statuses_function_name
   handler                          = "uk.gov.nationalarchives.Lambda::run"
   reserved_concurrency             = -1
-  timeout_seconds                  = 30
+  timeout_seconds                  = 600
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
   policies = {
     "TDRStatusesLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_statuses_policy.json.tpl", {
