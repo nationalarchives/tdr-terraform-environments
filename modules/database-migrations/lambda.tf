@@ -53,7 +53,7 @@ resource "aws_lambda_function" "database_migration_function" {
 
 resource "aws_security_group" "db_migration" {
   name        = "db-migration-security-group-${var.environment}"
-  description = "Controls access to the keycloak load balancer"
+  description = "Controls access for the database migration Lambda to the database"
   vpc_id      = var.vpc_id
 
   egress {
