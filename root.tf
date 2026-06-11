@@ -71,7 +71,7 @@ module "consignment_api" {
   frontend_url                   = module.frontend.frontend_url
   dns_zone_name_trimmed          = local.dns_zone_name_trimmed
   db_instance_resource_id        = module.consignment_api_database.resource_id
-  create_users_security_group_id = flatten([module.create_db_users_lambda.create_users_lambda_security_group_id, module.create_bastion_user_lambda.create_users_lambda_security_group_id])
+  create_users_security_group_id = flatten([module.create_db_users_lambda.create_users_lambda_security_group_id])
   da_reference_generator_url     = local.da_reference_generator_url
   da_reference_generator_limit   = local.da_reference_generator_limit
   aws_guardduty_ecr_arn          = local.aws_guardduty_ecr_arn
@@ -407,22 +407,6 @@ module "create_db_users_lambda" {
   database_name                    = "consignmentapi"
 }
 
-module "create_bastion_user_lambda" {
-  source                           = "./tdr-terraform-modules/lambda"
-  project                          = var.project
-  common_tags                      = local.common_tags
-  lambda_create_db_users           = true
-  vpc_id                           = module.shared_vpc.vpc_id
-  private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
-  db_url                           = module.consignment_api_database.database_url
-  db_secrets_arn                   = module.consignment_api_database.database_master_user_secret_arn
-  kms_key_arn                      = module.encryption_key.kms_key_arn
-  database_security_group          = module.api_database_security_group.security_group_id
-  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
-  lambda_name                      = "create-bastion-user"
-  database_name                    = "bastion"
-}
-
 module "service_unavailable_lambda" {
   source                           = "./tdr-terraform-modules/lambda"
   project                          = var.project
@@ -565,7 +549,6 @@ module "export_efs" {
   policy                       = "efs_access_policy"
   policy_roles                 = jsonencode(module.consignment_export_task_role.role.arn)
   mount_target_security_groups = flatten([module.consignment_export_ecs_security_group.security_group_id])
-  bastion_role                 = module.bastion_role.role.arn
   netnum_offset                = 6
   nat_gateway_ids              = module.shared_vpc.nat_gateway_ids
   vpc_cidr_block               = module.shared_vpc.vpc_cidr_block
@@ -827,16 +810,6 @@ module "athena" {
     "tdr_s3_request_errors"
   ]
 }
-// Create bastion role here so we can attach it to the EFS file system policy as you can't add roles that don't exist
-// We'll attach policies to the role when the bastion is created.
-module "bastion_role" {
-  source = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./tdr-terraform-modules/ec2/templates/ec2_assume_role.json.tpl", {
-  account_id = data.aws_caller_identity.current.id })
-  common_tags        = local.common_tags
-  name               = "BastionEC2Role${title(local.environment)}"
-  policy_attachments = {}
-}
 
 module "create_keycloak_users_api_lambda" {
   source                           = "./tdr-terraform-modules/lambda"
@@ -1008,7 +981,6 @@ module "api_database_security_group" {
   ingress_security_group_rules = [
     { port = 5432, description = "Allow inbound access from ECS", security_group_id = module.consignment_api.ecs_task_security_group_id },
     { port = 5432, description = "Allow inbound access from database migrations", security_group_id = module.database_migrations.db_migration_security_group },
-    { port = 5432, description = "Allow inbound access from create bastion users lambda", security_group_id = module.create_bastion_user_lambda.create_users_lambda_security_group_id[0] },
     { port = 5432, description = "Allow inbound access from create users lambda", security_group_id = module.create_db_users_lambda.create_users_lambda_security_group_id[0] },
     { port = 5432, description = "Allow inbound access from export", security_group_id = module.consignment_export_ecs_security_group.security_group_id }
   ]
