@@ -36,6 +36,15 @@
     {
       "Effect": "Allow",
       "Action": [
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${transfer_errors_bucket_name}/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
         "s3:GetObject"
       ],
       "Resource": [
@@ -72,10 +81,10 @@
     {
       "Effect": "Allow",
       "Action": [
-        "kms:Decrypt"
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
       ],
-      "Resource": "${clean_bucket_kms_key_arn}"
+      "Resource": "${internal_s3_kms_key_arn}"
     }
   ]
 }
-
