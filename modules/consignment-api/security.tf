@@ -28,7 +28,7 @@ resource "aws_security_group" "lb" {
 # Traffic to the ECS cluster should only come from the application load balancer
 resource "aws_security_group" "ecs_tasks" {
   name        = "${var.app_name}-ecs-tasks-security-group-${var.environment}"
-  description = "Allow inbound access to the ECS from the keycloak load balancer only"
+  description = "Allow inbound access to the ECS from the consignment API load balancer only"
   vpc_id      = var.vpc_id
 
   ingress {
