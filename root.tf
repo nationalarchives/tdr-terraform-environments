@@ -180,7 +180,7 @@ module "cloudfront_waf_non_prod" {
 }
 
 module "cloudfront_waf_prod" {
-  count                             = local.environment == "staging" ? 1 : 0
+  count                             = local.environment == "staging" || local.environment == "prod" ? 1 : 0
   source                            = "./tdr-terraform-modules/waf_cloudfront_prod"
   project                           = var.project
   function                          = "cloudfront"
@@ -235,7 +235,7 @@ module "cloudfront_upload" {
   alias_domain_name                   = local.upload_domain
   certificate_arn                     = module.cloudfront_certificate.certificate_arn
   api_gateway_url                     = module.signed_cookies_api.api_url
-  waf_arn                             = local.environment == "intg" || local.environment == "dev" ? module.cloudfront_waf_non_prod[0].aws_wafv2_web_acl.arn : (local.environment == "staging" ? module.cloudfront_waf_prod[0].aws_wafv2_web_acl.arn : null)
+  waf_arn                             = local.environment == "intg" || local.environment == "dev" ? module.cloudfront_waf_non_prod[0].aws_wafv2_web_acl.arn : module.cloudfront_waf_prod[0].aws_wafv2_web_acl.arn
 }
 
 module "cloudfront_upload_dns" {
