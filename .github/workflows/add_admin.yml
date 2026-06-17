@@ -4,63 +4,56 @@ on:
   workflow_dispatch:
     inputs:
       kms_key_target:
-        description: "KMS key to grant access to"
+        description: KMS key to grant access
         required: true
         type: choice
         options:
           - module.s3_internal_kms_key.aws_kms_key.encryption
           - module.s3_upload_kms_key.aws_kms_key.encryption
       reason:
-        description: "Reason for access"
+        description: Reason for access
         required: true
         type: string
 
+run-name: Granting access to ${{ inputs.kms_key_target }}
+
+permissions:
+  id-token: write
+  contents: write
+
 jobs:
-    grant-access:
-        runs-on: ubuntu-latest
-        environment: prod
-        steps:
-        - name: Checkout
-          uses: actions/checkout@v4
-    
-        - name: Set up Terraform
-          uses: hashicorp/setup-terraform@v3
-          with:
-            terraform_version: 1.6.0
-    
-        - name: Initialize Terraform
-          run: terraform init
-    
-        - name: Grant Access
-          run: |
-            terraform apply -auto-approve \
-                -var="kms_key_target=${{ github.event.inputs.kms_key_target }}" \
-                -var="reason=${{ github.event.inputs.reason }}"
+  grant-access:
+    uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@17a4dacd1607170122eff29d316e220bfc10563f # v0.0.30
+    with:
+      repo-name: tdr-terraform-environments
+      environment: prod
+      terraform-version: 1.12.2
+    #   not sure the target will work
+      target: ${{ inputs.kms_key_target }}
+    secrets:
+      MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
+      WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
+      ACCOUNT_NUMBER: ${{ secrets.ACCOUNT_NUMBER }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      INTG_ACCOUNT_NUMBER: ${{ secrets.INTG_ACCOUNT_NUMBER }}
+      STAGING_ACCOUNT_NUMBER: ${{ secrets.STAGING_ACCOUNT_NUMBER }}
+      PROD_ACCOUNT_NUMBER: ${{ secrets.PROD_ACCOUNT_NUMBER }}
 
-    rollback:
-        needs: grant-access
-        runs-on: ubuntu-latest
-        if: always()
-        steps:
-        - name: Checkout
-          uses: actions/checkout@v4
-
-        - name: Configure AWS credentials
-          uses: aws-actions/configure-aws-credentials@v4
-          with:
-            # not sure about this. Copilot seems to have kicked in and suggested this. 
-            role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.AWS_ROLE_NAME }}
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: eu-west-2
-
-        - name: Setup Terraform
-          uses: hashicorp/setup-terraform@v3
-
-        - name: Terraform Init
-          run: terraform init
-
-        - name: Terraform Apply - Rollback
-          run: |
-            terraform apply -auto-approve \
-                -target=${{ inputs.kms_key_target }}  
+  rollback:
+    needs: grant-access
+    if: always()
+    uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@17a4dacd1607170122eff29d316e220bfc10563f # v0.0.30
+    with:
+      repo-name: tdr-terraform-environments
+      environment: prod
+      terraform-version: 1.12.2
+    #   not sure if the target will work
+      target: ${{ inputs.kms_key_target }}
+    secrets:
+      MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
+      WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
+      ACCOUNT_NUMBER: ${{ secrets.ACCOUNT_NUMBER }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      INTG_ACCOUNT_NUMBER: ${{ secrets.INTG_ACCOUNT_NUMBER }}
+      STAGING_ACCOUNT_NUMBER: ${{ secrets.STAGING_ACCOUNT_NUMBER }}
+      PROD_ACCOUNT_NUMBER: ${{ secrets.PROD_ACCOUNT_NUMBER }}
