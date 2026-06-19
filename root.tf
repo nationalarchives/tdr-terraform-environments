@@ -238,6 +238,7 @@ module "cloudfront_upload" {
   certificate_arn                     = module.cloudfront_certificate.certificate_arn
   api_gateway_url                     = module.signed_cookies_api.api_url
   waf_arn                             = local.environment == "intg" || local.environment == "dev" ? module.cloudfront_waf_non_prod[0].aws_wafv2_web_acl.arn : module.cloudfront_waf_prod[0].aws_wafv2_web_acl.arn
+  signed_cookie_public_key_names      = ["sign_cookies_public_key_${local.environment}_2026-1.pem", "sign_cookies_public_key_intg.pem"]
 }
 
 module "cloudfront_upload_dns" {
@@ -493,7 +494,8 @@ module "signed_cookies_lambda" {
   upload_domain                    = local.upload_domain
   auth_url                         = local.keycloak_auth_url
   frontend_url                     = module.frontend.frontend_url
-  cloudfront_key_pair_id           = module.cloudfront_upload.cloudfront_key_pair_id
+  cloudfront_key_pair_id           = module.global_parameters.signed_cookie_key["${local.environment}"].key_id
+  cloudfront_private_key_ssm_name  = module.global_parameters.signed_cookie_key["${local.environment}"].ssm_private_key_param_name
   timeout_seconds                  = 60
   api_gateway_arn                  = module.signed_cookies_api.api_arn
   kms_key_arn                      = module.encryption_key.kms_key_arn
