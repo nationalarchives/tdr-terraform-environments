@@ -65,6 +65,8 @@ variable "draft_metadata_s3_kms_keys" {}
 
 variable "draft_metadata_s3_bucket_name" {}
 
+variable "transfer_errors_s3_bucket_name" {}
+
 variable "notification_sns_topic_arn" {}
 
 variable "encryption_kms_key_arn" {}
