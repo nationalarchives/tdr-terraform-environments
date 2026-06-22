@@ -238,7 +238,7 @@ module "cloudfront_upload" {
   certificate_arn                     = module.cloudfront_certificate.certificate_arn
   api_gateway_url                     = module.signed_cookies_api.api_url
   waf_arn                             = local.environment == "intg" || local.environment == "dev" ? module.cloudfront_waf_non_prod[0].aws_wafv2_web_acl.arn : module.cloudfront_waf_prod[0].aws_wafv2_web_acl.arn
-  signed_cookie_public_key_names      = ["sign_cookies_public_key_${local.environment}_2026-1.pem", "sign_cookies_public_key_intg.pem"]
+  signed_cookie_public_key_names      = ["sign_cookies_public_key_${local.environment}.pem"]
 }
 
 module "cloudfront_upload_dns" {
