@@ -158,8 +158,9 @@ locals {
   block_skip_metadata_review   = false
   block_file_checks_failure_v2 = local.environment == "prod" ? true : false
 
-  disable_users_dry_run         = false
-  draft_metadata_s3_bucket_name = "${var.project}-draft-metadata-${local.environment}"
+  disable_users_dry_run          = false
+  draft_metadata_s3_bucket_name  = "${var.project}-draft-metadata-${local.environment}"
+  transfer_errors_s3_bucket_name = "${var.project}-transfer-errors-${local.environment}"
 
   flat_format_bucket_name          = "tdr-export-${local.environment}"
   flat_format_judgment_bucket_name = "tdr-export-judgment-${local.environment}"
