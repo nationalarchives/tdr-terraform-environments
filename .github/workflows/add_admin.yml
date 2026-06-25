@@ -1,8 +1,76 @@
+# name: Grant Admin SSO Access to S3 KMS Key
+
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       kms_key_target:
+#         description: KMS key to grant access
+#         required: true
+#         type: choice
+#         options:
+#           - module.s3_internal_kms_key.aws_kms_key.encryption
+#           - module.s3_upload_kms_key.aws_kms_key.encryption
+#       reason:
+#         description: Reason for access
+#         required: true
+#         type: string
+
+# run-name: Granting access to ${{ inputs.kms_key_target }}
+
+# permissions:
+#   id-token: write
+#   contents: write
+
+# jobs:
+#   grant-access:
+#     uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@17a4dacd1607170122eff29d316e220bfc10563f # v0.0.30
+#     with:
+#       repo-name: tdr-terraform-environments
+#       environment: prod
+#       terraform-version: 1.12.2
+#     #   not sure the target will work
+#       target: ${{ inputs.kms_key_target }}
+#     secrets:
+#       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
+#       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
+#       ACCOUNT_NUMBER: ${{ secrets.ACCOUNT_NUMBER }}
+#       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+#       INTG_ACCOUNT_NUMBER: ${{ secrets.INTG_ACCOUNT_NUMBER }}
+#       STAGING_ACCOUNT_NUMBER: ${{ secrets.STAGING_ACCOUNT_NUMBER }}
+#       PROD_ACCOUNT_NUMBER: ${{ secrets.PROD_ACCOUNT_NUMBER }}
+
+#   rollback:
+#     needs: grant-access
+    # if: always()
+    #  reusable workflow
+#     uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@17a4dacd1607170122eff29d316e220bfc10563f # v0.0.30
+#     with:
+#       repo-name: tdr-terraform-environments
+#       environment: prod
+#       terraform-version: 1.12.2
+#     #   not sure if the target will work
+#       target: ${{ inputs.kms_key_target }}
+#     secrets:
+#       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
+#       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
+#       ACCOUNT_NUMBER: ${{ secrets.ACCOUNT_NUMBER }}
+#       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+#       INTG_ACCOUNT_NUMBER: ${{ secrets.INTG_ACCOUNT_NUMBER }}
+#       STAGING_ACCOUNT_NUMBER: ${{ secrets.STAGING_ACCOUNT_NUMBER }}
+#       PROD_ACCOUNT_NUMBER: ${{ secrets.PROD_ACCOUNT_NUMBER }}
+
 name: Grant Admin SSO Access to S3 KMS Key
 
 on:
   workflow_dispatch:
     inputs:
+      action:
+        description: Grant or revoke access
+        required: true
+        type: choice
+        options:
+          - grant
+          - rollback
       kms_key_target:
         description: KMS key to grant access
         required: true
@@ -15,45 +83,46 @@ on:
         required: true
         type: string
 
-run-name: Granting access to ${{ inputs.kms_key_target }}
+run-name: "${{ inputs.action }}: ${{ inputs.kms_key_target }}"
 
 permissions:
   id-token: write
-  contents: write
+  contents: read
 
 jobs:
-  grant-access:
-    uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@17a4dacd1607170122eff29d316e220bfc10563f # v0.0.30
-    with:
-      repo-name: tdr-terraform-environments
-      environment: prod
-      terraform-version: 1.12.2
-    #   not sure the target will work
-      target: ${{ inputs.kms_key_target }}
-    secrets:
-      MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
-      WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
-      ACCOUNT_NUMBER: ${{ secrets.ACCOUNT_NUMBER }}
-      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-      INTG_ACCOUNT_NUMBER: ${{ secrets.INTG_ACCOUNT_NUMBER }}
-      STAGING_ACCOUNT_NUMBER: ${{ secrets.STAGING_ACCOUNT_NUMBER }}
-      PROD_ACCOUNT_NUMBER: ${{ secrets.PROD_ACCOUNT_NUMBER }}
+  apply:
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  rollback:
-    needs: grant-access
-    if: always()
-    uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@17a4dacd1607170122eff29d316e220bfc10563f # v0.0.30
-    with:
-      repo-name: tdr-terraform-environments
-      environment: prod
-      terraform-version: 1.12.2
-    #   not sure if the target will work
-      target: ${{ inputs.kms_key_target }}
-    secrets:
-      MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
-      WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
-      ACCOUNT_NUMBER: ${{ secrets.ACCOUNT_NUMBER }}
-      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-      INTG_ACCOUNT_NUMBER: ${{ secrets.INTG_ACCOUNT_NUMBER }}
-      STAGING_ACCOUNT_NUMBER: ${{ secrets.STAGING_ACCOUNT_NUMBER }}
-      PROD_ACCOUNT_NUMBER: ${{ secrets.PROD_ACCOUNT_NUMBER }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.WORKFLOW_PAT }}
+          aws-region: eu-west-2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.12.2
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: |
+          terraform plan -target=${{ inputs.kms_key_target }} -out=tfplan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
+
+        # add a slack notification that lets us know who is asking and their reason?
+
+
+        # target needs to be the kms key. target the line that you want changing. couold chnge both and the target will still work. python script.
+        # a script that targets that one line. might be a github actions thing out of the box. checkout to change the file.
+        # want to create a branch that makes the change as part of the action. commit to that branch then run the plan and apply with a clean up. 
+        # could maybe do it all in bash rather than python. inline in a github action. look at github actions that make changes to a file. 
+        # clean the branch with a rollback. notify slack needs to be included. 
