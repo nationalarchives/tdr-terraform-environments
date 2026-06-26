@@ -58,9 +58,8 @@ jobs:
 
         # add a slack notification that lets us know who is asking and their reason?
 
-
         # target needs to be the kms key. target the line that you want changing. couold chnge both and the target will still work. python script.
         # a script that targets that one line. might be a github actions thing out of the box. checkout to change the file.
-        # want to create a branch that makes the change as part of the action. commit to that branch then run the plan and apply with a clean up. 
-        # could maybe do it all in bash rather than python. inline in a github action. look at github actions that make changes to a file. 
-        # clean the branch with a rollback. notify slack needs to be included. 
+        # want to create a branch that makes the change as part of the action. commit to that branch then run the plan and apply with a clean up.
+        # could maybe do it all in bash rather than python. inline in a github action. look at github actions that make changes to a file.
+        # clean the branch with a rollback. notify slack needs to be included.
