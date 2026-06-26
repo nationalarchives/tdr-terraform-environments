@@ -26,21 +26,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Edit locals file to grant or rollback access
-        run: python3 .github/scripts/edit_locals.py ${{ inputs.action }}
-
-      - name: Commit and push
+      - name: Configure git identity
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add root_s3_bucket_access.tf
-          git commit -m "${{ inputs.action }}: KMS access - ${{ inputs.reason }}"
-          git push
 
-      - uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.WORKFLOW_PAT }}
-          aws-region: eu-west-2
+      - name: Create working branch
+        run: |
+          BRANCH="kms-access-${{ inputs.action }}-${{ github.run_id }}"
+          git checkout -b "$BRANCH"
+          echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
+
+      - name: Edit locals
+        run: python ./scripts/edit_kms_locals.py "${{ inputs.action }}" "${{ inputs.reason }}"
+
+      - name: Show diff
+        run: git diff root_s3_bucket_access.tf
+
+      - name: Commit and push to new branch
+        run: |
+          git add root_s3_bucket_access.tf
+          git commit -m "${{ inputs.action }}: KMS access — ${{ inputs.reason }} by ${{ github.actor }}"
+          git push origin "$BRANCH"
 
       - name: Send usage message
         if: always()
@@ -48,14 +55,6 @@ jobs:
         with:
           message: "${{ github.actor }} has ${{ inputs.action }} KMS access. Reason given: ${{ inputs.reason }}"
           slack-url: ${{ secrets.SLACK_WEBHOOK }}
-
-      - uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.12.2
-
-      - run: terraform init
-      - run: terraform plan -target=module.s3_internal_kmy_key.aws_kms_key.encyrption -out=tfplan
-      - run: terraform apply -auto-approve tfplan
 
         # add a slack notification that lets us know who is asking and their reason?
 
