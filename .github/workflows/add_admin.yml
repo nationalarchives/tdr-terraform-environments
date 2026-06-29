@@ -32,21 +32,27 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Create working branch
+        env:
+          ACTION: ${{ inputs.action }}
         run: |
-          BRANCH="kms-access-${{ inputs.action }}-${{ github.run_id }}"
+          BRANCH="kms-access-${ACTION}-${{ github.run_id }}"
           git checkout -b "$BRANCH"
           echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
 
       - name: Edit locals
-        run: python ./scripts/edit_kms_locals.py "${{ inputs.action }}" "${{ inputs.reason }}"
-
-      - name: Show diff
-        run: git diff root_s3_bucket_access.tf
+        env:
+          ACTION: ${{ inputs.action }}
+          REASON: ${{ inputs.reason }}
+        run: python ./scripts/edit_kms_locals.py "$ACTION" "$REASON"
 
       - name: Commit and push to new branch
+        env:
+          ACTION: ${{ inputs.action }}
+          REASON: ${{ inputs.reason }}
+          ACTOR: ${{ github.actor }}
         run: |
           git add root_s3_bucket_access.tf
-          git commit -m "${{ inputs.action }}: KMS access — ${{ inputs.reason }} by ${{ github.actor }}"
+          git commit -m "$ACTION: KMS access — $REASON by $ACTOR"
           git push origin "$BRANCH"
 
       - name: Send usage message
