@@ -134,6 +134,10 @@ locals {
           value = var.draft_metadata_s3_bucket_name
         },
         {
+          name  = "TRANSFER_ERRORS_S3_BUCKET_NAME"
+          value = var.transfer_errors_s3_bucket_name
+        },
+        {
           name  = "NOTIFICATION_SNS_TOPIC_ARN"
           value = var.notification_sns_topic_arn
         },
