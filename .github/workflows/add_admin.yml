@@ -3,7 +3,15 @@ name: Grant Admin SSO Access to S3 KMS Key
 on:
   workflow_dispatch:
     inputs:
-      action:
+      kms_key_target:
+        description: Which KMS key(s) to update
+        required: true
+        type: choice
+        options:
+          - internal
+          - export
+          - both
+      grant-rollback-access:
         description: Grant or rollback access
         required: true
         type: choice
@@ -33,7 +41,7 @@ jobs:
 
       - name: Create working branch
         env:
-          ACTION: ${{ inputs.action }}
+          ACTION: ${{ inputs.grant-rollback-access }}
         run: |
           BRANCH="kms-access-${ACTION}-${{ github.run_id }}"
           git checkout -b "$BRANCH"
@@ -41,13 +49,13 @@ jobs:
 
       - name: Edit locals
         env:
-          ACTION: ${{ inputs.action }}
+          ACTION: ${{ inputs.grant-rollback-access }}
           REASON: ${{ inputs.reason }}
-        run: python ./scripts/edit_kms_locals.py "$ACTION" "$REASON"
+        run: python ./scripts/edit_kms_locals.py "$ACTION" "$TARGET" "$REASON"
 
       - name: Commit and push to new branch
         env:
-          ACTION: ${{ inputs.action }}
+          ACTION: ${{ inputs.grant-rollback-access }}
           REASON: ${{ inputs.reason }}
           ACTOR: ${{ github.actor }}
         run: |
@@ -59,6 +67,6 @@ jobs:
         if: always()
         uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@f318ce8a5d99c08b1235663f97fdb1b35844674e # v0.0.39
         with:
-          message: "${{ github.actor }} has ${{ inputs.action }} KMS access. Reason given: ${{ inputs.reason }}"
+          message: "${{ github.actor }} has ${{ inputs.grant-rollback-access }} KMS access. Reason given: ${{ inputs.reason }}"
           slack-url: ${{ secrets.SLACK_WEBHOOK }}
           
