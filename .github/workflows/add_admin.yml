@@ -32,6 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     # environment: prod
     steps:
+      # warning on ziz for below
       - uses: actions/checkout@v4
 
       - name: Configure git identity
@@ -62,6 +63,31 @@ jobs:
           git add root_s3_bucket_access.tf
           git commit -m "$ACTION: KMS access — $REASON by $ACTOR"
           git push origin "$BRANCH"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+         role-to-assume: ${{ secrets.WORKFLOW_PAT }}
+         aws-region: eu-west-2
+
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+         terraform_version: 1.12.2
+
+
+      - name: Terraform Init
+        run: terraform init
+
+
+      - name: Terraform Plan
+        run: |
+         terraform plan -target=${{ inputs.kms_key_target }} -out=tfplan
+
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
 
       - name: Send usage message
         if: always()
