@@ -1,5 +1,4 @@
-name: Grant Admin SSO Access to S3 KMS Key
-
+name: Grant Admin SSO Access to Production S3 KMS Key
 on:
   workflow_dispatch:
     inputs:
@@ -22,6 +21,10 @@ on:
         description: Reason for access
         required: true
         type: string
+      ticket:
+        description: Ticket number for request (TRDR-XXXX)
+        required: true
+        type: string
 
 permissions:
   id-token: write
@@ -30,10 +33,8 @@ permissions:
 jobs:
   apply:
     runs-on: ubuntu-latest
-    # environment: prod
     steps:
-      # warning on ziz for below
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Configure git identity
         run: |
@@ -52,6 +53,7 @@ jobs:
         env:
           ACTION: ${{ inputs.action }}
           REASON: ${{ inputs.reason }}
+          TARGET: ${{ inputs.kms_key_target }}
         run: python ./scripts/edit_kms_locals.py "$ACTION" "$TARGET" "$REASON"
 
       - name: Commit and push to new branch
@@ -59,7 +61,10 @@ jobs:
           ACTION: ${{ inputs.action }}
           REASON: ${{ inputs.reason }}
           ACTOR: ${{ github.actor }}
+          TICKET: ${{ inputs.ticket }}
         run: |
+          git branch "$TICKET"
+          git checkout "$TICKET"
           git add root_s3_bucket_access.tf
           git commit -m "$ACTION: KMS access — $REASON by $ACTOR"
           git push origin "$BRANCH"
@@ -70,21 +75,16 @@ jobs:
          role-to-assume: ${{ secrets.WORKFLOW_PAT }}
          aws-region: eu-west-2
 
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
          terraform_version: 1.12.2
 
-
       - name: Terraform Init
         run: terraform init
 
-
       - name: Terraform Plan
-        run: |
-         terraform plan -target=${{ inputs.kms_key_target }} -out=tfplan
-
+        run: terraform plan
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
@@ -95,8 +95,10 @@ jobs:
           ACTOR: ${{ github.actor }}
           ACTION: ${{ inputs.action}}
           REASON: ${{ inputs.reason }}
+          TICKET: ${{ inputs.ticket }}
+          TARGET: ${{ inputs.kms_key_target }}
         uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@f318ce8a5d99c08b1235663f97fdb1b35844674e # v0.0.39
         with:
-          message: "$ACTOR has $ACTION KMS access. Reason given: $REASON"
+          message: "$ACTOR has $ACTION KMS access to KMS key $TARGET. Reason given: $REASON"
           slack-url: ${{ secrets.SLACK_WEBHOOK }}
           
