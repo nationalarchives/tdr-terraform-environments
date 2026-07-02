@@ -1,0 +1,104 @@
+name: Grant Admin SSO Access to Production S3 KMS Key
+on:
+  workflow_dispatch:
+    inputs:
+      kms_key_target:
+        description: Which KMS key(s) to update
+        required: true
+        type: choice
+        options:
+          - internal
+          - export
+          - both
+      action:
+        description: Grant or rollback access
+        required: true
+        type: choice
+        options:
+          - grant
+          - rollback
+      reason:
+        description: Reason for access
+        required: true
+        type: string
+      ticket:
+        description: Ticket number for request (TRDR-XXXX)
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create working branch
+        env:
+          ACTION: ${{ inputs.action }}
+        run: |
+          BRANCH="kms-access-${ACTION}-${{ github.run_id }}"
+          git checkout -b "$BRANCH"
+          echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
+
+      - name: Edit locals
+        env:
+          ACTION: ${{ inputs.action }}
+          REASON: ${{ inputs.reason }}
+          TARGET: ${{ inputs.kms_key_target }}
+        run: python ./scripts/edit_kms_locals.py "$ACTION" "$TARGET" "$REASON"
+
+      - name: Commit and push to new branch
+        env:
+          ACTION: ${{ inputs.action }}
+          REASON: ${{ inputs.reason }}
+          ACTOR: ${{ github.actor }}
+          TICKET: ${{ inputs.ticket }}
+        run: |
+          git branch "$TICKET"
+          git checkout "$TICKET"
+          git add root_s3_bucket_access.tf
+          git commit -m "$ACTION: KMS access — $REASON by $ACTOR"
+          git push origin "$BRANCH"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+         role-to-assume: ${{ secrets.WORKFLOW_PAT }}
+         aws-region: eu-west-2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85 # v4.0.0
+        with:
+         terraform_version: 1.12.2
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
+
+      - name: Send usage message
+        if: always()
+        env:
+          ACTOR: ${{ github.actor }}
+          ACTION: ${{ inputs.action}}
+          REASON: ${{ inputs.reason }}
+          TICKET: ${{ inputs.ticket }}
+          TARGET: ${{ inputs.kms_key_target }}
+        uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@f318ce8a5d99c08b1235663f97fdb1b35844674e # v0.0.39
+        with:
+          message: "$ACTOR has $ACTION KMS access to KMS key $TARGET. Reason given: $REASON"
+          slack-url: ${{ secrets.SLACK_WEBHOOK }}
+          
