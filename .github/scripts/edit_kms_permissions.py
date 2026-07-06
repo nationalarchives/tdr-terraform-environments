@@ -1,31 +1,35 @@
-import sys
-from pathlib import Path
+# NOT CURRENTLY USED
 
-FILE = Path("root_s3_bucket_access.tf")
+# import sys
+# from pathlib import Path
 
-EXPORT_S3_BUCKET_ACCESS_GRANTED = 'local.environment == "prod" ? [data.aws_ssm_parameter.aws_sso_admin_role.value] : [data.aws_ssm_parameter.aws_sso_admin_role.value, data.aws_ssm_parameter.aws_sso_export_role.value]'
-EXPORT_S3_BUCKET_ACCESS_REVOKED = 'local.environment == "prod" ? [] : [data.aws_ssm_parameter.aws_sso_admin_role.value, data.aws_ssm_parameter.aws_sso_export_role.value]'
+# FILE = Path("root_s3_bucket_access.tf")
 
-INTERNAL_S3_BUCKET_ACCESS_GRANTED = 'aws_sso_internal_bucket_access_roles = local.environment == "prod" ? [data.aws_ssm_parameter.aws_sso_admin_role.value] : [data.aws_ssm_parameter.aws_sso_admin_role.value]'
-INTERNAL_S3_BUCKET_ACCESS_REVOKED = 'aws_sso_internal_bucket_access_roles = local.environment == "prod" ? [] : [data.aws_ssm_parameter.aws_sso_admin_role.value]'
+# REVOKED = 'admin_sso_access_enabled = false'
+# GRANTED = 'admin_sso_access_enabled = true'
 
-target = sys.argv[1]
-action = sys.argv[2]
-reason = sys.argv[3]
-ticket = sys.argv[4]
+# target = sys.argv[1]
+# action = sys.argv[2]
 
-content = FILE.read_text()
+# content = FILE.read_text()
 
-if target in ("internal", "both"):
-    if action == "grant":
-        content = content.replace(INTERNAL_S3_BUCKET_ACCESS_REVOKED, INTERNAL_S3_BUCKET_ACCESS_GRANTED)
-    else:
-        content = content.replace(INTERNAL_S3_BUCKET_ACCESS_GRANTED, INTERNAL_S3_BUCKET_ACCESS_REVOKED)
+# if target in ("internal", "both"):
+#     if action == "grant":
+#         content = content.replace(INTERNAL_S3_BUCKET_ACCESS_REVOKED, INTERNAL_S3_BUCKET_ACCESS_GRANTED)
+#     else:
+#         content = content.replace(INTERNAL_S3_BUCKET_ACCESS_GRANTED, INTERNAL_S3_BUCKET_ACCESS_REVOKED)
 
-if target in ("export", "both"):
-    if action == "grant":
-        content = content.replace(EXPORT_S3_BUCKET_ACCESS_REVOKED, EXPORT_S3_BUCKET_ACCESS_GRANTED)
-    else:
-        content = content.replace(EXPORT_S3_BUCKET_ACCESS_GRANTED, EXPORT_S3_BUCKET_ACCESS_REVOKED)
+# if target in ("export", "both"):
+#     if action == "grant":
+#         content = content.replace(EXPORT_S3_BUCKET_ACCESS_REVOKED, EXPORT_S3_BUCKET_ACCESS_GRANTED)
+#     else:
+#         content = content.replace(EXPORT_S3_BUCKET_ACCESS_GRANTED, EXPORT_S3_BUCKET_ACCESS_REVOKED)
 
-FILE.write_text(content)
+# FILE.write_text(content)
+
+# make this more robust by not searching exactly for the string. a variable that reacts to the changed locals. or regex.
+# specific locals for this script. 
+# revisit AWS CLI as a solution. 
+# testing: merge all and run against staging. or on prod and not terraform. remove apply. 
+# think about a timed revoke action. Cron job! Nightly?
+# check for double runs. catch errors.

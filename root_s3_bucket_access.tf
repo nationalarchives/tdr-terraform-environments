@@ -1,8 +1,8 @@
 # AWS SSO groups that require access to encrypted s3 buckets need updating with relevant decrypt permissions for KMS s3 Key
 
 locals {
-  aws_sso_export_bucket_access_roles   = local.environment == "prod" ? [] : [data.aws_ssm_parameter.aws_sso_admin_role.value, data.aws_ssm_parameter.aws_sso_export_role.value]
-  aws_sso_internal_bucket_access_roles = local.environment == "prod" ? [] : [data.aws_ssm_parameter.aws_sso_admin_role.value]
+  aws_sso_export_bucket_access_roles   = local.environment == contains(["intg", "prod"], environment) ? (var.admin_sso_export_access_enabled ? [data.aws_ssm_parameter.aws_sso_admin_role.value] : []) : [data.aws_ssm_parameter.aws_sso_admin_role.value]
+  aws_sso_internal_bucket_access_roles   = local.environment == contains(["intg", "prod"], environment) ? (var.admin_sso_internal_access_enabled ? [data.aws_ssm_parameter.aws_sso_admin_role.value] : []) : [data.aws_ssm_parameter.aws_sso_admin_role.value]
 }
 
 data "aws_ssm_parameter" "aws_sso_admin_role" {
@@ -39,3 +39,6 @@ module "aws_sso_export_roles_ssm_parameters" {
   ]
   tags = local.common_tags
 }
+
+# python should just change the boolean. if the boolean is true the change is made in the terraform.
+# be careful will boolean toggle it doesnt affect other terraform applies. an additional parametre to link to the action.
