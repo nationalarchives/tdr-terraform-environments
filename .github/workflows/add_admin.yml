@@ -26,7 +26,6 @@ concurrency:
   grou
 jobs:
   apply:
-    runs-on: ubuntu-latest
     uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@TDRD-1062
     with:
       repo-name: tdr-terraform-environments
@@ -48,11 +47,10 @@ jobs:
       - name: Build Slack message
         env:
           ACTOR: ${{ github.actor }}
-          TARGET: ${{ inputs.kms_key_target }}
           REASON: ${{ inputs.reason }}
           TICKET: ${{ inputs.ticket }}
         run: |
-          echo "MESSAGE=${TICKET}: ${ACTOR} has granted KMS access to ${TARGET} key. Reason: ${REASON}" >> "$GITHUB_ENV"
+          echo "MESSAGE=${TICKET}: ${ACTOR} has granted KMS access to key. Reason: ${REASON}" >> "$GITHUB_ENV"
       - name: Send usage message
         if: always()
         uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@f318ce8a5d99c08b1235663f97fdb1b35844674e # v0.0.39
