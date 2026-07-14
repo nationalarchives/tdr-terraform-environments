@@ -17,3 +17,15 @@ variable "domain" {
   description = "domain, e.g. example.com"
   default     = "nationalarchives.gov.uk"
 }
+
+variable "admin_sso_internal_access_manually_enabled" {
+  description = "grants admin SSO access to internal s3 bucket KMS key. Managed by add_admin workflow"
+  type        = bool
+  default     = false
+}
+
+variable "admin_sso_export_access_manually_enabled" {
+  description = "grants admin SSO access to export s3 bucket KMS key. Managed by add_admin workflow"
+  type        = bool
+  default     = false
+}
