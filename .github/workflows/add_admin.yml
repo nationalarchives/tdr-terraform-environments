@@ -10,13 +10,6 @@ on:
         description: Allow admin role to use export KMS key
         required: true
         type: boolean
-      action:
-        description: Grant or revoke access
-        required: true
-        type: choice
-        options:
-          - grant
-          - revoke
       reason:
         description: Reason for access
         required: true
@@ -35,49 +28,6 @@ jobs:
   apply:
     runs-on: ubuntu-latest
     steps:
-      # - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      #   with:
-      #     persist-credentials: false
-      # - name: Configure git identity
-      #   run: |
-      #     git config user.name "github-actions[bot]"
-      #     git config user.email "github-actions[bot]@users.noreply.github.com"
-      # - name: Create working branch
-      #   env:
-      #     TICKET: ${{ inputs.ticket }}
-      #     ACTION: ${{ inputs.action }}
-      #   run: |
-      #     BRANCH="$TICKET: kms-access-${ACTION}-${{ github.run_id }}"
-      #     git checkout -b "$BRANCH"
-      #     echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
-
-      # - name: Terraform set variables
-      #   env:
-      #     ACTION: ${{ inputs.action }}
-      #     TARGET: ${{ inputs.kms_key_target }}
-      #   run: |
-      #     INTERNAL = "false"
-      #     EXPORT = "false"
-      #     if [ "$ACTION" = "grant" ]; then
-      #       if [ "$TARGET" = "internal"] || [ "$TARGET" = "both"]; then
-      #         INTERNAL = "true"
-      #       fi
-      #       if [ "$TARGET" = "export" ] || [ "$TARGET" = "both" ]; then
-      #         EXPORT = "true"
-      #       fi
-      #     fi
-      #     echo "INTERNAL = $INTERNAL" >> "$GITHUB_ENV"
-      #     echo "EXPORT = $EXPORT" >> "$GITHUB_ENV"     
-      # - name: Terraform Plan
-      #   env:
-      #     GITHUB_OWNER: nationalarchives
-      #     GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
-      #     TF_VAR_tdr_account_number: ${{ secrets.INTG_ACCOUNT_NUMBER }}
-      #     TF_ENVIRONMENT: intg
-      #   run: |
-      #     terraform init
-      #     terraform workspace
-      #     terraform plan -var="admin_sso_internal_access_enabled=${{ env.INTERNAL }}" -var="admin_sso_export_access_enabled=${{ env.EXPORT }}"
       - name: terraform apply
         uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@17a4dacd1607170122eff29d316e220bfc10563f # v0.0.30
         with:
@@ -97,12 +47,11 @@ jobs:
       - name: Build Slack message
         env:
           ACTOR: ${{ github.actor }}
-          ACTION: ${{ inputs.action }}
           TARGET: ${{ inputs.kms_key_target }}
           REASON: ${{ inputs.reason }}
           TICKET: ${{ inputs.ticket }}
         run: |
-          echo "MESSAGE=${TICKET}: ${ACTOR} has ${ACTION} KMS access to ${TARGET} key. Reason: ${REASON}" >> "$GITHUB_ENV"
+          echo "MESSAGE=${TICKET}: ${ACTOR} has granted KMS access to ${TARGET} key. Reason: ${REASON}" >> "$GITHUB_ENV"
       - name: Send usage message
         if: always()
         uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@f318ce8a5d99c08b1235663f97fdb1b35844674e # v0.0.39
