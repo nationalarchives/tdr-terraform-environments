@@ -61,9 +61,12 @@ variable "block_file_checks_failure_v2" {}
 
 variable "draft_metadata_validator_api_url" {}
 
-variable "draft_metadata_s3_kms_keys" {}
+variable "internal_s3_kms_keys" {}
 
 variable "draft_metadata_s3_bucket_name" {}
+
+variable "transfer_errors_s3_bucket_name" {}
+
 
 variable "notification_sns_topic_arn" {}
 
