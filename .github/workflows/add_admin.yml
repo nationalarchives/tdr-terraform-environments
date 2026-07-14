@@ -2,14 +2,14 @@ name: Grant Admin SSO Access to Production S3 KMS Key
 on:
   workflow_dispatch:
     inputs:
-      kms_key_target:
-        description: Which KMS key(s) to update
+      allow_admin_access_to_internal_kms_key:
+        description: Allow admin role to use internal KMS key
         required: true
-        type: choice
-        options:
-          - internal
-          - export
-          - both
+        type: boolean
+      allow_admin_access_to_export_kms_keyt:
+        description: Allow admin role to use export KMS key
+        required: true
+        type: boolean
       action:
         description: Grant or revoke access
         required: true
@@ -35,55 +35,65 @@ jobs:
   apply:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          persist-credentials: false
-      - name: Configure git identity
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-      - name: Create working branch
-        env:
-          TICKET: ${{ inputs.ticket }}
-          ACTION: ${{ inputs.action }}
-        run: |
-          BRANCH="$TICKET: kms-access-${ACTION}-${{ github.run_id }}"
-          git checkout -b "$BRANCH"
-          echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
+      # - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      #   with:
+      #     persist-credentials: false
+      # - name: Configure git identity
+      #   run: |
+      #     git config user.name "github-actions[bot]"
+      #     git config user.email "github-actions[bot]@users.noreply.github.com"
+      # - name: Create working branch
+      #   env:
+      #     TICKET: ${{ inputs.ticket }}
+      #     ACTION: ${{ inputs.action }}
+      #   run: |
+      #     BRANCH="$TICKET: kms-access-${ACTION}-${{ github.run_id }}"
+      #     git checkout -b "$BRANCH"
+      #     echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
 
-      # This is the bit that needs changing?
-      - name: Edit locals
-        env:
-          ACTION: ${{ inputs.action }}
-          REASON: ${{ inputs.reason }}
-          TARGET: ${{ inputs.kms_key_target }}
-        run: python ./scripts/edit_kms_locals.py "$ACTION" "$TARGET" "$REASON"
-      - name: Commit and push to new branch
-        env:
-          ACTION: ${{ inputs.action }}
-          REASON: ${{ inputs.reason }}
-          ACTOR: ${{ github.actor }}
-        run: |
-          git add root_s3_bucket_access.tf
-          git commit -m "$ACTION: KMS access — $REASON by $ACTOR"
-          git push origin "$BRANCH"
-
-          
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@254c19bd240aabef8777f48595e9d2d7b972184b # v6.
+      # - name: Terraform set variables
+      #   env:
+      #     ACTION: ${{ inputs.action }}
+      #     TARGET: ${{ inputs.kms_key_target }}
+      #   run: |
+      #     INTERNAL = "false"
+      #     EXPORT = "false"
+      #     if [ "$ACTION" = "grant" ]; then
+      #       if [ "$TARGET" = "internal"] || [ "$TARGET" = "both"]; then
+      #         INTERNAL = "true"
+      #       fi
+      #       if [ "$TARGET" = "export" ] || [ "$TARGET" = "both" ]; then
+      #         EXPORT = "true"
+      #       fi
+      #     fi
+      #     echo "INTERNAL = $INTERNAL" >> "$GITHUB_ENV"
+      #     echo "EXPORT = $EXPORT" >> "$GITHUB_ENV"     
+      # - name: Terraform Plan
+      #   env:
+      #     GITHUB_OWNER: nationalarchives
+      #     GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+      #     TF_VAR_tdr_account_number: ${{ secrets.INTG_ACCOUNT_NUMBER }}
+      #     TF_ENVIRONMENT: intg
+      #   run: |
+      #     terraform init
+      #     terraform workspace
+      #     terraform plan -var="admin_sso_internal_access_enabled=${{ env.INTERNAL }}" -var="admin_sso_export_access_enabled=${{ env.EXPORT }}"
+      - name: terraform apply
+        uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@17a4dacd1607170122eff29d316e220bfc10563f # v0.0.30
         with:
-         role-to-assume: ${{ secrets.WORKFLOW_PAT }}
-         aws-region: eu-west-2
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85 # v4.0.0
-        with:
-         terraform_version: 1.12.2
-      - name: Terraform Init
-        run: terraform init
-      - name: Terraform Plan
-        run: terraform plan 
-      # - name: Terraform Apply
-      #   run: terraform apply #-auto-approve tfplan
+          repo-name: tdr-terraform-environments
+          environment: ${{ github.event.inputs.environment }}
+          terraform-version: 1.12.2
+          allow-admin-access-internal: ${{ inputs.allow_admin_access_to_internal_kms_key }}
+          allow-admin-access-export: ${{ inputs.allow_admin_access_to_export_kms_key }}
+        secrets:
+          MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
+          WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
+          ACCOUNT_NUMBER: ${{ secrets.ACCOUNT_NUMBER }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          INTG_ACCOUNT_NUMBER: ${{ secrets.INTG_ACCOUNT_NUMBER }}
+          STAGING_ACCOUNT_NUMBER: ${{ secrets.STAGING_ACCOUNT_NUMBER }}
+          PROD_ACCOUNT_NUMBER: ${{ secrets.PROD_ACCOUNT_NUMBER }}       
       - name: Build Slack message
         env:
           ACTOR: ${{ github.actor }}
