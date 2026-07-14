@@ -27,23 +27,24 @@ concurrency:
 jobs:
   apply:
     runs-on: ubuntu-latest
+    uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@TDRD-1062
+    with:
+      repo-name: tdr-terraform-environments
+      environment: intg
+      terraform-version: 1.12.2
+      allow-admin-access-internal: ${{ inputs.allow_admin_access_to_internal_kms_key }}
+      allow-admin-access-export: ${{ inputs.allow_admin_access_to_export_kms_key }}
+    secrets:
+      MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
+      WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
+      ACCOUNT_NUMBER: ${{ secrets.ACCOUNT_NUMBER }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      INTG_ACCOUNT_NUMBER: ${{ secrets.INTG_ACCOUNT_NUMBER }}
+      STAGING_ACCOUNT_NUMBER: ${{ secrets.STAGING_ACCOUNT_NUMBER }}
+      PROD_ACCOUNT_NUMBER: ${{ secrets.PROD_ACCOUNT_NUMBER }}
+  notify:
+    runs-on: ubuntu-latest
     steps:
-      - name: terraform apply
-        uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@TDRD-1062
-        with:
-          repo-name: tdr-terraform-environments
-          environment: intg
-          terraform-version: 1.12.2
-          allow-admin-access-internal: ${{ inputs.allow_admin_access_to_internal_kms_key }}
-          allow-admin-access-export: ${{ inputs.allow_admin_access_to_export_kms_key }}
-        secrets:
-          MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
-          WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
-          ACCOUNT_NUMBER: ${{ secrets.ACCOUNT_NUMBER }}
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          INTG_ACCOUNT_NUMBER: ${{ secrets.INTG_ACCOUNT_NUMBER }}
-          STAGING_ACCOUNT_NUMBER: ${{ secrets.STAGING_ACCOUNT_NUMBER }}
-          PROD_ACCOUNT_NUMBER: ${{ secrets.PROD_ACCOUNT_NUMBER }}       
       - name: Build Slack message
         env:
           ACTOR: ${{ github.actor }}
