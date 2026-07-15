@@ -19,9 +19,6 @@ on:
         required: true
         type: string
 
-permissions:
-  id-token: write
-  contents: write
 jobs:
   apply:
     uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@17a4dacd1607170122eff29d316e220bfc10563f # v0.0.30
