@@ -238,6 +238,7 @@ module "cloudfront_upload" {
   certificate_arn                     = module.cloudfront_certificate.certificate_arn
   api_gateway_url                     = module.signed_cookies_api.api_url
   waf_arn                             = local.environment == "intg" || local.environment == "dev" ? module.cloudfront_waf_non_prod[0].aws_wafv2_web_acl.arn : module.cloudfront_waf_prod[0].aws_wafv2_web_acl.arn
+  trusted_public_key_file_names       = module.global_parameters.signed_cookie["${local.environment}"].trusted_public_key_file_names
 }
 
 module "cloudfront_upload_dns" {
@@ -486,22 +487,23 @@ module "export_authoriser_lambda" {
 }
 
 module "signed_cookies_lambda" {
-  source                           = "./tdr-terraform-modules/lambda"
-  common_tags                      = local.common_tags
-  project                          = "tdr"
-  lambda_signed_cookies            = true
-  upload_domain                    = local.upload_domain
-  auth_url                         = local.keycloak_auth_url
-  frontend_url                     = module.frontend.frontend_url
-  cloudfront_key_pair_id           = module.cloudfront_upload.cloudfront_key_pair_id
-  timeout_seconds                  = 60
-  api_gateway_arn                  = module.signed_cookies_api.api_arn
-  kms_key_arn                      = module.encryption_key.kms_key_arn
-  private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
-  vpc_id                           = module.shared_vpc.vpc_id
-  environment_full                 = local.environment_full_name
-  user_session_timeout_mins        = local.user_session_timeout_mins
-  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
+  source                             = "./tdr-terraform-modules/lambda"
+  common_tags                        = local.common_tags
+  project                            = "tdr"
+  lambda_signed_cookies              = true
+  upload_domain                      = local.upload_domain
+  auth_url                           = local.keycloak_auth_url
+  frontend_url                       = module.frontend.frontend_url
+  cloudfront_key_pair_id             = module.global_parameters.signed_cookie["${local.environment}"].signing_key_id
+  signing_private_key_ssm_param_name = module.global_parameters.signed_cookie["${local.environment}"].signing_private_key_ssm_param_name
+  timeout_seconds                    = 60
+  api_gateway_arn                    = module.signed_cookies_api.api_arn
+  kms_key_arn                        = module.encryption_key.kms_key_arn
+  private_subnet_ids                 = module.shared_vpc.private_backend_checks_subnets
+  vpc_id                             = module.shared_vpc.vpc_id
+  environment_full                   = local.environment_full_name
+  user_session_timeout_mins          = local.user_session_timeout_mins
+  cloudwatch_log_retention_in_days   = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "export_status_update_lambda" {
