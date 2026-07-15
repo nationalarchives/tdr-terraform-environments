@@ -27,6 +27,10 @@
       {
         "name": "REFERENCE_GENERATOR_LIMIT",
         "value": "${da_reference_generator_limit}"
+      },
+      {
+        "name": "BLOCK_ASSIGN_ASSET_ID",
+        "value": "${block_assign_asset_id}"
       }
     ],
     "secrets": [
