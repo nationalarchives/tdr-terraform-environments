@@ -25,7 +25,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@TDRD-1062     #17a4dacd1607170122eff29d316e220bfc10563f # v0.0.30
+    # BELOW NEEDS UPDATING WHEN TDR-GITHUB-ACTIONS CHANGES ARE MERGED
+    uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@17a4dacd1607170122eff29d316e220bfc10563f # v0.0.30
     with:
       repo-name: tdr-terraform-environments
       environment: intg
@@ -41,7 +42,7 @@ jobs:
       STAGING_ACCOUNT_NUMBER: ${{ secrets.STAGING_ACCOUNT_NUMBER }}
       PROD_ACCOUNT_NUMBER: ${{ secrets.PROD_ACCOUNT_NUMBER }}
   notify:
-    # needs: apply
+    needs: apply
     runs-on: ubuntu-latest
     steps:
       - name: Build Slack message
