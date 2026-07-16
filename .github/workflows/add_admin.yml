@@ -29,7 +29,7 @@ jobs:
     uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@17a4dacd1607170122eff29d316e220bfc10563f # v0.0.30
     with:
       repo-name: tdr-terraform-environments
-      environment: intg
+      environment: prod
       terraform-version: 1.12.2
       allow-admin-access-internal: ${{ inputs.allow_admin_access_to_internal_kms_key }}
       allow-admin-access-export: ${{ inputs.allow_admin_access_to_export_kms_key }}
@@ -63,7 +63,7 @@ jobs:
           else
             KEYS="none (access revoked)"
           fi
-          echo "MESSAGE=${TICKET}: ${ACTOR} has granted KMS access to the ${KEYS} key. Reason: ${REASON}" >> "$GITHUB_ENV"
+          echo ":siren: MESSAGE=${TICKET}: ${ACTOR} has granted KMS access to the ${KEYS} key. Reason: ${REASON}" >> "$GITHUB_ENV"
       - name: Send usage message
         if: always()
         uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@f318ce8a5d99c08b1235663f97fdb1b35844674e # v0.0.39
