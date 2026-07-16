@@ -18,12 +18,13 @@ on:
         description: Ticket number for request (TRDR-XXXX)
         required: true
         type: string
-permissions:
-  id-token: write
-  contents: read
+permissions: {}
 
 jobs:
   apply:
+    permissions:
+      id-token: write
+      contents: read
     uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@TDRD-1062     #17a4dacd1607170122eff29d316e220bfc10563f # v0.0.30
     with:
       repo-name: tdr-terraform-environments
