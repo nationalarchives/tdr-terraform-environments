@@ -24,7 +24,7 @@ jobs:
     uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@17a4dacd1607170122eff29d316e220bfc10563f # v0.0.30
     with:
       repo-name: tdr-terraform-environments
-      environment: prod
+      environment: intg
       terraform-version: 1.12.2
       allow-admin-access-internal: ${{ inputs.allow_admin_access_to_internal_kms_key }}
       allow-admin-access-export: ${{ inputs.allow_admin_access_to_export_kms_key }}
