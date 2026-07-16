@@ -18,6 +18,9 @@ on:
         description: Ticket number for request (TRDR-XXXX)
         required: true
         type: string
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   apply:
