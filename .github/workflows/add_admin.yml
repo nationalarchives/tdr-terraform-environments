@@ -1,0 +1,73 @@
+name: Grant Admin SSO Access to Production S3 KMS Key
+on:
+  workflow_dispatch:
+    inputs:
+      allow_admin_access_to_internal_kms_key:
+        description: Allow admin role to use internal KMS key
+        required: true
+        type: boolean
+      allow_admin_access_to_export_kms_key:
+        description: Allow admin role to use export KMS key
+        required: true
+        type: boolean
+      reason:
+        description: Reason for access
+        required: true
+        type: string
+      ticket:
+        description: Ticket number for request (TRDR-XXXX)
+        required: true
+        type: string
+permissions: {}
+
+jobs:
+  apply:
+    permissions:
+      id-token: write
+      contents: read
+    # BELOW NEEDS UPDATING WHEN TDR-GITHUB-ACTIONS CHANGES ARE MERGED
+    uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@2d29c2e83fbaba6554c1e0d8c0b45d2015d610b2 # v0.0.41
+    with:
+      repo-name: tdr-terraform-environments
+      environment: prod
+      terraform-version: 1.12.2
+      allow-admin-access-internal: ${{ inputs.allow_admin_access_to_internal_kms_key }}
+      allow-admin-access-export: ${{ inputs.allow_admin_access_to_export_kms_key }}
+    secrets:
+      MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
+      WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
+      ACCOUNT_NUMBER: ${{ secrets.ACCOUNT_NUMBER }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      INTG_ACCOUNT_NUMBER: ${{ secrets.INTG_ACCOUNT_NUMBER }}
+      STAGING_ACCOUNT_NUMBER: ${{ secrets.STAGING_ACCOUNT_NUMBER }}
+      PROD_ACCOUNT_NUMBER: ${{ secrets.PROD_ACCOUNT_NUMBER }}
+  notify:
+    needs: apply
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build Slack message
+        env:
+          ACTOR: ${{ github.actor }}
+          REASON: ${{ inputs.reason }}
+          TICKET: ${{ inputs.ticket }}
+          INTERNAL: ${{ inputs.allow_admin_access_to_internal_kms_key }}
+          EXPORT: ${{ inputs.allow_admin_access_to_export_kms_key }}
+        run: |
+          KEYS=""
+          if [ "$INTERNAL" = "true" ] && [ "$EXPORT" = "true" ]; then
+            KEYS="internal and export"
+          elif [ "$INTERNAL" = "true" ]; then
+            KEYS="internal"
+          elif [ "$EXPORT" = "true" ]; then
+            KEYS="export"
+          else
+            KEYS="none (access revoked)"
+          fi
+          echo ":siren: MESSAGE=${TICKET}: ${ACTOR} has granted KMS access to the ${KEYS} key. Reason: ${REASON}" >> "$GITHUB_ENV"
+      - name: Send usage message
+        if: always()
+        uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@f318ce8a5d99c08b1235663f97fdb1b35844674e # v0.0.39
+        with:
+          message: ${{ env.MESSAGE }}
+          slack-url: ${{ secrets.SLACK_WEBHOOK }}
+          
