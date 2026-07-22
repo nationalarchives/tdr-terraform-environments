@@ -156,7 +156,7 @@ locals {
   //feature access blocks
   block_shared_keycloak_pages  = local.environment == "intg" ? false : true
   block_skip_metadata_review   = false
-  block_file_checks_failure_v2 = local.environment == "prod" ? true : false
+  block_file_checks_failure_v2 = false
   block_assign_asset_id        = false
 
   disable_users_dry_run          = false
