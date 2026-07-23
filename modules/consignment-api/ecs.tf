@@ -14,7 +14,6 @@ locals {
     frontend_url                 = var.frontend_url
     da_reference_generator_url   = var.da_reference_generator_url
     da_reference_generator_limit = var.da_reference_generator_limit
-    block_assign_asset_id        = var.block_assign_asset_id
   })
 }
 
