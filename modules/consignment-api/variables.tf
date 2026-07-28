@@ -59,3 +59,8 @@ variable "aws_backup_tag" {
 variable "block_assign_asset_id" {
   description = "Feature access block to not assign asset ids"
 }
+
+variable "metadata_version_override" {
+  description = "metadata schema version override. File name prefix"
+  type        = string
+}

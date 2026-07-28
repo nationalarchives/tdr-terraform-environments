@@ -31,7 +31,11 @@
       {
         "name": "BLOCK_ASSIGN_ASSET_ID",
         "value": "${block_assign_asset_id}"
-      }
+      }%{ if metadata_version_override != "" },
+      {
+        "name": "METADATA_VERSION_OVERRIDE",
+        "value": "${metadata_version_override}"
+      }%{ endif }
     ],
     "secrets": [
       {
