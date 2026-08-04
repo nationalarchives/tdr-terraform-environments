@@ -34,34 +34,3 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_s3_object_put_quarantine" {
 
   provider = aws.alarm_deployer
 }
-
-resource "aws_cloudwatch_metric_alarm" "tdr_alarms_s3_object_put_transfer_errors" {
-  count             = local.environment == "prod" ? 1 : 0
-  alarm_description = "This alarm fires when an object has been put into the bucket"
-  alarm_name        = format("AWS/S3 Object Put in tdr-transfer-errors-%s", local.environment)
-
-  metric_query {
-    account_id  = data.aws_caller_identity.current.id
-    id          = "m1"
-    return_data = "true"
-
-    metric {
-      metric_name = "PutRequests"
-      namespace   = "AWS/S3"
-      stat        = "Sum"
-      period      = 60
-      dimensions = {
-        BucketName = format("tdr-transfer-errors-%s", local.environment)
-        FilterId   = "EntireBucket"
-      }
-    }
-  }
-  evaluation_periods  = 1
-  datapoints_to_alarm = 1
-  threshold           = 1
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  treat_missing_data  = "notBreaching"
-
-  provider = aws.alarm_deployer
-}
-
