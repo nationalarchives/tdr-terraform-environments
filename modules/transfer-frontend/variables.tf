@@ -125,3 +125,5 @@ variable "capacity_limit_max_transfer_size_mb" {
   type        = number
 }
 
+variable "block_connector_sharepoint_pages" {}
+
