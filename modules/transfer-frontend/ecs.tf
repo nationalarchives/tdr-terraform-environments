@@ -287,4 +287,12 @@ data "aws_iam_policy_document" "frontend_ecs_execution" {
     actions   = ["ecr:GetAuthorizationToken"]
     resources = ["*"]
   }
+  statement {
+    actions = ["states:StartExecution"]
+    resources = [
+      var.backend_checks_state_machine_arn,
+      var.draft_metadata_state_machine_arn,
+      var.export_state_machine_arn
+    ]
+  }
 }
