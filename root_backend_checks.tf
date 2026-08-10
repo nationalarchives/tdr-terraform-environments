@@ -222,7 +222,7 @@ module "file_checks" {
   reserved_concurrency = -1
   timeout_seconds      = 900
   storage_size         = 2560
-  memory_size          = 2560
+  memory_size          = 3008
   policies = {
     "TDRFileChecksLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_file_checks_policy.json.tpl", {
       function_name         = local.file_checks_function_name,
