@@ -253,6 +253,13 @@ resource "aws_s3_access_point" "file_checks_s3_files" {
   bucket = module.upload_file_cloudfront_dirty_s3.s3_bucket_name
   name   = "${var.project}-file-checks-s3files-${local.environment}"
 
+  public_access_block_configuration {
+    block_public_acls       = true
+    block_public_policy     = true
+    ignore_public_acls      = true
+    restrict_public_buckets = true
+  }
+
   vpc_configuration {
     vpc_id = module.shared_vpc.vpc_id
   }
