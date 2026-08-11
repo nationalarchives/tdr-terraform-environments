@@ -32,9 +32,7 @@
         "arn:aws:s3:::${dirty_bucket}",
         "arn:aws:s3:::${dirty_bucket}/*",
         "arn:aws:s3:::${draft_metadata_bucket}",
-        "arn:aws:s3:::${draft_metadata_bucket}/*",
-        "${s3_access_point_arn}",
-        "${s3_access_point_arn}/object/*"
+        "arn:aws:s3:::${draft_metadata_bucket}/*"
       ]
     },
     {
