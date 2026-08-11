@@ -285,8 +285,12 @@ module "s3files_mount_target_security_group" {
   name        = "s3files_mount_target_security_group"
   vpc_id      = module.shared_vpc.vpc_id
   common_tags = local.common_tags
-  ingress_cidr_rules = [
-    { port = 2049, cidr_blocks = [module.shared_vpc.vpc_cidr_block], description = "Allow NFS from VPC", protocol = "tcp" }
+  ingress_security_group_rules = [
+    {
+      port              = 2049
+      security_group_id = module.outbound_only_security_group.security_group_id
+      description       = "Allow NFS from file-checks lambda security group"
+    }
   ]
 }
 
