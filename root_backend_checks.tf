@@ -222,7 +222,7 @@ module "file_checks" {
   reserved_concurrency = -1
   timeout_seconds      = 900
   storage_size         = 2560
-  memory_size          = 3008
+  memory_size          = 2560
   policies = {
     "TDRFileChecksLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_file_checks_policy.json.tpl", {
       function_name         = local.file_checks_function_name,
@@ -231,37 +231,14 @@ module "file_checks" {
       upload_bucket         = module.upload_bucket.s3_bucket_name
       quarantine_bucket     = module.upload_bucket_quarantine.s3_bucket_name
       draft_metadata_bucket = local.draft_metadata_s3_bucket_name
-      s3_access_point_arn   = aws_s3_access_point.file_checks_s3_files.arn
       decryption_keys       = jsonencode([module.s3_upload_kms_key.kms_key_arn])
       encryption_keys       = jsonencode([module.s3_internal_kms_key.kms_key_arn])
     })
   }
   runtime = local.runtime_java_21
-  efs_access_points = [
-    {
-      access_point_arn = aws_s3_access_point.file_checks_s3_files.arn
-      mount_path       = "/mnt/s3"
-    }
-  ]
   vpc_config = {
     subnet_ids         = module.shared_vpc.private_backend_checks_subnets
     security_group_ids = [module.outbound_only_security_group.security_group_id]
-  }
-}
-
-resource "aws_s3_access_point" "file_checks_s3_files" {
-  bucket = module.upload_file_cloudfront_dirty_s3.s3_bucket_name
-  name   = "${var.project}-file-checks-s3files-${local.environment}"
-
-  public_access_block_configuration {
-    block_public_acls       = true
-    block_public_policy     = true
-    ignore_public_acls      = true
-    restrict_public_buckets = true
-  }
-
-  vpc_configuration {
-    vpc_id = module.shared_vpc.vpc_id
   }
 }
 
