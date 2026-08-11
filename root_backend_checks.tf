@@ -242,6 +242,72 @@ module "file_checks" {
   }
 }
 
+resource "aws_iam_role" "s3files_file_checks" {
+  name               = "TDRFileChecksS3FilesRole${title(local.environment)}"
+  assume_role_policy = templatefile("./templates/iam_policy/assume_role_policy.json.tpl", { service = "s3files.amazonaws.com" })
+  tags               = local.common_tags
+}
+
+resource "aws_iam_role_policy" "s3files_file_checks" {
+  name = "TDRFileChecksS3FilesPolicy${title(local.environment)}"
+  role = aws_iam_role.s3files_file_checks.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectVersion",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}",
+          "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}/*"
+        ]
+      }
+    ]
+  })
+}
+
+module "s3files_mount_target_security_group" {
+  source      = "./tdr-terraform-modules/security_group"
+  description = "S3 Files mount target NFS access for file-checks lambda"
+  name        = "s3files_mount_target_security_group"
+  vpc_id      = module.shared_vpc.vpc_id
+  common_tags = local.common_tags
+  ingress_security_group_rules = [
+    {
+      port              = 2049
+      security_group_id = module.outbound_only_security_group.security_group_id
+      description       = "Allow NFS from file-checks lambda security group"
+    }
+  ]
+}
+
+resource "aws_s3files_file_system" "file_checks_s3_files" {
+  bucket   = "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}"
+  role_arn = aws_iam_role.s3files_file_checks.arn
+  tags     = local.common_tags
+}
+
+resource "aws_s3files_access_point" "file_checks_s3_files" {
+  file_system_id = aws_s3files_file_system.file_checks_s3_files.id
+  tags           = local.common_tags
+}
+
+resource "aws_s3files_mount_target" "file_checks_s3_files" {
+  for_each       = toset(module.shared_vpc.private_backend_checks_subnets)
+  file_system_id = aws_s3files_file_system.file_checks_s3_files.id
+  subnet_id      = each.value
+  security_groups = [
+    module.s3files_mount_target_security_group.security_group_id,
+    module.outbound_only_security_group.security_group_id
+  ]
+}
+
 module "backend_checks_v2_step_function" {
   source             = "./tdr-terraform-modules/stepfunctions"
   tags               = local.common_tags
