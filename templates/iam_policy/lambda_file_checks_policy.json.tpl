@@ -39,6 +39,11 @@
     },
     {
       "Effect": "Allow",
+      "Action": "s3files:MountFileSystem",
+      "Resource": "${s3_access_point_arn}"
+    },
+    {
+      "Effect": "Allow",
       "Action": [
         "s3:GetObject",
         "s3:GetObjectTagging",

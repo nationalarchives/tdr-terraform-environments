@@ -231,7 +231,7 @@ module "file_checks" {
       upload_bucket         = module.upload_bucket.s3_bucket_name
       quarantine_bucket     = module.upload_bucket_quarantine.s3_bucket_name
       draft_metadata_bucket = local.draft_metadata_s3_bucket_name
-      s3_access_point_arn   = aws_s3_access_point.file_checks_s3_files.arn
+      s3_access_point_arn   = aws_s3files_access_point.file_checks_s3_files.arn
       decryption_keys       = jsonencode([module.s3_upload_kms_key.kms_key_arn])
       encryption_keys       = jsonencode([module.s3_internal_kms_key.kms_key_arn])
     })
@@ -239,7 +239,7 @@ module "file_checks" {
   runtime = local.runtime_java_21
   efs_access_points = [
     {
-      access_point_arn = aws_s3_access_point.file_checks_s3_files.arn
+      access_point_arn = aws_s3files_access_point.file_checks_s3_files.arn
       mount_path       = "/mnt/s3"
     }
   ]
@@ -249,20 +249,66 @@ module "file_checks" {
   }
 }
 
-resource "aws_s3_access_point" "file_checks_s3_files" {
-  bucket = module.upload_file_cloudfront_dirty_s3.s3_bucket_name
-  name   = "${var.project}-file-checks-s3files-${local.environment}"
+resource "aws_iam_role" "s3files_file_checks" {
+  name               = "TDRFileChecksS3FilesRole${title(local.environment)}"
+  assume_role_policy = templatefile("./templates/iam_policy/assume_role_policy.json.tpl", { service = "s3files.amazonaws.com" })
+  tags               = local.common_tags
+}
 
-  public_access_block_configuration {
-    block_public_acls       = true
-    block_public_policy     = true
-    ignore_public_acls      = true
-    restrict_public_buckets = true
-  }
+resource "aws_iam_role_policy" "s3files_file_checks" {
+  name = "TDRFileChecksS3FilesPolicy${title(local.environment)}"
+  role = aws_iam_role.s3files_file_checks.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectVersion",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}",
+          "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}/*"
+        ]
+      }
+    ]
+  })
+}
 
-  vpc_configuration {
-    vpc_id = module.shared_vpc.vpc_id
-  }
+module "s3files_mount_target_security_group" {
+  source      = "./tdr-terraform-modules/security_group"
+  description = "S3 Files mount target NFS access for file-checks lambda"
+  name        = "s3files_mount_target_security_group"
+  vpc_id      = module.shared_vpc.vpc_id
+  common_tags = local.common_tags
+  ingress_cidr_rules = [
+    { port = 2049, cidr_blocks = [module.shared_vpc.vpc_cidr_block], description = "Allow NFS from VPC", protocol = "tcp" }
+  ]
+}
+
+resource "aws_s3files_file_system" "file_checks_s3_files" {
+  bucket   = "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}"
+  role_arn = aws_iam_role.s3files_file_checks.arn
+  tags     = local.common_tags
+}
+
+resource "aws_s3files_access_point" "file_checks_s3_files" {
+  file_system_id = aws_s3files_file_system.file_checks_s3_files.id
+  tags           = local.common_tags
+}
+
+resource "aws_s3files_mount_target" "file_checks_s3_files" {
+  for_each       = toset(module.shared_vpc.private_backend_checks_subnets)
+  file_system_id = aws_s3files_file_system.file_checks_s3_files.id
+  subnet_id      = each.value
+  security_groups = [
+    module.s3files_mount_target_security_group.security_group_id,
+    module.outbound_only_security_group.security_group_id
+  ]
 }
 
 module "backend_checks_v2_step_function" {
