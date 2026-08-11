@@ -251,7 +251,7 @@ module "file_checks" {
 
 resource "aws_iam_role" "s3files_file_checks" {
   name               = "TDRFileChecksS3FilesRole${title(local.environment)}"
-  assume_role_policy = templatefile("./templates/iam_policy/assume_role_policy.json.tpl", { service = "s3files.amazonaws.com" })
+  assume_role_policy = templatefile("./templates/iam_policy/assume_role_policy.json.tpl", { service = "elasticfilesystem.amazonaws.com" })
   tags               = local.common_tags
 }
 
@@ -262,18 +262,81 @@ resource "aws_iam_role_policy" "s3files_file_checks" {
     Version = "2012-10-17"
     Statement = [
       {
+        Sid    = "S3BucketPermissions"
         Effect = "Allow"
         Action = [
-          "s3:GetObject",
-          "s3:GetObjectVersion",
-          "s3:PutObject",
-          "s3:DeleteObject",
-          "s3:ListBucket"
+          "s3:ListBucket",
+          "s3:ListBucketVersions"
         ]
-        Resource = [
-          "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}",
-          "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}/*"
+        Resource = "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}"
+        Condition = {
+          StringEquals = {
+            "aws:ResourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      },
+      {
+        Sid    = "S3ObjectPermissions"
+        Effect = "Allow"
+        Action = [
+          "s3:AbortMultipartUpload",
+          "s3:DeleteObject*",
+          "s3:GetObject*",
+          "s3:List*",
+          "s3:PutObject*"
         ]
+        Resource = "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}/*"
+        Condition = {
+          StringEquals = {
+            "aws:ResourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      },
+      {
+        Sid    = "UseKmsKeyWithS3Files"
+        Effect = "Allow"
+        Action = [
+          "kms:GenerateDataKey",
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncryptFrom",
+          "kms:ReEncryptTo"
+        ]
+        Resource = module.s3_upload_kms_key.kms_key_arn
+        Condition = {
+          StringLike = {
+            "kms:ViaService" = "s3.eu-west-2.amazonaws.com"
+          }
+        }
+      },
+      {
+        Sid    = "EventBridgeManage"
+        Effect = "Allow"
+        Action = [
+          "events:DeleteRule",
+          "events:DisableRule",
+          "events:EnableRule",
+          "events:PutRule",
+          "events:PutTargets",
+          "events:RemoveTargets"
+        ]
+        Resource = "arn:aws:events:*:*:rule/DO-NOT-DELETE-S3-Files*"
+        Condition = {
+          StringEquals = {
+            "events:ManagedBy" = "elasticfilesystem.amazonaws.com"
+          }
+        }
+      },
+      {
+        Sid    = "EventBridgeRead"
+        Effect = "Allow"
+        Action = [
+          "events:DescribeRule",
+          "events:ListRuleNamesByTarget",
+          "events:ListRules",
+          "events:ListTargetsByRule"
+        ]
+        Resource = "arn:aws:events:*:*:rule/*"
       }
     ]
   })

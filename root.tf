@@ -1001,7 +1001,7 @@ module "consignment_api_database" {
   availability_zone       = local.environment == "prod" ? local.database_availability_zone : "eu-west-2b"
   common_tags             = local.common_tags
   database_name           = "consignmentapi"
-  database_version        = "17.9"
+  database_version        = "17.10"
   environment             = local.environment
   kms_key_id              = module.encryption_key.kms_key_arn
   private_subnets         = module.shared_vpc.private_backend_checks_subnets
