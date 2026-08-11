@@ -212,6 +212,26 @@ resource "aws_iam_role_policy_attachment" "frontend_ecs_task_sns_publish" {
   policy_arn = aws_iam_policy.frontend_sns_notifications_publish.arn
 }
 
+data "aws_iam_policy_document" "frontend_step_functions_start_execution" {
+  statement {
+    actions = ["states:StartExecution"]
+    resources = [
+      var.backend_checks_state_machine_arn,
+      var.draft_metadata_state_machine_arn,
+      var.export_state_machine_arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "frontend_step_functions_start_execution" {
+  name   = "TDRFrontendStepFunctionsExecutionPolicy${title(var.environment)}"
+  policy = data.aws_iam_policy_document.frontend_step_functions_start_execution.json
+}
+
+resource "aws_iam_role_policy_attachment" "frontend_ecs_task_step_functions_start_execution" {
+  role       = aws_iam_role.frontend_ecs_task.name
+  policy_arn = aws_iam_policy.frontend_step_functions_start_execution.arn
+}
 
 resource "aws_iam_role_policy_attachment" "frontend_ecs_task_xray" {
   role       = aws_iam_role.frontend_ecs_task.name
@@ -286,13 +306,5 @@ data "aws_iam_policy_document" "frontend_ecs_execution" {
   statement {
     actions   = ["ecr:GetAuthorizationToken"]
     resources = ["*"]
-  }
-  statement {
-    actions = ["states:StartExecution"]
-    resources = [
-      var.backend_checks_state_machine_arn,
-      var.draft_metadata_state_machine_arn,
-      var.export_state_machine_arn
-    ]
   }
 }
