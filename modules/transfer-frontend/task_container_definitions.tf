@@ -110,6 +110,18 @@ locals {
           value = var.backend_checks_api_url
         },
         {
+          name  = "BACKEND_CHECKS_ARN"
+          value = var.backend_checks_state_machine_arn
+        },
+        {
+          name  = "DRAFT_METADATA_ARN"
+          value = var.draft_metadata_state_machine_arn
+        },
+        {
+          name  = "EXPORT_ARN"
+          value = var.export_state_machine_arn
+        },
+        {
           name  = "ALB_IP_A"
           value = var.public_subnet_ranges[0]
         },

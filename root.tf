@@ -100,6 +100,9 @@ module "frontend" {
   read_client_secret_path          = module.keycloak_ssm_parameters.params[local.keycloak_tdr_read_client_secret_name].name
   export_api_url                   = module.export_api.api_url
   backend_checks_api_url           = module.backend_checks_api.api_url
+  backend_checks_state_machine_arn = module.backend_checks_v2_step_function.state_machine_arn
+  draft_metadata_state_machine_arn = module.draft_metadata_checks.step_function_arn
+  export_state_machine_arn         = module.export_step_function.state_machine_arn
   alb_id                           = module.frontend_alb.alb_id
   public_subnet_ranges             = module.shared_vpc.public_subnet_ranges
   otel_service_name                = "frontend-${local.environment}"
@@ -999,7 +1002,7 @@ module "consignment_api_database" {
   availability_zone       = local.environment == "prod" ? local.database_availability_zone : "eu-west-2b"
   common_tags             = local.common_tags
   database_name           = "consignmentapi"
-  database_version        = "17.9"
+  database_version        = local.environment == "prod" ? "17.9" : "17.10"
   environment             = local.environment
   kms_key_id              = module.encryption_key.kms_key_arn
   private_subnets         = module.shared_vpc.private_backend_checks_subnets
