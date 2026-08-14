@@ -102,14 +102,6 @@ locals {
           value = var.environment
         },
         {
-          name  = "EXPORT_API_URL"
-          value = var.export_api_url
-        },
-        {
-          name  = "BACKEND_CHECKS_BASE_URL"
-          value = var.backend_checks_api_url
-        },
-        {
           name  = "BACKEND_CHECKS_ARN"
           value = var.backend_checks_state_machine_arn
         },
@@ -136,10 +128,6 @@ locals {
         {
           name  = "OTEL_SERVICE_NAME"
           value = var.otel_service_name
-        },
-        {
-          name  = "DRAFT_METADATA_VALIDATOR_API_URL"
-          value = var.draft_metadata_validator_api_url
         },
         {
           name  = "DRAFT_METADATA_S3_BUCKET_NAME"
@@ -170,36 +158,36 @@ locals {
           value = tostring(var.block_connector_sharepoint_pages)
         },
         {
-          "name"  = "S3_ACL_HEADER_VALUE",
-          "value" = var.s3_acl_header_value
+          name  = "S3_ACL_HEADER_VALUE",
+          value = var.s3_acl_header_value
         },
         {
-          "name"  = "S3_IF_NONE_MATCH_HEADER_VALUE",
-          "value" = var.s3_if_none_match_header_value
+          name  = "S3_IF_NONE_MATCH_HEADER_VALUE"
+          value = var.s3_if_none_match_header_value
         },
         {
-          "name" : "MAX_NUMBER_RECORDS",
-          "value" : tostring(var.capacity_limit_max_number_records)
+          name  = "MAX_NUMBER_RECORDS"
+          value = tostring(var.capacity_limit_max_number_records)
         },
         {
-          "name" : "MAX_INDIVIDUAL_FILE_SIZE_MB",
-          "value" : tostring(var.capacity_limit_max_individual_file_size_mb)
+          name  = "MAX_INDIVIDUAL_FILE_SIZE_MB"
+          value = tostring(var.capacity_limit_max_individual_file_size_mb)
         },
         {
-          "name" : "MAX_TRANSFER_SIZE_MB",
-          "value" : tostring(var.capacity_limit_max_transfer_size_mb)
+          name  = "MAX_TRANSFER_SIZE_MB"
+          value = tostring(var.capacity_limit_max_transfer_size_mb)
         },
       ],
       var.metadata_version_override != "" ? [
         {
-          "name"  = "METADATA_VERSION_OVERRIDE",
-          "value" = var.metadata_version_override
+          name  = "METADATA_VERSION_OVERRIDE"
+          value = var.metadata_version_override
         }
       ] : [],
       var.enable_otel ? [
         {
-          "name"  = "JAVA_TOOL_OPTIONS",
-          "value" = "-javaagent:/opt/aws-opentelemetry-agent.jar"
+          name  = "JAVA_TOOL_OPTIONS"
+          value = "-javaagent:/opt/aws-opentelemetry-agent.jar"
         }
       ] : []
     )
