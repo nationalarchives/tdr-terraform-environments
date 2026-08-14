@@ -166,6 +166,10 @@ locals {
           value = tostring(var.block_file_checks_failure_v2)
         },
         {
+          name  = "BLOCK_CONNECTOR_SHAREPOINT_PAGES",
+          value = tostring(var.block_connector_sharepoint_pages)
+        },
+        {
           "name"  = "S3_ACL_HEADER_VALUE",
           "value" = var.s3_acl_header_value
         },
