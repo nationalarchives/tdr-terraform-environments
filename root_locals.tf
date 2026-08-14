@@ -154,10 +154,9 @@ locals {
   da_reference_generator_limit = module.tdr_configuration.terraform_config["reference_generator_limit"]
 
   //feature access blocks
-  block_shared_keycloak_pages      = local.environment == "intg" ? false : true
-  block_skip_metadata_review       = false
-  block_file_checks_failure_v2     = false
-  block_assign_asset_id            = false
+  block_shared_keycloak_pages  = local.environment == "intg" ? false : true
+  block_skip_metadata_review   = false
+  block_file_checks_failure_v2 = false
   block_connector_sharepoint_pages = local.environment == "intg" ? false : true
 
   disable_users_dry_run          = false

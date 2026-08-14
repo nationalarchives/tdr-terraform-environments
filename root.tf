@@ -75,7 +75,6 @@ module "consignment_api" {
   da_reference_generator_url     = local.da_reference_generator_url
   da_reference_generator_limit   = local.da_reference_generator_limit
   aws_guardduty_ecr_arn          = local.aws_guardduty_ecr_arn
-  block_assign_asset_id          = local.block_assign_asset_id
 }
 
 module "frontend" {
@@ -797,14 +796,14 @@ module "athena" {
   bucket      = module.athena_s3.s3_bucket_id
   environment = local.environment
   queries = [
-    "create_table_keycloak_alb_logs",
-    "create_table_frontend_alb_logs",
+    "create_table_transfer_service_alb_logs",
     "create_table_consignmentapi_alb_logs",
+    "create_table_frontend_alb_logs",
+    "create_table_keycloak_alb_logs",
     "create_table_tdr_cloudtrail_logs",
     "create_table_tdr_s3_upload_logs",
     "tdr_alb_client_ip_count",
     "tdr_alb_error_counts",
-    "tdr_cloudtrail_action_for_iam_user",
     "tdr_cloudtrail_action_for_principal",
     "tdr_cloudtrail_action_for_role_name",
     "tdr_cloudtrail_action_on_date",
@@ -813,7 +812,12 @@ module "athena" {
     "tdr_cloudtrail_user_for_access_key",
     "tdr_s3_deleted_objects",
     "tdr_s3_object_operations",
-    "tdr_s3_request_errors"
+    "tdr_s3_request_errors",
+    "create_view_consignmentapi_alb_4xx_errors_today_by_ip",
+    "create_view_frontend_alb_4xx_errors_today_by_ip",
+    "create_view_transfer_service_alb_4xx_errors_today_by_ip",
+    "create_view_keycloak_alb_4xx_errors_today_by_ip",
+    "create_view_frontend_consignment_errors_today"
   ]
 }
 

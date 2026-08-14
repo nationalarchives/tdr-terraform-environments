@@ -55,7 +55,3 @@ variable "aws_backup_tag" {
   description = "Tag to mark resource to be backed up"
   default     = null
 }
-
-variable "block_assign_asset_id" {
-  description = "Feature access block to not assign asset ids"
-}
