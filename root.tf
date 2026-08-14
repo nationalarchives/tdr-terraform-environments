@@ -75,7 +75,6 @@ module "consignment_api" {
   da_reference_generator_url     = local.da_reference_generator_url
   da_reference_generator_limit   = local.da_reference_generator_limit
   aws_guardduty_ecr_arn          = local.aws_guardduty_ecr_arn
-  block_assign_asset_id          = local.block_assign_asset_id
 }
 
 module "frontend" {
@@ -108,6 +107,7 @@ module "frontend" {
   otel_service_name                = "frontend-${local.environment}"
   block_skip_metadata_review       = local.block_skip_metadata_review
   block_file_checks_failure_v2     = local.block_file_checks_failure_v2
+  block_connector_sharepoint_pages = local.block_connector_sharepoint_pages
   draft_metadata_validator_api_url = module.draft_metadata_api_gateway.api_url
   internal_s3_kms_keys             = jsonencode([module.s3_internal_kms_key.kms_key_arn])
   draft_metadata_s3_bucket_name    = local.draft_metadata_s3_bucket_name
