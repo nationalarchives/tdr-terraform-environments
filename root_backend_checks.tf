@@ -1,35 +1,3 @@
-module "backend_checks_api_policy" {
-  source        = "./tdr-terraform-modules/iam_policy"
-  name          = "TDRBackendChecksAPIPolicy${title(local.environment)}"
-  policy_string = templatefile("./templates/iam_policy/api_gateway_state_machine_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, state_machine_arn = module.backend_checks_v2_step_function.state_machine_arn })
-}
-
-module "backend_checks_api_role" {
-  source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./templates/iam_policy/api_gateway_assume_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.id })
-  common_tags        = local.common_tags
-  name               = "TDRBackendChecksAPIRole${title(local.environment)}"
-  policy_attachments = {
-    AmazonAPIGatewayPushToCloudWatchLogs = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
-    AWSStepFunctionsFullAccess           = "arn:aws:iam::aws:policy/AWSStepFunctionsFullAccess"
-  }
-}
-
-module "backend_checks_api" {
-  source = "./tdr-terraform-modules/apigateway"
-  api_definition = templatefile("./templates/api_gateway/backend_checks.json.tpl", {
-    environment       = local.environment
-    title             = "Backend Checks API"
-    role_arn          = module.backend_checks_api_role.role.arn
-    region            = local.region
-    lambda_arn        = module.export_authoriser_lambda.export_api_authoriser_arn
-    state_machine_arn = module.backend_checks_v2_step_function.state_machine_arn
-  })
-  api_name    = "BackendChecks"
-  common_tags = local.common_tags
-  environment = local.environment
-}
-
 module "outbound_only_security_group" {
   source      = "./tdr-terraform-modules/security_group"
   description = "Outbound access on 443 only"

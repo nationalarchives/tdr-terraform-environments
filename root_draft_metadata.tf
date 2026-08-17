@@ -57,48 +57,6 @@ module "draft_metadata_checks_lambda" {
   )
 }
 
-module "draft_metadata_api_gateway" {
-  source = "./da-terraform-modules/apigateway"
-  api_definition = templatefile("./templates/api_gateway/draft_metadata.json.tpl", {
-    environment           = local.environment
-    title                 = "Draft Metadata"
-    state_machine_arn     = module.draft_metadata_checks.step_function_arn
-    execution_role_arn    = aws_iam_role.draft_metadata_api_gateway_execution_role.arn
-    region                = local.region
-    authoriser_lambda_arn = module.export_authoriser_lambda.export_api_authoriser_arn
-  })
-  api_name    = "DraftMetadata"
-  environment = local.environment
-  common_tags = local.common_tags
-  api_method_settings = [{
-    method_path        = "*/*"
-    logging_level      = "INFO",
-    metrics_enabled    = false,
-    data_trace_enabled = false
-  }]
-}
-
-resource "aws_iam_role" "draft_metadata_api_gateway_execution_role" {
-  name               = "TDRMetadataChecksAPIGatewayExecutionRole${title(local.environment)}"
-  assume_role_policy = templatefile("./templates/iam_policy/api_gateway_assume_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.id })
-}
-
-resource "aws_iam_policy" "api_gateway_execution_policy" {
-  name = "TDRMetadataChecksAPIGatewayStepFunctionExecutionPolicy${title(local.environment)}"
-  policy = templatefile(
-    "./templates/iam_policy/api_gateway_state_machine_policy.json.tpl",
-    {
-      account_id        = data.aws_caller_identity.current.account_id,
-      state_machine_arn = module.draft_metadata_checks.step_function_arn
-    }
-  )
-}
-
-resource "aws_iam_role_policy_attachment" "api_gateway_execution_policy" {
-  role       = aws_iam_role.draft_metadata_api_gateway_execution_role.name
-  policy_arn = aws_iam_policy.api_gateway_execution_policy.arn
-}
-
 module "draft_metadata_bucket" {
   source      = "./da-terraform-modules/s3"
   bucket_name = local.draft_metadata_s3_bucket_name
