@@ -43,10 +43,6 @@ variable "ip_allowlist" {
   default     = ["0.0.0.0/0"]
 }
 
-variable "export_api_url" {}
-
-variable "backend_checks_api_url" {}
-
 variable "backend_checks_state_machine_arn" {}
 
 variable "draft_metadata_state_machine_arn" {}
@@ -64,8 +60,6 @@ variable "public_subnet_ranges" {
 variable "block_skip_metadata_review" {}
 
 variable "block_file_checks_failure_v2" {}
-
-variable "draft_metadata_validator_api_url" {}
 
 variable "internal_s3_kms_keys" {}
 
