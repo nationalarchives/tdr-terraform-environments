@@ -97,8 +97,6 @@ module "frontend" {
   auth_url                         = local.keycloak_auth_url
   client_secret_path               = module.keycloak_ssm_parameters.params[local.keycloak_tdr_client_secret_name].name
   read_client_secret_path          = module.keycloak_ssm_parameters.params[local.keycloak_tdr_read_client_secret_name].name
-  export_api_url                   = module.export_api.api_url
-  backend_checks_api_url           = module.backend_checks_api.api_url
   backend_checks_state_machine_arn = module.backend_checks_v2_step_function.state_machine_arn
   draft_metadata_state_machine_arn = module.draft_metadata_checks.step_function_arn
   export_state_machine_arn         = module.export_step_function.state_machine_arn
@@ -107,7 +105,7 @@ module "frontend" {
   otel_service_name                = "frontend-${local.environment}"
   block_skip_metadata_review       = local.block_skip_metadata_review
   block_file_checks_failure_v2     = local.block_file_checks_failure_v2
-  draft_metadata_validator_api_url = module.draft_metadata_api_gateway.api_url
+  block_connector_sharepoint_pages = local.block_connector_sharepoint_pages
   internal_s3_kms_keys             = jsonencode([module.s3_internal_kms_key.kms_key_arn])
   draft_metadata_s3_bucket_name    = local.draft_metadata_s3_bucket_name
   transfer_errors_s3_bucket_name   = local.transfer_errors_s3_bucket_name
@@ -426,37 +424,6 @@ module "api_gateway_account" {
   environment = local.environment
 }
 
-module "export_api_policy" {
-  source        = "./tdr-terraform-modules/iam_policy"
-  name          = "TDRExportAPIPolicy${title(local.environment)}"
-  policy_string = templatefile("./templates/iam_policy/api_gateway_state_machine_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, state_machine_arn = module.export_step_function.state_machine_arn })
-}
-
-module "export_api_role" {
-  source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./templates/iam_policy/api_gateway_assume_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.id })
-  common_tags        = local.common_tags
-  name               = "TDRExportAPIRole${title(local.environment)}"
-  policy_attachments = {
-    export_policy = module.export_api_policy.policy_arn
-  }
-}
-
-module "export_api" {
-  source      = "./tdr-terraform-modules/apigateway"
-  api_name    = "ExportAPI"
-  environment = local.environment
-  common_tags = local.common_tags
-  api_definition = templatefile("./templates/api_gateway/export_api.json.tpl", {
-    environment       = local.environment,
-    title             = "Export API",
-    role_arn          = module.export_api_role.role.arn,
-    region            = local.region
-    state_machine_arn = module.export_step_function.state_machine_arn
-    lambda_arn        = module.export_authoriser_lambda.export_api_authoriser_arn
-  })
-}
-
 module "signed_cookies_api" {
   source   = "./tdr-terraform-modules/apigateway"
   api_name = "SignedCookiesAPI"
@@ -469,22 +436,6 @@ module "signed_cookies_api" {
   })
   environment = local.environment
   common_tags = local.common_tags
-}
-
-module "export_authoriser_lambda" {
-  source                           = "./tdr-terraform-modules/lambda"
-  common_tags                      = local.common_tags
-  project                          = "tdr"
-  lambda_export_authoriser         = true
-  timeout_seconds                  = 10
-  api_url                          = module.consignment_api.api_url
-  api_gateway_arn                  = module.export_api.api_arn
-  backend_checks_api_arn           = module.backend_checks_api.api_arn
-  draft_metadata_api_arn           = module.draft_metadata_api_gateway.api_execution_arn
-  kms_key_arn                      = module.encryption_key.kms_key_arn
-  private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
-  vpc_id                           = module.shared_vpc.vpc_id
-  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "signed_cookies_lambda" {
