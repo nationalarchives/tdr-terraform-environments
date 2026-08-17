@@ -247,11 +247,8 @@ resource "aws_iam_role_policy" "s3files_file_checks" {
         Sid    = "S3ObjectPermissions"
         Effect = "Allow"
         Action = [
-          "s3:AbortMultipartUpload",
-          "s3:DeleteObject*",
           "s3:GetObject*",
-          "s3:List*",
-          "s3:PutObject*"
+          "s3:List*"
         ]
         Resource = "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}/*"
         Condition = {
@@ -264,11 +261,7 @@ resource "aws_iam_role_policy" "s3files_file_checks" {
         Sid    = "UseKmsKeyWithS3Files"
         Effect = "Allow"
         Action = [
-          "kms:GenerateDataKey",
-          "kms:Encrypt",
-          "kms:Decrypt",
-          "kms:ReEncryptFrom",
-          "kms:ReEncryptTo"
+          "kms:Decrypt"
         ]
         Resource = module.s3_upload_kms_key.kms_key_arn
         Condition = {
