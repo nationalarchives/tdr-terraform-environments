@@ -318,6 +318,16 @@ module "s3files_mount_target_security_group" {
   ]
 }
 
+resource "aws_security_group_rule" "outbound_only_to_s3files_mount_target" {
+  type                     = "egress"
+  protocol                 = "tcp"
+  from_port                = 2049
+  to_port                  = 2049
+  security_group_id        = module.outbound_only_security_group.security_group_id
+  source_security_group_id = module.s3files_mount_target_security_group.security_group_id
+  description              = "Allow NFS to the S3 Files mount targets"
+}
+
 resource "aws_s3files_file_system" "file_checks_s3_files" {
   bucket   = "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}"
   role_arn = aws_iam_role.s3files_file_checks.arn
