@@ -38,7 +38,10 @@
     {
       "Effect": "Allow",
       "Action": "s3files:MountFileSystem",
-      "Resource": "${s3_access_point_arn}"
+      "Resource": [
+        "${s3_file_system_arn}",
+        "${s3_access_point_arn}"
+      ]
     },
     {
       "Effect": "Allow",
