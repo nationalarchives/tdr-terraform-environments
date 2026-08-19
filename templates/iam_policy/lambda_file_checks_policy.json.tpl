@@ -39,8 +39,7 @@
     {
       "Effect": "Allow",
       "Action": [
-        "s3files:ClientMount",
-        "s3files:ClientWrite"
+        "s3files:ClientMount"
       ],
       "Resource": "${s3_file_system_arn}"
     },
