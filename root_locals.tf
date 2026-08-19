@@ -117,10 +117,6 @@ locals {
   statuses_function_name                = "${var.project}-statuses-${local.environment}"
   inactive_keycloak_users_function_name = "${var.project}-inactive-keycloak-users-${local.environment}"
   file_checks_function_name             = "${var.project}-file-checks-${local.environment}"
-  # Matches the role name the lambda module creates ("$${function_name}-role"). Referencing the role by name rather
-  # than through module.file_checks lets the s3 upload KMS key be built without depending on the lambda, which would
-  # otherwise make it impossible to order the lambda after the S3 Files mount targets.
-  file_checks_lambda_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.file_checks_function_name}-role"
 
   runtime_python_3_13 = "python3.13"
   runtime_java_11     = "java11"

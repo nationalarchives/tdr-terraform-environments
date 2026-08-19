@@ -87,14 +87,11 @@ module "s3_upload_kms_key" {
   default_policy_variables = {
     user_roles = concat([
       module.file_upload_data.lambda_role_arn,
+      module.file_checks.lambda_role_arn,
       module.aws_guard_duty_s3_malware_scan_role.role_arn,
       aws_iam_role.s3files_file_checks.arn
     ], local.aws_sso_internal_bucket_access_roles, local.aws_back_up_roles, local.aggregate_processing_access_role, local.e2e_testing_role_arns)
-    # Added by name rather than as a principal so this key does not depend on the file-checks lambda. The lambda has to
-    # be created after the S3 Files mount targets, which in turn depend on this key policy allowing the S3 Files role
-    # to decrypt the dirty bucket.
-    user_roles_decoupled = [local.file_checks_lambda_role_arn]
-    ci_roles             = [local.terraform_role]
+    ci_roles = [local.terraform_role]
     service_details = [
       {
         service_name : "cloudwatch"
