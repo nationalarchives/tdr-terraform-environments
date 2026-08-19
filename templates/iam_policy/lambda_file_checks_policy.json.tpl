@@ -43,8 +43,8 @@
         "s3files:ClientWrite"
       ],
       "Resource": [
-        "arn:aws:s3files:eu-west-2:${account_id}:file-system/*",
-        "arn:aws:s3files:eu-west-2:${account_id}:file-system/*/access-point/*"
+        "${s3_file_system_arn}",
+        "${s3_file_system_arn}/access-point/*"
       ]
     },
     {

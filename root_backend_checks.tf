@@ -199,6 +199,7 @@ module "file_checks" {
       upload_bucket         = module.upload_bucket.s3_bucket_name
       quarantine_bucket     = module.upload_bucket_quarantine.s3_bucket_name
       draft_metadata_bucket = local.draft_metadata_s3_bucket_name
+      s3_file_system_arn    = aws_s3files_file_system.file_checks_s3_files.arn
       decryption_keys       = jsonencode([module.s3_upload_kms_key.kms_key_arn])
       encryption_keys       = jsonencode([module.s3_internal_kms_key.kms_key_arn])
     })
