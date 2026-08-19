@@ -344,9 +344,9 @@ resource "aws_s3files_file_system" "file_checks_s3_files" {
   tags     = local.common_tags
 
   # S3 Files validates access to the bucket when the file system is created, so the role must already have its
-  # permissions. Nothing else links the inline policy or the KMS key policy to this resource, so without depends_on
-  # Terraform can create the file system before either is applied and creation fails with an access denied error.
-  depends_on = [aws_iam_role_policy.s3files_file_checks, module.s3_upload_kms_key]
+  # permissions. Nothing else links the inline policy to this resource. The policy grants decrypt on the s3 upload KMS
+  # key, so waiting for it also waits for that key policy to allow the role.
+  depends_on = [aws_iam_role_policy.s3files_file_checks]
 }
 
 resource "aws_s3files_access_point" "file_checks_s3_files" {
