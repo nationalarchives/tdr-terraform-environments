@@ -205,10 +205,20 @@ module "file_checks" {
     })
   }
   runtime = local.runtime_java_21
+  efs_access_points = [
+    {
+      access_point_arn = aws_s3files_access_point.file_checks_s3_files.arn
+      mount_path       = "/mnt/s3"
+    }
+  ]
   vpc_config = {
     subnet_ids         = module.shared_vpc.private_backend_checks_subnets
     security_group_ids = [module.outbound_only_security_group.security_group_id]
   }
+
+  # Lambda refuses to attach a file system until every mount target in the availability zones it runs in is available,
+  # and nothing else in the configuration orders the function after them.
+  depends_on = [aws_s3files_mount_target.file_checks_s3_files]
 }
 
 resource "aws_iam_role" "s3files_file_checks" {
