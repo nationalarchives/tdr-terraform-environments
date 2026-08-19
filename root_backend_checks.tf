@@ -214,6 +214,10 @@ module "file_checks" {
     subnet_ids         = module.shared_vpc.private_backend_checks_subnets
     security_group_ids = [module.outbound_only_security_group.security_group_id]
   }
+
+  # Lambda refuses to attach a file system until every mount target in the availability zones it runs in is available,
+  # and nothing else in the configuration orders the function after them.
+  depends_on = [aws_s3files_mount_target.file_checks_s3_files]
 }
 
 resource "aws_iam_role" "s3files_file_checks" {
