@@ -210,6 +210,128 @@ module "file_checks" {
   }
 }
 
+resource "aws_iam_role" "s3files_file_checks" {
+  name               = "TDRFileChecksS3FilesRole${title(local.environment)}"
+  assume_role_policy = templatefile("./templates/iam_policy/assume_role_policy.json.tpl", { service = "elasticfilesystem.amazonaws.com" })
+  tags               = local.common_tags
+}
+
+resource "aws_iam_role_policy" "s3files_file_checks" {
+  name = "TDRFileChecksS3FilesPolicy${title(local.environment)}"
+  role = aws_iam_role.s3files_file_checks.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "S3BucketPermissions"
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket",
+          "s3:ListBucketVersions"
+        ]
+        Resource = "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}"
+        Condition = {
+          StringEquals = {
+            "aws:ResourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      },
+      {
+        Sid    = "S3ObjectPermissions"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject*",
+          "s3:List*"
+        ]
+        Resource = "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}/*"
+        Condition = {
+          StringEquals = {
+            "aws:ResourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      },
+      {
+        Sid    = "UseKmsKeyWithS3Files"
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt"
+        ]
+        Resource = module.s3_upload_kms_key.kms_key_arn
+        Condition = {
+          StringLike = {
+            "kms:ViaService" = "s3.eu-west-2.amazonaws.com"
+          }
+        }
+      },
+      {
+        Sid    = "EventBridgeManage"
+        Effect = "Allow"
+        Action = [
+          "events:DeleteRule",
+          "events:DisableRule",
+          "events:EnableRule",
+          "events:PutRule",
+          "events:PutTargets",
+          "events:RemoveTargets"
+        ]
+        Resource = "arn:aws:events:*:*:rule/DO-NOT-DELETE-S3-Files*"
+        Condition = {
+          StringEquals = {
+            "events:ManagedBy" = "elasticfilesystem.amazonaws.com"
+          }
+        }
+      },
+      {
+        Sid    = "EventBridgeRead"
+        Effect = "Allow"
+        Action = [
+          "events:DescribeRule",
+          "events:ListRuleNamesByTarget",
+          "events:ListRules",
+          "events:ListTargetsByRule"
+        ]
+        Resource = "arn:aws:events:*:*:rule/*"
+      }
+    ]
+  })
+}
+
+module "s3files_mount_target_security_group" {
+  source      = "./tdr-terraform-modules/security_group"
+  description = "S3 Files mount target NFS access for file-checks lambda"
+  name        = "s3files_mount_target_security_group"
+  vpc_id      = module.shared_vpc.vpc_id
+  common_tags = local.common_tags
+  ingress_security_group_rules = [
+    {
+      port              = 2049
+      security_group_id = module.outbound_only_security_group.security_group_id
+      description       = "Allow NFS from file-checks lambda security group"
+    }
+  ]
+}
+
+resource "aws_s3files_file_system" "file_checks_s3_files" {
+  bucket   = "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}"
+  role_arn = aws_iam_role.s3files_file_checks.arn
+  tags     = local.common_tags
+}
+
+resource "aws_s3files_access_point" "file_checks_s3_files" {
+  file_system_id = aws_s3files_file_system.file_checks_s3_files.id
+  tags           = local.common_tags
+}
+
+resource "aws_s3files_mount_target" "file_checks_s3_files" {
+  for_each       = toset(module.shared_vpc.private_backend_checks_subnets)
+  file_system_id = aws_s3files_file_system.file_checks_s3_files.id
+  subnet_id      = each.value
+  security_groups = [
+    module.s3files_mount_target_security_group.security_group_id,
+    module.outbound_only_security_group.security_group_id
+  ]
+}
+
 module "backend_checks_v2_step_function" {
   source             = "./tdr-terraform-modules/stepfunctions"
   tags               = local.common_tags
