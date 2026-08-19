@@ -25,6 +25,7 @@
       "Effect": "Allow",
       "Action": [
         "s3:GetObject",
+        "s3:GetObjectVersion",
         "s3:GetObjectTagging",
         "s3:ListBucket"
       ],
@@ -41,7 +42,10 @@
         "s3files:ClientMount",
         "s3files:ClientWrite"
       ],
-      "Resource": "${s3_file_system_arn}"
+      "Resource": [
+        "${s3_file_system_arn}",
+        "${s3_file_system_arn}/access-point/*"
+      ]
     },
     {
       "Effect": "Allow",
