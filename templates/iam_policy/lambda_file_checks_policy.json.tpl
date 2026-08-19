@@ -42,7 +42,10 @@
         "s3files:ClientMount",
         "s3files:ClientWrite"
       ],
-      "Resource": "${s3_file_system_arn}"
+      "Resource": [
+        "${s3_file_system_arn}",
+        "${s3_file_system_arn}/access-point/*"
+      ]
     },
     {
       "Effect": "Allow",
