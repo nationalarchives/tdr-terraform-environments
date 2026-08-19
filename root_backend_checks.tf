@@ -244,6 +244,7 @@ resource "aws_iam_role_policy" "s3files_file_checks" {
         Effect = "Allow"
         Action = [
           "s3:AbortMultipartUpload",
+          "s3:DeleteObject*",
           "s3:GetObject*",
           "s3:List*",
           "s3:PutObject*"
