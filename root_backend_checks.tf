@@ -218,9 +218,11 @@ module "file_checks" {
 }
 
 resource "aws_iam_role" "s3files_file_checks" {
-  name               = "TDRFileChecksS3FilesRole${title(local.environment)}"
-  assume_role_policy = templatefile("./templates/iam_policy/assume_role_policy.json.tpl", { service = "elasticfilesystem.amazonaws.com" })
-  tags               = local.common_tags
+  name = "TDRFileChecksS3FilesRole${title(local.environment)}"
+  assume_role_policy = templatefile("./templates/iam_policy/s3_files_assume_role_policy.json.tpl", {
+    account_id = data.aws_caller_identity.current.account_id
+  })
+  tags = local.common_tags
 }
 
 resource "aws_iam_role_policy" "s3files_file_checks" {
@@ -247,8 +249,11 @@ resource "aws_iam_role_policy" "s3files_file_checks" {
         Sid    = "S3ObjectPermissions"
         Effect = "Allow"
         Action = [
+          "s3:AbortMultipartUpload",
+          "s3:DeleteObject*",
           "s3:GetObject*",
-          "s3:List*"
+          "s3:List*",
+          "s3:PutObject*"
         ]
         Resource = "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}/*"
         Condition = {
@@ -261,12 +266,20 @@ resource "aws_iam_role_policy" "s3files_file_checks" {
         Sid    = "UseKmsKeyWithS3Files"
         Effect = "Allow"
         Action = [
-          "kms:Decrypt"
+          "kms:Decrypt",
+          "kms:Encrypt",
+          "kms:GenerateDataKey",
+          "kms:ReEncryptFrom",
+          "kms:ReEncryptTo"
         ]
         Resource = module.s3_upload_kms_key.kms_key_arn
         Condition = {
           StringLike = {
             "kms:ViaService" = "s3.eu-west-2.amazonaws.com"
+            "kms:EncryptionContext:aws:s3:arn" = [
+              "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}",
+              "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}/*"
+            ]
           }
         }
       },
@@ -332,6 +345,11 @@ resource "aws_s3files_file_system" "file_checks_s3_files" {
   bucket   = "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}"
   role_arn = aws_iam_role.s3files_file_checks.arn
   tags     = local.common_tags
+
+  # S3 Files validates access to the bucket when the file system is created, so the role must already have its
+  # permissions. Nothing else links the inline policy or the KMS key policy to this resource, so without depends_on
+  # Terraform can create the file system before either is applied and creation fails with an access denied error.
+  depends_on = [aws_iam_role_policy.s3files_file_checks, module.s3_upload_kms_key]
 }
 
 resource "aws_s3files_access_point" "file_checks_s3_files" {

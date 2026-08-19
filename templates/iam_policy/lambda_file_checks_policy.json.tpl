@@ -25,6 +25,7 @@
       "Effect": "Allow",
       "Action": [
         "s3:GetObject",
+        "s3:GetObjectVersion",
         "s3:GetObjectTagging",
         "s3:ListBucket"
       ],
