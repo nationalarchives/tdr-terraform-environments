@@ -38,6 +38,14 @@
     {
       "Effect": "Allow",
       "Action": [
+        "s3files:ClientMount",
+        "s3files:ClientWrite"
+      ],
+      "Resource": "${s3_file_system_arn}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
         "s3:GetObject",
         "s3:GetObjectTagging",
         "s3:ListBucket",

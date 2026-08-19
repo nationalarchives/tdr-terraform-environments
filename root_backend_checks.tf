@@ -190,7 +190,7 @@ module "file_checks" {
   reserved_concurrency = -1
   timeout_seconds      = 900
   storage_size         = 2560
-  memory_size          = 2560
+  memory_size          = 3008
   policies = {
     "TDRFileChecksLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_file_checks_policy.json.tpl", {
       function_name         = local.file_checks_function_name,
@@ -199,11 +199,18 @@ module "file_checks" {
       upload_bucket         = module.upload_bucket.s3_bucket_name
       quarantine_bucket     = module.upload_bucket_quarantine.s3_bucket_name
       draft_metadata_bucket = local.draft_metadata_s3_bucket_name
+      s3_file_system_arn    = aws_s3files_file_system.file_checks_s3_files.arn
       decryption_keys       = jsonencode([module.s3_upload_kms_key.kms_key_arn])
       encryption_keys       = jsonencode([module.s3_internal_kms_key.kms_key_arn])
     })
   }
   runtime = local.runtime_java_21
+  efs_access_points = [
+    {
+      access_point_arn = aws_s3files_access_point.file_checks_s3_files.arn
+      mount_path       = "/mnt/s3"
+    }
+  ]
   vpc_config = {
     subnet_ids         = module.shared_vpc.private_backend_checks_subnets
     security_group_ids = [module.outbound_only_security_group.security_group_id]
@@ -309,6 +316,16 @@ module "s3files_mount_target_security_group" {
       description       = "Allow NFS from file-checks lambda security group"
     }
   ]
+}
+
+resource "aws_security_group_rule" "outbound_only_to_s3files_mount_target" {
+  type                     = "egress"
+  protocol                 = "tcp"
+  from_port                = 2049
+  to_port                  = 2049
+  security_group_id        = module.outbound_only_security_group.security_group_id
+  source_security_group_id = module.s3files_mount_target_security_group.security_group_id
+  description              = "Allow NFS to the S3 Files mount targets"
 }
 
 resource "aws_s3files_file_system" "file_checks_s3_files" {
