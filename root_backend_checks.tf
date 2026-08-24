@@ -212,13 +212,10 @@ module "file_checks" {
     }
   ]
   vpc_config = {
-    subnet_ids         = module.shared_vpc.private_backend_checks_subnets
+    # The lambda can only attach the file system once the mount targets in its subnets exist
+    subnet_ids         = values(aws_s3files_mount_target.file_checks_s3_files)[*].subnet_id
     security_group_ids = [module.outbound_only_security_group.security_group_id]
   }
-
-  # Lambda refuses to attach a file system until every mount target in the availability zones it runs in is available,
-  # and nothing else in the configuration orders the function after them.
-  depends_on = [aws_s3files_mount_target.file_checks_s3_files]
 }
 
 resource "aws_iam_role" "s3files_file_checks" {
@@ -346,14 +343,11 @@ resource "aws_security_group_rule" "outbound_only_to_s3files_mount_target" {
 }
 
 resource "aws_s3files_file_system" "file_checks_s3_files" {
-  bucket   = "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}"
-  role_arn = aws_iam_role.s3files_file_checks.arn
-  tags     = local.common_tags
+  bucket = "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}"
 
-  # S3 Files validates access to the bucket when the file system is created, so the role must already have its
-  # permissions. Nothing else links the inline policy to this resource. The policy grants decrypt on the s3 upload KMS
-  # key, so waiting for it also waits for that key policy to allow the role.
-  depends_on = [aws_iam_role_policy.s3files_file_checks]
+  # S3 Files checks bucket access when the file system is created, so wait for the role policy
+  role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role_policy.s3files_file_checks.role}"
+  tags     = local.common_tags
 }
 
 resource "aws_s3files_access_point" "file_checks_s3_files" {
