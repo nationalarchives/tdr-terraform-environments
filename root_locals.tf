@@ -117,7 +117,7 @@ locals {
   statuses_function_name                = "${var.project}-statuses-${local.environment}"
   inactive_keycloak_users_function_name = "${var.project}-inactive-keycloak-users-${local.environment}"
   file_checks_function_name             = "${var.project}-file-checks-${local.environment}"
-  file_checks_lambda_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.file_checks_function_name}-role"
+  file_checks_lambda_role_arn           = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.file_checks_function_name}-role"
 
   runtime_python_3_13 = "python3.13"
   runtime_java_11     = "java11"
