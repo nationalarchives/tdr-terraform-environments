@@ -995,7 +995,7 @@ module "ecs_task_stopped_event" {
 }
 
 module "frontend_ecs_task_stopped_event" {
-  source        = "./da-terraform-modules/cloudwatch_events"
+  source = "./da-terraform-modules/cloudwatch_events"
   event_pattern = templatefile("${path.module}/templates/cloudwatch_events/ecs_task_stopped_event.json.tpl", {
     cluster_arn = module.frontend.ecs_cluster_arn
   })
