@@ -783,7 +783,7 @@ module "create_keycloak_users_api_lambda" {
   vpc_id                           = module.shared_vpc.vpc_id
   lambda_create_keycloak_user_api  = true
   private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
-  keycloak_user_management_api_arn = module.create_keycloak_users_api[0].api_arn
+  keycloak_user_management_api_arn = one(module.create_keycloak_users_api[*].api_arn)
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
@@ -862,6 +862,13 @@ module "create_keycloak_users_api" {
   common_tags                      = local.common_tags
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].api_gateway
 }
+
+# TDRD-1710
+moved {
+  from = module.create_keycloak_users_api
+  to   = module.create_keycloak_users_api[0]
+}
+
 
 module "create_bulk_users_bucket" {
   source              = "./tdr-terraform-modules/s3"
