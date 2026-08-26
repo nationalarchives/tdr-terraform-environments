@@ -50,6 +50,14 @@ resource "aws_ecs_service" "frontend_service" {
   launch_type                       = "FARGATE"
   health_check_grace_period_seconds = "360"
 
+  # Stop ECS endlessly cycling new tasks when a deployment's tasks repeatedly
+  # fail to start/stabilise (e.g. missing env var). After enough failures ECS
+  # rolls back to the last known good task definition
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
+
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]
     subnets          = var.private_subnets_ecs
