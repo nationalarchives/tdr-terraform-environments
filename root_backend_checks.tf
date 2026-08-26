@@ -205,7 +205,7 @@ module "file_checks" {
     })
   }
   runtime = local.runtime_java_21
-  efs_access_points = [
+  s3_files_access_points = [
     {
       access_point_arn = aws_s3files_access_point.file_checks_s3_files.arn
       mount_path       = "/mnt/s3"
