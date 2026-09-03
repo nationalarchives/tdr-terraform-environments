@@ -205,8 +205,15 @@ module "file_checks" {
     })
   }
   runtime = local.runtime_java_21
+  s3_files_access_points = [
+    {
+      access_point_arn = aws_s3files_access_point.file_checks_s3_files.arn
+      mount_path       = "/mnt/s3"
+    }
+  ]
   vpc_config = {
-    subnet_ids         = module.shared_vpc.private_backend_checks_subnets
+    # The lambda can only attach the file system once the mount targets in its subnets exist
+    subnet_ids         = values(aws_s3files_mount_target.file_checks_s3_files)[*].subnet_id
     security_group_ids = [module.outbound_only_security_group.security_group_id]
   }
 }
@@ -335,6 +342,14 @@ resource "aws_security_group_rule" "outbound_only_to_s3files_mount_target" {
   description              = "Allow NFS to the S3 Files mount targets"
 }
 
+# S3 Files keeps the file system in sync with the bucket using the managed DO-NOT-DELETE-S3-Files EventBridge rules it
+# creates with the role above. Those rules only receive events if the bucket sends its notifications to EventBridge, so
+# without this objects uploaded after the file system was created never appear under the lambda's mount point.
+resource "aws_s3_bucket_notification" "upload_file_cloudfront_dirty_eventbridge" {
+  bucket      = module.upload_file_cloudfront_dirty_s3.s3_bucket_name
+  eventbridge = true
+}
+
 resource "aws_s3files_file_system" "file_checks_s3_files" {
   bucket   = "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}"
   role_arn = aws_iam_role.s3files_file_checks.arn
@@ -343,7 +358,13 @@ resource "aws_s3files_file_system" "file_checks_s3_files" {
   # S3 Files validates access to the bucket when the file system is created, so the role must already have its
   # permissions. Nothing else links the inline policy to this resource. The policy grants decrypt on the s3 upload KMS
   # key, so waiting for it also waits for that key policy to allow the role.
-  depends_on = [aws_iam_role_policy.s3files_file_checks]
+  #
+  # The EventBridge notification configuration must also exist first, otherwise the file system is created without a
+  # source of change events and never picks up newly uploaded objects.
+  depends_on = [
+    aws_iam_role_policy.s3files_file_checks,
+    aws_s3_bucket_notification.upload_file_cloudfront_dirty_eventbridge
+  ]
 }
 
 resource "aws_s3files_access_point" "file_checks_s3_files" {
