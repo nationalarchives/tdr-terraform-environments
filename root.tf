@@ -133,6 +133,7 @@ module "alb_logs_s3" {
   access_logs   = false
   bucket_policy = "alb_logging_euwest2"
   common_tags   = local.common_tags
+  lifecycle_rules = local.cloudfront_logs_lifesycle_rules
 }
 
 module "upload_bucket" {
