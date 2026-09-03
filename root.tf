@@ -1006,6 +1006,7 @@ module "frontend_ecs_task_stopped_event" {
   source = "./da-terraform-modules/cloudwatch_events"
   event_pattern = templatefile("${path.module}/templates/cloudwatch_events/ecs_task_stopped_event.json.tpl", {
     cluster_arn = module.frontend.ecs_cluster_arn
+    anythingBut = local.environment == "prod" ? "0" : "0,143"
   })
   event_target_arns = {
     "sns_target" = module.notifications_topic.sns_arn
