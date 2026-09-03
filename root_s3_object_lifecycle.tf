@@ -79,9 +79,10 @@ locals {
       }
   }]
 
+  # TDRD-1742
   cloudfront_logs_lifesycle_rules = [
     {
-      id     = "cloudfront-logs-delete-objects"
+      id     = "delete-cloudfront-logs-objects"
       status = "Enabled"
       expiration = {
         days = module.global_parameters.policy_cloudwatch_logs_retention[local.environment].waf
