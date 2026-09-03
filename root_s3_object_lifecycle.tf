@@ -81,7 +81,7 @@ locals {
 
   cloudfront_logs_lifesycle_rules = [
     {
-      id = "cloudfront-logs-delete-objects"
+      id     = "cloudfront-logs-delete-objects"
       status = "Enabled"
       expiration = {
         days = module.global_parameters.policy_cloudwatch_logs_retention[local.environment].waf
