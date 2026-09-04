@@ -127,12 +127,13 @@ module "frontend" {
 }
 
 module "alb_logs_s3" {
-  source        = "./tdr-terraform-modules/s3"
-  project       = var.project
-  function      = "alb-logs"
-  access_logs   = false
-  bucket_policy = "alb_logging_euwest2"
-  common_tags   = local.common_tags
+  source          = "./tdr-terraform-modules/s3"
+  project         = var.project
+  function        = "alb-logs"
+  access_logs     = false
+  bucket_policy   = "alb_logging_euwest2"
+  common_tags     = local.common_tags
+  lifecycle_rules = local.cloudfront_logs_lifesycle_rules
 }
 
 module "upload_bucket" {
@@ -1006,6 +1007,7 @@ module "frontend_ecs_task_stopped_event" {
   source = "./da-terraform-modules/cloudwatch_events"
   event_pattern = templatefile("${path.module}/templates/cloudwatch_events/ecs_task_stopped_event.json.tpl", {
     cluster_arn = module.frontend.ecs_cluster_arn
+    anythingBut = local.environment == "prod" ? "0" : "0,143"
   })
   event_target_arns = {
     "sns_target" = module.notifications_topic.sns_arn
