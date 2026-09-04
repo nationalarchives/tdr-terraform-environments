@@ -26,7 +26,7 @@ jobs:
       id-token: write
       contents: read
     # BELOW NEEDS UPDATING WHEN TDR-GITHUB-ACTIONS CHANGES ARE MERGED
-    uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@TDRD-1062 # v0.0.41
+    uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@b98899c2acfaf872e0053671743a5b1284b0dab0 # v0.0.41
     with:
       repo-name: tdr-terraform-environments
       environment: prod
