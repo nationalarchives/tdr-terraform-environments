@@ -33,6 +33,7 @@ jobs:
       terraform-version: 1.12.2
       allow-admin-access-internal: ${{ inputs.allow_admin_access_to_internal_kms_key }}
       allow-admin-access-export: ${{ inputs.allow_admin_access_to_export_kms_key }}
+      target-kms-keys: true
     secrets:
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
