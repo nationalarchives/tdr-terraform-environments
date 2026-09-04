@@ -192,3 +192,18 @@ resource "aws_vpc_endpoint_policy" "vpc_endpoints_ecr_policy" {
       organisation_id = data.aws_organizations_organization.tna.id
   })
 }
+
+resource "aws_vpc_endpoint" "vpc_endpoints_api_gateway" {
+  vpc_id              = aws_vpc.main.id
+  service_name        = "com.amazonaws.eu-west-2.execute-api"
+  security_group_ids  = [aws_security_group.endpoint_security_group.id]
+  subnet_ids          = aws_subnet.private_backend_checks.*.id
+  private_dns_enabled = true
+  vpc_endpoint_type   = "Interface"
+  tags = merge(
+    var.common_tags,
+    tomap(
+      { "Name" = "com.amazonaws.eu-west-2.execute-api" }
+    )
+  )
+}
