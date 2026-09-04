@@ -144,6 +144,7 @@ module "upload_bucket" {
   kms_key_id                 = local.internal_s3_encryption_key_arn
   common_tags                = local.common_tags
   lifecycle_rules            = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
   aws_backup_local_role_arn  = local.aws_back_up_local_role
   s3_bucket_additional_tags  = local.aws_back_up_tags
   enable_request_metrics_all = local.environment == "prod"
@@ -157,6 +158,7 @@ module "upload_bucket_quarantine" {
   kms_key_id                 = local.internal_s3_encryption_key_arn
   common_tags                = local.common_tags
   lifecycle_rules            = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
   aws_backup_local_role_arn  = local.aws_back_up_local_role
   s3_bucket_additional_tags  = local.aws_back_up_tags
   enable_request_metrics_all = true
@@ -214,6 +216,7 @@ module "upload_file_cloudfront_dirty_s3" {
   abort_incomplete_uploads      = true
   cloudfront_distribution_arns  = [module.cloudfront_upload.cloudfront_arn]
   lifecycle_rules               = local.dirty_bucket_lifecycle_rules
+  log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
   aws_backup_local_role_arn     = local.aws_back_up_local_role
   s3_bucket_additional_tags     = local.aws_back_up_tags
   bucket_owner_object_ownership = true
@@ -228,6 +231,8 @@ module "upload_file_cloudfront_logs" {
   bucket_policy                = "upload_cloudfront_logs"
   aws_logs_delivery_account_id = local.aws_logs_delivery_account_id
   access_logs                  = false
+  # TDRD-1796
+  lifecycle_rules              = local.bucket_logs_lifecycle_rules
 }
 
 module "cloudfront_upload" {
@@ -393,6 +398,7 @@ module "backend_lambda_function_bucket" {
   function        = "backend-checks"
   project         = var.project
   lifecycle_rules = local.backend_checks_results_bucket_lifecycle_rules
+  log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
 }
 
 module "create_db_users_lambda" {
@@ -653,6 +659,7 @@ module "export_bucket" {
   s3_bucket_additional_tags  = local.aws_back_up_tags
   aws_backup_local_role_arn  = local.aws_back_up_local_role
   lifecycle_rules            = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
   enable_request_metrics_all = local.environment == "prod"
 }
 
@@ -878,6 +885,7 @@ module "create_bulk_users_bucket" {
   project             = var.project
   lambda_notification = true
   lambda_arn          = module.create_keycloak_users_s3_lambda.create_keycloak_users_s3_lambda_arn
+  log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
 }
 
 module "rotate_keycloak_secrets_lambda" {
@@ -941,6 +949,7 @@ module "shield_response_s3_bucket" {
   common_tags = local.common_tags
   function    = "shield-team-information"
   project     = var.project
+  log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
 }
 
 module "api_database_security_group" {
