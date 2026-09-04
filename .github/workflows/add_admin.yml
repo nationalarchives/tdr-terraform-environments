@@ -18,14 +18,6 @@ on:
         description: Ticket number for request (TRDR-XXXX)
         required: true
         type: string
-      operation:
-        description: Grant or revoke admin SSO access
-        required: true
-        type: choice
-        options:
-          - grant
-          - revoke
-      
 permissions: {}
 
 jobs:
@@ -39,9 +31,8 @@ jobs:
       repo-name: tdr-terraform-environments
       environment: prod
       terraform-version: 1.12.2
-      update-tag: false
-      allow-admin-access-internal: ${{ inputs.operation == 'grant' && inputs.allow_admin_access_to_internal_kms_key || false }}
-      allow-admin-access-export: ${{ inputs.operation == 'grant' && inputs.allow_admin_access_to_export_kms_key || false }}
+      allow-admin-access-internal: ${{ inputs.allow_admin_access_to_internal_kms_key }}
+      allow-admin-access-export: ${{ inputs.allow_admin_access_to_export_kms_key }}
       target-kms-keys: true
     secrets:
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
@@ -60,28 +51,20 @@ jobs:
           ACTOR: ${{ github.actor }}
           REASON: ${{ inputs.reason }}
           TICKET: ${{ inputs.ticket }}
-          OPERATION: ${{ inputs.operation }}
-          INTERNAL: ${{ inputs.operation == 'grant' && inputs.allow_admin_access_to_internal_kms_key || false }}
-          EXPORT: ${{ inputs.operation == 'grant' && inputs.allow_admin_access_to_export_kms_key || false }}
+          INTERNAL: ${{ inputs.allow_admin_access_to_internal_kms_key }}
+          EXPORT: ${{ inputs.allow_admin_access_to_export_kms_key }}
         run: |
-          if [ "$OPERATION" = "revoke" ]; then
-            KEYS="all"
-            ACTION="revoked"
-          elif [ "$INTERNAL" = "true" ] && [ "$EXPORT" = "true" ]; then
+          KEYS=""
+          if [ "$INTERNAL" = "true" ] && [ "$EXPORT" = "true" ]; then
             KEYS="internal and export"
-            ACTION="granted"
           elif [ "$INTERNAL" = "true" ]; then
             KEYS="internal"
-            ACTION="granted"
           elif [ "$EXPORT" = "true" ]; then
             KEYS="export"
-            ACTION="granted"
           else
-            KEYS="none"
-            ACTION="revoked"
+            KEYS="none (access revoked)"
           fi
-
-          echo ":siren: MESSAGE=${TICKET}: ${ACTOR} has ${ACTION} admin SSO access to the ${KEYS} KMS key(s). Reason: ${REASON}" >> "$GITHUB_ENV"
+          echo ":siren: MESSAGE=${TICKET}: ${ACTOR} has granted KMS access to the ${KEYS} key. Reason: ${REASON}" >> "$GITHUB_ENV"
       - name: Send usage message
         if: always()
         uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@f318ce8a5d99c08b1235663f97fdb1b35844674e # v0.0.39
