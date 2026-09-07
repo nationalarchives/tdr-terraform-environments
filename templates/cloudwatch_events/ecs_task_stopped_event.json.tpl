@@ -16,7 +16,7 @@
       "exitCode": [
         {
           "anything-but": [
-            0
+            ${anythingBut}
           ]
         }
       ]

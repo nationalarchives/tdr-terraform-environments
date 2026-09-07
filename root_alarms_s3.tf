@@ -6,7 +6,7 @@
 
 # S3
 resource "aws_cloudwatch_metric_alarm" "tdr_alarms_s3_object_put_quarantine" {
-  count             = local.environment == "intg" ? 0 : 1
+  count             = local.environment == "prod" ? 1 : 0
   alarm_description = "This alarm fires when an object has been put into the bucket"
   alarm_name        = format("AWS/S3 Object Put in tdr-upload-files-quarantine-%s", local.environment)
 
