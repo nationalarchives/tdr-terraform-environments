@@ -32,6 +32,28 @@ locals {
       }
   }]
 
+  default_bucket_lifecycle_rules = [{
+    id     = "delete-bucket-objects"
+    status = "Enabled"
+    expiration = {
+      days = local.environment == "prod" ? 180 : 90
+    }
+    noncurrent_version_expiration = {
+      noncurrent_days = local.environment == "prod" ? 180 : 90
+    }
+  }]
+
+  default_log_bucket_lifecycle_rules = [{
+    id     = "delete-log-bucket-objects"
+    status = "Enabled"
+    expiration = {
+      days = local.environment == "prod" ? 180 : 90
+    }
+    noncurrent_version_expiration = {
+      noncurrent_days = local.environment == "prod" ? 180 : 90
+    }
+  }]
+
   dirty_bucket_lifecycle_rules = [
     {
       id     = "delete-dirty-bucket-objects"

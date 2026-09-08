@@ -58,10 +58,12 @@ module "draft_metadata_checks_lambda" {
 }
 
 module "draft_metadata_bucket" {
-  source      = "./da-terraform-modules/s3"
-  bucket_name = local.draft_metadata_s3_bucket_name
-  common_tags = local.common_tags
-  kms_key_arn = module.s3_internal_kms_key.kms_key_arn
+  source                     = "./da-terraform-modules/s3"
+  bucket_name                = local.draft_metadata_s3_bucket_name
+  common_tags                = local.common_tags
+  kms_key_arn                = module.s3_internal_kms_key.kms_key_arn
+  lifecycle_rules            = local.default_bucket_lifecycle_rules
+  log_bucket_lifecycle_rules = local.default_log_bucket_lifecycle_rules
 }
 
 data "aws_ssm_parameter" "draft_metadata_keycloak_secret" {
