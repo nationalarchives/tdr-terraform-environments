@@ -1,15 +1,17 @@
 module "athena_metadata_checks_s3" {
-  source      = "./da-terraform-modules/s3"
-  bucket_name = local.athena_metadata_checks_database_name
-  kms_key_arn = module.s3_internal_kms_key.kms_key_arn
-  common_tags = local.common_tags
+  source                     = "./da-terraform-modules/s3"
+  bucket_name                = local.athena_metadata_checks_database_name
+  kms_key_arn                = module.s3_internal_kms_key.kms_key_arn
+  common_tags                = local.common_tags
+  log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
 }
 
 module "athena_reporting_results_s3" {
-  source      = "./da-terraform-modules/s3"
-  bucket_name = local.athena_results_bucket_name
-  common_tags = local.common_tags
-  kms_key_arn = module.s3_internal_kms_key.kms_key_arn
+  source                     = "./da-terraform-modules/s3"
+  bucket_name                = local.athena_results_bucket_name
+  common_tags                = local.common_tags
+  kms_key_arn                = module.s3_internal_kms_key.kms_key_arn
+  log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
 }
 
 module "athena_reporting_analytics" {
