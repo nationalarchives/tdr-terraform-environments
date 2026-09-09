@@ -673,6 +673,7 @@ module "export_bucket_judgment" {
   read_access_role_arns      = local.judgment_export_bucket_read_access_roles
   bucket_policy              = "export_bucket"
   lifecycle_rules            = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
   s3_bucket_additional_tags  = local.aws_back_up_tags
   aws_backup_local_role_arn  = local.aws_back_up_local_role
   enable_request_metrics_all = local.environment == "prod"
