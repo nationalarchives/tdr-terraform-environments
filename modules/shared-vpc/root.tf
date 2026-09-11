@@ -198,7 +198,7 @@ resource "aws_vpc_endpoint" "vpc_endpoints_api_gateway" {
   service_name        = "com.amazonaws.eu-west-2.execute-api"
   security_group_ids  = [aws_security_group.endpoint_security_group.id]
   subnet_ids          = aws_subnet.private_backend_checks.*.id
-  private_dns_enabled = true
+  private_dns_enabled = false
   vpc_endpoint_type   = "Interface"
   tags = merge(
     var.common_tags,
