@@ -26,13 +26,14 @@ jobs:
       id-token: write
       contents: read
     # BELOW NEEDS UPDATING WHEN TDR-GITHUB-ACTIONS CHANGES ARE MERGED
-    uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@2d29c2e83fbaba6554c1e0d8c0b45d2015d610b2 # v0.0.41
+    uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_apply.yml@b98899c2acfaf872e0053671743a5b1284b0dab0 # v0.0.43
     with:
       repo-name: tdr-terraform-environments
       environment: prod
       terraform-version: 1.12.2
       allow-admin-access-internal: ${{ inputs.allow_admin_access_to_internal_kms_key }}
       allow-admin-access-export: ${{ inputs.allow_admin_access_to_export_kms_key }}
+      target-kms-keys: true
     secrets:
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}

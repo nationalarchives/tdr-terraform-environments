@@ -127,12 +127,13 @@ module "frontend" {
 }
 
 module "alb_logs_s3" {
-  source        = "./tdr-terraform-modules/s3"
-  project       = var.project
-  function      = "alb-logs"
-  access_logs   = false
-  bucket_policy = "alb_logging_euwest2"
-  common_tags   = local.common_tags
+  source          = "./tdr-terraform-modules/s3"
+  project         = var.project
+  function        = "alb-logs"
+  access_logs     = false
+  bucket_policy   = "alb_logging_euwest2"
+  common_tags     = local.common_tags
+  lifecycle_rules = local.cloudfront_logs_lifesycle_rules
 }
 
 module "upload_bucket" {
@@ -783,7 +784,7 @@ module "create_keycloak_users_api_lambda" {
   vpc_id                           = module.shared_vpc.vpc_id
   lambda_create_keycloak_user_api  = true
   private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
-  keycloak_user_management_api_arn = module.create_keycloak_users_api.api_arn
+  keycloak_user_management_api_arn = one(module.create_keycloak_users_api[*].api_arn)
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
@@ -854,6 +855,7 @@ module "disable_inactive_judgment_users_scheduled_event" {
 }
 
 module "create_keycloak_users_api" {
+  count                            = local.environment != "prod" ? 1 : 0
   source                           = "./tdr-terraform-modules/apigatewayv2"
   body_template                    = templatefile("${path.module}/templates/api_gateway/create_keycloak_users.json.tpl", { region = local.region, lambda_arn = module.create_keycloak_users_api_lambda.create_keycloak_users_api_lambda_arn, auth_url = local.keycloak_auth_url })
   environment                      = local.environment
@@ -861,6 +863,13 @@ module "create_keycloak_users_api" {
   common_tags                      = local.common_tags
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].api_gateway
 }
+
+# TDRD-1710
+moved {
+  from = module.create_keycloak_users_api
+  to   = module.create_keycloak_users_api[0]
+}
+
 
 module "create_bulk_users_bucket" {
   source              = "./tdr-terraform-modules/s3"
@@ -998,6 +1007,7 @@ module "frontend_ecs_task_stopped_event" {
   source = "./da-terraform-modules/cloudwatch_events"
   event_pattern = templatefile("${path.module}/templates/cloudwatch_events/ecs_task_stopped_event.json.tpl", {
     cluster_arn = module.frontend.ecs_cluster_arn
+    anythingBut = local.environment == "prod" ? "0" : "0,143"
   })
   event_target_arns = {
     "sns_target" = module.notifications_topic.sns_arn
