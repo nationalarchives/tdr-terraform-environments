@@ -945,10 +945,10 @@ module "shield_response_team_role" {
 }
 
 module "shield_response_s3_bucket" {
-  source                     = "./tdr-terraform-modules/s3"
-  common_tags                = local.common_tags
-  function                   = "shield-team-information"
-  project                    = var.project
+  source      = "./tdr-terraform-modules/s3"
+  common_tags = local.common_tags
+  function    = "shield-team-information"
+  project     = var.project
 }
 
 module "api_database_security_group" {
