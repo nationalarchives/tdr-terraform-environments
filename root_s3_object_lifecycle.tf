@@ -79,7 +79,6 @@ locals {
       }
   }]
 
-  # TDRD-1742
   cloudfront_logs_lifesycle_rules = [
     {
       id     = "delete-cloudfront-logs-objects"
@@ -92,7 +91,6 @@ locals {
       }
   }]
 
-  # TDRD-1796
   bucket_logs_lifecycle_rules = [
     {
       id     = "delete-bucket-logs-objects"
