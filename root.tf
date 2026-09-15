@@ -949,7 +949,6 @@ module "shield_response_s3_bucket" {
   common_tags                = local.common_tags
   function                   = "shield-team-information"
   project                    = var.project
-  log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
 }
 
 module "api_database_security_group" {
