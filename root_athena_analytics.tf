@@ -6,7 +6,7 @@ module "athena_metadata_checks_s3" {
   enable_log_bucket_lifecycle = true
   log_bucket_lifecycle_rules  = var.bucket_logs_lifecycle_rules
 }
-#
+
 module "athena_reporting_results_s3" {
   source                      = "./da-terraform-modules/s3"
   bucket_name                 = local.athena_results_bucket_name
