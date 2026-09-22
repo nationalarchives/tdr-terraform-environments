@@ -231,7 +231,6 @@ module "upload_file_cloudfront_logs" {
   bucket_policy                = "upload_cloudfront_logs"
   aws_logs_delivery_account_id = local.aws_logs_delivery_account_id
   access_logs                  = false
-  # TDRD-1796
   lifecycle_rules = local.bucket_logs_lifecycle_rules
 }
 
