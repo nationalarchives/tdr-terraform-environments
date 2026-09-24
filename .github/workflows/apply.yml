@@ -7,6 +7,7 @@ on:
         description: 'The environment to deploy against.'
         required: true
         options:
+          - dev
           - intg
           - staging
           - prod
@@ -30,3 +31,4 @@ jobs:
       INTG_ACCOUNT_NUMBER: ${{ secrets.INTG_ACCOUNT_NUMBER }}
       STAGING_ACCOUNT_NUMBER: ${{ secrets.STAGING_ACCOUNT_NUMBER }}
       PROD_ACCOUNT_NUMBER: ${{ secrets.PROD_ACCOUNT_NUMBER }}
+      DEV_ACCOUNT_NUMBER: ${{ secrets.DEV_ACCOUNT_NUMBER }}

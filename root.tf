@@ -38,6 +38,7 @@ module "shared_vpc" {
   common_tags                 = local.common_tags
   environment                 = local.environment
   database_availability_zones = local.database_availability_zones
+  aws_guardduty_ecr_arn       = local.aws_guardduty_ecr_arn
 }
 
 module "database_migrations" {

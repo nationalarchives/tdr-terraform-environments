@@ -189,7 +189,8 @@ resource "aws_vpc_endpoint_policy" "vpc_endpoints_ecr_policy" {
   vpc_endpoint_id = each.value.id
   policy = templatefile("./templates/endpoint_policies/ecr_same_org.tpl",
     {
-      organisation_id = data.aws_organizations_organization.tna.id
+      organisation_id       = data.aws_organizations_organization.tna.id
+      aws_guardduty_ecr_arn = var.aws_guardduty_ecr_arn
   })
 }
 
