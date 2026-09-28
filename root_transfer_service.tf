@@ -280,5 +280,6 @@ module "tdr_transfer_errors_s3_bucket" {
   bucket_name                = local.tdr_transfer_errors_s3_bucket_name
   common_tags                = local.common_tags
   kms_key_arn                = module.s3_internal_kms_key.kms_key_arn
+  log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
   enable_request_metrics_all = local.environment == "prod"
 }

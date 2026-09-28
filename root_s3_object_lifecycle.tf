@@ -79,7 +79,6 @@ locals {
       }
   }]
 
-  # TDRD-1742
   cloudfront_logs_lifesycle_rules = [
     {
       id     = "delete-cloudfront-logs-objects"
@@ -89,6 +88,18 @@ locals {
       }
       noncurrent_version_expiration = {
         noncurrent_days = module.global_parameters.policy_cloudwatch_logs_retention[local.environment].waf
+      }
+  }]
+
+  bucket_logs_lifecycle_rules = [
+    {
+      id     = "delete-bucket-logs-objects"
+      status = "Enabled"
+      expiration = {
+        days = local.environment == "prod" ? 180 : 90
+      }
+      noncurrent_version_expiration = {
+        noncurrent_days = local.environment == "prod" ? 180 : 90
       }
   }]
 }
