@@ -63,6 +63,7 @@ module "draft_metadata_bucket" {
   common_tags                = local.common_tags
   kms_key_arn                = module.s3_internal_kms_key.kms_key_arn
   log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
+  enable_log_bucket_lifecycle  = true
 }
 
 data "aws_ssm_parameter" "draft_metadata_keycloak_secret" {
