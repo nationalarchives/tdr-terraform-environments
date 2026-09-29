@@ -4,7 +4,7 @@ module "athena_metadata_checks_s3" {
   kms_key_arn                 = module.s3_internal_kms_key.kms_key_arn
   common_tags                 = local.common_tags
   enable_log_bucket_lifecycle = true
-  log_bucket_lifecycle_rules  = var.bucket_logs_lifecycle_rules
+  log_bucket_lifecycle_rules  = local.bucket_logs_lifecycle_rules
 }
 
 module "athena_reporting_results_s3" {
@@ -13,7 +13,7 @@ module "athena_reporting_results_s3" {
   common_tags                 = local.common_tags
   kms_key_arn                 = module.s3_internal_kms_key.kms_key_arn
   enable_log_bucket_lifecycle = true
-  log_bucket_lifecycle_rules  = var.bucket_logs_lifecycle_rules
+  log_bucket_lifecycle_rules  = local.bucket_logs_lifecycle_rules
 }
 
 module "athena_reporting_analytics" {

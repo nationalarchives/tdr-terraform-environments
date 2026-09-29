@@ -275,11 +275,12 @@ module "aggregate_processing_sqs_queue" {
 }
 
 module "tdr_transfer_errors_s3_bucket" {
-  count                      = local.transfer_service_count
-  source                     = "./da-terraform-modules/s3"
-  bucket_name                = local.tdr_transfer_errors_s3_bucket_name
-  common_tags                = local.common_tags
-  kms_key_arn                = module.s3_internal_kms_key.kms_key_arn
-  log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
-  enable_request_metrics_all = local.environment == "prod"
+  count                       = local.transfer_service_count
+  source                      = "./da-terraform-modules/s3"
+  bucket_name                 = local.tdr_transfer_errors_s3_bucket_name
+  common_tags                 = local.common_tags
+  kms_key_arn                 = module.s3_internal_kms_key.kms_key_arn
+  log_bucket_lifecycle_rules  = local.bucket_logs_lifecycle_rules
+  enable_log_bucket_lifecycle = true
+  enable_request_metrics_all  = local.environment == "prod"
 }
