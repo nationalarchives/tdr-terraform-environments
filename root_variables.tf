@@ -29,3 +29,10 @@ variable "admin_sso_export_access_manually_enabled" {
   type        = bool
   default     = false
 }
+
+variable "bucket_logs_lifecycle_rules" {
+  description = "Lifecycle rules for S3 log buckets"
+  type        = any
+  default     = []
+}
+
