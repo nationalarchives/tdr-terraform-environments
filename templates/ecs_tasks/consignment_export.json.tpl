@@ -43,7 +43,7 @@
         "value": "${download_files_batch_size}"
       },
       {
-        "name": "CONSIGNMENT_ID_TAG"
+        "name": "CONSIGNMENT_ID_TAG",
         "value": "${consignment_id_tag}"
       },
       {
@@ -53,7 +53,7 @@
       {
         "name": "ASSET_SOURCE_TAG",
         "value": "${asset_source_tag}"
-      }
+      },
       {
         "name": "DOWNLOAD_BATCH_DELAY_MS",
         "value": "${download_batch_delay_ms}"
