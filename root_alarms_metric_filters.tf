@@ -2,7 +2,7 @@
 
 locals {
   namespace_name = "Log_Metrics"
-  authentication_alarms_log_groups = local.environment == "dev" ? tomap({
+  authentication_alarms_log_groups = local.environment == "prod" ? tomap({
     transfer-service = "/ecs/transfer-service-${local.environment}"
   frontend = "/ecs/frontend-${local.environment}" }) : tomap({})
 }
