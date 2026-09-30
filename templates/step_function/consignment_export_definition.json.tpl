@@ -146,10 +146,6 @@
                         {
                           "Name": "BLOCK_MOCK_SERIES_INGEST",
                           "Value": "${block_mock_series_ingest}"
-                        },
-                        {
-                          "Name": "BLOCK_ADD_CONTEXT_TAGGING",
-                          "Value": "${block_add_context_tagging}"
                         }
                       ]
                     }
