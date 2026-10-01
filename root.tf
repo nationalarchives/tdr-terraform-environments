@@ -456,7 +456,7 @@ module "signed_cookies_lambda" {
   frontend_url                       = module.frontend.frontend_url
   cloudfront_key_pair_id             = module.global_parameters.signed_cookie["${local.environment}"].signing_key_id
   signing_private_key_ssm_param_name = module.global_parameters.signed_cookie["${local.environment}"].signing_private_key_ssm_param_name
-  timeout_seconds                    = 60
+  timeout_seconds                    = 10
   api_gateway_arn                    = module.signed_cookies_api.api_arn
   kms_key_arn                        = module.encryption_key.kms_key_arn
   private_subnet_ids                 = module.shared_vpc.private_backend_checks_subnets
