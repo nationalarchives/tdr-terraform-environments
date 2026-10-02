@@ -2,9 +2,10 @@
 
 locals {
   namespace_name = "Log_Metrics"
-  authentication_alarms_log_groups = local.environment == "prod" ? tomap({
+  authentication_alarms_log_groups = tomap({
     transfer-service = "/ecs/transfer-service-${local.environment}"
-  frontend = "/ecs/frontend-${local.environment}" }) : tomap({})
+  frontend = "/ecs/frontend-${local.environment}" })
+  authentication_alarms_mute = local.environment == "prod" ? "" : "Muted: "
 }
 
 resource "aws_cloudwatch_log_metric_filter" "consignment_export_success" {
@@ -24,7 +25,7 @@ resource "aws_cloudwatch_log_metric_filter" "consignment_export_success" {
 resource "aws_cloudwatch_metric_alarm" "misconfigured_user_no_transferring_body" {
   for_each          = local.authentication_alarms_log_groups
   alarm_description = "This alarm fires when a TDR user with no transferring body assigned interacts with TDR"
-  alarm_name        = format("${local.namespace_name} Misconfigured User no transferring body %s", each.key)
+  alarm_name        = format("${local.authentication_alarms_mute}${local.namespace_name}/MisconfiguredUser/No Transferring Body - Service=%s Environment=%s", title(each.key), title(local.environment))
 
   metric_query {
     account_id  = data.aws_caller_identity.current.id
@@ -32,7 +33,7 @@ resource "aws_cloudwatch_metric_alarm" "misconfigured_user_no_transferring_body"
     return_data = "true"
 
     metric {
-      metric_name = "misconfigured-user-no-transferring-body-${each.key}"
+      metric_name = "Misconfigured User - no transferring body - ${each.key} - ${title(local.environment)}"
       namespace   = local.namespace_name
       stat        = "Sum"
       period      = 60
@@ -40,8 +41,8 @@ resource "aws_cloudwatch_metric_alarm" "misconfigured_user_no_transferring_body"
   }
   evaluation_periods  = 1
   datapoints_to_alarm = 1
-  threshold           = 1
-  comparison_operator = "GreaterThanOrEqualToThreshold"
+  threshold           = 0
+  comparison_operator = "GreaterThanThreshold"
   treat_missing_data  = "notBreaching"
 
   provider = aws.alarm_deployer
@@ -49,12 +50,12 @@ resource "aws_cloudwatch_metric_alarm" "misconfigured_user_no_transferring_body"
 
 resource "aws_cloudwatch_log_metric_filter" "misconfigured_user_no_transferring_body" {
   for_each       = local.authentication_alarms_log_groups
-  name           = "misconfigured-user-no-transferring-body-${each.key}"
+  name           = "misconfigured-user-no-transferring-body-${local.environment}-${each.key}"
   pattern        = "not assigned to a transferring body"
   log_group_name = each.value
 
   metric_transformation {
-    name      = "Misconfigured User - no transferring body - ${title(local.environment)}"
+    name      = "Misconfigured User - no transferring body - ${each.key} - ${title(local.environment)}"
     namespace = local.namespace_name
     value     = "1"
   }
