@@ -43,6 +43,22 @@
         "value": "${download_files_batch_size}"
       },
       {
+        "name": "CONSIGNMENT_ID_TAG",
+        "value": "${consignment_id_tag}"
+      },
+      {
+        "name": "USER_ID_TAG",
+        "value": "${user_id_tag}"
+      },
+      {
+        "name": "ASSET_SOURCE_TAG",
+        "value": "${asset_source_tag}"
+      },
+      {
+        "name": "BLOCK_ADD_CONTEXT_TAGGING",
+        "value": "${block_add_context_tagging}"
+      },
+      {
         "name": "DOWNLOAD_BATCH_DELAY_MS",
         "value": "${download_batch_delay_ms}"
       }%{ if metadata_version_override != "" },
