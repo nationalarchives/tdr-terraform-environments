@@ -117,6 +117,10 @@
       {
         "name": "OVERRIDE_INCLUDE_TOP_LEVEL_FOLDER",
         "value": "${override_include_top_level_folder}"
+      },
+      {
+        "name": "MAX_CONSIGNMENTS_WITHOUT_SERIES",
+        "value": "${max_consignments_without_series}"
       }
     ],
     "logConfiguration": {
