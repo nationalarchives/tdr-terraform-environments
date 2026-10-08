@@ -119,8 +119,8 @@
         "value": "${override_include_top_level_folder}"
       },
       {
-        "name": "MAX_NUMBER_NO_SERIES_ASSIGNMENT",
-        "value": "${max_number_no_series_assignment}"
+        "name": "MAX_CONSIGNMENTS_WITHOUT_SERIES",
+        "value": "${max_consignments_without_series}"
       }
     ],
     "logConfiguration": {
