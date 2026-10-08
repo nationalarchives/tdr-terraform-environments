@@ -7,6 +7,7 @@ locals {
   alb_function_name                        = local.environment == "staging" ? "transfer-serv" : "transfer-service"
   aggregate_processing_function_name       = "tdr-aggregate-processing-${local.environment}"
   aggregate_processing_lambda_timeout_secs = 900
+  max_number_no_series_assignment          = local.environment == "prod" ? 5 : 500
 
   transfer_service_ecs_task_role_arn = module.transfer_service_task_role[0].role_arn
   tdr_transfer_errors_s3_bucket_name = "tdr-transfer-errors-${local.environment}"
@@ -192,7 +193,8 @@ module "transfer_service_ecs_task" {
       log_body                            = false
       log_headers                         = false
       ignore_site_name_bodies             = local.ignore_site_name_bodies
-      override_include_top_level_folder   = local.override_include_top_level_folder
+      override_include_top_level_folder   = local.override_include_top_level_folder,
+      max_number_no_series_assignment     = local.max_number_no_series_assignment
   })
   container_name               = "transfer-service"
   cpu                          = 512

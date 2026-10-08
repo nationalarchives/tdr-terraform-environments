@@ -117,6 +117,10 @@
       {
         "name": "OVERRIDE_INCLUDE_TOP_LEVEL_FOLDER",
         "value": "${override_include_top_level_folder}"
+      },
+      {
+        "name": "MAX_NUMBER_NO_SERIES_ASSIGNMENT",
+        "value": "${max_number_no_series_assignment}"
       }
     ],
     "logConfiguration": {
