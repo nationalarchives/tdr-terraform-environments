@@ -5,8 +5,8 @@ locals {
   authentication_alarms_log_groups = tomap({
     transfer-service = "/ecs/transfer-service-${local.environment}"
   frontend = "/ecs/frontend-${local.environment}" })
-  default_alarms_mute  = local.environment == "prod" ? "" : "Muted: "
-  default_alarm_prefix = "${local.default_alarms_mute}${local.namespace_name}"
+  alarms_mute_default  = local.environment == "prod" ? "" : "Muted: "
+  alarm_prefix_default = "${local.alarms_mute_default}${local.namespace_name}"
 }
 
 resource "aws_cloudwatch_log_metric_filter" "consignment_export_success" {
@@ -25,7 +25,7 @@ resource "aws_cloudwatch_log_metric_filter" "consignment_export_success" {
 resource "aws_cloudwatch_metric_alarm" "misconfigured_user_no_transferring_body" {
   for_each          = local.authentication_alarms_log_groups
   alarm_description = "This alarm fires when a TDR user with no transferring body assigned interacts with TDR"
-  alarm_name        = format("${local.default_alarm_prefix}/MisconfiguredUser/No Transferring Body - Service=%s Environment=%s", title(each.key), title(local.environment))
+  alarm_name        = format("${local.alarm_prefix_default}/MisconfiguredUser/No Transferring Body - Service=%s Environment=%s", title(each.key), title(local.environment))
 
   metric_query {
     account_id  = data.aws_caller_identity.current.id
@@ -111,7 +111,7 @@ resource "aws_cloudwatch_log_metric_filter" "sharepoint_asset_metadata_processed
 
 resource "aws_cloudwatch_metric_alarm" "max_transfers_without_series" {
   alarm_description = "This alarm fires when a TDR user attempts a transfer initiation but has more than ${local.max_consignments_without_series} consignments without a series"
-  alarm_name        = format("${local.default_alarm_prefix}/TransferService/Maximum Transfers Without Series - Environment=%s", title(local.environment))
+  alarm_name        = format("${local.alarm_prefix_default}/TransferService/Maximum Transfers Without Series - Environment=%s", title(local.environment))
 
   metric_query {
     account_id  = data.aws_caller_identity.current.id
@@ -148,7 +148,7 @@ resource "aws_cloudwatch_log_metric_filter" "max_transfers_without_series" {
 
 resource "aws_cloudwatch_metric_alarm" "upload_state_incorrect" {
   alarm_description = "This alarm fires when a TDR user attempts an upload where the state is incorrect"
-  alarm_name        = format("${local.default_alarm_prefix}/TransferService/Upload State Incorrect - Environment=%s", title(local.environment))
+  alarm_name        = format("${local.alarm_prefix_default}/TransferService/Upload State Incorrect - Environment=%s", title(local.environment))
 
   metric_query {
     account_id  = data.aws_caller_identity.current.id
