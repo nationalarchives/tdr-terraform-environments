@@ -5,7 +5,8 @@ locals {
   authentication_alarms_log_groups = tomap({
     transfer-service = "/ecs/transfer-service-${local.environment}"
   frontend = "/ecs/frontend-${local.environment}" })
-  authentication_alarms_mute = local.environment == "prod" ? "" : "Muted: "
+  alarms_mute_default  = local.environment == "prod" ? "" : "Muted: "
+  alarm_prefix_default = "${local.alarms_mute_default}${local.namespace_name}"
 }
 
 resource "aws_cloudwatch_log_metric_filter" "consignment_export_success" {
@@ -21,11 +22,10 @@ resource "aws_cloudwatch_log_metric_filter" "consignment_export_success" {
   }
 }
 
-
 resource "aws_cloudwatch_metric_alarm" "misconfigured_user_no_transferring_body" {
   for_each          = local.authentication_alarms_log_groups
   alarm_description = "This alarm fires when a TDR user with no transferring body assigned interacts with TDR"
-  alarm_name        = format("${local.authentication_alarms_mute}${local.namespace_name}/MisconfiguredUser/No Transferring Body - Service=%s Environment=%s", title(each.key), title(local.environment))
+  alarm_name        = format("${local.alarm_prefix_default}/MisconfiguredUser/No Transferring Body - Service=%s Environment=%s", title(each.key), title(local.environment))
 
   metric_query {
     account_id  = data.aws_caller_identity.current.id
@@ -104,6 +104,80 @@ resource "aws_cloudwatch_log_metric_filter" "sharepoint_asset_metadata_processed
 
   metric_transformation {
     name      = "SharePoint Asset Metadata Proccessed Failed - ${title(local.environment)}"
+    namespace = local.namespace_name
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "max_transfers_without_series" {
+  alarm_description = "This alarm fires when a TDR user attempts a transfer initiation but has more than ${local.max_consignments_without_series} consignments without a series"
+  alarm_name        = format("${local.alarm_prefix_default}/TransferService/Maximum Transfers Without Series - Environment=%s", title(local.environment))
+
+  metric_query {
+    account_id  = data.aws_caller_identity.current.id
+    id          = "m1"
+    return_data = "true"
+
+    metric {
+      metric_name = "Maximum Transfers Without Series - Transfer Service - ${title(local.environment)}"
+      namespace   = local.namespace_name
+      stat        = "Sum"
+      period      = 60
+    }
+  }
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  threshold           = 0
+  comparison_operator = "GreaterThanThreshold"
+  treat_missing_data  = "notBreaching"
+
+  provider = aws.alarm_deployer
+}
+
+resource "aws_cloudwatch_log_metric_filter" "max_transfers_without_series" {
+  name           = "max-transfers-without-series-${local.environment}"
+  pattern        = local.error_pattern_transfers_without_series
+  log_group_name = "/ecs/transfer-service-${local.environment}"
+
+  metric_transformation {
+    name      = "Maximum Transfers Without Series - Transfer Service - ${title(local.environment)}"
+    namespace = local.namespace_name
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "upload_state_incorrect" {
+  alarm_description = "This alarm fires when a TDR user attempts an upload where the state is incorrect"
+  alarm_name        = format("${local.alarm_prefix_default}/TransferService/Upload State Incorrect - Environment=%s", title(local.environment))
+
+  metric_query {
+    account_id  = data.aws_caller_identity.current.id
+    id          = "m1"
+    return_data = "true"
+
+    metric {
+      metric_name = "Upload State Incorrect - Transfer Service - ${title(local.environment)}"
+      namespace   = local.namespace_name
+      stat        = "Sum"
+      period      = 60
+    }
+  }
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  threshold           = 0
+  comparison_operator = "GreaterThanThreshold"
+  treat_missing_data  = "notBreaching"
+
+  provider = aws.alarm_deployer
+}
+
+resource "aws_cloudwatch_log_metric_filter" "upload_state_incorrect" {
+  name           = "upload-state-incorrect-${local.environment}"
+  pattern        = local.error_pattern_incorrect_upload_state
+  log_group_name = "/ecs/transfer-service-${local.environment}"
+
+  metric_transformation {
+    name      = "Upload State Incorrect - Transfer Service - ${title(local.environment)}"
     namespace = local.namespace_name
     value     = "1"
   }

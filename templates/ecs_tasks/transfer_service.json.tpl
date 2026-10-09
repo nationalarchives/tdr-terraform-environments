@@ -121,6 +121,14 @@
       {
         "name": "MAX_CONSIGNMENTS_WITHOUT_SERIES",
         "value": "${max_consignments_without_series}"
+      },
+      {
+        "name": "ERROR_TRANSFERS_WITHOUT_SERIES",
+        "value": "${error_pattern_transfers_without_series}"
+      },
+      {
+        "name": "ERROR_INCORRECT_UPLOAD_STATE",
+        "value": "${error_pattern_incorrect_upload_state}"
       }
     ],
     "logConfiguration": {
