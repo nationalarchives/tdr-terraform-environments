@@ -182,3 +182,38 @@ resource "aws_cloudwatch_log_metric_filter" "upload_state_incorrect" {
     value     = "1"
   }
 }
+resource "aws_cloudwatch_metric_alarm" "consignment_access_denied" {
+  alarm_description = "This alarm fires when a TDR user attempts an upload where the state is incorrect"
+  alarm_name        = format("${local.alarm_prefix_default}/TransferService/Consignment Access Denied - Environment=%s", title(local.environment))
+
+  metric_query {
+    account_id  = data.aws_caller_identity.current.id
+    id          = "m1"
+    return_data = "true"
+
+    metric {
+      metric_name = "Consignment Access Denied - Transfer Service - ${title(local.environment)}"
+      namespace   = local.namespace_name
+      stat        = "Sum"
+      period      = 60
+    }
+  }
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  threshold           = 0
+  comparison_operator = "GreaterThanThreshold"
+  treat_missing_data  = "notBreaching"
+
+  provider = aws.alarm_deployer
+}
+resource "aws_cloudwatch_log_metric_filter" "consignment_access_denied" {
+  name           = "consignment-access-denied-${local.environment}"
+  pattern        = local.error_pattern_consignment_access_denied
+  log_group_name = "/ecs/transfer-service-${local.environment}"
+
+  metric_transformation {
+    name      = "Consignment Access Denied - Transfer Service - ${title(local.environment)}"
+    namespace = local.namespace_name
+    value     = "1"
+  }
+}
