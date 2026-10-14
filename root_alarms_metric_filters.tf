@@ -183,7 +183,7 @@ resource "aws_cloudwatch_log_metric_filter" "upload_state_incorrect" {
   }
 }
 resource "aws_cloudwatch_metric_alarm" "consignment_access_denied" {
-  alarm_description = "This alarm fires when a TDR user attempts an upload where the state is incorrect"
+  alarm_description = "This alarm fires when a user attempts to load a consignment but is denied access due to permissions"
   alarm_name        = format("${local.alarm_prefix_default}/TransferService/Consignment Access Denied - Environment=%s", title(local.environment))
 
   metric_query {
