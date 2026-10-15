@@ -129,6 +129,10 @@
       {
         "name": "ERROR_INCORRECT_UPLOAD_STATE",
         "value": "${error_pattern_incorrect_upload_state}"
+      },
+      {
+        "name": "ERROR_CONSIGNMENT_ACCESS_DENIED",
+        "value": "${error_pattern_consignment_access_denied}"
       }
     ],
     "logConfiguration": {
