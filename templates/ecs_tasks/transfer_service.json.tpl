@@ -131,7 +131,7 @@
         "value": "${error_pattern_incorrect_upload_state}"
       },
       {
-        "name": "CONSIGNMENT_ACCESS_DENIED"
+        "name": "ERROR_CONSIGNMENT_ACCESS_DENIED",
         "value": "${error_pattern_consignment_access_denied}"
       }
     ],
