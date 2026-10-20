@@ -133,6 +133,14 @@
       {
         "name": "ERROR_CONSIGNMENT_ACCESS_DENIED",
         "value": "${error_pattern_consignment_access_denied}"
+      },
+      {
+        "name": "FEATURE_ACCESS_CONTROL_SHAREPOINT_UPLOAD",
+        "value": "${feature_access_control_sharepoint_upload}"
+      },
+      {
+        "name": "ERROR_SHAREPOINT_UPLOAD_ACCESS_DENIED",
+        "value": "${error_pattern_sharepoint_upload_access_denied}"
       }
     ],
     "logConfiguration": {
