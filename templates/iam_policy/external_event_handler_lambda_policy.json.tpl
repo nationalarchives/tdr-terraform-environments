@@ -42,6 +42,18 @@
          "arn:aws:s3:::${judgment_export_bucket}/*"
        ]
     },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObjectTagging",
+        "s3:PutObjectTagging"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${dirty_bucket}/*",
+        "arn:aws:s3:::${clean_bucket}/*",
+        "arn:aws:s3:::${quarantine_bucket}/*"
+      ]
+    },
      {
           "Effect": "Allow",
           "Action": [
