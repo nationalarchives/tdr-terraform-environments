@@ -7,7 +7,7 @@ locals {
   alb_function_name                        = local.environment == "staging" ? "transfer-serv" : "transfer-service"
   aggregate_processing_function_name       = "tdr-aggregate-processing-${local.environment}"
   aggregate_processing_lambda_timeout_secs = 900
-  max_consignments_without_series          = local.environment == "prod" ? 5 : 500
+  max_consignments_without_series          = local.environment == "prod" || local.environment == "staging" ? 5 : 500
 
   transfer_service_ecs_task_role_arn = module.transfer_service_task_role[0].role_arn
   tdr_transfer_errors_s3_bucket_name = "tdr-transfer-errors-${local.environment}"
@@ -20,13 +20,16 @@ locals {
   block_tdr_custom_tags   = local.is_lower_environment ? false : true
 
   # Feature Access Controls (FAC)
-  feature_access_control_sharepoint_upload = local.environment == "prod" ? true : false
+  feature_access_control_sharepoint_upload = local.environment == "prod" || local.environment == "staging"
 
   # Temporary expedient to handle transferring bodies who do not wish the SharePoint site name to appear as part of the arrangement in the public catalogue
   # Should be removed when proper UI solution implemented
   # Contain list of transferring body codes as a comma separated string, for example: "TDR-BODY1,TDR-BODY2, ... etc ..."
   ignore_site_name_bodies           = ""
   override_include_top_level_folder = true
+
+  # Provide override for capacity testing
+  override_capacity_limit_max_number_records = local.environment == "prod" ? local.capacity_limit_max_number_records : 10000
 
   # Error message patterns
   # Defined here so can be used within ECS task and for metric alarms
@@ -187,7 +190,7 @@ module "transfer_service_ecs_task" {
       auth_url                                      = local.keycloak_auth_url
       consignment_api_url                           = module.consignment_api.api_url
       transfer_service_api_port                     = "8080"
-      max_number_records                            = local.capacity_limit_max_number_records
+      max_number_records                            = local.override_capacity_limit_max_number_records
       max_individual_file_size_mb                   = local.capacity_limit_max_individual_file_size_mb
       max_transfer_size_mb                          = local.capacity_limit_max_transfer_size_mb
       transfer_service_client_secret_path           = local.keycloak_tdr_transfer_service_secret_name
