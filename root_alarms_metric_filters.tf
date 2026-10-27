@@ -217,3 +217,41 @@ resource "aws_cloudwatch_log_metric_filter" "consignment_access_denied" {
     value     = "1"
   }
 }
+resource "aws_cloudwatch_log_metric_filter" "email_limit_exceeded" {
+  count          = contains(["dev", "intg", "staging"], local.environment) ? 1 : 0
+  name           = "email-limit-exceeded-${local.environment}"
+  pattern        = local.error_pattern_email_limit_exceeded
+  log_group_name = "/aws/lambda/tdr-notifications-${local.environment}"
+
+  metric_transformation {
+    name      = "Email Limit Exceeded - Notifications - ${title(local.environment)}"
+    namespace = local.namespace_name
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "email_limit_exceeded" {
+  count             = contains(["dev", "intg", "staging"], local.environment) ? 1 : 0
+  alarm_description = "This alarm fires when GOV.UK Notify has reached the daily email send limit for this environment"
+  alarm_name        = format("${local.alarm_prefix_default}/Notifications/Email Limit Exceeded - Environment=%s", title(local.environment))
+
+  metric_query {
+    account_id  = data.aws_caller_identity.current.id
+    id          = "m1"
+    return_data = "true"
+
+    metric {
+      metric_name = "Email Limit Exceeded - Notifications - ${title(local.environment)}"
+      namespace   = local.namespace_name
+      stat        = "Sum"
+      period      = 86400
+    }
+  }
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  threshold           = 0
+  comparison_operator = "GreaterThanThreshold"
+  treat_missing_data  = "notBreaching"
+
+  provider = aws.alarm_deployer
+}
