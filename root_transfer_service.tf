@@ -37,6 +37,7 @@ locals {
   error_pattern_incorrect_upload_state          = "consignment state incorrect for upload"
   error_pattern_consignment_access_denied       = "does not have access to consignment"
   error_pattern_sharepoint_upload_access_denied = "does not have permission to upload from SharePoint"
+  error_pattern_email_limit_exceeded            = "\"TooManyRequestsError\" \"Exceeded send limits (email\""
 }
 
 module "transfer_service_execution_role" {
