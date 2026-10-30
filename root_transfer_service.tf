@@ -115,24 +115,25 @@ module "transfer_service_route53" {
 }
 
 module "transfer_service_tdr_alb" {
-  count                 = local.transfer_service_count
-  source                = "./tdr-terraform-modules/alb"
-  project               = var.project
-  function              = local.alb_function_name
-  environment           = local.environment
-  alb_log_bucket        = module.alb_logs_s3.s3_bucket_id
-  alb_security_group_id = module.transfer_service_alb_security_group[0].security_group_id
-  alb_target_group_port = 8080
-  alb_target_type       = "ip"
-  certificate_arn       = module.transfer_service_certificate[0].certificate_arn
-  health_check_matcher  = "200,303"
-  health_check_path     = "healthcheck"
-  http_listener         = false
-  public_subnets        = module.shared_vpc.public_subnets
-  vpc_id                = module.shared_vpc.vpc_id
-  common_tags           = local.common_tags
-  own_host_header_only  = true
-  host                  = "transfer-service.${local.environment_domain}"
+  count                     = local.transfer_service_count
+  source                    = "./tdr-terraform-modules/alb"
+  project                   = var.project
+  function                  = local.alb_function_name
+  environment               = local.environment
+  alb_log_bucket            = module.alb_logs_s3.s3_bucket_id
+  alb_security_group_id     = module.transfer_service_alb_security_group[0].security_group_id
+  alb_target_group_port     = 8080
+  alb_target_type           = "ip"
+  alb_target_group_protocol = "HTTPS"
+  certificate_arn           = module.transfer_service_certificate[0].certificate_arn
+  health_check_matcher      = "200,303"
+  health_check_path         = "healthcheck"
+  http_listener             = false
+  public_subnets            = module.shared_vpc.public_subnets
+  vpc_id                    = module.shared_vpc.vpc_id
+  common_tags               = local.common_tags
+  own_host_header_only      = true
+  host                      = "transfer-service.${local.environment_domain}"
 }
 
 module "transfer_service_cloudwatch" {
