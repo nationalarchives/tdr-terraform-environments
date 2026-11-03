@@ -21,6 +21,7 @@ locals {
 
   # Feature Access Controls (FAC)
   feature_access_control_sharepoint_upload = local.environment == "prod" || local.environment == "staging"
+  feature_access_control_transfer_errors   = true
 
   # Temporary expedient to handle transferring bodies who do not wish the SharePoint site name to appear as part of the arrangement in the public catalogue
   # Should be removed when proper UI solution implemented
@@ -30,13 +31,6 @@ locals {
 
   # Provide override for capacity testing
   override_capacity_limit_max_number_records = local.environment == "prod" ? local.capacity_limit_max_number_records : 10000
-
-  # Error message patterns
-  # Defined here so can be used within ECS task and for metric alarms
-  error_pattern_transfers_without_series        = "too many consignments without series assigned"
-  error_pattern_incorrect_upload_state          = "consignment state incorrect for upload"
-  error_pattern_consignment_access_denied       = "does not have access to consignment"
-  error_pattern_sharepoint_upload_access_denied = "does not have permission to upload from SharePoint"
 }
 
 module "transfer_service_execution_role" {
@@ -214,7 +208,8 @@ module "transfer_service_ecs_task" {
       error_pattern_incorrect_upload_state          = local.error_pattern_incorrect_upload_state
       error_pattern_consignment_access_denied       = local.error_pattern_consignment_access_denied
       feature_access_control_sharepoint_upload      = local.feature_access_control_sharepoint_upload
-      error_pattern_sharepoint_upload_access_denied = local.error_pattern_sharepoint_upload_access_denied
+      error_pattern_transfer_function_access_denied = local.error_pattern_transfer_function_access_denied
+      feature_access_control_transfer_errors        = local.feature_access_control_transfer_errors
   })
   container_name               = "transfer-service"
   cpu                          = 512

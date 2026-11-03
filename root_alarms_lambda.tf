@@ -29,16 +29,23 @@ locals {
   intg_lambdas = [
     "tdr-rotate-keycloak-secrets-intg"
   ]
+  dev_lambdas = []
   mgmt_lambdas = [
     "tdr-notifications-mgmt",
     "tdr-ecr-scan-mgmt"
   ]
 
-  non_prod_lambdas = local.environment == "staging" ? toset(concat(local.staging_lambdas)) : toset(concat(local.intg_lambdas))
+  env_lambdas = {
+    prod    = local.prod_lambdas
+    staging = local.staging_lambdas
+    intg    = local.intg_lambdas
+    dev     = local.dev_lambdas
+    mgmt    = local.mgmt_lambdas
+  }
 }
 
 resource "aws_cloudwatch_metric_alarm" "tdr_alarms_lambda_failure" {
-  for_each          = local.environment == "prod" ? toset(concat(local.prod_lambdas, local.mgmt_lambdas)) : local.non_prod_lambdas
+  for_each          = local.environment == "prod" ? toset(concat(local.prod_lambdas, local.mgmt_lambdas)) : toset([for k, v in local.env_lambdas[local.environment] : v])
   alarm_description = "This alarm fires when a lambda fails"
   alarm_name        = format("AWS/Lambda Error on %s", each.key)
 
@@ -67,7 +74,7 @@ resource "aws_cloudwatch_metric_alarm" "tdr_alarms_lambda_failure" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "tdr_alarms_lambda_throttles" {
-  for_each          = local.environment == "prod" ? toset(local.prod_lambdas) : local.non_prod_lambdas
+  for_each          = toset([for k, v in local.env_lambdas[local.environment] : v])
   alarm_description = "This alarm detects a high number of throttled invocation requests. Throttling occurs when there is no concurrency available for scale up"
   alarm_name        = format("AWS/Lambda Throttles on %s", each.key)
 
