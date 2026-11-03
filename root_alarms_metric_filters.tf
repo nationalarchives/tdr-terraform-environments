@@ -254,7 +254,7 @@ resource "aws_cloudwatch_metric_alarm" "transfer_function_access_denied" {
 }
 
 resource "aws_cloudwatch_log_metric_filter" "transfer_function_access_denied" {
-  name           = "consignment-access-denied-${local.environment}"
+  name           = "transfer-function-access-denied-${local.environment}"
   pattern        = local.error_pattern_transfer_function_access_denied
   log_group_name = "/ecs/transfer-service-${local.environment}"
 

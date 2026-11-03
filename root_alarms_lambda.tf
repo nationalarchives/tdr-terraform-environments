@@ -40,7 +40,6 @@ locals {
     staging = local.staging_lambdas
     intg    = local.intg_lambdas
     dev     = local.dev_lambdas
-    mgmt    = local.mgmt_lambdas
   }
 }
 
