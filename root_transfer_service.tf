@@ -7,7 +7,7 @@ locals {
   alb_function_name                        = local.environment == "staging" ? "transfer-serv" : "transfer-service"
   aggregate_processing_function_name       = "tdr-aggregate-processing-${local.environment}"
   aggregate_processing_lambda_timeout_secs = 900
-  max_consignments_without_series          = local.environment == "prod" || local.environment == "staging" ? 5 : 500
+  max_consignments_without_series          = local.environment == "prod" ? 5 : 500
 
   transfer_service_ecs_task_role_arn = module.transfer_service_task_role[0].role_arn
   tdr_transfer_errors_s3_bucket_name = "tdr-transfer-errors-${local.environment}"
@@ -20,7 +20,7 @@ locals {
   block_tdr_custom_tags   = local.is_lower_environment ? false : true
 
   # Feature Access Controls (FAC)
-  feature_access_control_sharepoint_upload = local.environment == "prod" || local.environment == "staging"
+  feature_access_control_sharepoint_upload = local.environment == "prod"
   feature_access_control_transfer_errors   = true
 
   # Temporary expedient to handle transferring bodies who do not wish the SharePoint site name to appear as part of the arrangement in the public catalogue
