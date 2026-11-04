@@ -159,7 +159,7 @@ locals {
   block_shared_keycloak_pages      = local.environment == "intg" ? false : true
   block_skip_metadata_review       = false
   block_file_checks_failure_v2     = false
-  block_connector_sharepoint_pages = local.environment == "prod" ? true : false
+  block_connector_sharepoint_pages = false
   block_add_context_tagging        = local.environment == "prod" ? true : false
 
   disable_users_dry_run          = false
