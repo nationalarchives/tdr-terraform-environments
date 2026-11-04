@@ -34,6 +34,7 @@ jobs:
       allow-admin-access-internal: ${{ inputs.allow_admin_access_to_internal_kms_key }}
       allow-admin-access-export: ${{ inputs.allow_admin_access_to_export_kms_key }}
       target-kms-keys: true
+      update-tag: false
     secrets:
       MANAGEMENT_ACCOUNT: ${{ secrets.MANAGEMENT_ACCOUNT }}
       WORKFLOW_PAT: ${{ secrets.WORKFLOW_PAT }}
@@ -64,10 +65,10 @@ jobs:
           else
             KEYS="none (access revoked)"
           fi
-          echo ":siren: MESSAGE=${TICKET}: ${ACTOR} has granted KMS access to the ${KEYS} key. Reason: ${REASON}" >> "$GITHUB_ENV"
+          echo "MESSAGE=:siren: ${TICKET}: ${ACTOR} has granted KMS access to the ${KEYS} key. Reason: ${REASON}" >> "$GITHUB_ENV"
       - name: Send usage message
         if: always()
-        uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@f318ce8a5d99c08b1235663f97fdb1b35844674e # v0.0.39
+        uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@68960904fc1b628f92756d3f760e7ab64cfe95f2 # v0.0.44
         with:
           message: ${{ env.MESSAGE }}
           slack-url: ${{ secrets.SLACK_WEBHOOK }}
