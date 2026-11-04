@@ -42,14 +42,14 @@ module "shared_vpc" {
 }
 
 module "database_migrations" {
-  source          = "./modules/database-migrations"
+  source               = "./modules/database-migrations"
   lambda_java_runtimes = module.global_parameters.lambda_java_runtimes
-  environment     = local.environment
-  vpc_id          = module.shared_vpc.vpc_id
-  private_subnets = module.shared_vpc.private_backend_checks_subnets
-  common_tags     = local.common_tags
-  db_url          = module.consignment_api_database.database_url
-  db_instance_id  = module.consignment_api_database.resource_id
+  environment          = local.environment
+  vpc_id               = module.shared_vpc.vpc_id
+  private_subnets      = module.shared_vpc.private_backend_checks_subnets
+  common_tags          = local.common_tags
+  db_url               = module.consignment_api_database.database_url
+  db_instance_id       = module.consignment_api_database.resource_id
 }
 
 module "consignment_api" {
