@@ -75,6 +75,7 @@ module "external_event_handler_lambda" {
     CONSIGNMENT_ID_TAG               = "ConsignmentId",
     USER_ID_TAG                      = "UserId",
     ASSET_SOURCE_TAG                 = "AssetSource",
+    UPLOAD_MATCH_ID_TAG              = "UploadMatchId",
     API_URL                          = "${module.consignment_api.api_url}/graphql",
     AUTH_URL                         = local.keycloak_auth_url
     CLIENT_ID                        = local.keycloak_backend-checks_client_id
