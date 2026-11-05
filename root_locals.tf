@@ -157,7 +157,7 @@ locals {
 
   //feature access blocks
   block_shared_keycloak_pages      = local.environment == "intg" ? false : true
-  block_skip_metadata_review       = false
+  block_skip_metadata_review       = local.environment == "prod" ? true : false
   block_file_checks_failure_v2     = false
   block_connector_sharepoint_pages = local.environment == "prod" ? true : false
   block_add_context_tagging        = local.environment == "prod" ? true : false
