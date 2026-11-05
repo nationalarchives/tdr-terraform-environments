@@ -139,8 +139,12 @@
         "value": "${feature_access_control_sharepoint_upload}"
       },
       {
-        "name": "ERROR_SHAREPOINT_UPLOAD_ACCESS_DENIED",
-        "value": "${error_pattern_sharepoint_upload_access_denied}"
+        "name": "FEATURE_ACCESS_CONTROL_TRANSFER_ERRORS",
+        "value": "${feature_access_control_transfer_errors}"
+      },
+      {
+        "name": "ERROR_TRANSFER_FUNCTION_ACCESS_DENIED",
+        "value": "${error_pattern_transfer_function_access_denied}"
       }
     ],
     "logConfiguration": {
