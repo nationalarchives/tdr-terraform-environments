@@ -90,6 +90,10 @@ module "consignment_export_ecs_task" {
       download_files_batch_size  = 40
       download_batch_delay_ms    = 10
       metadata_version_override  = local.metadata_version_override
+      consignment_id_tag         = "ConsignmentId"
+      user_id_tag                = "UserId"
+      asset_source_tag           = "AssetSource"
+      block_add_context_tagging  = local.block_add_context_tagging
   })
   container_name   = "consignmentexport"
   cpu              = local.environment == "intg" ? 1024 : 2048

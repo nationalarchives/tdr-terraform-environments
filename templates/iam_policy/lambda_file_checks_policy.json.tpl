@@ -25,6 +25,7 @@
       "Effect": "Allow",
       "Action": [
         "s3:GetObject",
+        "s3:GetObjectVersion",
         "s3:GetObjectTagging",
         "s3:ListBucket"
       ],
@@ -33,6 +34,17 @@
         "arn:aws:s3:::${dirty_bucket}/*",
         "arn:aws:s3:::${draft_metadata_bucket}",
         "arn:aws:s3:::${draft_metadata_bucket}/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3files:ClientMount",
+        "s3files:ClientWrite"
+      ],
+      "Resource": [
+        "${s3_file_system_arn}",
+        "${s3_file_system_arn}/access-point/*"
       ]
     },
     {

@@ -95,10 +95,11 @@ locals {
   keycloak_rotate_secrets_client_secret_name     = "/${local.environment}/keycloak/rotate_secrets_client/secret"
   keycloak_db_url                                = "/${local.environment}/keycloak/instance/url"
 
-  slack_bot_token_name           = "/${local.environment}/slack/bot"
-  slack_bau_webhook              = "/${local.environment}/slack/bau/webhook"
-  slack_transfers_webhook        = "/${local.environment}/slack/transfers/webhook"
-  tdr_reporting_slack_channel_id = "/${local.environment}/slack/tdr_reporting/channel_id"
+  slack_bot_token_name             = "/${local.environment}/slack/bot"
+  slack_bau_webhook                = "/${local.environment}/slack/bau/webhook"
+  slack_transfers_webhook          = "/${local.environment}/slack/transfers/webhook"
+  slack_admin_action_alert_webhook = "/${local.environment}/slack/admin_action_alert/webhook"
+  tdr_reporting_slack_channel_id   = "/${local.environment}/slack/tdr_reporting/channel_id"
 
   keycloak_reporting_client_id      = "tdr-reporting"
   keycloak_backend-checks_client_id = "tdr-backend-checks"
@@ -116,6 +117,7 @@ locals {
   statuses_function_name                = "${var.project}-statuses-${local.environment}"
   inactive_keycloak_users_function_name = "${var.project}-inactive-keycloak-users-${local.environment}"
   file_checks_function_name             = "${var.project}-file-checks-${local.environment}"
+  file_checks_lambda_role_arn           = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.file_checks_function_name}-role"
 
   runtime_python_3_13 = "python3.13"
   runtime_java_11     = "java11"
@@ -154,9 +156,11 @@ locals {
   da_reference_generator_limit = module.tdr_configuration.terraform_config["reference_generator_limit"]
 
   //feature access blocks
-  block_shared_keycloak_pages  = local.environment == "intg" ? false : true
-  block_skip_metadata_review   = false
-  block_file_checks_failure_v2 = local.environment == "prod" ? true : false
+  block_shared_keycloak_pages      = local.environment == "intg" ? false : true
+  block_skip_metadata_review       = false
+  block_file_checks_failure_v2     = false
+  block_connector_sharepoint_pages = local.environment == "prod" ? true : false
+  block_add_context_tagging        = local.environment == "prod" ? true : false
 
   disable_users_dry_run          = false
   draft_metadata_s3_bucket_name  = "${var.project}-draft-metadata-${local.environment}"

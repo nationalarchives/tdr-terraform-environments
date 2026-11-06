@@ -189,6 +189,22 @@ resource "aws_vpc_endpoint_policy" "vpc_endpoints_ecr_policy" {
   vpc_endpoint_id = each.value.id
   policy = templatefile("./templates/endpoint_policies/ecr_same_org.tpl",
     {
-      organisation_id = data.aws_organizations_organization.tna.id
+      organisation_id       = data.aws_organizations_organization.tna.id
+      aws_guardduty_ecr_arn = var.aws_guardduty_ecr_arn
   })
+}
+
+resource "aws_vpc_endpoint" "vpc_endpoints_api_gateway" {
+  vpc_id              = aws_vpc.main.id
+  service_name        = "com.amazonaws.eu-west-2.execute-api"
+  security_group_ids  = [aws_security_group.endpoint_security_group.id]
+  subnet_ids          = aws_subnet.private_backend_checks.*.id
+  private_dns_enabled = false
+  vpc_endpoint_type   = "Interface"
+  tags = merge(
+    var.common_tags,
+    tomap(
+      { "Name" = "com.amazonaws.eu-west-2.execute-api" }
+    )
+  )
 }

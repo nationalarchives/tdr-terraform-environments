@@ -38,6 +38,7 @@ module "shared_vpc" {
   common_tags                 = local.common_tags
   environment                 = local.environment
   database_availability_zones = local.database_availability_zones
+  aws_guardduty_ecr_arn       = local.aws_guardduty_ecr_arn
 }
 
 module "database_migrations" {
@@ -97,14 +98,15 @@ module "frontend" {
   auth_url                         = local.keycloak_auth_url
   client_secret_path               = module.keycloak_ssm_parameters.params[local.keycloak_tdr_client_secret_name].name
   read_client_secret_path          = module.keycloak_ssm_parameters.params[local.keycloak_tdr_read_client_secret_name].name
-  export_api_url                   = module.export_api.api_url
-  backend_checks_api_url           = module.backend_checks_api.api_url
+  backend_checks_state_machine_arn = module.backend_checks_v2_step_function.state_machine_arn
+  draft_metadata_state_machine_arn = module.draft_metadata_checks.step_function_arn
+  export_state_machine_arn         = module.export_step_function.state_machine_arn
   alb_id                           = module.frontend_alb.alb_id
   public_subnet_ranges             = module.shared_vpc.public_subnet_ranges
   otel_service_name                = "frontend-${local.environment}"
   block_skip_metadata_review       = local.block_skip_metadata_review
   block_file_checks_failure_v2     = local.block_file_checks_failure_v2
-  draft_metadata_validator_api_url = module.draft_metadata_api_gateway.api_url
+  block_connector_sharepoint_pages = local.block_connector_sharepoint_pages
   internal_s3_kms_keys             = jsonencode([module.s3_internal_kms_key.kms_key_arn])
   draft_metadata_s3_bucket_name    = local.draft_metadata_s3_bucket_name
   transfer_errors_s3_bucket_name   = local.transfer_errors_s3_bucket_name
@@ -126,12 +128,13 @@ module "frontend" {
 }
 
 module "alb_logs_s3" {
-  source        = "./tdr-terraform-modules/s3"
-  project       = var.project
-  function      = "alb-logs"
-  access_logs   = false
-  bucket_policy = "alb_logging_euwest2"
-  common_tags   = local.common_tags
+  source          = "./tdr-terraform-modules/s3"
+  project         = var.project
+  function        = "alb-logs"
+  access_logs     = false
+  bucket_policy   = "alb_logging_euwest2"
+  common_tags     = local.common_tags
+  lifecycle_rules = local.cloudfront_logs_lifesycle_rules
 }
 
 module "upload_bucket" {
@@ -142,6 +145,7 @@ module "upload_bucket" {
   kms_key_id                 = local.internal_s3_encryption_key_arn
   common_tags                = local.common_tags
   lifecycle_rules            = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
   aws_backup_local_role_arn  = local.aws_back_up_local_role
   s3_bucket_additional_tags  = local.aws_back_up_tags
   enable_request_metrics_all = local.environment == "prod"
@@ -155,6 +159,7 @@ module "upload_bucket_quarantine" {
   kms_key_id                 = local.internal_s3_encryption_key_arn
   common_tags                = local.common_tags
   lifecycle_rules            = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
   aws_backup_local_role_arn  = local.aws_back_up_local_role
   s3_bucket_additional_tags  = local.aws_back_up_tags
   enable_request_metrics_all = true
@@ -212,6 +217,7 @@ module "upload_file_cloudfront_dirty_s3" {
   abort_incomplete_uploads      = true
   cloudfront_distribution_arns  = [module.cloudfront_upload.cloudfront_arn]
   lifecycle_rules               = local.dirty_bucket_lifecycle_rules
+  log_bucket_lifecycle_rules    = local.bucket_logs_lifecycle_rules
   aws_backup_local_role_arn     = local.aws_back_up_local_role
   s3_bucket_additional_tags     = local.aws_back_up_tags
   bucket_owner_object_ownership = true
@@ -226,6 +232,7 @@ module "upload_file_cloudfront_logs" {
   bucket_policy                = "upload_cloudfront_logs"
   aws_logs_delivery_account_id = local.aws_logs_delivery_account_id
   access_logs                  = false
+  lifecycle_rules              = local.bucket_logs_lifecycle_rules
 }
 
 module "cloudfront_upload" {
@@ -237,6 +244,7 @@ module "cloudfront_upload" {
   certificate_arn                     = module.cloudfront_certificate.certificate_arn
   api_gateway_url                     = module.signed_cookies_api.api_url
   waf_arn                             = local.environment == "intg" || local.environment == "dev" ? module.cloudfront_waf_non_prod[0].aws_wafv2_web_acl.arn : module.cloudfront_waf_prod[0].aws_wafv2_web_acl.arn
+  trusted_public_key_file_names       = module.global_parameters.signed_cookie["${local.environment}"].trusted_public_key_file_names
 }
 
 module "cloudfront_upload_dns" {
@@ -385,11 +393,12 @@ module "waf_prod" {
 }
 
 module "backend_lambda_function_bucket" {
-  source          = "./tdr-terraform-modules/s3"
-  common_tags     = local.common_tags
-  function        = "backend-checks"
-  project         = var.project
-  lifecycle_rules = local.backend_checks_results_bucket_lifecycle_rules
+  source                     = "./tdr-terraform-modules/s3"
+  common_tags                = local.common_tags
+  function                   = "backend-checks"
+  project                    = var.project
+  lifecycle_rules            = local.backend_checks_results_bucket_lifecycle_rules
+  log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
 }
 
 module "create_db_users_lambda" {
@@ -423,37 +432,6 @@ module "api_gateway_account" {
   environment = local.environment
 }
 
-module "export_api_policy" {
-  source        = "./tdr-terraform-modules/iam_policy"
-  name          = "TDRExportAPIPolicy${title(local.environment)}"
-  policy_string = templatefile("./templates/iam_policy/api_gateway_state_machine_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, state_machine_arn = module.export_step_function.state_machine_arn })
-}
-
-module "export_api_role" {
-  source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./templates/iam_policy/api_gateway_assume_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.id })
-  common_tags        = local.common_tags
-  name               = "TDRExportAPIRole${title(local.environment)}"
-  policy_attachments = {
-    export_policy = module.export_api_policy.policy_arn
-  }
-}
-
-module "export_api" {
-  source      = "./tdr-terraform-modules/apigateway"
-  api_name    = "ExportAPI"
-  environment = local.environment
-  common_tags = local.common_tags
-  api_definition = templatefile("./templates/api_gateway/export_api.json.tpl", {
-    environment       = local.environment,
-    title             = "Export API",
-    role_arn          = module.export_api_role.role.arn,
-    region            = local.region
-    state_machine_arn = module.export_step_function.state_machine_arn
-    lambda_arn        = module.export_authoriser_lambda.export_api_authoriser_arn
-  })
-}
-
 module "signed_cookies_api" {
   source   = "./tdr-terraform-modules/apigateway"
   api_name = "SignedCookiesAPI"
@@ -468,39 +446,24 @@ module "signed_cookies_api" {
   common_tags = local.common_tags
 }
 
-module "export_authoriser_lambda" {
-  source                           = "./tdr-terraform-modules/lambda"
-  common_tags                      = local.common_tags
-  project                          = "tdr"
-  lambda_export_authoriser         = true
-  timeout_seconds                  = 10
-  api_url                          = module.consignment_api.api_url
-  api_gateway_arn                  = module.export_api.api_arn
-  backend_checks_api_arn           = module.backend_checks_api.api_arn
-  draft_metadata_api_arn           = module.draft_metadata_api_gateway.api_execution_arn
-  kms_key_arn                      = module.encryption_key.kms_key_arn
-  private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
-  vpc_id                           = module.shared_vpc.vpc_id
-  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
-}
-
 module "signed_cookies_lambda" {
-  source                           = "./tdr-terraform-modules/lambda"
-  common_tags                      = local.common_tags
-  project                          = "tdr"
-  lambda_signed_cookies            = true
-  upload_domain                    = local.upload_domain
-  auth_url                         = local.keycloak_auth_url
-  frontend_url                     = module.frontend.frontend_url
-  cloudfront_key_pair_id           = module.cloudfront_upload.cloudfront_key_pair_id
-  timeout_seconds                  = 60
-  api_gateway_arn                  = module.signed_cookies_api.api_arn
-  kms_key_arn                      = module.encryption_key.kms_key_arn
-  private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
-  vpc_id                           = module.shared_vpc.vpc_id
-  environment_full                 = local.environment_full_name
-  user_session_timeout_mins        = local.user_session_timeout_mins
-  cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
+  source                             = "./tdr-terraform-modules/lambda"
+  common_tags                        = local.common_tags
+  project                            = "tdr"
+  lambda_signed_cookies              = true
+  upload_domain                      = local.upload_domain
+  auth_url                           = local.keycloak_auth_url
+  frontend_url                       = module.frontend.frontend_url
+  cloudfront_key_pair_id             = module.global_parameters.signed_cookie["${local.environment}"].signing_key_id
+  signing_private_key_ssm_param_name = module.global_parameters.signed_cookie["${local.environment}"].signing_private_key_ssm_param_name
+  timeout_seconds                    = 10
+  api_gateway_arn                    = module.signed_cookies_api.api_arn
+  kms_key_arn                        = module.encryption_key.kms_key_arn
+  private_subnet_ids                 = module.shared_vpc.private_backend_checks_subnets
+  vpc_id                             = module.shared_vpc.vpc_id
+  environment_full                   = local.environment_full_name
+  user_session_timeout_mins          = local.user_session_timeout_mins
+  cloudwatch_log_retention_in_days   = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
 module "export_status_update_lambda" {
@@ -531,7 +494,7 @@ module "reporting_lambda" {
   reporting_client_secret_path     = local.keycloak_reporting_client_secret_name
   slack_bot_token                  = module.keycloak_ssm_parameters.params[local.slack_bot_token_name].value
   tdr_reporting_slack_channel_id   = module.reporting_lambda_ssm_parameters.params[local.tdr_reporting_slack_channel_id].value
-  timeout_seconds                  = 120
+  timeout_seconds                  = 180
   kms_key_arn                      = module.encryption_key.kms_key_arn
   private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
   vpc_id                           = module.shared_vpc.vpc_id
@@ -696,6 +659,7 @@ module "export_bucket" {
   s3_bucket_additional_tags  = local.aws_back_up_tags
   aws_backup_local_role_arn  = local.aws_back_up_local_role
   lifecycle_rules            = local.environment == "prod" ? [] : local.non_prod_default_bucket_lifecycle_rules
+  log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
   enable_request_metrics_all = local.environment == "prod"
 }
 
@@ -792,14 +756,14 @@ module "athena" {
   bucket      = module.athena_s3.s3_bucket_id
   environment = local.environment
   queries = [
-    "create_table_keycloak_alb_logs",
-    "create_table_frontend_alb_logs",
+    "create_table_transfer_service_alb_logs",
     "create_table_consignmentapi_alb_logs",
+    "create_table_frontend_alb_logs",
+    "create_table_keycloak_alb_logs",
     "create_table_tdr_cloudtrail_logs",
     "create_table_tdr_s3_upload_logs",
     "tdr_alb_client_ip_count",
     "tdr_alb_error_counts",
-    "tdr_cloudtrail_action_for_iam_user",
     "tdr_cloudtrail_action_for_principal",
     "tdr_cloudtrail_action_for_role_name",
     "tdr_cloudtrail_action_on_date",
@@ -808,7 +772,12 @@ module "athena" {
     "tdr_cloudtrail_user_for_access_key",
     "tdr_s3_deleted_objects",
     "tdr_s3_object_operations",
-    "tdr_s3_request_errors"
+    "tdr_s3_request_errors",
+    "create_view_consignmentapi_alb_4xx_errors_today_by_ip",
+    "create_view_frontend_alb_4xx_errors_today_by_ip",
+    "create_view_transfer_service_alb_4xx_errors_today_by_ip",
+    "create_view_keycloak_alb_4xx_errors_today_by_ip",
+    "create_view_frontend_consignment_errors_today"
   ]
 }
 
@@ -822,7 +791,7 @@ module "create_keycloak_users_api_lambda" {
   vpc_id                           = module.shared_vpc.vpc_id
   lambda_create_keycloak_user_api  = true
   private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
-  keycloak_user_management_api_arn = module.create_keycloak_users_api.api_arn
+  keycloak_user_management_api_arn = one(module.create_keycloak_users_api[*].api_arn)
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 }
 
@@ -893,6 +862,7 @@ module "disable_inactive_judgment_users_scheduled_event" {
 }
 
 module "create_keycloak_users_api" {
+  count                            = local.environment != "prod" ? 1 : 0
   source                           = "./tdr-terraform-modules/apigatewayv2"
   body_template                    = templatefile("${path.module}/templates/api_gateway/create_keycloak_users.json.tpl", { region = local.region, lambda_arn = module.create_keycloak_users_api_lambda.create_keycloak_users_api_lambda_arn, auth_url = local.keycloak_auth_url })
   environment                      = local.environment
@@ -901,13 +871,21 @@ module "create_keycloak_users_api" {
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].api_gateway
 }
 
+# TDRD-1710
+moved {
+  from = module.create_keycloak_users_api
+  to   = module.create_keycloak_users_api[0]
+}
+
+
 module "create_bulk_users_bucket" {
-  source              = "./tdr-terraform-modules/s3"
-  common_tags         = local.common_tags
-  function            = "create-bulk-keycloak-users"
-  project             = var.project
-  lambda_notification = true
-  lambda_arn          = module.create_keycloak_users_s3_lambda.create_keycloak_users_s3_lambda_arn
+  source                     = "./tdr-terraform-modules/s3"
+  common_tags                = local.common_tags
+  function                   = "create-bulk-keycloak-users"
+  project                    = var.project
+  lambda_notification        = true
+  lambda_arn                 = module.create_keycloak_users_s3_lambda.create_keycloak_users_s3_lambda_arn
+  log_bucket_lifecycle_rules = local.bucket_logs_lifecycle_rules
 }
 
 module "rotate_keycloak_secrets_lambda" {
@@ -997,7 +975,7 @@ module "consignment_api_database" {
   availability_zone       = local.environment == "prod" ? local.database_availability_zone : "eu-west-2b"
   common_tags             = local.common_tags
   database_name           = "consignmentapi"
-  database_version        = "17.9"
+  database_version        = local.environment == "prod" ? "17.9" : "17.10"
   environment             = local.environment
   kms_key_id              = module.encryption_key.kms_key_arn
   private_subnets         = module.shared_vpc.private_backend_checks_subnets
@@ -1031,6 +1009,19 @@ module "ecs_task_stopped_event" {
   }
   rule_name        = "ecs-task-state-stopped"
   rule_description = "Log to cloudwatch when ECS task state is STOPPED"
+}
+
+module "frontend_ecs_task_stopped_event" {
+  source = "./da-terraform-modules/cloudwatch_events"
+  event_pattern = templatefile("${path.module}/templates/cloudwatch_events/ecs_task_stopped_event.json.tpl", {
+    cluster_arn = module.frontend.ecs_cluster_arn
+    anythingBut = local.environment == "prod" ? "0" : "0,143"
+  })
+  event_target_arns = {
+    "sns_target" = module.notifications_topic.sns_arn
+  }
+  rule_name        = "frontend-ecs-task-stopped-${local.environment}"
+  rule_description = "Notify Slack when a frontend ECS task stops"
 }
 
 # Route53 Resolver logging for the VPC - TDRD-1090

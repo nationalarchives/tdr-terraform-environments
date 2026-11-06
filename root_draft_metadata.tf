@@ -19,14 +19,14 @@ module "draft_metadata_persistence_lambda" {
       kms_key_arn    = module.s3_internal_kms_key.kms_key_arn
     })
   }
-  plaintext_env_vars = {
+  plaintext_env_vars = merge({
     API_URL                      = "${module.consignment_api.api_url}/graphql"
     AUTH_URL                     = local.keycloak_auth_url
     CLIENT_SECRET_PATH           = local.keycloak_tdr_draft_metadata_client_secret_name
     BUCKET_NAME                  = local.draft_metadata_s3_bucket_name
     BATCH_SIZE_FOR_METADATA      = 400
     MAX_CONCURRENCY_FOR_METADATA = 10
-  }
+  }, local.metadata_version_override != "" ? { METADATA_VERSION_OVERRIDE = local.metadata_version_override } : {})
 }
 
 module "draft_metadata_checks_lambda" {
@@ -57,53 +57,13 @@ module "draft_metadata_checks_lambda" {
   )
 }
 
-module "draft_metadata_api_gateway" {
-  source = "./da-terraform-modules/apigateway"
-  api_definition = templatefile("./templates/api_gateway/draft_metadata.json.tpl", {
-    environment           = local.environment
-    title                 = "Draft Metadata"
-    state_machine_arn     = module.draft_metadata_checks.step_function_arn
-    execution_role_arn    = aws_iam_role.draft_metadata_api_gateway_execution_role.arn
-    region                = local.region
-    authoriser_lambda_arn = module.export_authoriser_lambda.export_api_authoriser_arn
-  })
-  api_name    = "DraftMetadata"
-  environment = local.environment
-  common_tags = local.common_tags
-  api_method_settings = [{
-    method_path        = "*/*"
-    logging_level      = "INFO",
-    metrics_enabled    = false,
-    data_trace_enabled = false
-  }]
-}
-
-resource "aws_iam_role" "draft_metadata_api_gateway_execution_role" {
-  name               = "TDRMetadataChecksAPIGatewayExecutionRole${title(local.environment)}"
-  assume_role_policy = templatefile("./templates/iam_policy/api_gateway_assume_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.id })
-}
-
-resource "aws_iam_policy" "api_gateway_execution_policy" {
-  name = "TDRMetadataChecksAPIGatewayStepFunctionExecutionPolicy${title(local.environment)}"
-  policy = templatefile(
-    "./templates/iam_policy/api_gateway_state_machine_policy.json.tpl",
-    {
-      account_id        = data.aws_caller_identity.current.account_id,
-      state_machine_arn = module.draft_metadata_checks.step_function_arn
-    }
-  )
-}
-
-resource "aws_iam_role_policy_attachment" "api_gateway_execution_policy" {
-  role       = aws_iam_role.draft_metadata_api_gateway_execution_role.name
-  policy_arn = aws_iam_policy.api_gateway_execution_policy.arn
-}
-
 module "draft_metadata_bucket" {
-  source      = "./da-terraform-modules/s3"
-  bucket_name = local.draft_metadata_s3_bucket_name
-  common_tags = local.common_tags
-  kms_key_arn = module.s3_internal_kms_key.kms_key_arn
+  source                      = "./da-terraform-modules/s3"
+  bucket_name                 = local.draft_metadata_s3_bucket_name
+  common_tags                 = local.common_tags
+  kms_key_arn                 = module.s3_internal_kms_key.kms_key_arn
+  log_bucket_lifecycle_rules  = local.bucket_logs_lifecycle_rules
+  enable_log_bucket_lifecycle = true
 }
 
 data "aws_ssm_parameter" "draft_metadata_keycloak_secret" {

@@ -1,35 +1,3 @@
-module "backend_checks_api_policy" {
-  source        = "./tdr-terraform-modules/iam_policy"
-  name          = "TDRBackendChecksAPIPolicy${title(local.environment)}"
-  policy_string = templatefile("./templates/iam_policy/api_gateway_state_machine_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id, state_machine_arn = module.backend_checks_v2_step_function.state_machine_arn })
-}
-
-module "backend_checks_api_role" {
-  source             = "./tdr-terraform-modules/iam_role"
-  assume_role_policy = templatefile("./templates/iam_policy/api_gateway_assume_role_policy.json.tpl", { account_id = data.aws_caller_identity.current.id })
-  common_tags        = local.common_tags
-  name               = "TDRBackendChecksAPIRole${title(local.environment)}"
-  policy_attachments = {
-    AmazonAPIGatewayPushToCloudWatchLogs = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
-    AWSStepFunctionsFullAccess           = "arn:aws:iam::aws:policy/AWSStepFunctionsFullAccess"
-  }
-}
-
-module "backend_checks_api" {
-  source = "./tdr-terraform-modules/apigateway"
-  api_definition = templatefile("./templates/api_gateway/backend_checks.json.tpl", {
-    environment       = local.environment
-    title             = "Backend Checks API"
-    role_arn          = module.backend_checks_api_role.role.arn
-    region            = local.region
-    lambda_arn        = module.export_authoriser_lambda.export_api_authoriser_arn
-    state_machine_arn = module.backend_checks_v2_step_function.state_machine_arn
-  })
-  api_name    = "BackendChecks"
-  common_tags = local.common_tags
-  environment = local.environment
-}
-
 module "outbound_only_security_group" {
   source      = "./tdr-terraform-modules/security_group"
   description = "Outbound access on 443 only"
@@ -222,7 +190,7 @@ module "file_checks" {
   reserved_concurrency = -1
   timeout_seconds      = 900
   storage_size         = 2560
-  memory_size          = 2560
+  memory_size          = 3008
   policies = {
     "TDRFileChecksLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/lambda_file_checks_policy.json.tpl", {
       function_name         = local.file_checks_function_name,
@@ -231,15 +199,187 @@ module "file_checks" {
       upload_bucket         = module.upload_bucket.s3_bucket_name
       quarantine_bucket     = module.upload_bucket_quarantine.s3_bucket_name
       draft_metadata_bucket = local.draft_metadata_s3_bucket_name
+      s3_file_system_arn    = aws_s3files_file_system.file_checks_s3_files.arn
       decryption_keys       = jsonencode([module.s3_upload_kms_key.kms_key_arn])
       encryption_keys       = jsonencode([module.s3_internal_kms_key.kms_key_arn])
     })
   }
   runtime = local.runtime_java_21
+  s3_files_access_points = [
+    {
+      access_point_arn = aws_s3files_access_point.file_checks_s3_files.arn
+      mount_path       = "/mnt/s3"
+    }
+  ]
   vpc_config = {
-    subnet_ids         = module.shared_vpc.private_backend_checks_subnets
+    # The lambda can only attach the file system once the mount targets in its subnets exist
+    subnet_ids         = values(aws_s3files_mount_target.file_checks_s3_files)[*].subnet_id
     security_group_ids = [module.outbound_only_security_group.security_group_id]
   }
+}
+
+resource "aws_iam_role" "s3files_file_checks" {
+  name = "TDRFileChecksS3FilesRole${title(local.environment)}"
+  assume_role_policy = templatefile("./templates/iam_policy/s3_files_assume_role_policy.json.tpl", {
+    account_id = data.aws_caller_identity.current.account_id
+  })
+  tags = local.common_tags
+}
+
+resource "aws_iam_role_policy" "s3files_file_checks" {
+  name = "TDRFileChecksS3FilesPolicy${title(local.environment)}"
+  role = aws_iam_role.s3files_file_checks.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "S3BucketPermissions"
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket",
+          "s3:ListBucketVersions"
+        ]
+        Resource = "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}"
+        Condition = {
+          StringEquals = {
+            "aws:ResourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      },
+      {
+        Sid    = "S3ObjectPermissions"
+        Effect = "Allow"
+        Action = [
+          "s3:AbortMultipartUpload",
+          "s3:DeleteObject*",
+          "s3:GetObject*",
+          "s3:List*",
+          "s3:PutObject*"
+        ]
+        Resource = "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}/*"
+        Condition = {
+          StringEquals = {
+            "aws:ResourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      },
+      {
+        Sid    = "UseKmsKeyWithS3Files"
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt",
+          "kms:Encrypt",
+          "kms:GenerateDataKey",
+          "kms:ReEncryptFrom",
+          "kms:ReEncryptTo"
+        ]
+        Resource = module.s3_upload_kms_key.kms_key_arn
+        Condition = {
+          StringLike = {
+            "kms:ViaService" = "s3.eu-west-2.amazonaws.com"
+            "kms:EncryptionContext:aws:s3:arn" = [
+              "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}",
+              "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}/*"
+            ]
+          }
+        }
+      },
+      {
+        Sid    = "EventBridgeManage"
+        Effect = "Allow"
+        Action = [
+          "events:DeleteRule",
+          "events:DisableRule",
+          "events:EnableRule",
+          "events:PutRule",
+          "events:PutTargets",
+          "events:RemoveTargets"
+        ]
+        Resource = "arn:aws:events:*:*:rule/DO-NOT-DELETE-S3-Files*"
+        Condition = {
+          StringEquals = {
+            "events:ManagedBy" = "elasticfilesystem.amazonaws.com"
+          }
+        }
+      },
+      {
+        Sid    = "EventBridgeRead"
+        Effect = "Allow"
+        Action = [
+          "events:DescribeRule",
+          "events:ListRuleNamesByTarget",
+          "events:ListRules",
+          "events:ListTargetsByRule"
+        ]
+        Resource = "arn:aws:events:*:*:rule/*"
+      }
+    ]
+  })
+}
+
+module "s3files_mount_target_security_group" {
+  source      = "./tdr-terraform-modules/security_group"
+  description = "S3 Files mount target NFS access for file-checks lambda"
+  name        = "s3files_mount_target_security_group"
+  vpc_id      = module.shared_vpc.vpc_id
+  common_tags = local.common_tags
+  ingress_security_group_rules = [
+    {
+      port              = 2049
+      security_group_id = module.outbound_only_security_group.security_group_id
+      description       = "Allow NFS from file-checks lambda security group"
+    }
+  ]
+}
+
+resource "aws_security_group_rule" "outbound_only_to_s3files_mount_target" {
+  type                     = "egress"
+  protocol                 = "tcp"
+  from_port                = 2049
+  to_port                  = 2049
+  security_group_id        = module.outbound_only_security_group.security_group_id
+  source_security_group_id = module.s3files_mount_target_security_group.security_group_id
+  description              = "Allow NFS to the S3 Files mount targets"
+}
+
+# S3 Files keeps the file system in sync with the bucket using the managed DO-NOT-DELETE-S3-Files EventBridge rules it
+# creates with the role above. Those rules only receive events if the bucket sends its notifications to EventBridge, so
+# without this objects uploaded after the file system was created never appear under the lambda's mount point.
+resource "aws_s3_bucket_notification" "upload_file_cloudfront_dirty_eventbridge" {
+  bucket      = module.upload_file_cloudfront_dirty_s3.s3_bucket_name
+  eventbridge = true
+}
+
+resource "aws_s3files_file_system" "file_checks_s3_files" {
+  bucket   = "arn:aws:s3:::${module.upload_file_cloudfront_dirty_s3.s3_bucket_name}"
+  role_arn = aws_iam_role.s3files_file_checks.arn
+  tags     = local.common_tags
+
+  # S3 Files validates access to the bucket when the file system is created, so the role must already have its
+  # permissions. Nothing else links the inline policy to this resource. The policy grants decrypt on the s3 upload KMS
+  # key, so waiting for it also waits for that key policy to allow the role.
+  #
+  # The EventBridge notification configuration must also exist first, otherwise the file system is created without a
+  # source of change events and never picks up newly uploaded objects.
+  depends_on = [
+    aws_iam_role_policy.s3files_file_checks,
+    aws_s3_bucket_notification.upload_file_cloudfront_dirty_eventbridge
+  ]
+}
+
+resource "aws_s3files_access_point" "file_checks_s3_files" {
+  file_system_id = aws_s3files_file_system.file_checks_s3_files.id
+  tags           = local.common_tags
+}
+
+resource "aws_s3files_mount_target" "file_checks_s3_files" {
+  for_each       = toset(module.shared_vpc.private_backend_checks_subnets)
+  file_system_id = aws_s3files_file_system.file_checks_s3_files.id
+  subnet_id      = each.value
+  security_groups = [
+    module.s3files_mount_target_security_group.security_group_id,
+    module.outbound_only_security_group.security_group_id
+  ]
 }
 
 module "backend_checks_v2_step_function" {

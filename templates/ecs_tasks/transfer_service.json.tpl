@@ -117,6 +117,34 @@
       {
         "name": "OVERRIDE_INCLUDE_TOP_LEVEL_FOLDER",
         "value": "${override_include_top_level_folder}"
+      },
+      {
+        "name": "MAX_CONSIGNMENTS_WITHOUT_SERIES",
+        "value": "${max_consignments_without_series}"
+      },
+      {
+        "name": "ERROR_TRANSFERS_WITHOUT_SERIES",
+        "value": "${error_pattern_transfers_without_series}"
+      },
+      {
+        "name": "ERROR_INCORRECT_UPLOAD_STATE",
+        "value": "${error_pattern_incorrect_upload_state}"
+      },
+      {
+        "name": "ERROR_CONSIGNMENT_ACCESS_DENIED",
+        "value": "${error_pattern_consignment_access_denied}"
+      },
+      {
+        "name": "FEATURE_ACCESS_CONTROL_SHAREPOINT_UPLOAD",
+        "value": "${feature_access_control_sharepoint_upload}"
+      },
+      {
+        "name": "FEATURE_ACCESS_CONTROL_TRANSFER_ERRORS",
+        "value": "${feature_access_control_transfer_errors}"
+      },
+      {
+        "name": "ERROR_TRANSFER_FUNCTION_ACCESS_DENIED",
+        "value": "${error_pattern_transfer_function_access_denied}"
       }
     ],
     "logConfiguration": {

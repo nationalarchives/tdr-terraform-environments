@@ -114,7 +114,7 @@ module "tdr_keycloak_ecs" {
   alb_target_group_arn = module.keycloak_tdr_alb.alb_target_group_arn
   cluster_name         = "keycloak_${local.environment}"
   common_tags          = local.common_tags
-  desired_count        = local.environment == "dev" ? 0 : 1
+  desired_count        = 1
   container_definition = templatefile("${path.module}/templates/ecs_tasks/keycloak.json.tpl", {
     app_image                         = "${local.ecr_account_number}.dkr.ecr.eu-west-2.amazonaws.com/auth-server:${local.environment}"
     app_port                          = 8080
@@ -182,7 +182,7 @@ module "keycloak_database_instance" {
   availability_zone       = local.environment == "prod" ? local.database_availability_zone : "eu-west-2b"
   common_tags             = local.common_tags
   database_name           = "keycloak"
-  database_version        = "17.9"
+  database_version        = local.environment == "prod" ? "17.9" : "17.10"
   environment             = local.environment
   kms_key_id              = module.encryption_key.kms_key_arn
   private_subnets         = module.shared_vpc.private_backend_checks_subnets

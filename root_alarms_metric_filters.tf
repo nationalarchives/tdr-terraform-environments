@@ -2,9 +2,19 @@
 
 locals {
   namespace_name = "Log_Metrics"
+  authentication_alarms_log_groups = tomap({
+    transfer-service = "/ecs/transfer-service-${local.environment}"
+  frontend = "/ecs/frontend-${local.environment}" })
+  alarms_mute_default  = local.environment == "prod" ? "" : "Muted: "
+  alarm_prefix_default = "${local.alarms_mute_default}${local.namespace_name}"
 
-  # For now SharePoint integration not released to Prod so monitor staging
-  sharepoint_metrics_env = "staging"
+  # Error message patterns
+  # Defined here so can be used for resource logging and metric alarms
+  error_pattern_unassigned_transferring_body    = "not assigned to a transferring body"
+  error_pattern_transfers_without_series        = "too many consignments without series assigned"
+  error_pattern_incorrect_upload_state          = "consignment state incorrect for upload"
+  error_pattern_consignment_access_denied       = "does not have access to consignment"
+  error_pattern_transfer_function_access_denied = "access denied to transfer function"
 }
 
 resource "aws_cloudwatch_log_metric_filter" "consignment_export_success" {
@@ -20,53 +30,236 @@ resource "aws_cloudwatch_log_metric_filter" "consignment_export_success" {
   }
 }
 
-resource "aws_cloudwatch_log_metric_filter" "sharepoint_load_initiated" {
-  count          = local.environment == local.sharepoint_metrics_env ? 1 : 0
-  name           = "sharepoint_load_initiated"
-  pattern        = "\"POST /load/sharepoint/initiate\""
-  log_group_name = "/ecs/transfer-service-${local.sharepoint_metrics_env}"
+resource "aws_cloudwatch_metric_alarm" "misconfigured_user_no_transferring_body" {
+  for_each          = local.authentication_alarms_log_groups
+  alarm_description = "This alarm fires when a TDR user with no transferring body assigned interacts with TDR"
+  alarm_name        = format("${local.alarm_prefix_default}/MisconfiguredUser/No Transferring Body - Service=%s Environment=%s", title(each.key), title(local.environment))
+
+  metric_query {
+    account_id  = data.aws_caller_identity.current.id
+    id          = "m1"
+    return_data = "true"
+
+    metric {
+      metric_name = "Misconfigured User - no transferring body - ${each.key} - ${title(local.environment)}"
+      namespace   = local.namespace_name
+      stat        = "Sum"
+      period      = 60
+    }
+  }
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  threshold           = 0
+  comparison_operator = "GreaterThanThreshold"
+  treat_missing_data  = "notBreaching"
+
+  provider = aws.alarm_deployer
+}
+
+resource "aws_cloudwatch_log_metric_filter" "misconfigured_user_no_transferring_body" {
+  for_each       = local.authentication_alarms_log_groups
+  name           = "misconfigured-user-no-transferring-body-${local.environment}-${each.key}"
+  pattern        = local.error_pattern_unassigned_transferring_body
+  log_group_name = each.value
 
   metric_transformation {
-    name      = "SharePoint Load Initiated - ${title(local.sharepoint_metrics_env)}"
+    name      = "Misconfigured User - no transferring body - ${each.key} - ${title(local.environment)}"
+    namespace = local.namespace_name
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "sharepoint_load_initiated" {
+  name           = "sharepoint_load_initiated"
+  pattern        = "\"POST /load/sharepoint/initiate\""
+  log_group_name = "/ecs/transfer-service-${local.environment}"
+
+  metric_transformation {
+    name      = "SharePoint Load Initiated - ${title(local.environment)}"
     namespace = local.namespace_name
     value     = "1"
   }
 }
 
 resource "aws_cloudwatch_log_metric_filter" "sharepoint_load_completed" {
-  count          = local.environment == local.sharepoint_metrics_env ? 1 : 0
   name           = "sharepoint_load_completed"
   pattern        = "\"POST /load/sharepoint/complete\""
-  log_group_name = "/ecs/transfer-service-${local.sharepoint_metrics_env}"
+  log_group_name = "/ecs/transfer-service-${local.environment}"
 
   metric_transformation {
-    name      = "SharePoint Load Completed - ${title(local.sharepoint_metrics_env)}"
+    name      = "SharePoint Load Completed - ${title(local.environment)}"
     namespace = local.namespace_name
     value     = "1"
   }
 }
 
 resource "aws_cloudwatch_log_metric_filter" "sharepoint_asset_metadata_processed_success" {
-  count          = local.environment == local.sharepoint_metrics_env ? 1 : 0
   name           = "sharepoint_asset_metadata_processed_success"
   pattern        = "Asset metadata successfully processed for sharepoint .metadata"
-  log_group_name = "/aws/lambda/tdr-aggregate-processing-${local.sharepoint_metrics_env}"
+  log_group_name = "/aws/lambda/tdr-aggregate-processing-${local.environment}"
 
   metric_transformation {
-    name      = "SharePoint Asset Metadata Proccessed Success - ${title(local.sharepoint_metrics_env)}"
+    name      = "SharePoint Asset Metadata Proccessed Success - ${title(local.environment)}"
     namespace = local.namespace_name
     value     = "1"
   }
 }
 
 resource "aws_cloudwatch_log_metric_filter" "sharepoint_asset_metadata_processed_failed" {
-  count          = local.environment == local.sharepoint_metrics_env ? 1 : 0
   name           = "sharepoint_asset_metadata_processed_failed"
   pattern        = "errorCode errorMessage"
-  log_group_name = "/aws/lambda/tdr-aggregate-processing-${local.sharepoint_metrics_env}"
+  log_group_name = "/aws/lambda/tdr-aggregate-processing-${local.environment}"
 
   metric_transformation {
-    name      = "SharePoint Asset Metadata Proccessed Failed - ${title(local.sharepoint_metrics_env)}"
+    name      = "SharePoint Asset Metadata Proccessed Failed - ${title(local.environment)}"
+    namespace = local.namespace_name
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "max_transfers_without_series" {
+  alarm_description = "This alarm fires when a TDR user attempts a transfer initiation but has more than ${local.max_consignments_without_series} consignments without a series"
+  alarm_name        = format("${local.alarm_prefix_default}/TransferService/Maximum Transfers Without Series - Environment=%s", title(local.environment))
+
+  metric_query {
+    account_id  = data.aws_caller_identity.current.id
+    id          = "m1"
+    return_data = "true"
+
+    metric {
+      metric_name = "Maximum Transfers Without Series - Transfer Service - ${title(local.environment)}"
+      namespace   = local.namespace_name
+      stat        = "Sum"
+      period      = 60
+    }
+  }
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  threshold           = 0
+  comparison_operator = "GreaterThanThreshold"
+  treat_missing_data  = "notBreaching"
+
+  provider = aws.alarm_deployer
+}
+
+resource "aws_cloudwatch_log_metric_filter" "max_transfers_without_series" {
+  name           = "max-transfers-without-series-${local.environment}"
+  pattern        = local.error_pattern_transfers_without_series
+  log_group_name = "/ecs/transfer-service-${local.environment}"
+
+  metric_transformation {
+    name      = "Maximum Transfers Without Series - Transfer Service - ${title(local.environment)}"
+    namespace = local.namespace_name
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "upload_state_incorrect" {
+  alarm_description = "This alarm fires when a TDR user attempts an upload where the state is incorrect"
+  alarm_name        = format("${local.alarm_prefix_default}/TransferService/Upload State Incorrect - Environment=%s", title(local.environment))
+
+  metric_query {
+    account_id  = data.aws_caller_identity.current.id
+    id          = "m1"
+    return_data = "true"
+
+    metric {
+      metric_name = "Upload State Incorrect - Transfer Service - ${title(local.environment)}"
+      namespace   = local.namespace_name
+      stat        = "Sum"
+      period      = 60
+    }
+  }
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  threshold           = 0
+  comparison_operator = "GreaterThanThreshold"
+  treat_missing_data  = "notBreaching"
+
+  provider = aws.alarm_deployer
+}
+
+resource "aws_cloudwatch_log_metric_filter" "upload_state_incorrect" {
+  name           = "upload-state-incorrect-${local.environment}"
+  pattern        = local.error_pattern_incorrect_upload_state
+  log_group_name = "/ecs/transfer-service-${local.environment}"
+
+  metric_transformation {
+    name      = "Upload State Incorrect - Transfer Service - ${title(local.environment)}"
+    namespace = local.namespace_name
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "consignment_access_denied" {
+  alarm_description = "This alarm fires when a user attempts to load a consignment but is denied access due to permissions"
+  alarm_name        = format("${local.alarm_prefix_default}/TransferService/Consignment Access Denied - Environment=%s", title(local.environment))
+
+  metric_query {
+    account_id  = data.aws_caller_identity.current.id
+    id          = "m1"
+    return_data = "true"
+
+    metric {
+      metric_name = "Consignment Access Denied - Transfer Service - ${title(local.environment)}"
+      namespace   = local.namespace_name
+      stat        = "Sum"
+      period      = 60
+    }
+  }
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  threshold           = 0
+  comparison_operator = "GreaterThanThreshold"
+  treat_missing_data  = "notBreaching"
+
+  provider = aws.alarm_deployer
+}
+
+resource "aws_cloudwatch_log_metric_filter" "consignment_access_denied" {
+  name           = "consignment-access-denied-${local.environment}"
+  pattern        = local.error_pattern_consignment_access_denied
+  log_group_name = "/ecs/transfer-service-${local.environment}"
+
+  metric_transformation {
+    name      = "Consignment Access Denied - Transfer Service - ${title(local.environment)}"
+    namespace = local.namespace_name
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "transfer_function_access_denied" {
+  alarm_description = "This alarm fires when a user attempts to access a transfer function they don't have permission for"
+  alarm_name        = format("${local.alarm_prefix_default}/TransferService/Transfer Function Access Denied - Environment=%s", title(local.environment))
+
+  metric_query {
+    account_id  = data.aws_caller_identity.current.id
+    id          = "m1"
+    return_data = "true"
+
+    metric {
+      metric_name = "Transfer Function Access Denied - Transfer Service - ${title(local.environment)}"
+      namespace   = local.namespace_name
+      stat        = "Sum"
+      period      = 60
+    }
+  }
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  threshold           = 0
+  comparison_operator = "GreaterThanThreshold"
+  treat_missing_data  = "notBreaching"
+
+  provider = aws.alarm_deployer
+}
+
+resource "aws_cloudwatch_log_metric_filter" "transfer_function_access_denied" {
+  name           = "transfer-function-access-denied-${local.environment}"
+  pattern        = local.error_pattern_transfer_function_access_denied
+  log_group_name = "/ecs/transfer-service-${local.environment}"
+
+  metric_transformation {
+    name      = "Transfer Function Access Denied - Transfer Service - ${title(local.environment)}"
     namespace = local.namespace_name
     value     = "1"
   }

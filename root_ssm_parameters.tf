@@ -47,6 +47,19 @@ module "transfers_slack_channel_ssm_parameter" {
   tags = merge(local.common_tags, local.manual_input_tag)
 }
 
+module "admin_action_alert_channel_ssm_parameter" {
+  source = "./da-terraform-modules/ssm_parameter"
+  parameters = [
+    {
+      name        = local.slack_admin_action_alert_webhook,
+      description = "The Slack webhook for the da-tdr-admin-action-alert notifications channel"
+      type        = "SecureString"
+      value       = "To be manually added"
+    }
+  ]
+  tags = merge(local.common_tags, local.manual_input_tag)
+}
+
 module "s3_put_request_header_acl_ssm_parameter" {
   source = "./da-terraform-modules/ssm_parameter"
   parameters = [

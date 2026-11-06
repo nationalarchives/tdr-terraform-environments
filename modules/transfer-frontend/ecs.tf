@@ -46,9 +46,17 @@ resource "aws_ecs_service" "frontend_service" {
   name                              = "${var.app_name}_service_${var.environment}"
   cluster                           = aws_ecs_cluster.frontend_ecs.id
   task_definition                   = aws_ecs_task_definition.frontend_task.arn
-  desired_count                     = var.environment == "dev" ? 0 : 1
+  desired_count                     = 1
   launch_type                       = "FARGATE"
   health_check_grace_period_seconds = "360"
+
+  # Stop ECS endlessly cycling new tasks when a deployment's tasks repeatedly
+  # fail to start/stabilise (e.g. missing env var). After enough failures ECS
+  # rolls back to the last known good task definition
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
 
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]
@@ -212,6 +220,26 @@ resource "aws_iam_role_policy_attachment" "frontend_ecs_task_sns_publish" {
   policy_arn = aws_iam_policy.frontend_sns_notifications_publish.arn
 }
 
+data "aws_iam_policy_document" "frontend_step_functions_start_execution" {
+  statement {
+    actions = ["states:StartExecution"]
+    resources = [
+      var.backend_checks_state_machine_arn,
+      var.draft_metadata_state_machine_arn,
+      var.export_state_machine_arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "frontend_step_functions_start_execution" {
+  name   = "TDRFrontendStepFunctionsExecutionPolicy${title(var.environment)}"
+  policy = data.aws_iam_policy_document.frontend_step_functions_start_execution.json
+}
+
+resource "aws_iam_role_policy_attachment" "frontend_ecs_task_step_functions_start_execution" {
+  role       = aws_iam_role.frontend_ecs_task.name
+  policy_arn = aws_iam_policy.frontend_step_functions_start_execution.arn
+}
 
 resource "aws_iam_role_policy_attachment" "frontend_ecs_task_xray" {
   role       = aws_iam_role.frontend_ecs_task.name

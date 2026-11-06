@@ -9,3 +9,7 @@ output "frontend_url" {
 output "task_role_arn" {
   value = aws_iam_role.frontend_ecs_task.arn
 }
+
+output "ecs_cluster_arn" {
+  value = aws_ecs_cluster.frontend_ecs.arn
+}
