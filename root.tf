@@ -470,7 +470,7 @@ module "signed_cookies_lambda" {
 module "export_status_update_lambda" {
   source                            = "./tdr-terraform-modules/lambda"
   common_tags                       = local.common_tags
-  runtime                           = "java${module.global_parameters.lambda_java_runtimes["export-status-update"]}"
+  runtime                           = "java${module.global_parameters.lambda_java_runtimes["export-status-updates"]}"
   project                           = "tdr"
   lambda_export_status_update       = true
   auth_url                          = local.keycloak_auth_url
@@ -787,7 +787,7 @@ module "athena" {
 module "create_keycloak_users_api_lambda" {
   source                           = "./tdr-terraform-modules/lambda"
   common_tags                      = local.common_tags
-  runtime                          = "java${module.global_parameters.lambda_java_runtimes["keylcoak-management"]}"
+  runtime                          = "java${module.global_parameters.lambda_java_runtimes["keycloak-management"]}"
   project                          = var.project
   user_admin_client_secret_path    = local.keycloak_user_admin_client_secret_name
   kms_key_arn                      = module.encryption_key.kms_key_arn
@@ -819,7 +819,7 @@ module "inactive_keycloak_users_lambda" {
   function_name   = local.inactive_keycloak_users_function_name
   tags            = local.common_tags
   handler         = "uk.gov.nationalarchives.keycloak.users.InactiveKeycloakUsersLambda::handleRequest"
-  runtime         = "java${module.global_parameters.lambda_java_runtimes["keycloak_inactive_users"]}"
+  runtime         = "java${module.global_parameters.lambda_java_runtimes["keycloak-inactive-users"]}"
   timeout_seconds = 240
   log_retention   = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 
