@@ -117,7 +117,7 @@ module "statuses" {
   function_name                    = local.statuses_function_name
   handler                          = "uk.gov.nationalarchives.Lambda::run"
   reserved_concurrency             = -1
-  timeout_seconds                  = contains(["staging", "prod"], local.environment) ? 600 : 30
+  timeout_seconds                  = contains(["staging", "prod"], local.environment) ? 900 : 30
   memory_size                      = contains(["staging", "prod"], local.environment) ? 4096 : 1024
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
   policies = {
