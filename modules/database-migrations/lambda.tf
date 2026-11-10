@@ -34,6 +34,7 @@ resource "aws_iam_role_policy_attachment" "lambda_role_attach_migration_policy" 
 resource "aws_lambda_function" "database_migration_function" {
   function_name = "tdr-database-migrations-${var.environment}"
   handler       = "migration.Main::runMigration"
+  runtime       = var.runtime
   role          = aws_iam_role.lambda_assume_role.arn
   filename      = "${path.module}/temp.zip"
   memory_size   = 512
