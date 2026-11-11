@@ -49,7 +49,7 @@ module "external_event_handler_lambda" {
   timeout_seconds      = local.external_event_handling_lambda_timeout_secs
   reserved_concurrency = 10
   memory_size          = 512
-  runtime              = "java21"
+  runtime              = "java${module.global_parameters.lambda_java_runtimes["external-event-handling"]}"
   policies = {
     "TDRExternalEventHandlerLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/external_event_handler_lambda_policy.json.tpl", {
       function_name          = local.external_event_handler_function_name
