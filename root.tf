@@ -406,7 +406,7 @@ module "create_db_users_lambda" {
   source                           = "./tdr-terraform-modules/lambda"
   project                          = var.project
   common_tags                      = local.common_tags
-    runtime                        = "java${module.global_parameters.lambda_java_runtimes["create-db-user"]}"
+  runtime                          = "java${module.global_parameters.lambda_java_runtimes["create-db-user"]}"
   lambda_create_db_users           = true
   vpc_id                           = module.shared_vpc.vpc_id
   private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
