@@ -120,8 +120,6 @@ locals {
   file_checks_lambda_role_arn           = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.file_checks_function_name}-role"
 
   runtime_python_3_13 = "python3.13"
-  runtime_java_11     = "java11"
-  runtime_java_21     = "java21"
 
   upload_files_cloudfront_dirty_bucket_name = "${var.project}-upload-files-cloudfront-dirty-${local.environment}"
   upload_files_quarantine_bucket_name       = "${var.project}-upload-files-quarantine-${local.environment}"
@@ -157,7 +155,7 @@ locals {
 
   //feature access blocks
   block_shared_keycloak_pages      = local.environment == "intg" ? false : true
-  block_skip_metadata_review       = false
+  block_skip_metadata_review       = local.environment == "prod" ? true : false
   block_file_checks_failure_v2     = false
   block_connector_sharepoint_pages = local.environment == "prod" ? true : false
   block_add_context_tagging        = local.environment == "prod" ? true : false

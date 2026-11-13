@@ -35,7 +35,7 @@ resource "aws_lambda_function" "database_migration_function" {
   function_name = "tdr-database-migrations-${var.environment}"
   handler       = "migration.Main::runMigration"
   role          = aws_iam_role.lambda_assume_role.arn
-  runtime       = "java17"
+  runtime       = var.runtime
   filename      = "${path.module}/temp.zip"
   memory_size   = 512
   timeout       = 60

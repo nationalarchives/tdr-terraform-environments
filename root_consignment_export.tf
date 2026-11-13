@@ -93,6 +93,7 @@ module "consignment_export_ecs_task" {
       consignment_id_tag         = "ConsignmentId"
       user_id_tag                = "UserId"
       asset_source_tag           = "AssetSource"
+      upload_match_id_tag        = "UploadMatchId"
       block_add_context_tagging  = local.block_add_context_tagging
   })
   container_name   = "consignmentexport"

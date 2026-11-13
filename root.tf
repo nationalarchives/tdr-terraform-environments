@@ -44,6 +44,7 @@ module "shared_vpc" {
 module "database_migrations" {
   source          = "./modules/database-migrations"
   environment     = local.environment
+  runtime         = "java${module.global_parameters.lambda_java_runtimes["database-migrations"]}"
   vpc_id          = module.shared_vpc.vpc_id
   private_subnets = module.shared_vpc.private_backend_checks_subnets
   common_tags     = local.common_tags
@@ -405,6 +406,7 @@ module "create_db_users_lambda" {
   source                           = "./tdr-terraform-modules/lambda"
   project                          = var.project
   common_tags                      = local.common_tags
+  runtime                          = "java${module.global_parameters.lambda_java_runtimes["create-db-user"]}"
   lambda_create_db_users           = true
   vpc_id                           = module.shared_vpc.vpc_id
   private_subnet_ids               = module.shared_vpc.private_backend_checks_subnets
@@ -470,6 +472,7 @@ module "export_status_update_lambda" {
   source                            = "./tdr-terraform-modules/lambda"
   common_tags                       = local.common_tags
   project                           = "tdr"
+  runtime                           = "java${module.global_parameters.lambda_java_runtimes["export-status-updates"]}"
   lambda_export_status_update       = true
   auth_url                          = local.keycloak_auth_url
   timeout_seconds                   = 60
@@ -690,6 +693,7 @@ module "notifications_topic" {
 module "notification_lambda" {
   source                        = "./tdr-terraform-modules/lambda"
   common_tags                   = local.common_tags
+  runtime                       = "java${module.global_parameters.lambda_java_runtimes["notification-service"]}"
   project                       = "tdr"
   lambda_ecr_scan_notifications = true
   kms_key_arn                   = module.encryption_key.kms_key_arn
@@ -784,6 +788,7 @@ module "athena" {
 module "create_keycloak_users_api_lambda" {
   source                           = "./tdr-terraform-modules/lambda"
   common_tags                      = local.common_tags
+  runtime                          = "java${module.global_parameters.lambda_java_runtimes["keycloak-management"]}"
   project                          = var.project
   user_admin_client_secret_path    = local.keycloak_user_admin_client_secret_name
   kms_key_arn                      = module.encryption_key.kms_key_arn
@@ -798,6 +803,7 @@ module "create_keycloak_users_api_lambda" {
 module "create_keycloak_users_s3_lambda" {
   source                           = "./tdr-terraform-modules/lambda"
   common_tags                      = local.common_tags
+  runtime                          = "java${module.global_parameters.lambda_java_runtimes["keycloak-management"]}"
   project                          = var.project
   user_admin_client_secret_path    = local.keycloak_user_admin_client_secret_name
   kms_key_arn                      = module.encryption_key.kms_key_arn
@@ -814,7 +820,7 @@ module "inactive_keycloak_users_lambda" {
   function_name   = local.inactive_keycloak_users_function_name
   tags            = local.common_tags
   handler         = "uk.gov.nationalarchives.keycloak.users.InactiveKeycloakUsersLambda::handleRequest"
-  runtime         = local.runtime_java_21
+  runtime         = "java${module.global_parameters.lambda_java_runtimes["keycloak-inactive-users"]}"
   timeout_seconds = 240
   log_retention   = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
 
@@ -891,6 +897,7 @@ module "create_bulk_users_bucket" {
 module "rotate_keycloak_secrets_lambda" {
   source                            = "./tdr-terraform-modules/lambda"
   common_tags                       = local.common_tags
+  runtime                           = "java${module.global_parameters.lambda_java_runtimes["keycloak-rotate-secret"]}"
   project                           = "tdr"
   lambda_rotate_keycloak_secrets    = true
   notifications_topic               = module.notifications_topic.sns_arn
