@@ -87,7 +87,7 @@ module "consignment_export_ecs_task" {
       output_topic_arn           = module.external_sns_notifications_topic.sns_arn
       auth_url                   = local.keycloak_auth_url
       region                     = local.region
-      download_files_batch_size  = 40
+      download_files_batch_size  = 4
       download_batch_delay_ms    = 10
       metadata_version_override  = local.metadata_version_override
       consignment_id_tag         = "ConsignmentId"
