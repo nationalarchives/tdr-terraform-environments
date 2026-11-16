@@ -198,6 +198,7 @@ module "create_keycloak_db_users_lambda_new" {
   source                  = "./tdr-terraform-modules/lambda"
   project                 = var.project
   common_tags             = local.common_tags
+  runtime                 = "java${module.global_parameters.lambda_java_runtimes["keycloak-management"]}"
   lambda_create_db_users  = true
   database_name           = "keycloak"
   lambda_name             = "create-keycloak-user"

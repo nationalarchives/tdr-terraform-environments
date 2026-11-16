@@ -65,7 +65,7 @@ module "api_update_v2" {
     })
   }
   role_name = "TDRAPIUpdateV2LambdaRole${title(local.environment)}"
-  runtime   = local.runtime_java_11
+  runtime   = "java${module.global_parameters.lambda_java_runtimes["api-update-v2"]}"
   plaintext_env_vars = {
     API_URL            = "${module.consignment_api.api_url}/graphql"
     AUTH_URL           = local.keycloak_auth_url
@@ -99,7 +99,7 @@ module "redacted_files" {
     })
   }
   role_name = "TDRRedactedFilesLambdaRole${title(local.environment)}"
-  runtime   = local.runtime_java_11
+  runtime   = "java${module.global_parameters.lambda_java_runtimes["redacted-files"]}"
   vpc_config = [
     {
       subnet_ids         = module.shared_vpc.private_backend_checks_subnets
@@ -117,7 +117,7 @@ module "statuses" {
   function_name                    = local.statuses_function_name
   handler                          = "uk.gov.nationalarchives.Lambda::run"
   reserved_concurrency             = -1
-  timeout_seconds                  = contains(["staging", "prod"], local.environment) ? 600 : 30
+  timeout_seconds                  = contains(["staging", "prod"], local.environment) ? 900 : 30
   memory_size                      = contains(["staging", "prod"], local.environment) ? 4096 : 1024
   cloudwatch_log_retention_in_days = module.global_parameters.policy_cloudwatch_logs_retention["${local.environment}"].lambda
   policies = {
@@ -134,7 +134,7 @@ module "statuses" {
     })
   }
   role_name = "TDRStatusesLambdaRole${title(local.environment)}"
-  runtime   = local.runtime_java_11
+  runtime   = "java${module.global_parameters.lambda_java_runtimes["statuses"]}"
   plaintext_env_vars = {
     API_URL            = "${module.consignment_api.api_url}/graphql"
     AUTH_URL           = local.keycloak_auth_url
@@ -204,7 +204,7 @@ module "file_checks" {
       encryption_keys       = jsonencode([module.s3_internal_kms_key.kms_key_arn])
     })
   }
-  runtime = local.runtime_java_21
+  runtime = "java${module.global_parameters.lambda_java_runtimes["file-checks"]}"
   s3_files_access_points = [
     {
       access_point_arn = aws_s3files_access_point.file_checks_s3_files.arn

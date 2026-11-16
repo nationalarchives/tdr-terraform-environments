@@ -232,7 +232,7 @@ module "aggregate_processing_lambda" {
   handler         = "uk.gov.nationalarchives.aggregate.processing.AggregateProcessingLambda::handleRequest"
   timeout_seconds = local.aggregate_processing_lambda_timeout_secs
   memory_size     = 512
-  runtime         = "java21"
+  runtime         = "java${module.global_parameters.lambda_java_runtimes["aggregate-processing"]}"
   log_retention   = module.global_parameters.policy_cloudwatch_logs_retention[local.environment].lambda
   lambda_sqs_queue_mappings = [{
     sqs_queue_arn         = "arn:aws:sqs:eu-west-2:${var.tdr_account_number}:${local.aggregate_processing_function_name}",
