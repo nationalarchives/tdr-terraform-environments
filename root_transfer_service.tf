@@ -16,7 +16,7 @@ locals {
 
   # Feature Access Blocks (FAB)
   block_api_documentation = local.is_lower_environment ? false : true
-  block_service_endpoints = local.environment == "prod" ? true : false
+  block_service_endpoints = false
   block_tdr_custom_tags   = local.is_lower_environment ? false : true
 
   # Feature Access Controls (FAC)
