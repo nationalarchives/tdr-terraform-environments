@@ -6,7 +6,7 @@ module "draft_metadata_persistence_lambda" {
   source          = "./da-terraform-modules/lambda"
   function_name   = "tdr-draft-metadata-persistence-${local.environment}"
   handler         = "uk.gov.nationalarchives.tdr.draftmetadatapersistence.Lambda::handleRequest"
-  runtime         = local.runtime_java_21
+  runtime         = "java${module.global_parameters.lambda_java_runtimes["draft-metadata-validator"]}"
   tags            = local.common_tags
   timeout_seconds = 240
   memory_size     = 1024
@@ -33,7 +33,7 @@ module "draft_metadata_checks_lambda" {
   source          = "./da-terraform-modules/lambda"
   function_name   = "tdr-draft-metadata-checks-${local.environment}"
   handler         = "uk.gov.nationalarchives.tdr.draftmetadatachecks.Lambda::handleRequest"
-  runtime         = local.runtime_java_21
+  runtime         = "java${module.global_parameters.lambda_java_runtimes["draft-metadata-validator"]}"
   tags            = local.common_tags
   timeout_seconds = 900
   memory_size     = 2048

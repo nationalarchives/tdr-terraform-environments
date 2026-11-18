@@ -49,7 +49,7 @@ module "external_event_handler_lambda" {
   timeout_seconds      = local.external_event_handling_lambda_timeout_secs
   reserved_concurrency = 10
   memory_size          = 512
-  runtime              = "java21"
+  runtime              = "java${module.global_parameters.lambda_java_runtimes["external-event-handling"]}"
   policies = {
     "TDRExternalEventHandlerLambdaPolicy${title(local.environment)}" = templatefile("./templates/iam_policy/external_event_handler_lambda_policy.json.tpl", {
       function_name          = local.external_event_handler_function_name
@@ -59,6 +59,9 @@ module "external_event_handler_lambda" {
       export_bucket          = local.flat_format_bucket_name,
       judgment_export_bucket = local.flat_format_judgment_bucket_name
       parameter_name         = local.keycloak_backend_checks_secret_name
+      dirty_bucket           = local.upload_files_cloudfront_dirty_bucket_name
+      clean_bucket           = module.upload_bucket.s3_bucket_name
+      quarantine_bucket      = local.upload_files_quarantine_bucket_name
     })
   }
   plaintext_env_vars = {
@@ -66,6 +69,13 @@ module "external_event_handler_lambda" {
     JUDGMENT_EXPORT_BUCKET           = local.flat_format_judgment_bucket_name,
     DR2_INGEST_TAG_KEY               = local.object_tag_dr2_ingest_key,
     DR2_INGEST_TAG_VALUE             = local.object_tag_dr2_ingest_value_complete,
+    DIRTY_BUCKET                     = local.upload_files_cloudfront_dirty_bucket_name,
+    CLEAN_BUCKET                     = module.upload_bucket.s3_bucket_name,
+    QUARANTINE_BUCKET                = local.upload_files_quarantine_bucket_name,
+    CONSIGNMENT_ID_TAG               = "ConsignmentId",
+    USER_ID_TAG                      = "UserId",
+    ASSET_SOURCE_TAG                 = "AssetSource",
+    UPLOAD_MATCH_ID_TAG              = "UploadMatchId",
     API_URL                          = "${module.consignment_api.api_url}/graphql",
     AUTH_URL                         = local.keycloak_auth_url
     CLIENT_ID                        = local.keycloak_backend-checks_client_id

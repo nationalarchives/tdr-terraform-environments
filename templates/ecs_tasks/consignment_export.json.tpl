@@ -55,6 +55,10 @@
         "value": "${asset_source_tag}"
       },
       {
+        "name": "UPLOAD_MATCH_ID_TAG",
+        "value": "${upload_match_id_tag}"
+      },
+      {
         "name": "BLOCK_ADD_CONTEXT_TAGGING",
         "value": "${block_add_context_tagging}"
       },
