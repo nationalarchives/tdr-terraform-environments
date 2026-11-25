@@ -162,8 +162,8 @@
             "Run ECS task Bagit": {
               "Type": "Task",
               "Resource": "arn:aws:states:::ecs:runTask.waitForTaskToken",
-              "HeartbeatSeconds": 60,
-              "TimeoutSeconds": 4500,
+              "HeartbeatSeconds": 120,
+              "TimeoutSeconds": 7200,
               "Retry": [
                 {
                   "ErrorEquals": [
