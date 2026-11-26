@@ -15,9 +15,10 @@ locals {
   is_lower_environment = local.environment == "intg" || local.environment == "dev"
 
   # Feature Access Blocks (FAB)
-  block_api_documentation = local.is_lower_environment ? false : true
-  block_service_endpoints = false
-  block_tdr_custom_tags   = local.is_lower_environment ? false : true
+  block_api_documentation   = local.is_lower_environment ? false : true
+  block_service_endpoints   = false
+  block_tdr_custom_tags     = local.is_lower_environment ? false : true
+  block_check_record_exists = local.environment == "prod" ? true : false
 
   # Feature Access Controls (FAC)
   feature_access_control_sharepoint_upload = local.environment == "prod"
@@ -269,6 +270,8 @@ module "aggregate_processing_lambda" {
     MALWARE_SCAN_TAG_KEY            = local.scan_complete_tag_key
     MALWARE_SCAN_THREAT_FOUND_VALUE = local.scan_complete_threat_found_value
     MAX_INDIVIDUAL_FILE_SIZE_MB     = local.capacity_limit_max_individual_file_size_mb
+    BLOCK_INVALID_FILE_NAME_CHECK   = false
+    BLOCK_CHECK_RECORD_EXISTS       = local.block_check_record_exists
   }
   vpc_config = {
     subnet_ids         = module.shared_vpc.private_backend_checks_subnets
