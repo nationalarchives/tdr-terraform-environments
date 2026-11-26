@@ -282,22 +282,23 @@ module "cloudfront_certificate" {
 }
 
 module "consignment_api_alb" {
-  source                = "./tdr-terraform-modules/alb"
-  project               = var.project
-  function              = "consignmentapi"
-  environment           = local.environment
-  alb_log_bucket        = module.alb_logs_s3.s3_bucket_id
-  alb_security_group_id = module.consignment_api.alb_security_group_id
-  alb_target_group_port = 8080
-  alb_target_type       = "ip"
-  certificate_arn       = module.consignment_api_certificate.certificate_arn
-  health_check_matcher  = "200,303"
-  health_check_path     = "healthcheck"
-  http_listener         = false
-  public_subnets        = module.shared_vpc.public_subnets
-  vpc_id                = module.shared_vpc.vpc_id
-  common_tags           = local.common_tags
-  idle_timeout          = 180
+  source                    = "./tdr-terraform-modules/alb"
+  project                   = var.project
+  function                  = "consignmentapi"
+  environment               = local.environment
+  alb_log_bucket            = module.alb_logs_s3.s3_bucket_id
+  alb_security_group_id     = module.consignment_api.alb_security_group_id
+  alb_target_group_protocol = "HTTPS"
+  alb_target_group_port     = 8080
+  alb_target_type           = "ip"
+  certificate_arn           = module.consignment_api_certificate.certificate_arn
+  health_check_matcher      = "200,303"
+  health_check_path         = "healthcheck"
+  http_listener             = false
+  public_subnets            = module.shared_vpc.public_subnets
+  vpc_id                    = module.shared_vpc.vpc_id
+  common_tags               = local.common_tags
+  idle_timeout              = 180
 }
 
 module "keycloak_certificate" {
