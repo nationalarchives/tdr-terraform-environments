@@ -34,6 +34,10 @@
         "name": "TRANSFER_ERROR_BUCKET_NAME",
         "value": "${transfer_error_bucket_name}"
       },
+      {
+        "name": "CONSIGNMENT_EXPORT_BUCKET_NAME",
+        "value": "${consignment_export_bucket_name}"
+      },
        {
          "name": "CONSIGNMENT_API_URL",
          "value": "${consignment_api_url}/graphql"
@@ -81,6 +85,10 @@
       {
         "name": "AGGREGATE_PROCESSING_QUEUE_URL",
         "value": "${aggregate_processing_queue_url}"
+      },
+      {
+        "name": "EXTERNAL_EVENT_HANDLING_QUEUE_URL",
+        "value": "${external_event_handling_queue_url}"
       },
       {
         "name": "S3_ACL_HEADER_VALUE",

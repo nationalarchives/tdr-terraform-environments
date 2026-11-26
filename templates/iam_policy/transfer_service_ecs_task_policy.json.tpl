@@ -7,8 +7,18 @@
         "sqs:SendMessage"
       ],
       "Resource": [
-        "arn:aws:sqs:eu-west-2:${account_id}:tdr-aggregate-processing-${environment}"
+        "arn:aws:sqs:eu-west-2:${account_id}:tdr-aggregate-processing-${environment}",
+        "${external_event_queue_arn}"
       ]
+    },
+    {
+      "Sid": "ConsignmentExportObjectTagging",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObjectTagging",
+        "s3:PutObjectTagging"
+      ],
+      "Resource": "arn:aws:s3:::${consignment_export_bucket_name}/*"
     },
     {
       "Sid": "S3GetObjectPermission",
