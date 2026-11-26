@@ -81,6 +81,8 @@ module "transfer_service_task_policy" {
     "${path.module}/templates/iam_policy/transfer_service_ecs_task_policy.json.tpl", {
       account_id                         = data.aws_caller_identity.current.account_id, environment = local.environment,
       tdr_transfer_errors_s3_bucket_name = local.tdr_transfer_errors_s3_bucket_name,
+      consignment_export_bucket_name     = "tdr-consignment-export-${local.environment}",
+      external_event_queue_arn           = local.event_handling_count > 0 ? module.external_event_handling_sqs_queue[0].sqs_arn : "arn:aws:sqs:${local.region}:${data.aws_caller_identity.current.account_id}:${local.sqs_name}",
       kms_arn                            = module.s3_internal_kms_key.kms_key_arn
   })
 }
@@ -182,6 +184,7 @@ module "transfer_service_ecs_task" {
       metadata_upload_bucket_arn                    = module.upload_file_cloudfront_dirty_s3.s3_bucket_arn
       metadata_upload_bucket_name                   = module.upload_file_cloudfront_dirty_s3.s3_bucket_name
       transfer_error_bucket_name                    = local.tdr_transfer_errors_s3_bucket_name
+      consignment_export_bucket_name                = module.export_bucket.s3_bucket_name
       auth_url                                      = local.keycloak_auth_url
       consignment_api_url                           = module.consignment_api.api_url
       transfer_service_api_port                     = "8080"
@@ -195,6 +198,7 @@ module "transfer_service_ecs_task" {
       user_read_client_secret                       = local.keycloak_tdr_read_client_secret_name
       user_read_client_id                           = local.keycloak_user_read_client_id
       aggregate_processing_queue_url                = module.aggregate_processing_sqs_queue[0].sqs_queue_url
+      external_event_handling_queue_url             = local.event_handling_count > 0 ? module.external_event_handling_sqs_queue[0].sqs_queue_url : "https://sqs.${local.region}.amazonaws.com/${data.aws_caller_identity.current.account_id}/${local.sqs_name}"
       s3_acl_header_value                           = module.s3_put_request_header_acl_ssm_parameter.params[local.s3_put_request_header_acl_parameter].value
       s3_if_none_match_header_value                 = module.s3_put_request_header_if_none_match_ssm_parameter.params[local.s3_put_request_header_if_none_match_parameter].value
       block_api_documentation                       = local.block_api_documentation
